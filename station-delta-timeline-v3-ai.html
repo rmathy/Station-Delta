@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Station Delta — Master Timeline to Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06090d;--surface:#0b1018;--s2:#101822;--s3:#162030;
+  --border:#1c2a3a;--b2:#243447;--b3:#2d4160;
+  --text:#c4d4e0;--muted:#4a6275;--muted2:#6a8090;
+  --green:#1db954;--green-d:#0d5c28;--green-bg:#040f09;
+  --blue:#3b9eff;--blue-d:#0c3d6e;--blue-bg:#030d18;
+  --amber:#f59e0b;--amber-d:#7a4c05;--amber-bg:#160e02;
+  --red:#ef4444;--red-d:#7f1d1d;--red-bg:#140404;
+  --gold:#fbbf24;--gold-d:#3d2d00;--gold-bg:#130f00;
+  --purple:#a78bfa;--purple-d:#3b1f6e;--purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--mono)}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px);
+  z-index:9998}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 28px;height:52px;display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:200
+}
+.logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap}
+.logo-sep{color:var(--border)}
+.logo-sub{font-size:10px;color:var(--muted2);letter-spacing:.06em}
+.telem{margin-left:auto;font-size:10px;color:var(--muted2);letter-spacing:.08em;white-space:nowrap}
+.telem span{color:var(--green)}
+
+/* ── WRAP ── */
+.wrap{max-width:940px;margin:0 auto;padding:36px 28px 80px}
+
+/* ── HERO STAT BAR ── */
+.stat-bar{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  overflow:hidden;margin-bottom:32px;
+}
+.stat-cell{
+  padding:16px 14px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:4px;
+}
+.stat-cell:last-child{border-right:none}
+.stat-val{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.04em;line-height:1}
+.stat-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2)}
+.c-green{color:var(--green)}
+.c-amber{color:var(--amber)}
+.c-blue{color:var(--blue)}
+.c-gold{color:var(--gold)}
+.c-purple{color:var(--purple)}
+.c-muted{color:var(--muted2)}
+
+/* ── FOCUS BOX ── */
+.focus-box{
+  background:var(--s2);border:1px solid var(--amber-d);border-radius:6px;
+  padding:20px 24px;margin-bottom:32px;
+}
+.focus-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.focus-items{display:flex;flex-direction:column;gap:10px}
+.focus-item{display:flex;gap:12px;align-items:flex-start}
+.focus-num{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;border:1px solid
+}
+.fn-1{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.fn-2{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.fn-3{background:var(--blue-bg);border-color:var(--blue-d);color:var(--blue)}
+.focus-text-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+.focus-text-body{font-size:11px;color:var(--muted2);line-height:1.65}
+
+/* ── SECTION KICKER ── */
+.section-kicker{
+  font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin:28px 0 18px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.section-kicker::after{content:'';flex:1;height:1px;background:var(--border)}
+.sk-badge{
+  font-size:9px;padding:2px 8px;border-radius:2px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.skb-done{background:var(--green-d);color:var(--green)}
+.skb-now{background:var(--amber-d);color:var(--amber)}
+.skb-next{background:var(--blue-d);color:var(--blue)}
+.skb-future{background:var(--s3);color:var(--muted2);border:1px solid var(--border)}
+.skb-money{background:var(--gold-d);color:var(--gold)}
+.skb-arch{background:var(--purple-d);color:var(--purple)}
+
+/* ── TIMELINE ── */
+.timeline{position:relative}
+.timeline::before{
+  content:'';position:absolute;left:19px;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,var(--green),var(--border) 65%,transparent);
+  z-index:0
+}
+.tl-item{display:flex;gap:20px;margin-bottom:4px;position:relative;z-index:1}
+
+/* nodes */
+.tl-node{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;margin-top:2px;border:2px solid;
+}
+.nd-done{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.nd-active{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);animation:pulse 2.2s ease-in-out infinite}
+.nd-next{background:var(--blue-bg);border-color:var(--blue-d);color:var(--blue)}
+.nd-future{background:var(--s2);border-color:var(--border);color:var(--muted)}
+.nd-arch{background:var(--purple-bg);border-color:var(--purple-d);color:var(--purple)}
+.nd-milestone{background:var(--gold-bg);border-color:var(--gold);color:var(--gold)}
+
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 12px 2px rgba(245,158,11,.25)}}
+
+.tl-content{flex:1;padding-bottom:26px}
+.tl-period{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.tl-title{font-size:13px;font-weight:500;margin-bottom:7px;letter-spacing:.02em;line-height:1.4}
+
+/* title colors by state */
+.tl-done .tl-title{color:var(--green)}
+.tl-active .tl-title{color:var(--amber)}
+.tl-next .tl-title{color:var(--blue)}
+.tl-future .tl-title{color:var(--muted2)}
+.tl-arch .tl-title{color:var(--purple)}
+.tl-milestone .tl-title{color:var(--gold)}
+
+.tl-desc{font-size:11px;color:var(--muted2);line-height:1.8;margin-bottom:9px}
+.tl-desc strong{color:var(--text)}
+.tl-desc code{background:var(--s3);color:var(--cyan);padding:1px 5px;border-radius:3px;font-size:10px}
+
+/* checklist */
+.checklist{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.cl-item{display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.6}
+.cl-box{
+  width:13px;height:13px;border-radius:2px;
+  flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;
+}
+.cl-done .cl-box{background:var(--green-d);border:1px solid var(--green);color:var(--green)}
+.cl-partial .cl-box{background:var(--amber-d);border:1px solid var(--amber);color:var(--amber)}
+.cl-todo .cl-box{background:transparent;border:1px solid var(--b2)}
+.cl-done .cl-text{color:var(--muted)}
+.cl-partial .cl-text{color:var(--amber)}
+.cl-todo .cl-text{color:var(--muted2)}
+
+/* indent sub-items */
+.cl-sub{margin-left:20px;font-size:10px;color:var(--muted)}
+
+/* notes */
+.tl-note{
+  background:var(--s2);border-left:2px solid var(--amber);
+  padding:8px 12px;font-size:11px;color:var(--amber);
+  line-height:1.65;border-radius:0 3px 3px 0;margin-top:8px
+}
+.tl-note.green{border-color:var(--green);color:var(--green)}
+.tl-note.blue{border-color:var(--blue);color:var(--blue)}
+.tl-note.purple{border-color:var(--purple);color:var(--purple)}
+.tl-note strong{font-weight:600}
+
+/* warning box */
+.warn-box{
+  background:var(--red-bg);border:1px solid var(--red-d);border-radius:4px;
+  padding:10px 13px;font-size:11px;color:var(--red);line-height:1.65;margin-top:8px;
+}
+.warn-box strong{font-weight:600}
+
+/* arch box */
+.arch-box{
+  background:var(--purple-bg);border:1px solid var(--purple-d);border-radius:4px;
+  padding:12px 14px;font-size:11px;color:var(--muted2);line-height:1.75;margin-top:8px;
+}
+.arch-box .arch-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:7px;font-weight:700}
+.arch-box code{background:var(--s3);color:var(--cyan);padding:1px 5px;border-radius:3px;font-size:10px}
+.arch-box strong{color:var(--text)}
+
+/* tag rows */
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:9px;padding:2px 8px;border-radius:2px;letter-spacing:.06em;text-transform:uppercase}
+.tag-done{background:var(--green-d);color:var(--green)}
+.tag-now{background:var(--amber-d);color:var(--amber)}
+.tag-next{background:var(--blue-d);color:var(--blue)}
+.tag-future{background:var(--s3);color:var(--muted2);border:1px solid var(--border)}
+.tag-money{background:var(--gold-d);color:var(--gold)}
+.tag-arch{background:var(--purple-d);color:var(--purple)}
+
+.divider{height:1px;background:var(--border);margin:4px 0 0}
+
+/* feedback */
+.feedback-box{
+  background:var(--amber-bg);border:1px solid var(--amber-d);
+  border-radius:4px;padding:12px 14px;margin-top:9px
+}
+.feedback-title{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:7px}
+.feedback-note{font-size:11px;color:var(--muted2);line-height:1.7;margin-bottom:4px}
+.feedback-note::before{content:'→ ';color:var(--amber)}
+.feedback-note:last-child{margin-bottom:0}
+
+/* save key grid */
+.bug-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+.bug-cell{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-size:10px}
+.bug-label{color:var(--red);margin-bottom:3px;font-weight:500}
+.bug-fix{color:var(--green)}
+
+/* infra stack grid */
+.stack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stack-cell{
+  background:var(--s2);border:1px solid var(--border);border-radius:4px;
+  padding:10px 12px;font-size:11px
+}
+.stack-role{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.stack-tool{color:var(--text);font-weight:500;margin-bottom:2px}
+.stack-why{font-size:10px;color:var(--muted2);line-height:1.5}
+
+@media(max-width:700px){
+  .stat-bar{grid-template-columns:1fr 1fr 1fr}
+  .stat-cell:nth-child(3n){border-right:none}
+  .stat-cell:nth-child(n+4){border-top:1px solid var(--border)}
+  .stack-grid{grid-template-columns:1fr 1fr}
+  .bug-grid{grid-template-columns:1fr}
+  .topbar{padding:0 16px}
+  .wrap{padding:24px 16px 60px}
+}
+@media(max-width:500px){
+  .stat-bar{grid-template-columns:1fr 1fr}
+  .stat-cell:nth-child(2n){border-right:none}
+  .stat-cell:nth-child(n+3){border-top:1px solid var(--border)}
+  .stack-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">STATION DELTA</div>
+  <span class="logo-sep">·</span>
+  <div class="logo-sub">Master Timeline — Beta Edition</div>
+  <div class="telem">Updated: <span>April 2026</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- STAT BAR -->
+  <div class="stat-bar">
+    <div class="stat-cell">
+      <div class="stat-val c-green">6</div>
+      <div class="stat-label">Milestones done</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val c-amber">2</div>
+      <div class="stat-label">Active now</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val c-blue">~14</div>
+      <div class="stat-label">Weeks to beta</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val c-gold">$25/mo</div>
+      <div class="stat-label">Active tool spend</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val" style="color:var(--cyan)">13</div>
+      <div class="stat-label">Sims built</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val c-purple">Next.js</div>
+      <div class="stat-label">Real app target</div>
+    </div>
+  </div>
+
+  <!-- FOCUS BOX -->
+  <div class="focus-box">
+    <div class="focus-title">// The three things that matter right now — in order</div>
+    <div class="focus-items">
+      <div class="focus-item">
+        <div class="focus-num fn-1">1</div>
+        <div>
+          <div class="focus-text-title">Ship the Cadet feedback fixes</div>
+          <div class="focus-text-body">Sort student notes into fix / clarify / add. Fix the broken things first. Everything downstream depends on having a clean Cadet. Share notes here and fixes are written immediately.</div>
+        </div>
+      </div>
+      <div class="focus-item">
+        <div class="focus-num fn-2">2</div>
+        <div>
+          <div class="focus-text-title">Build Vibe Engineer — one phase per session</div>
+          <div class="focus-text-body">The outline is done. Say "build Phase 1 of Vibe Engineer" and it gets built. Don't try all 9 phases at once. Phase 1 + 2 first, test, then continue.</div>
+        </div>
+      </div>
+      <div class="focus-item">
+        <div class="focus-num fn-3">3</div>
+        <div>
+          <div class="focus-text-title">Get Lieutenant in front of real engineers this week</div>
+          <div class="focus-text-body">Lieutenant is live on Vercel. Every day it's not in front of experienced engineers is feedback you're not collecting. Share the URL today — imperfect is fine.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-kicker">// Acceleration Layer — AI + Automation <span class="sk-badge skb-now">Add now</span> <span class="sk-badge skb-money">Free-first</span></div>
+  <div class="timeline">
+
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">AI</div>
+      <div class="tl-content">
+        <div class="tl-period">Use immediately · Updated Apr 22, 2026</div>
+        <div class="tl-title">Free-first founder stack for a non-technical solo builder</div>
+        <div class="tl-desc">Use <strong>one primary coding agent</strong> so the workflow stays simple: Codex for repo edits, debugging, test plans, and "tell me exactly where this file goes." Use a second free chat model only as a reviewer or writing partner, not a second engineering lead. This reduces thrash and makes the product easier to operate without a software background.</div>
+        <div class="checklist">
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text"><strong>Primary engineering agent:</strong> Codex for code changes, bug fixes, file placement, and "what do I click next?" walkthroughs <strong>($25/month subscription active)</strong></div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>Secondary reviewer:</strong> Claude Free or another free model to critique copy, onboarding, and lesson flow before shipping</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>Free operating stack:</strong> GitHub Issues, GitHub Projects, Google Docs/Sheets, Loom or screen recordings for bug repros</div></div>
+          <div class="cl-item cl-partial"><div class="cl-box">~</div><div class="cl-text">Delay additional paid AI IDEs until Codex is clearly the bottleneck (keep paid stack to one tool)</div></div>
+        </div>
+        <div class="tl-note blue"><strong>Rule of thumb:</strong> every time AI generates code, also ask for four things in the same prompt: where the file goes, required env vars, how to test it, and how to roll it back.</div>
+        <div class="tl-note"><strong>Spend policy now:</strong> Codex is the only active software subscription at <strong>$25/month</strong>; all other tooling remains free tier until beta conversion is proven.</div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">4x</div>
+      <div class="tl-content">
+        <div class="tl-period">Reusable agents</div>
+        <div class="tl-title">Four repeatable agents that close the founder experience gap</div>
+        <div class="tl-desc">The founder does not need to become a full engineer. The faster path is to reuse the same four AI roles over and over until they become muscle memory.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>Spec Writer:</strong> turns rough ideas into a one-page build brief with acceptance criteria</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>Implementer:</strong> writes the actual code and names the exact files to change</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>QA Agent:</strong> generates a manual test script plus edge cases before anything ships</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>Feedback Synthesizer:</strong> converts user notes into fix / clarify / add, top issues, and homepage proof points</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">⟳</div>
+      <div class="tl-content">
+        <div class="tl-period">Weekly automations</div>
+        <div class="tl-title">Small automations to save founder hours every week</div>
+        <div class="tl-desc">The best low-cost automation is not fully autonomous coding. It is recurring synthesis and checklist generation so nothing important gets dropped.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">After every user test: summarize notes into fix / clarify / add + 3 highest-priority changes</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Every Friday: convert shipped work, bugs, and user quotes into next week's ranked backlog</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Before every release: generate a 10-minute regression checklist for Cadet, Engineer, auth, and paywall</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Once beta starts: draft 5 founder outreach messages per week for engineers, instructors, and design partners</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 0 — FOUNDATION (COMPLETE)
+       ════════════════════════════════════ -->
+  <div class="section-kicker">// Phase 0 — Foundation <span class="sk-badge skb-done">Complete</span></div>
+  <div class="timeline">
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">13 simulation files built</div>
+        <div class="tl-desc">All 13 HTML training sims created and deployed: Vibe Cadet, Vibe Lieutenant (v2 with LOLA strip + split pane), Agent Architect, Chaos Officer, Data Officer, Deployment Officer, FinOps, Performance Officer, Comms Officer, Security Officer, Systems Integrity, Vibe Captain. JANET protocol, spaced repetition, boss fights, career impact logs, and achievements fully working across the suite.</div>
+        <div class="tag-row"><span class="tag tag-done">13 sims</span><span class="tag tag-done">LOLA strip</span><span class="tag tag-done">JANET</span><span class="tag tag-done">Boss fights</span><span class="tag tag-done">Expert timer</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">GitHub + Vercel auto-deploy live</div>
+        <div class="tl-desc">Repository at <strong>rmathy-lang/vibe-academy</strong> connected to Vercel. Every push to main deploys in seconds. The product is on the internet — anyone in the world can play Vibe Cadet right now. <strong>Keep this on free infrastructure while prototyping, but plan a Vercel Pro upgrade before a commercial beta.</strong></div>
+        <div class="tl-note green">This is the moment the project became real. Everything before was building. This was shipping. <strong>$ Before real paid beta:</strong> move off Vercel Hobby so the deployment matches a commercial use case.</div>
+        <div class="tag-row"><span class="tag tag-done">GitHub</span><span class="tag tag-done">Vercel</span><span class="tag tag-done">Auto-deploy</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">Station Delta brand + full homepage live</div>
+        <div class="tl-desc">Rebranded from Vibe Academy. Production homepage with all 13 sims, pricing tiers, manager dashboard mockup, JANET section, "How it works" flow. Live at station-delta-one.vercel.app.</div>
+        <div class="tag-row"><span class="tag tag-done">Brand</span><span class="tag tag-done">Homepage</span><span class="tag tag-done">Pricing tiers</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">Vibe Cadet tested with real students</div>
+        <div class="tl-desc">First real-world user test completed with the AI Fluency and Future of Work class. Feedback collected. Real users, real confusion points, real "I get it" moments. That data is irreplaceable.</div>
+        <div class="feedback-box">
+          <div class="feedback-title">⚡ Pending: action items from student feedback</div>
+          <div class="feedback-note">Share your notes and they'll be sorted into fix / clarify / add buckets immediately</div>
+          <div class="feedback-note">Student confusion points from beginners are the most valuable data for Vibe Engineer onboarding</div>
+        </div>
+        <div class="tag-row"><span class="tag tag-done">Real users</span><span class="tag tag-done">Feedback collected</span><span class="tag tag-now">Fixes pending</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">Vibe Engineer 9-phase outline complete</div>
+        <div class="tl-desc">Full outline built: shell scripting, SSH, curl, jq + advanced pipes, Docker, advanced Git (fetch vs pull, rebase, bisect, cherry-pick), process management, .env mastery, capstone + boss fight. LOLA and JANET voice guides written. <strong>Live AI API call in Phase 4</strong> — the learner types a real curl command to Anthropic and LOLA responds from the live model. Ready to build phase by phase.</div>
+        <div class="tag-row"><span class="tag tag-done">9 phases outlined</span><span class="tag tag-done">Live AI plan</span><span class="tag tag-done">Boss fight designed</span><span class="tag tag-done">Voice guide</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-done">
+      <div class="tl-node nd-done">✓</div>
+      <div class="tl-content">
+        <div class="tl-period">Complete</div>
+        <div class="tl-title">Full series architecture + real-app migration plan designed</div>
+        <div class="tl-desc">Complete technical architecture documented: Next.js app shell, Supabase auth + database, Stripe payments, WebContainers for real command execution (Cadet/Engineer/Lieutenant), ephemeral Docker containers for advanced sims (Fleet). API proxy pattern to protect Anthropic key. Five-phase migration path from independent HTML files to production SaaS — sequenced for a solo non-technical founder.</div>
+        <div class="tag-row"><span class="tag tag-done">Architecture</span><span class="tag tag-done">Migration plan</span><span class="tag tag-done">5-phase infra sequence</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 1 — ACTIVE SPRINT
+       ════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="section-kicker">// Phase 1 — Active Sprint <span class="sk-badge skb-now">Right now</span></div>
+  <div class="timeline">
+
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">→</div>
+      <div class="tl-content">
+        <div class="tl-period">Now — Week 1–2</div>
+        <div class="tl-title">Process Cadet feedback + ship fixes</div>
+        <div class="tl-desc">Turn student feedback into three buckets: <strong>fix</strong> (broken), <strong>clarify</strong> (confusing), <strong>add</strong> (missing). Fix broken first, clarify second, add goes to backlog. Every fix goes to GitHub — Vercel auto-deploys in seconds.</div>
+        <div class="checklist">
+          <div class="cl-item cl-partial"><div class="cl-box">→</div><div class="cl-text">Collect and sort all student feedback notes into fix / clarify / add</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Use a feedback-synthesis agent to turn messy notes into a ranked fix list + GitHub Issues</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Identify top 3 confusion points — these become priority fixes</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fix broken commands or incorrect accept patterns</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Clarify LOLA hint language anywhere students got stuck for >2 minutes</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Log all "nice to have" suggestions as GitHub Issues for later</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Re-test with 2–3 students before moving on</div></div>
+        </div>
+        <div class="tl-note">Share feedback notes here. They'll be sorted immediately and fixes written to paste into GitHub.</div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">→</div>
+      <div class="tl-content">
+        <div class="tl-period">Now — Weeks 1–3</div>
+        <div class="tl-title">Build Vibe Engineer — one phase per session</div>
+        <div class="tl-desc">The outline is complete. Build phase by phase modeled on Cadet's code structure. The live AI integration in Phase 4 comes last. Don't build all 9 at once — each phase gets tested before the next is built.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Copy Vibe Cadet HTML as template — change title, save key to <code>vbe_v1</code>, color accents to amber/gold</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">For each phase, ask AI for the build bundle in one shot: code, acceptance tests, hint copy, and regression checklist</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 1 (Recall + Reorient) + Phase 2 (Shell Scripting) — test with a student</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 3 (SSH + Remote Access) + Phase 4 (curl + API Literacy) — test curl commands work</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 5 (jq + Advanced Pipes) + Phase 6 (Docker) — Docker is heaviest, test more carefully</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 7 (Advanced Git) + Phase 8 (.env + Process Management)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 9 (Full Stack Rescue) + Boss Fight (The Dead Server Protocol)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 4 Step 5: live AI call — add Anthropic API key to Vercel env vars, implement proxy</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Upload to GitHub → auto-deploys to Vercel</div></div>
+        </div>
+        <div class="tl-note blue">Say "build Phase 1 of Vibe Engineer" at any time. One phase at a time, modeled on Cadet.</div>
+      </div>
+    </div>
+
+    <!-- SAVE KEY BUG -->
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">⚠</div>
+      <div class="tl-content">
+        <div class="tl-period">Fix before any new users — critical bug</div>
+        <div class="tl-title">Fix 2 save key collisions across officer sims</div>
+        <div class="tl-desc">Two pairs of sims share the same <code>localStorage</code> save key. If a student plays both in the same browser, one silently corrupts the other's progress. This is a two-line fix per file but it will cause real user support problems if it ships to paying customers.</div>
+        <div class="bug-grid">
+          <div class="bug-cell">
+            <div class="bug-label">Chaos Officer + Comms Officer</div>
+            <div>Both use: <code style="color:var(--red)">vco_v1</code></div>
+            <div class="bug-fix">→ Change Chaos to: <code>vcho_v1</code></div>
+            <div class="bug-fix">→ Change Comms to: <code>vcmo_v1</code></div>
+          </div>
+          <div class="bug-cell">
+            <div class="bug-label">Deployment Officer + Data Officer</div>
+            <div>Both use: <code style="color:var(--red)">vdo_v1</code></div>
+            <div class="bug-fix">→ Change Deployment to: <code>vdep_v1</code></div>
+            <div class="bug-fix">→ Change Data to: <code>vdat_v1</code></div>
+          </div>
+        </div>
+        <div class="warn-box"><strong>One-line fix per file.</strong> Open each file, search for <code>SAVE_KEY</code>, update the string. Commit all four changes at once. Done in under 10 minutes.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 2 — TEST + REFINE
+       ════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="section-kicker">// Phase 2 — Test + Refine <span class="sk-badge skb-next">Weeks 3–6</span></div>
+  <div class="timeline">
+
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">3</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 3–4</div>
+        <div class="tl-title">Lieutenant tested with co-worker's engineer network</div>
+        <div class="tl-desc">Experienced engineers find different problems than students do. They'll hit edge cases, broken accept patterns, commands that should work but don't, and expert mode gaps that feel either too easy or unfair. Collect feedback the same way: fix / clarify / add.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Share the live Vercel URL — 5–10 people ideal</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Ask specifically: "What command did you type that should have worked but didn't?"</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Ask: "Where did expert mode feel too easy? Where did it feel unfair?"</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Ask for 2 sentences about the experience — that's your first social proof</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Run engineer notes through an AI summarizer to extract top 5 fixes, strongest quotes, and homepage wording</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fix the top 5 issues before beta</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">4</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 4–5</div>
+        <div class="tl-title">Vibe Engineer tested + iterated with students</div>
+        <div class="tl-desc">Run the same test cycle as Cadet: 3–5 students who completed Cadet complete Engineer start to finish. Specific things to watch: does the SSH section land? Does Docker Phase 6 lose them? Does fetch vs pull land? Does the live AI call in Phase 4 work reliably? Iterate on anything that causes 3+ people to get stuck.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test with students who completed Cadet — does the bridge feel natural?</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Time each phase — anything over 20 minutes needs to be split or simplified</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Verify Phase 4 live AI call works end-to-end in all browsers</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test expert mode with a developer</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fix top issues, re-test once, then lock the content</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">5</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 5–6</div>
+        <div class="tl-title">Finalize + polish the free tier — Cadet → Engineer → paywall</div>
+        <div class="tl-desc">Decision point: confirm free tier is Cadet + Engineer, with Lieutenant the first paid sim. If Engineer proves stronger than expected, the order may shift. By end of week 6 there should be a clean, tested free experience any stranger can discover and complete without confusion.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Confirm free tier order: Cadet → Engineer → (paywall) → Lieutenant (adjust if feedback suggests otherwise)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add "Next: Vibe Engineer →" CTA at Cadet graduation screen</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add "Next: Vibe Lieutenant →" CTA at Engineer graduation (teases paywall)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Update homepage rank strip to reflect confirmed free tier</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Make sure the three free sims flow as one experience, not three separate files</div></div>
+        </div>
+        <div class="tl-note">The graduation-to-next-sim CTA is the single most important conversion mechanic. Someone who finishes Cadet and sees a "Next" button converts at 3–4× the rate of someone who navigates back to the homepage.</div>
+      </div>
+    </div>
+
+    <!-- OFFICER SIM LOLA VOICE PASS -->
+    <div class="tl-item tl-next">
+      <div class="tl-node nd-next">5b</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 5–6 (parallel)</div>
+        <div class="tl-title">Add LOLA phase intros + series framing to officer sims</div>
+        <div class="tl-desc">The 9 officer sims currently have no <code>lolaIntro</code> per phase and no mention of where they sit in the series. Students landing on Security Officer cold don't know Lieutenant is a prerequisite. This is a content pass — no new engineering, just writing and pasting. Biggest quality gap between core series and officer track.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add boot modal line to each officer sim: "Recommended: complete Vibe Lieutenant first."</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Write 1–2 sentence LOLA phase intro for each of the 9 phases in each officer sim</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Priority order: Security, Deployment, Data (highest expected traffic), then the rest</div></div>
+        </div>
+        <div class="tl-note blue">Say "write LOLA phase intros for Security Officer" and they'll be generated in one pass, ready to paste.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 3 — REAL APP INFRASTRUCTURE
+       ════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="section-kicker">// Phase 3 — Real App Infrastructure <span class="sk-badge skb-future">Weeks 6–12</span> <span class="sk-badge skb-arch">Engineering</span></div>
+  <div class="timeline">
+
+    <!-- WHAT THIS PHASE IS -->
+    <div class="tl-item tl-arch">
+      <div class="tl-node nd-arch">∑</div>
+      <div class="tl-content">
+        <div class="tl-period">Context — read before starting Phase 3</div>
+        <div class="tl-title">Why move from HTML files to a real app — and what that means for a solo founder</div>
+        <div class="tl-desc">This phase converts Station Delta from 13 independent HTML files into a proper SaaS product. This is the right move, and it needs to happen <strong>before</strong> you have paying fleet customers — not after. The specific problems it solves:</div>
+        <div class="arch-box">
+          <div class="arch-title">What gets fixed in this phase</div>
+          <strong>1. Real execution score</strong> — Commands that actually run via WebContainers. Real <code>ls</code>, <code>cat</code>, <code>git</code>, <code>bun install</code>. Not simulated output.<br><br>
+          <strong>2. API key safety</strong> — Key lives only on the server. A leaked endpoint requires a valid session token to use. Your key is never in client JavaScript.<br><br>
+          <strong>3. Fleet is possible</strong> — Progress in a database means manager dashboards, CLI heat maps, time-to-solution tracking, and custom scenarios per org.<br><br>
+          <strong>4. Save key collisions die forever</strong> — localStorage goes away. Every user has a real session.
+        </div>
+        <div class="tl-note purple"><strong>For a solo non-technical founder:</strong> Claude writes every line of this code. Your job is to understand what each piece does well enough to paste it in the right place, set the right environment variables, and test that it works. Each step below is scoped to be completable in 1–2 days with AI assistance.</div>
+        <div class="tag-row"><span class="tag tag-arch">Next.js</span><span class="tag tag-arch">Supabase</span><span class="tag tag-arch">Stripe</span><span class="tag tag-arch">WebContainers</span></div>
+      </div>
+    </div>
+
+    <!-- INFRA STACK -->
+    <div class="tl-item tl-arch">
+      <div class="tl-node nd-arch">◈</div>
+      <div class="tl-content">
+        <div class="tl-period">Reference — the full stack</div>
+        <div class="tl-title">Technology decisions — rationale for each</div>
+        <div class="stack-grid">
+          <div class="stack-cell">
+            <div class="stack-role">Frontend + routing</div>
+            <div class="stack-tool">Next.js 14 (App Router)</div>
+            <div class="stack-why">Vercel already hosts it. Zero new infrastructure. Claude knows it extremely well — code generation is reliable.</div>
+          </div>
+          <div class="stack-cell">
+            <div class="stack-role">Auth + database</div>
+            <div class="stack-tool">Supabase</div>
+            <div class="stack-why">Free tier is generous. Handles auth, Postgres, and real-time. One service for three things. Excellent Claude integration.</div>
+          </div>
+          <div class="stack-cell">
+            <div class="stack-role">Payments</div>
+            <div class="stack-tool">Stripe</div>
+            <div class="stack-why">Industry standard. Excellent documentation. Claude can generate Stripe webhook handlers reliably. Takes ~1 day to integrate.</div>
+          </div>
+          <div class="stack-cell">
+            <div class="stack-role">Real execution (Cadet–Lieutenant)</div>
+            <div class="stack-tool">WebContainers (StackBlitz)</div>
+            <div class="stack-why">Runs a real Node.js environment in the browser — zero server cost. Real <code>git</code>, <code>bun</code>, file system. Free API.</div>
+          </div>
+          <div class="stack-cell">
+            <div class="stack-role">Rate limiting</div>
+            <div class="stack-tool">Upstash Redis</div>
+            <div class="stack-why">Serverless Redis, free tier. Handles per-user API call limits for LOLA. One line of code to set up with Claude's help.</div>
+          </div>
+          <div class="stack-cell">
+            <div class="stack-role">Analytics</div>
+            <div class="stack-tool">PostHog</div>
+            <div class="stack-why">Free tier covers early-stage. One script tag. Tracks phase completions, drop-off points, quiz answers. No data engineering needed yet.</div>
+          </div>
+        </div>
+        <div class="tl-note blue">Real execution for Engineer (SSH, Docker) requires ephemeral server containers — that's a Fleet-tier feature, Phase 5 of migration, not needed for beta. WebContainers handles everything through Lieutenant.</div>
+      </div>
+    </div>
+
+    <!-- INFRA STEP 1: AUTH -->
+    <div class="tl-item">
+      <div class="tl-node nd-future">6</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 6–7 · ~1 week · Claude writes everything</div>
+        <div class="tl-title">Step 1: Supabase auth + cloud progress saves</div>
+        <div class="tl-desc">The step that turns a demo into a product. Free users create an account, log in, and their progress saves to a database — not just their browser. This kills the localStorage save-key collision bugs permanently and makes the manager dashboard possible. <strong>Claude generates every line. You paste it in.</strong> <strong>Timeline improvement:</strong> start this in parallel as soon as Cadet fixes stabilize; do not wait for every content polish item to be perfect.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create Supabase account + project (5 min, free) — get project URL and anon key</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Say "scaffold a Next.js app with Supabase auth" — paste the generated code</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Build <code>signup.html</code> and <code>login.html</code> — Claude generates, you paste, Vercel deploys</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create Supabase <code>sim_progress</code> table (SQL provided — paste into Supabase SQL editor)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add auth check to top of each sim — redirects to login if not authenticated</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Replace <code>localStorage.setItem</code> calls with Supabase upsert (Claude rewrites these)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Keep one AI-written setup runbook so future changes do not require re-learning the stack from scratch</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test: complete Phase 1, log out, log in on different browser — progress should be there</div></div>
+        </div>
+        <div class="tag-row"><span class="tag tag-future">Supabase</span><span class="tag tag-future">Auth</span><span class="tag tag-future">Cloud saves</span></div>
+      </div>
+    </div>
+
+    <!-- INFRA STEP 2: API PROXY -->
+    <div class="tl-item">
+      <div class="tl-node nd-future">7</div>
+      <div class="tl-content">
+        <div class="tl-period">Week 7 · ~2–3 days · Highest priority security fix · $ API spend starts here</div>
+        <div class="tl-title">$ Step 2: LOLA API proxy — key never in client code</div>
+        <div class="tl-desc">Right now, if Vibe Engineer's Phase 4 live AI call is implemented naively, the API key would be visible in client JavaScript. This step moves it server-side permanently. A leaked endpoint URL is useless without a valid session token. Your key is safe even if someone inspects the source.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add <code>ANTHROPIC_API_KEY</code> to Vercel environment variables (not in any code file)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Say "create a Next.js API route that proxies Anthropic messages with session auth and rate limiting" — paste the generated file to <code>/app/api/lola/route.ts</code></div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create Upstash Redis account (free) — add connection string to Vercel env vars</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Update Vibe Engineer Phase 4 to call <code>/api/lola</code> instead of Anthropic directly</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test: verify key is not visible in browser network inspector</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">$ Add Anthropic API credits only when the live AI phase is ready, and set a hard monthly cap ($20–50 backstop)</div></div>
+        </div>
+        <div class="warn-box"><strong>Do not ship Vibe Engineer to real users before this step is complete.</strong> Once the proxy is in, a user finding the endpoint URL can only burn their own rate limit — not your account.</div>
+        <div class="tag-row"><span class="tag tag-future">Anthropic API</span><span class="tag tag-future">Next.js route</span><span class="tag tag-future">Upstash Redis</span></div>
+      </div>
+    </div>
+
+    <!-- INFRA STEP 3: STRIPE -->
+    <div class="tl-item">
+      <div class="tl-node nd-future">8</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 7–8 · ~1 week · First revenue possible · $ transaction fees only</div>
+        <div class="tl-title">$ Step 3: Stripe paywall for Officer + Captain tiers</div>
+        <div class="tl-desc">The step that converts Station Delta from a free demo to a business. A user finishing Engineer sees the Lieutenant paywall. One Stripe payment. One Supabase tier field flips from <code>free</code> to <code>officer</code>. Three moving parts total — Claude writes all of them.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create Stripe account + verify identity (1–2 days for approval — start early)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create "Officer" product at $19/month and "Captain" at $39/month in Stripe dashboard</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add <code>tier</code> column to Supabase profiles table (default: <code>free</code>)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Build upgrade page — simple Stripe payment link first, no custom checkout needed yet</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Say "create a Next.js Stripe webhook handler that updates Supabase tier on payment" — paste it in</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add tier check to Lieutenant and all paid sims — redirect to upgrade page if <code>tier === 'free'</code></div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test full loop: sign up free → hit paywall → pay $19 → access unlocked</div></div>
+        </div>
+        <div class="tag-row"><span class="tag tag-money">First revenue possible</span><span class="tag tag-future">Stripe</span><span class="tag tag-future">Supabase webhooks</span></div>
+      </div>
+    </div>
+
+    <!-- INFRA STEP 4: WEBCONTAINERS -->
+    <div class="tl-item">
+      <div class="tl-node nd-future">9</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 8–10 · ~2 weeks · Biggest quality jump</div>
+        <div class="tl-title">Step 4: WebContainers — real command execution for Cadet + Lieutenant</div>
+        <div class="tl-desc">WebContainers runs a real Node.js environment directly in the browser. Commands actually execute. <code>ls -la</code> lists real files. <code>git log</code> shows a real history. <code>bun install</code> actually installs packages. No servers, no containers, no cost per session. This is the fix for the "real execution" gap that no competitor has. The sim content stays the same — only how commands run changes.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Read WebContainer API docs (webcontainer.io) — 30 min, Claude can walk you through it</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Say "integrate WebContainer into the Vibe Cadet terminal so commands actually execute" — get the boilerplate</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Define the simulated filesystem for each sim (the files students interact with: <code>logs.txt</code>, <code>package.json</code>, etc.)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Replace string-match validation with process exit code + stdout validation</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Test Cadet Phases 1–5 with real execution — fix any commands that behave differently than expected</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Apply to Lieutenant — validate all 9 phases still work</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Apply to Vibe Engineer Phases 1–5 (Shell scripting, curl, jq — all work in WebContainers)</div></div>
+        </div>
+        <div class="tl-note blue"><strong>What WebContainers does NOT cover:</strong> SSH to external hosts, Docker daemon, and real network calls to external APIs. These are Fleet-tier features for a later phase. Everything through Lieutenant works in WebContainers.</div>
+        <div class="tag-row"><span class="tag tag-future">WebContainers</span><span class="tag tag-future">xterm.js</span><span class="tag tag-future">Real execution</span></div>
+      </div>
+    </div>
+
+    <!-- INFRA STEP 5: ANALYTICS + DASHBOARD -->
+    <div class="tl-item">
+      <div class="tl-node nd-future">10</div>
+      <div class="tl-content">
+        <div class="tl-period">Weeks 10–12 · ~1 week · Optional to move just after beta</div>
+        <div class="tl-title">Step 5: PostHog analytics + user dashboard</div>
+        <div class="tl-desc">Users see what they've completed and what's next. You see how people actually move through the sims — where they drop off, which phases take longest, which quizzes they fail. <strong>Timeline improvement:</strong> if time gets tight, ship beta with auth + paywall + basic logs first, then add this immediately after the first 3 paying users. PostHog's free tier is large enough that cost should not force the timing.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add PostHog script tag — one line, tracks phase completions, quiz answers, drop-off points automatically</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create <code>command_events</code> table in Supabase — logs every command attempt with timestamp and outcome</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Build <code>dashboard.html</code> — shows user's completed sims, scores, time spent (Claude generates)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add "Start next sim" button on each graduation screen — links to next in sequence</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Verify PostHog is capturing events in the dashboard before moving to beta</div></div>
+        </div>
+        <div class="tag-row"><span class="tag tag-future">PostHog</span><span class="tag tag-future">Supabase telemetry</span><span class="tag tag-future">Dashboard</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 4 — BETA LAUNCH
+       ════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="section-kicker">// Phase 4 — Beta Launch <span class="sk-badge skb-money">Weeks 12–16</span></div>
+  <div class="timeline">
+
+    <div class="tl-item tl-milestone">
+      <div class="tl-node nd-milestone">★</div>
+      <div class="tl-content">
+        <div class="tl-period">Week 12–14 target</div>
+        <div class="tl-title">Beta launch — first paying strangers</div>
+        <div class="tl-desc">Everything is in place: 3 free sims with real command execution, paywall, logins, Stripe, a homepage that explains the value, and an API that doesn't leak. The goal is <strong>3 paying strangers</strong>. Not 300. Not 30. Three people who found it, tried it, and paid for it. That's proof the product sells itself.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">$ Upgrade Vercel before taking paid customers so production is not running on a personal-use hobby tier</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Post "Show HN" on Hacker News — honest origin story (educator learning to code with AI), no hype</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Post on Indie Hackers — the community loves the "non-technical founder" narrative</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Send 20 direct LinkedIn messages to engineering managers — ask for feedback, not money</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Onboard 5 design partner orgs at $0 for structured weekly feedback</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add a one-question feedback form to every graduation screen</div></div>
+        </div>
+        <div class="tl-note green"><strong>Beta success criteria:</strong> 3 paying users you didn't personally know. That single signal proves the product sells itself and validates every subsequent investment of time.</div>
+        <div class="tag-row"><span class="tag tag-money">Revenue target: first $57</span><span class="tag tag-future">Hacker News</span><span class="tag tag-future">Indie Hackers</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 5 — POST-BETA / FLEET
+       ════════════════════════════════════ -->
+  <div class="divider"></div>
+  <div class="section-kicker">// Phase 5 — Fleet + Scale <span class="sk-badge skb-future">Month 4–6</span> <span class="sk-badge skb-money">Real revenue</span></div>
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-node nd-future">→</div>
+      <div class="tl-content">
+        <div class="tl-period">Month 4–6 — after beta signals confirmed</div>
+        <div class="tl-title">$ Fleet tier: team dashboard + CLI heat maps + custom scenarios</div>
+        <div class="tl-desc">These are the features that make this a B2B product rather than an individual learning tool. They come after real paying users have told you what they actually need. Building them before beta wastes time on features no one asked for. This is when Fleet at $29/seat becomes the actual business.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">AI debrief: post-session Claude analysis of every decision made during the sim</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Team dashboard: manager view — all users, completion rates, scores, time-to-solution per step</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">CLI heat maps: command-frequency data per user, per team, vs all users (D3 visualization)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Custom scenario editor: Fleet customers add their own phases via JSON (no engineering needed)</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fleet tier billing: $29/seat/month, 5-seat minimum, annual option at $290/seat</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Ephemeral server containers for Engineer SSH/Docker (Fleet-only, ~$0.03/session-hour on AWS Fargate)</div></div>
+        </div>
+        <div class="tl-note purple"><strong>One Fleet account at 20 seats = $580/month</strong>. That's equivalent to 30 individual Officer subscribers. Prioritize landing 3 Fleet accounts over 90 individual accounts — the economics are better and the product-market fit signal is stronger.</div>
+        <div class="tag-row"><span class="tag tag-future">Anthropic API</span><span class="tag tag-future">D3</span><span class="tag tag-money">Fleet = $29/seat</span><span class="tag tag-arch">AWS Fargate</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════
+       BOTTOM REFERENCE
+       ════════════════════════════════════ -->
+  <div class="divider" style="margin-top:12px"></div>
+
+  <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-top:24px">
+    <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:14px">// What Claude handles vs. what you handle</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:8px">Claude writes</div>
+        <div style="font-size:11px;color:var(--muted2);line-height:2">
+          All sim content (phases, LOLA, JANET)<br>
+          All infrastructure code (Next.js, Supabase, Stripe, WebContainers)<br>
+          All API routes and webhook handlers<br>
+          All dashboard and UI components<br>
+          All SQL schema and Supabase queries<br>
+          Fixes from student and engineer feedback
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:8px">You do</div>
+        <div style="font-size:11px;color:var(--muted2);line-height:2">
+          Create accounts (Supabase, Stripe, Vercel, PostHog)<br>
+          Paste generated code into the right files<br>
+          Set environment variables in Vercel dashboard<br>
+          Test each step works before proceeding<br>
+          Share with real users and collect feedback<br>
+          Make product decisions (pricing, free tier, content order)
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted2);line-height:1.7">
+      <span style="color:var(--cyan)">The model:</span> you are the product designer, educator, and decision-maker. Claude is the engineering team. Every item in this timeline that says "Claude generates" or "say X and get Y" is exactly that — ask, get code, paste, test, ship.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
