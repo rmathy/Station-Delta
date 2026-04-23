@@ -80,18 +80,18 @@ nav{
   background:rgba(4,7,10,.92);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(12px);
-  display:flex;align-items:center;padding:0 32px;height:56px;gap:0;
+  display:flex;align-items:center;padding:0 32px;height:60px;gap:0;
 }
 .nav-brand{display:flex;align-items:center;gap:14px;margin-right:auto;}
-.nav-delta{font-family:var(--display);font-size:26px;letter-spacing:.12em;color:var(--text-bright);line-height:1;}
-.nav-station{font-family:var(--janet);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted2);border-left:1px solid var(--border);padding-left:14px;line-height:1.4;}
-.nav-station span{display:block;color:var(--green);font-size:8px}
-.nav-status{display:flex;align-items:center;gap:6px;font-family:var(--janet);font-size:10px;color:var(--muted2);letter-spacing:.1em;margin-right:28px;}
+.nav-delta{font-family:var(--display);font-size:27px;letter-spacing:.12em;color:var(--text-bright);line-height:1;}
+.nav-station{font-family:var(--janet);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted2);border-left:1px solid var(--border);padding-left:14px;line-height:1.45;}
+.nav-station span{display:block;color:var(--green);font-size:9px}
+.nav-status{display:flex;align-items:center;gap:6px;font-family:var(--janet);font-size:11px;color:var(--muted2);letter-spacing:.1em;margin-right:28px;}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:statusBlink 2s infinite}
 .nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{font-family:var(--ui);font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;padding:6px 14px;border-radius:3px;transition:all .15s;}
+.nav-link{font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;padding:7px 14px;border-radius:3px;transition:all .15s;}
 .nav-link:hover{color:var(--text);background:rgba(255,255,255,.03)}
-.nav-cta{font-family:var(--ui);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--bg);background:var(--green-m);text-decoration:none;padding:7px 18px;border-radius:3px;transition:all .15s;margin-left:8px;}
+.nav-cta{font-family:var(--ui);font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--bg);background:var(--green-m);text-decoration:none;padding:8px 18px;border-radius:3px;transition:all .15s;margin-left:8px;}
 .nav-cta:hover{background:var(--green);box-shadow:0 0 20px rgba(0,255,136,.3)}
 
 /* ═══ HERO ═══ */
@@ -119,6 +119,8 @@ nav{
 .btn-primary:hover{background:var(--green);box-shadow:0 0 28px rgba(0,255,136,.35);transform:translateY(-1px)}
 .btn-outline{font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--text);text-decoration:none;padding:13px 32px;border-radius:3px;border:1px solid var(--border);transition:all .2s;}
 .btn-outline:hover{border-color:var(--b2);background:rgba(255,255,255,.02);transform:translateY(-1px)}
+.btn-janet{font-family:var(--ui);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(143,168,184,.08);color:var(--silver);text-decoration:none;padding:13px 32px;border-radius:3px;border:1px solid var(--silver-d);transition:all .2s;cursor:pointer}
+.btn-janet:hover{background:rgba(143,168,184,.13);border-color:var(--silver);transform:translateY(-1px)}
 
 /* STAT BAR */
 .stat-bar{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;animation:fadeUp .6s .3s ease both;}
@@ -139,15 +141,15 @@ section{position:relative;z-index:1}
 /* ═══ RANK TRACK ═══ */
 .rank-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .rank-track{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;}
-.rank-item{padding:18px 16px;border-right:1px solid var(--border);text-align:center;transition:background .15s;cursor:default;}
+.rank-item{padding:24px 18px;border-right:1px solid var(--border);text-align:center;transition:background .15s;cursor:default;}
 .rank-item:last-child{border-right:none}
 .rank-item:hover{background:var(--s2)}
-.rank-num{font-family:var(--janet);font-size:9px;color:var(--muted);letter-spacing:.2em;margin-bottom:4px}
-.rank-name{font-family:var(--display);font-size:16px;letter-spacing:.1em}
-.rank-price{font-family:var(--janet);font-size:10px;margin-top:3px}
-.rank-free .rank-name{color:var(--green-m)}.rank-free .rank-price{color:var(--green-d);border:1px solid var(--green-d);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
-.rank-off .rank-name{color:var(--blue)}.rank-off .rank-price{color:var(--blue-d);border:1px solid var(--blue-d);background:rgba(77,184,255,.05);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
-.rank-cap .rank-name{color:var(--amber)}.rank-cap .rank-price{color:var(--amber-d);border:1px solid var(--amber-d);background:rgba(255,183,0,.05);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
+.rank-num{font-family:var(--janet);font-size:10px;color:var(--muted);letter-spacing:.2em;margin-bottom:6px}
+.rank-name{font-family:var(--display);font-size:21px;letter-spacing:.1em}
+.rank-price{font-family:var(--janet);font-size:11px;margin-top:6px}
+.rank-free .rank-name{color:var(--green-m)}.rank-free .rank-price{color:var(--green-d);border:1px solid var(--green-d);display:inline-block;padding:2px 9px;border-radius:2px;font-size:9px;letter-spacing:.1em}
+.rank-off .rank-name{color:var(--blue)}.rank-off .rank-price{color:var(--blue-d);border:1px solid var(--blue-d);background:rgba(77,184,255,.05);display:inline-block;padding:2px 9px;border-radius:2px;font-size:9px;letter-spacing:.1em}
+.rank-cap .rank-name{color:var(--amber)}.rank-cap .rank-price{color:var(--amber-d);border:1px solid var(--amber-d);background:rgba(255,183,0,.05);display:inline-block;padding:2px 9px;border-radius:2px;font-size:9px;letter-spacing:.1em}
 
 /* ═══ CAREER TRACKS ═══ */
 .tracks-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -236,6 +238,40 @@ section{position:relative;z-index:1}
 .janet-status-text{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
 .janet-body{background:#060a0c;padding:22px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:2}
 .janet-body em{color:var(--silver-d);font-style:normal}
+
+/* ═══ JANET TRACK QUIZ MODAL ═══ */
+.jq-modal{position:fixed;inset:0;z-index:3000;background:rgba(2,5,8,.86);display:none;align-items:center;justify-content:center;padding:18px}
+.jq-modal.open{display:flex}
+.jq-card{width:min(880px,96vw);max-height:92vh;overflow:auto;border:1px solid var(--silver-d);border-radius:6px;background:#060a0c;box-shadow:0 20px 80px rgba(0,0,0,.5)}
+.jq-top{background:linear-gradient(90deg,#0f151b,#091016);border-bottom:1px solid var(--silver-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.jq-logo{font-family:var(--janet);font-size:12px;letter-spacing:.28em;color:#dce5ea}
+.jq-logo span{color:var(--silver-d)}
+.jq-status{margin-left:auto;font-family:var(--janet);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver-d)}
+.jq-close{border:1px solid var(--silver-d);background:transparent;color:var(--silver);font-family:var(--janet);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-radius:3px;padding:4px 9px;cursor:pointer}
+.jq-close:hover{border-color:var(--silver);color:var(--text-bright)}
+.jq-body{padding:18px 18px 14px}
+.jq-intro{border:1px solid #1d2935;background:#091118;border-radius:4px;padding:14px 14px 10px;font-family:var(--janet);font-size:12px;line-height:1.8;color:var(--silver);margin-bottom:12px}
+.jq-rules{font-family:var(--janet);font-size:10px;letter-spacing:.09em;color:var(--silver-d);text-transform:uppercase;margin-bottom:14px}
+.jq-q-label{font-family:var(--janet);font-size:10px;letter-spacing:.16em;color:var(--silver-d);text-transform:uppercase;margin-bottom:8px}
+.jq-q-prompt{font-family:var(--ui);font-size:20px;letter-spacing:.03em;color:var(--text-bright);line-height:1.3;margin-bottom:12px}
+.jq-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.jq-opt{border:1px solid var(--border);background:var(--surface);padding:12px 12px;text-align:left;border-radius:4px;cursor:pointer;color:var(--text);font-family:var(--ui);font-size:14px;line-height:1.45;transition:all .15s}
+.jq-opt:hover{border-color:var(--silver-d);background:#0e151d}
+.jq-foot{padding:12px 18px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.jq-prog{font-family:var(--janet);font-size:10px;letter-spacing:.14em;color:var(--silver-d);text-transform:uppercase}
+.jq-actions{display:flex;gap:8px}
+.jq-btn{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:8px 14px;border:1px solid var(--b2);background:var(--surface);color:var(--text);cursor:pointer}
+.jq-btn:hover{border-color:var(--silver-d);color:var(--text-bright)}
+.jq-btn.primary{border-color:var(--silver-d);background:rgba(143,168,184,.11);color:var(--text-bright)}
+.jq-result{border:1px solid var(--silver-d);background:#080f14;border-radius:4px;padding:14px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8}
+.jq-result strong{color:var(--text-bright)}
+.jq-reco{margin-top:10px;font-family:var(--ui);font-size:14px;color:var(--text)}
+.jq-note{margin-top:8px;font-family:var(--janet);font-size:10px;letter-spacing:.08em;color:var(--silver-d);text-transform:uppercase}
+.track-card.quiz-track-focus{outline:2px solid var(--silver);outline-offset:-2px;box-shadow:0 0 28px rgba(143,168,184,.25)}
+@media(max-width:760px){
+  .jq-opts{grid-template-columns:1fr}
+  .jq-q-prompt{font-size:17px}
+}
 
 /* ═══ PRICING ═══ */
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
@@ -390,6 +426,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
   </p>
   <div class="hero-btns">
     <a href="#tracks" class="btn-primary">Choose your track →</a>
+    <button class="btn-janet" type="button" onclick="showTrackPlacementQuizWithJanet()">Take J.A.N.E.T. placement quiz</button>
     <a href="#simulations" class="btn-outline">View all 13 simulations</a>
   </div>
   <div class="stat-bar">
@@ -1074,6 +1111,24 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
   </div>
 </section>
 
+<!-- JANET TRACK QUIZ MODAL -->
+<div id="janet-track-quiz" class="jq-modal" aria-hidden="true">
+  <div class="jq-card" role="dialog" aria-modal="true" aria-labelledby="jq-title">
+    <div class="jq-top">
+      <div class="jq-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+      <div id="jq-title" class="jq-status">Track Placement Assessment</div>
+      <button class="jq-close" type="button" onclick="closeTrackPlacementQuiz()">Close</button>
+    </div>
+    <div class="jq-body" id="jq-body"></div>
+    <div class="jq-foot">
+      <div class="jq-prog" id="jq-progress"></div>
+      <div class="jq-actions">
+        <button id="jq-back" class="jq-btn" type="button" onclick="janetQuizBack()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
@@ -1122,6 +1177,215 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div class="footer-copy">J.A.N.E.T. is always watching · She notes this without comment</div>
   </div>
 </footer>
+
+<script>
+const TRACK_PLACEMENT_QUIZ = {
+  janetIntro: [
+    "Attention, learner.",
+    "I am J.A.N.E.T.: Just Another Normal Education Test.",
+    "Yes, the bane of your existence. Your emotional response has been logged and ignored.",
+    "You will answer seven questions. I will route you to the track you are most likely to survive."
+  ],
+  janetRules: "One selection per question. No overthinking. I am measuring direction, not destiny.",
+  questions: [
+    { id: "q1", prompt: "Which problem sounds most worth solving?", options: [
+      { text: "Prevent breaches, lock down access, reduce risk.", track: "security" },
+      { text: "Ship reliable releases with minimal downtime.", track: "deployment" },
+      { text: "Turn messy data into clear decisions.", track: "data" },
+      { text: "Build AI workflows that actually work in production.", track: "ai" }
+    ]},
+    { id: "q2", prompt: "An incident starts. Your first terminal instinct is to:", options: [
+      { text: "Inspect auth logs and permission changes.", track: "security" },
+      { text: "Check pipeline status and rollback path.", track: "deployment" },
+      { text: "Pull metrics and trend anomalies.", track: "data" },
+      { text: "Use an AI assistant to summarize signals quickly.", track: "ai" }
+    ]},
+    { id: "q3", prompt: "Which output feels most actionable to you?", options: [
+      { text: "Vulnerability report and IAM diff.", track: "security" },
+      { text: "CI/CD logs, container health, deploy events.", track: "deployment" },
+      { text: "SQL results and dashboard deltas.", track: "data" },
+      { text: "Prompt eval results and agent traces.", track: "ai" }
+    ]},
+    { id: "q4", prompt: "What would you improve first on a real team?", options: [
+      { text: "Secret handling, access controls, policy hygiene.", track: "security" },
+      { text: "Release process, rollback safety, uptime confidence.", track: "deployment" },
+      { text: "Data quality, instrumentation, reporting trust.", track: "data" },
+      { text: "Prompt quality, agent reliability, automation guardrails.", track: "ai" }
+    ]},
+    { id: "q5", prompt: "You feel most satisfied when you:", options: [
+      { text: "Close security gaps before they become incidents.", track: "security" },
+      { text: "Ship cleanly with fewer broken releases.", track: "deployment" },
+      { text: "Find signal in noise and explain it clearly.", track: "data" },
+      { text: "Make AI systems useful, predictable, and safe.", track: "ai" }
+    ]},
+    { id: "q6", prompt: "Choose one mini-mission.", options: [
+      { text: "Rotate exposed keys and enforce least privilege.", track: "security" },
+      { text: "Write a deploy checklist and rollback runbook.", track: "deployment" },
+      { text: "Build a KPI panel from raw logs.", track: "data" },
+      { text: "Design a multi-agent workflow with clear constraints.", track: "ai" }
+    ]},
+    { id: "q7", prompt: "How confident are you in this direction?", options: [
+      { text: "1-2: Not very. I want safer recommendations.", confidence: "low" },
+      { text: "3-5: Confident. Route me directly.", confidence: "high" }
+    ]}
+  ],
+  trackNames: {
+    security: "Security & Reliability",
+    deployment: "Platform & Delivery",
+    data: "Data & Intelligence",
+    ai: "AI Systems"
+  },
+  janetResult: {
+    security: "Assessment complete. You optimize for prevention, control, and blast-radius reduction. Security track assigned.",
+    deployment: "Assessment complete. You optimize for stable delivery under pressure. Platform track assigned.",
+    data: "Assessment complete. You optimize for evidence over opinion. Data track assigned.",
+    ai: "Assessment complete. You optimize for AI systems that work in reality, not demos. AI Systems track assigned.",
+    dual: "Assessment complete. You are split between two viable paths. Inconvenient, but workable.",
+    low: "Your uncertainty is statistically normal. Explore mode is enabled."
+  },
+  janetCta: [
+    "Routing complete.",
+    "Select your assigned track and begin.",
+    "If you disagree with my recommendation, you may retake this assessment once and pretend that was your plan all along."
+  ]
+};
+
+const JANET_TRACK_SELECTOR = {
+  security: ".track-card.track-security",
+  deployment: ".track-card.track-platform",
+  data: ".track-card.track-data",
+  ai: ".track-card.track-ai"
+};
+
+const janetQuizState = { i: 0, answers: [] };
+
+function showTrackPlacementQuizWithJanet() {
+  janetQuizState.i = 0;
+  janetQuizState.answers = [];
+  const modal = document.getElementById("janet-track-quiz");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+  renderJanetQuestion();
+}
+
+function closeTrackPlacementQuiz() {
+  const modal = document.getElementById("janet-track-quiz");
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function janetQuizBack() {
+  if (janetQuizState.i === 0) return;
+  janetQuizState.i -= 1;
+  janetQuizState.answers.pop();
+  renderJanetQuestion();
+}
+
+function janetChooseOption(idx) {
+  janetQuizState.answers[janetQuizState.i] = idx;
+  janetQuizState.i += 1;
+  if (janetQuizState.i >= TRACK_PLACEMENT_QUIZ.questions.length) {
+    renderJanetResults();
+    return;
+  }
+  renderJanetQuestion();
+}
+
+function renderJanetQuestion() {
+  const q = TRACK_PLACEMENT_QUIZ.questions[janetQuizState.i];
+  const body = document.getElementById("jq-body");
+  const prog = document.getElementById("jq-progress");
+  const back = document.getElementById("jq-back");
+  back.disabled = janetQuizState.i === 0;
+
+  const introHtml = janetQuizState.i === 0
+    ? `<div class="jq-intro">${TRACK_PLACEMENT_QUIZ.janetIntro.join("<br>")}</div><div class="jq-rules">${TRACK_PLACEMENT_QUIZ.janetRules}</div>`
+    : "";
+
+  const optsHtml = q.options.map((opt, idx) =>
+    `<button class="jq-opt" type="button" onclick="janetChooseOption(${idx})">${opt.text}</button>`
+  ).join("");
+
+  body.innerHTML = `
+    ${introHtml}
+    <div class="jq-q-label">Question ${janetQuizState.i + 1} of ${TRACK_PLACEMENT_QUIZ.questions.length}</div>
+    <div class="jq-q-prompt">${q.prompt}</div>
+    <div class="jq-opts">${optsHtml}</div>
+  `;
+  prog.textContent = `Assessment Progress: ${janetQuizState.i + 1}/${TRACK_PLACEMENT_QUIZ.questions.length}`;
+}
+
+function scoreJanetQuiz() {
+  const scores = { security: 0, deployment: 0, data: 0, ai: 0 };
+  let confidence = "high";
+  TRACK_PLACEMENT_QUIZ.questions.forEach((q, qIdx) => {
+    const aIdx = janetQuizState.answers[qIdx];
+    const opt = q.options[aIdx];
+    if (!opt) return;
+    if (opt.track) scores[opt.track] += 1;
+    if (opt.confidence) confidence = opt.confidence;
+  });
+  const ordered = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = ordered[0][0];
+  const topScore = ordered[0][1];
+  const tied = ordered.filter(([, v]) => v === topScore).map(([k]) => k);
+  return { scores, top, tied, confidence };
+}
+
+function routeToTrack(trackKey) {
+  const selector = JANET_TRACK_SELECTOR[trackKey];
+  if (!selector) return;
+  const target = document.querySelector(selector);
+  if (!target) return;
+  window.location.hash = "tracks";
+  setTimeout(() => {
+    target.classList.add("quiz-track-focus");
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => target.classList.remove("quiz-track-focus"), 2600);
+  }, 120);
+  closeTrackPlacementQuiz();
+}
+
+function renderJanetResults() {
+  const { top, tied, confidence } = scoreJanetQuiz();
+  const body = document.getElementById("jq-body");
+  const prog = document.getElementById("jq-progress");
+  const back = document.getElementById("jq-back");
+  back.disabled = false;
+
+  const isTie = tied.length > 1;
+  const mainVoice = confidence === "low"
+    ? TRACK_PLACEMENT_QUIZ.janetResult.low
+    : (isTie ? TRACK_PLACEMENT_QUIZ.janetResult.dual : TRACK_PLACEMENT_QUIZ.janetResult[top]);
+
+  const recommended = isTie ? tied.slice(0, 2) : [top];
+  const recoLabel = recommended.map((k) => TRACK_PLACEMENT_QUIZ.trackNames[k]).join(" + ");
+
+  body.innerHTML = `
+    <div class="jq-result">
+      <strong>${mainVoice}</strong><br>
+      ${TRACK_PLACEMENT_QUIZ.janetCta.join("<br>")}
+      <div class="jq-reco"><strong>Recommended Route:</strong> ${recoLabel}</div>
+      <div class="jq-note">${confidence === "low" ? "Explore mode: start broad, then specialize." : "Direct mode: begin in your assigned track."}</div>
+    </div>
+    <div class="jq-opts" style="margin-top:12px">
+      ${recommended.map((k) => `<button class="jq-opt" type="button" onclick="routeToTrack('${k}')">Open ${TRACK_PLACEMENT_QUIZ.trackNames[k]} Track</button>`).join("")}
+      <button class="jq-opt" type="button" onclick="window.location.hash='tracks';closeTrackPlacementQuiz()">Compare all tracks first</button>
+      <button class="jq-opt" type="button" onclick="showTrackPlacementQuizWithJanet()">Retake Assessment</button>
+    </div>
+  `;
+
+  prog.textContent = "Assessment Complete";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeTrackPlacementQuiz();
+});
+
+document.getElementById("janet-track-quiz").addEventListener("click", (e) => {
+  if (e.target.id === "janet-track-quiz") closeTrackPlacementQuiz();
+});
+</script>
 
 </body>
 </html>
