@@ -401,7 +401,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
 .boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
 .boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
-.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%} */
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
 .cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
 .cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
  
@@ -458,6 +458,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #obj-cmd-val.blurred{filter:blur(5px)}
 #obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
 #obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-reveal:disabled{opacity:.45;cursor:not-allowed;color:var(--muted2);border-color:var(--border)}
 #obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
 #obj-tries{font-size:11px;color:var(--muted)}
 #obj-tries span{color:var(--red)}
@@ -1090,24 +1091,30 @@ function setLolaStrip(stepOrId){
     inner.innerHTML = `<span class="lola-strip-msg"><span class="ls-tag">tip</span> Type a command to continue. Use <code>man</code> for the full command reference.</span>`;
     return;
   }
+  const learnerPath=(G.learnerPath||'').toLowerCase();
+  const shouldSoften = learnerPath==='explorer' && !G.hard;
+  const softenedMsgs = shouldSoften
+    ? msgs.filter(m=>!['command','syntax','shortcut'].includes(m.tag))
+    : msgs;
+  const activeMsgs = softenedMsgs.length ? softenedMsgs : msgs.slice(0,1);
 
   function buildMsgs(list){
     return list.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span><span class="lola-strip-sep">◆</span>`).join('');
   }
 
-  if(msgs.length === 1){
+  if(activeMsgs.length === 1){
     inner.className = 'no-scroll';
     inner.style.animationDuration = '';
     inner.style.animationDelay = '';
-    inner.innerHTML = buildMsgs(msgs);
+    inner.innerHTML = buildMsgs(activeMsgs);
   } else {
     // Duplicate for seamless loop
-    const html = buildMsgs(msgs);
+    const html = buildMsgs(activeMsgs);
     // Force animation restart: remove class, flush, re-add
     inner.className = '';
     inner.innerHTML = html + html;
     // Measure and set animation duration proportional to content
-    const charCount = msgs.reduce((a,m)=>a+m.msg.length,0);
+    const charCount = activeMsgs.reduce((a,m)=>a+m.msg.length,0);
     const dur = Math.max(18, Math.min(38, charCount * 0.22));
     inner.style.animationDuration = dur + 's';
     inner.style.animationDelay = '0s';
@@ -1822,7 +1829,7 @@ const EASTER = {
     handle(){
       const log=[
         'commit a1b2c3d (HEAD -> main)',
-        'Author: '+G.name+' <cadet@vibe-ship>',
+        'Author: '+G.name+' <engineer@station-delta>',
         'Date:   '+new Date().toDateString(),
         '    Add mission manifest',
         '',
@@ -1873,7 +1880,7 @@ const EASTER = {
         appendLine('=== CURRENT OBJECTIVE ===','ln-warn');
         appendLine('Goal: '+s.obj,'ln-ok');
         appendLine('Context: '+s.ctx,'ln-sys');
-        if(!G.hard) showHint(s.hint);
+        if(!G.hard) showHint(hintForStep(s, false));
       }
       return true;
     }
@@ -2194,7 +2201,7 @@ function showBossStep(idx){
   document.getElementById('obj-cmd-row').style.display='none';
   document.getElementById('obj-prog-fill').style.width=pct+'%';
 
-  if(!G.hard)showHint(step.hint);
+  if(!G.hard)showHint(hintForStep(step, false));
 }
 
 async function handleBossStep(val){
@@ -2242,7 +2249,7 @@ async function handleBossStep(val){
       <div class="janet-intro">${janetWrong()} Review the scenario and try again. The prompt is: <em>${step.prompt}</em></div>
     `;
     $out.appendChild(janetWrongReact);$out.scrollTop=$out.scrollHeight;
-    if(!G.hard)showHint(step.hint);
+    if(!G.hard)showHint(hintForStep(step, false));
   }
 }
 
@@ -2421,7 +2428,7 @@ function toggleHint(btn){
 function renderStaticStep(step){
   $outS.innerHTML='';
   appendLineS(`▸ ${step.obj}`,'ln-info');
-  if(!G.hard && !G.practitioner) showHint(step.hint);
+  if(!G.hard && !G.practitioner) showHint(hintForStep(step, false));
 }
  
 /* ── SMART DIAGNOSIS BLOCK ── */
@@ -2926,10 +2933,18 @@ function sidebarTeachForStep(step){
   };
 }
 
+function hintForStep(step, exact=false){
+  if(!step) return '';
+  if(exact) return step.hint || 'Use the objective "show" control for exact syntax.';
+  if(step.hintNudge) return step.hintNudge;
+  return 'Nudge: focus on the objective wording and run one command that proves it. Use man if syntax is fuzzy.';
+}
+
 function lolaMessageForStep(step, phase){
+  if(step?.lola_guidance) return step.lola_guidance;
+  if(step.ctx) return step.ctx;
   const teach=sidebarTeachForStep(step);
   if(teach?.body) return teach.body;
-  if(step.ctx) return step.ctx;
   return phase?.lolaIntro || '';
 }
 
@@ -2949,7 +2964,11 @@ function syncObjCard(){
   document.getElementById('obj-cmd-row').style.display='flex';
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
-  document.getElementById('obj-reveal').textContent='show';
+  const revealBtn=document.getElementById('obj-reveal');
+  const revealLocked=(G.tries<2)&&!G.phaseReveal;
+  revealBtn.disabled=revealLocked;
+  revealBtn.title=revealLocked?'Available after 2 attempts':'Reveal exact command';
+  revealBtn.textContent=G.phaseReveal?'✓':'show';
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
@@ -2995,8 +3014,13 @@ function setLolaStripGeneric(tag, msg){
   inner.innerHTML=`<span class="lola-strip-msg"><span class="ls-tag">${tag}</span> ${msg}</span>`;
 }
 function revealCmd(){
+  const revealBtn=document.getElementById('obj-reveal');
+  if(revealBtn && revealBtn.disabled){
+    appendLine('L.O.L.A.: Run two attempts first. I want your brain to try before the exact syntax appears.','ln-lola');
+    return;
+  }
   document.getElementById('obj-cmd-val').classList.remove('blurred');
-  document.getElementById('obj-reveal').textContent='✓';
+  if(revealBtn) revealBtn.textContent='✓';
   telem('Hint revealed by user');
   G.phaseReveal=true;
 }
@@ -3276,9 +3300,10 @@ function handleWrong(val, s, ph){
     if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
   } else if(G.tries===2){
     if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
-    if(!diagnosed) showHint(s.hint);
+    if(!diagnosed) showHint(hintForStep(s, false));
   } else if(G.tries>=3){
     if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
+    if(!diagnosed) showHint(hintForStep(s, true));
     telem(`Struggling: phase ${G.phase} step ${G.step}, ${G.tries} attempts`);
   }
   save();
@@ -3599,7 +3624,7 @@ function handleSandbox(val){
     'echo $api_key':'sk-prod-abc123',
     'echo $API_KEY':'sk-prod-abc123',
     'git status':'On branch main\nYour branch is up to date.\nWorking tree clean.',
-    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@vibe-ship>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
+    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <engineer@station-delta>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
     'whoami':'certified-vibe-cadet',
     'cat manifest.txt':'Mission: Escape Pod',
     'cat logs.txt':'INFO: All systems nominal\nINFO: Escape pod deployed\nINFO: '+G.name+' has graduated',
@@ -3876,9 +3901,9 @@ document.head.appendChild(_engineerPolish);
 const ENGINEER_CHALLENGES={
   1:{
     title:'Reorient Challenge',
-    scenario:'You just landed on a remote terminal. Show where you are, list hidden files, and read the distress log in one chained command sequence.',
-    acceptFn:(v)=>includesInOrder(v,['pwd','ls -la','cat distress.log']),
-    retryHint:'Use the same orientation flow you use on every unknown machine: location, inventory, context.',
+    scenario:'You just landed on a remote terminal. Show where you are, list hidden files, then extract host/service signal from distress.log in one chained sequence.',
+    acceptFn:(v)=>includesInOrder(v,['pwd','ls -la'])&&v.includes('distress.log')&&v.includes('grep'),
+    retryHint:'Use orientation flow first, then a log-filter command for signal extraction.',
     successMsg:'Excellent. You oriented in under one minute, which is exactly what incident engineers do.',
     unlockMsg:'Challenge complete: orientation under pressure.'
   },
@@ -3938,18 +3963,20 @@ const ENGINEER_PRE_STEP_CONCEPTS={
 
 const ENGINEER_LOLA_STRIP={
   p1s1:[
-    {tag:'tip',msg:'You are in <code>/home/engineer/distress-bay</code>. Incident order is always: orient, inspect, then change.'},
-    {tag:'command',msg:'Use <code>pwd</code> to anchor location before any destructive command.'}
+    {tag:'tip',msg:'Cadet recall, but under incident pressure: start by anchoring your location before any file edits.'},
+    {tag:'habit',msg:'Fast teams still run a location check first to avoid wrong-directory mistakes.'}
   ],
   p1s2:[
-    {tag:'concept',msg:'Critical artifacts here are <code>distress.log</code>, <code>rescue.sh.template</code>, and <code>Dockerfile.template</code>.'},
-    {tag:'habit',msg:'Run <code>ls -la</code> (not plain <code>ls</code>) during incidents so hidden files like <code>.ssh</code> are visible.'}
+    {tag:'concept',msg:'Inventory second. Include hidden files so security and config artifacts are visible.'},
+    {tag:'habit',msg:'In real incidents, hidden files often hold the clue you need.'}
   ],
   p1s3:[
-    {tag:'tip',msg:'The remote host you will target for this mission is <code>192.168.1.42</code>. You will reuse it often.'}
+    {tag:'new!',msg:'Small escalation: extract only key lines from distress.log instead of reading everything.'},
+    {tag:'concept',msg:'This is a transfer from Cadet pipes into incident triage signal filtering.'}
   ],
   p1s4:[
-    {tag:'concept',msg:'Recent commit IDs matter for rollback and cherry-pick workflows in real incident response.'}
+    {tag:'concept',msg:'Recent commit IDs matter for rollback and cherry-pick workflows in real incident response.'},
+    {tag:'tip',msg:'Think timeline: what changed most recently that could explain the outage?'}
   ],
   p2s1:[
     {tag:'new!',msg:'Script target is <code>rescue.sh</code>. Keep this exact filename for later SSH and execution steps.'}
@@ -4080,13 +4107,13 @@ const ENGINEER_LOLA_STRIP={
 };
 
 const ENGINEER_PHASES=[
-  {title:'Recall & Reorient',
-   lolaIntro:'Welcome back, Engineer. Cadet got you off the station. This commission saves what is still running. Start with the fundamentals: orient, inspect, then decide.',
+  {title:'Cadet Recall Under Pressure',
+   lolaIntro:'Welcome back, Engineer. Quick warm-up: reuse Cadet fundamentals, but with incident constraints and tighter signal extraction.',
    steps:[
-    {id:'p1s1',obj:'Locate yourself on the rescue vessel',ctx:'Confirm your working directory before touching anything.',cmd:['pwd'],accept:['pwd'],hint:'Type: pwd',out:'/home/engineer/distress-bay',unlockCmd:'pwd',bridge:{title:'First reflex in any incident',body:'Senior engineers run <code>pwd</code> constantly in unfamiliar terminals to avoid destructive mistakes.',tags:['Incident response','Remote debugging']}},
-    {id:'p1s2',obj:'List files in the distress bay',ctx:'You need a full view including hidden files.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls',teach:{title:'Context before action',body:'You now know where SSH material, logs, and templates live. This is your working map.'}},
-    {id:'p1s3',obj:'Read the distress log',ctx:'Understand the failing system before making changes.',cmd:['cat distress.log'],accept:['cat distress.log'],hint:'Type: cat distress.log',out:'[Distress Beacon]\nHost: 192.168.1.42\nService: pod-monitor DOWN\nLast backup: 6h ago\nBattery remaining: 89m',unlockCmd:'cat'},
-    {id:'p1s4',obj:'Inspect recent commit history',ctx:'Find what changed recently on this service.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',out:'a1b2c3d restart monitor check\n7f8e9d0 add battery reporter\n2c3d4e5 initial distress server',unlockCmd:'git log --oneline',jit:{title:'Compact log mode',body:'<code>--oneline</code> compresses commit output for fast incident scanning.'}}
+    {id:'p1s1',obj:'Cadet recall: confirm location first',ctx:'Anchor where you are before touching files.',cmd:['pwd'],accept:['pwd'],hint:'Type: pwd',hintNudge:'You are proving location, not changing it. Think “print working directory.”',lola_guidance:'Cadet muscle memory check: before edits, confirm your exact path. We do this every time pressure goes up.',out:'/home/engineer/distress-bay',unlockCmd:'pwd',bridge:{title:'First reflex in incidents',body:'High-performing responders verify location first to avoid wrong-host and wrong-directory errors.',tags:['Incident response','Operational discipline']}},
+    {id:'p1s2',obj:'Cadet recall: inventory hidden + visible files',ctx:'Run a full directory inventory that includes hidden artifacts.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',hintNudge:'Use the listing variant that includes hidden dotfiles.',lola_guidance:'Now take inventory like an on-call engineer: include hidden files so security/config clues are not missed.',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls'},
+    {id:'p1s3',obj:'New twist: extract key beacon lines with a pipe',ctx:'From distress.log, extract only Host, Service, and Battery lines in one command.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('cat distress.log')&&v.includes('|')&&v.includes('grep')&&((v.includes('Host')&&v.includes('Service'))||v.includes('Battery')),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipeline: cat distress.log | grep ...',hintNudge:'Use a pipe from file output into grep and filter for key beacon terms.',lola_guidance:'Small level-up from Cadet: don’t scan every line manually. Pull only the signal you need.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],teach:{title:'Signal extraction under pressure',body:'This pattern is common on-call: full logs are noisy, so you filter for high-value fields first.'}},
+    {id:'p1s4',obj:'Inspect recent commit history',ctx:'Find what changed recently on this service.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',hintNudge:'Use Git’s compact history view so recent changes are easy to scan.',lola_guidance:'Last warm-up move: check commit timeline and identify likely change points before fixing anything.',out:'a1b2c3d restart monitor check\n7f8e9d0 add battery reporter\n2c3d4e5 initial distress server',unlockCmd:'git log --oneline',jit:{title:'Compact log mode',body:'<code>--oneline</code> compresses commit output for fast incident scanning.'}}
    ],
    challenge:ENGINEER_CHALLENGES[1],
    done:'Phase 1 complete. You reoriented fast and read the signal correctly.',
@@ -4402,8 +4429,9 @@ ENGINEER_PHASES.forEach((phase)=>{
 });
 
 Object.assign(DIAGNOSE,{
-  p1s1:(v)=>{ if(v.includes('ls')) return {msg:'Inventory is step two. First anchor location.',next:'Try: pwd'}; if(v.includes('cd')) return {msg:'Movement is not needed yet. Confirm location first.',next:'Try: pwd'}; return null; },
-  p1s2:(v)=>{ if(v==='ls') return {msg:'Use full listing with hidden files so you do not miss .ssh or dotfiles.',next:'Try: ls -la'}; return null; },
+  p1s1:(v)=>{ if(v.includes('cd')) return {msg:'Don’t move yet. First confirm exact location.',next:'Use print-working-directory command.'}; if(v.includes('ls')) return {msg:'Inventory comes second. Anchor location first.',next:'Run the location command.'}; return null; },
+  p1s2:(v)=>{ if(v==='ls') return {msg:'Use the full listing variant so hidden files appear too.',next:'Add the flags for all + long view.'}; if(v.includes('pwd')) return {msg:'Nice safety instinct. You already confirmed location in step one.',next:'Now run a full file inventory.'}; return null; },
+  p1s3:(v)=>{ if(v.includes('cat distress.log')&&!v.includes('|')) return {msg:'Good start, but this step asks for signal extraction in one pipeline.',next:'Send log output through grep.'}; if(v.includes('grep')&&!v.includes('distress.log')) return {msg:'Point grep at distress.log so you filter the correct source.',next:'Use cat distress.log | grep ...'}; return null; },
   p2s1:(v)=>{ if(v.startsWith('touch')&&!v.includes('rescue.sh')) return {msg:'Use the mission script filename exactly so later steps match.',next:'Try: touch rescue.sh'}; return null; },
   p2s2:(v)=>{ if(v.includes('>>')) return {msg:'Use overwrite for first line so the script starts clean.',next:'Try: echo \'#!/bin/bash\' > rescue.sh'}; if(v.includes('bash')&&!v.includes('echo')) return {msg:'You are writing the interpreter hint, not running bash yet.',next:'Write the shebang into rescue.sh'}; return null; },
   p2s3:(v)=>{ if(v.includes('SERVER')&&!v.includes('192.168.1.42')) return {msg:'Use the host from distress.log: 192.168.1.42.',next:'Try: echo \'SERVER=\"192.168.1.42\"\' >> rescue.sh'}; return null; },
@@ -4425,18 +4453,18 @@ Object.assign(DIAGNOSE,{
 
 const ENGINEER_RETRY_COACH={
   p1s1:[
-    'Strong start. In live incidents, orient before action: confirm where you are first.',
-    'You are close. Keep the first step deterministic: print location, then continue.',
+    'Strong start. Cadet recall move one: confirm where you are.',
+    'You are close. Use the command that prints your current path.',
     'Use the objective-card show button if needed, then run it again from recall.'
   ],
   p1s2:[
-    'Good effort. Inventory is step two in every unknown environment.',
-    'Close. Use the listing command exactly, then move to evidence review.',
+    'Good effort. Next is full inventory, including hidden files.',
+    'Close. Use the listing form with both all-files and long-view flags.',
     'Use show in the objective card, then rerun from memory.'
   ],
   p1s3:[
-    'Nice pressure handling. Read the distress evidence before changing anything.',
-    'You are close. Open the distress log directly and inspect signal first.',
+    'Nice pressure handling. New twist here is filtering signal, not reading everything.',
+    'You are close. Build a single pipeline from distress.log into grep.',
     'Use the objective-card show button, then rerun once from memory.'
   ],
   p2s2:[
@@ -4537,7 +4565,7 @@ EASTER['help']={
       appendLine('Goal: '+s.obj,'ln-ok');
       appendLine('Context: '+s.ctx,'ln-sys');
       appendLine('Hint: use man for syntax references, not guesswork.','ln-info');
-      if(!G.hard) showHint(s.hint);
+      if(!G.hard) showHint(hintForStep(s, false));
     }
     return true;
   }

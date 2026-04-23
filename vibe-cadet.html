@@ -401,7 +401,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
 .boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
 .boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
-.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%} */
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
 .cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
 .cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
  
@@ -483,7 +483,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
 #lola-online{font-size:10px;color:var(--green);margin-left:auto}
 #lola-online::before{content:'● '}
-#lola-msg{font-size:13px;line-height:1.72;color:var(--text);padding-left:32px}
+#lola-msg{font-size:13px;line-height:1.72;color:var(--text);padding-left:32px;white-space:pre-line}
 #lola-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
  
 /* crew */
@@ -1347,10 +1347,12 @@ const PHASES = [null,
    hint:'Type: pwd — stands for "print working directory"',
    out:'/home/cadet/projects',
    unlockCmd:'pwd',
-   jit:{title:'What is a filesystem path?',body:'Your computer stores files in a tree of folders. A <b>path</b> is the address of any file or folder, written with slashes: <code>/home/cadet/projects</code>. The leading <code>/</code> is the <b>root</b> — the very top of the tree. Everything lives inside root.'},
-   bridge:{title:'This first COMMAND is used every day',body:'Developers type <code>pwd</code> dozens of times a day — especially after <code>cd</code>-ing (changing directory) around a complex project. You\'ll also see paths in error messages like <code>Error: cannot find /home/cadet/projects/src/app.ts</code>. Knowing how to read paths means you can find the problem instantly.',tags:['Linux','macOS','WSL','Docker containers']},
+   jitPreOnly:true,
+   jit:{title:'📁 Before You Type — Your Filesystem, A Quick Map',body:'Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree.'},
+   jitAfter:{title:'Why typing pwd matters',body:'Typing <code>pwd</code> is like checking a map after moving around your system with <code>cd</code>. Even senior engineers get turned around in deep project folders. <code>pwd</code> gives you a hard location anchor so you can safely decide your next move and get to the exact directory you want.'},
+   bridge:{title:'This first command is used every day',body:'Developers run <code>pwd</code> constantly after moving around projects, containers, and servers. It is the fastest way to prevent “wrong folder” mistakes before editing, deleting, or deploying anything.',tags:['Linux','macOS','WSL','Docker containers']},
    teach:{title:'What pwd does',body:'<b>pwd</b> = <b>P</b>rint <b>W</b>orking <b>D</b>irectory. It shows your exact location in the filesystem as an <b>absolute path</b> — starting from root <code>/</code>. Run it whenever you feel lost.'}},
-  {id:'p1s2', obj:'List, <code>ls</code> the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
+  {id:'p1s2', obj:'List, ls the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
    cmd:['ls','eza','ls -la','ls -l','ls -a','ls -lah'],
    accept:['ls','eza','ls -la','ls -l','ls -a','ls -lah','ls --all'],
    hint:'Type: ls (or try ls -la for full details)',
@@ -1393,8 +1395,12 @@ const PHASES = [null,
    teach:{title:'touch — create or timestamp',body:'<code>touch</code> creates an empty file if it doesn\'t exist — or updates its timestamp if it does. Key file commands:<br><code>rm filename</code> — delete a file<br><code>cp src dest</code> — copy it<br><code>mv src dest</code> — move or rename it<br><code>mkdir dirname</code> — create a folder'}},
   {id:'p2s2', obj:'Write the content "Mission: Escape Pod" into manifest.txt', ctx:'Use <code>echo</code> with output redirection to write text into the file. The words between quotation marks are a <b>string</b> — plain text exactly as typed. Pattern: <code>command "string" > filename</code>.',
    cmd:['echo "Mission: Escape Pod" > manifest.txt'],
-   accept:['echo "> manifest.txt'],
-   acceptFn: v => v.startsWith('echo') && v.includes('> manifest.txt'),
+   accept:['echo "Mission: Escape Pod" > manifest.txt'],
+   acceptFn: v => {
+     const hasRedirect=/>>?\s*manifest\.txt/i.test(v);
+     const hasMission=/mission\s*:\s*escape\s*pod/i.test(v);
+     return v.startsWith('echo') && hasRedirect && hasMission;
+   },
    hint:'Type: echo "Mission: Escape Pod" > manifest.txt  — the > symbol redirects the text INTO the file (Shift+. on most keyboards)',
    out:'Written to manifest.txt',
    unlockCmd:'echo',
@@ -2862,11 +2868,12 @@ function sidebarTeachForStep(step){
   };
 }
 
-function lolaMessageForStep(step, phase){
+function lolaMessageForStep(step, phase, includeIntro=false){
   const teach=sidebarTeachForStep(step);
-  if(teach?.body) return teach.body;
-  if(step.ctx) return step.ctx;
-  return phase?.lolaIntro || '';
+  const body=teach?.body || step.ctx || '';
+  if(includeIntro && phase?.lolaIntro && body) return `${phase.lolaIntro}\n\n${body}`;
+  if(includeIntro && phase?.lolaIntro) return phase.lolaIntro;
+  return body || phase?.lolaIntro || '';
 }
 
 function syncObjCard(){
@@ -3122,7 +3129,8 @@ async function handleCorrect(s, ph, input){
  
   if (s.teach) showTeach(s.teach);
   if (s.concept) showConcept(s.concept);
-  if (s.jit) showJIT(s.jit);
+  if (s.jitAfter) showJIT(s.jitAfter);
+  else if (s.jit && !s.jitPreOnly) showJIT(s.jit);
   if (s.bridge) showBridge(s.bridge);
   if (s.unlockCmd) {
     const cmds = Array.isArray(s.unlockCmd) ? s.unlockCmd : [s.unlockCmd];
@@ -3372,8 +3380,8 @@ function continuePhaseStart(ph){
   markStepStart(s, ph);
   renderStaticStep(s);
   if(s.jit && !G.hard) showJIT(s.jit);
-  if(s.bridge && !G.hard) showBridge(s.bridge);
-  setLola(lolaMessageForStep(s, ph));
+  if(s.bridge && !s.jitPreOnly && !G.hard) showBridge(s.bridge);
+  setLola(lolaMessageForStep(s, ph, true));
   setLolaStrip(s);
   syncObjCard();
   syncDots();
