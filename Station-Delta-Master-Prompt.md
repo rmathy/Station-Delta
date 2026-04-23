@@ -199,6 +199,15 @@ Guidance routing rule:
 - Compute a step-specific L.O.L.A. message (for example `lolaMessageForStep(step)`).
 - Keep `lola_strip` concise and action-near; avoid duplicating long-form copy.
 
+No-guessing rule:
+- If a step depends on a specific simulation token, L.O.L.A. must state it before command entry.
+- Required examples: exact filename, host/IP, port, env var key, container name, branch/tag, API path.
+- Learners should not fail because the sim expected an unstated value.
+
+Coverage rule:
+- Every assessed step must include at least one teaching surface: `jit`, `bridge`, `teach`, `concept`, or `pre_step_concept`.
+- If a step is missing real-world transfer framing, inject it before ship.
+
 ### Challenge Rules
 - Challenges must only use already-taught concepts.
 - No trick questions.
@@ -300,6 +309,21 @@ Emotional job:
 - Every phase should have a clear checkpoint / safe stopping point.
 - Resume state should feel friendly and legible.
 - Do not let teaching panels squeeze the terminal below practical reading height on first screen.
+- Course accent identity must be consistent across top chrome, terminal accents, boot modal, graduation modal, and checkpoint modal.
+- Do not ship a course where boot/modals still inherit another course's color identity.
+
+### Course Surface Parity Rules
+When extending from an existing course file, these surfaces must be rewritten for the target course before release:
+- Career Impact Log
+- Achievements
+- Manual pages
+- Glossary
+- Graduation/share copy
+
+Each surface must:
+- reflect the target course command set and narrative
+- include real-world industry analogs where relevant
+- avoid stale references to prior-course filenames, hosts, commands, or story beats
 
 ### Shared Flow Requirements
 The course must feel connected to the larger program.
@@ -350,6 +374,11 @@ Before finalizing, verify:
 - Do incorrect-attempt responses preserve L.O.L.A. coaching voice (especially attempts 1-3)?
 - Does J.A.N.E.T. create productive tension without becoming unprofessional?
 - Does the course feel like part of the same Station Delta program?
+- Do boot/checkpoint/graduation visuals match the course accent identity (no inherited color drift)?
+- Do Career Log, Achievements, Manual, Glossary, and share text reflect this course rather than copied prior-tier content?
+- Are there any leftover prior-course strings in objectives, hints, diagnostics, challenges, or break-it scenarios?
+- Are diagnostics/retry mappings scoped so course steps do not get mismatched hints from other courses?
+- Are all required concrete mission tokens explicitly stated by L.O.L.A. before they are needed?
 
 ### Final Instruction
 Optimize for a course that feels:
