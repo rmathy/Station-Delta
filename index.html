@@ -1102,7 +1102,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
           <li>Volume discounts 20+ seats</li>
           <li>Dedicated onboarding</li>
         </ul>
-        <a href="mailto:hello@stationdelta.dev" class="price-cta cta-gold">Contact for Fleet →</a>
+        <a href="#waitlist" class="price-cta cta-gold waitlist-link" data-waitlist="Fleet Access">Contact for Fleet →</a>
       </div>
 
     </div>
@@ -1118,18 +1118,6 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="bundle-price">$149 <sub>one-time</sub></div>
       </div>
       <a href="#waitlist" class="bundle-cta waitlist-link" data-waitlist="Career Track Bundle">Choose your track →</a>
-    </div>
-
-    <!-- PRICING NOTES -->
-    <div class="pricing-notes">
-      <div class="pnote">
-        <div class="pnote-title">Why $19 Officer is right</div>
-        <div class="pnote-body">At $19/month, the payback period is <strong>one afternoon</strong>. A developer who completes Lieutenant and applies the stack trace debugging pattern once in the next week has recovered the cost. The price anchors low intentionally — your conversion metric is <em>subscriber to Fleet referral</em>, not subscriber LTV.</div>
-      </div>
-      <div class="pnote">
-        <div class="pnote-title">Fleet pricing is deliberate</div>
-        <div class="pnote-body">$29/seat matches or undercuts Pluralsight, LinkedIn Learning, and A Cloud Guru. The price removes the objection from the Fleet sales conversation entirely — <strong>one 20-seat Fleet account = 30 individual Officer subscribers</strong>. The product wins on fidelity, not price.</div>
-      </div>
     </div>
 
   </div>
@@ -1484,7 +1472,7 @@ function submitWaitlist(event) {
   );
   statusEl.textContent = "Opening your email app to complete signup...";
   statusEl.style.color = "var(--green-m)";
-  window.location.href = `mailto:hello@stationdelta.dev?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:hello@stationdelta.dev?cc=richard@fccbrewery.com&subject=${subject}&body=${body}`;
   setTimeout(closeWaitlistModal, 450);
 }
 
