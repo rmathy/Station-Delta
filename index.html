@@ -273,6 +273,30 @@ section{position:relative;z-index:1}
   .jq-q-prompt{font-size:17px}
 }
 
+/* WAITLIST MODAL */
+.waitlist-modal{position:fixed;inset:0;background:rgba(2,8,14,.82);backdrop-filter:blur(6px);z-index:120;display:none;align-items:center;justify-content:center;padding:20px}
+.waitlist-modal.open{display:flex}
+.waitlist-card{width:min(560px,94vw);background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:0 26px 60px rgba(0,0,0,.55);overflow:hidden}
+.waitlist-top{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,rgba(0,212,255,.08),rgba(0,212,255,.02))}
+.waitlist-title{font-family:var(--display);font-size:20px;letter-spacing:.06em;color:var(--text-bright)}
+.waitlist-close{font-family:var(--janet);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--border);background:var(--s2);color:var(--muted2);padding:6px 10px;border-radius:3px;cursor:pointer}
+.waitlist-close:hover{border-color:var(--b2);color:var(--text)}
+.waitlist-body{padding:18px 16px 16px}
+.waitlist-lead{font-family:var(--ui);font-size:14px;line-height:1.7;color:var(--muted2)}
+.waitlist-lead strong{color:var(--text)}
+.waitlist-target{margin-top:10px;font-family:var(--janet);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+.waitlist-form{display:grid;gap:12px;margin-top:14px}
+.waitlist-label{font-family:var(--janet);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.waitlist-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px 12px;color:var(--text);font-family:var(--ui);font-size:14px}
+.waitlist-input:focus{outline:none;border-color:var(--b2);box-shadow:0 0 0 2px rgba(77,184,255,.1)}
+.waitlist-help{font-family:var(--ui);font-size:12px;color:var(--muted);line-height:1.6}
+.waitlist-actions{display:flex;gap:10px;flex-wrap:wrap}
+.waitlist-btn{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:10px 14px;border:1px solid var(--blue-d);background:rgba(77,184,255,.12);color:var(--blue);cursor:pointer}
+.waitlist-btn:hover{background:rgba(77,184,255,.18)}
+.waitlist-btn.secondary{border-color:var(--border);background:var(--s2);color:var(--muted2)}
+.waitlist-btn.secondary:hover{border-color:var(--b2);color:var(--text)}
+.waitlist-status{min-height:18px;font-family:var(--ui);font-size:12px;color:var(--green-m)}
+
 /* ═══ PRICING ═══ */
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
 .price-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:28px 24px;transition:border-color .2s,transform .2s;position:relative;}
@@ -1039,7 +1063,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
           <li>Shareable on LinkedIn</li>
           <li>Cancel anytime</li>
         </ul>
-        <a href="#" class="price-cta cta-blue">Get Officer Access →</a>
+        <a href="#waitlist" class="price-cta cta-blue waitlist-link" data-waitlist="Officer Access">Get Officer Access →</a>
       </div>
 
       <div class="price-card">
@@ -1057,7 +1081,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
           <li>Full AI coaching reports</li>
           <li>Priority access to new sims</li>
         </ul>
-        <a href="#" class="price-cta cta-amber">Get Captain Access →</a>
+        <a href="#waitlist" class="price-cta cta-amber waitlist-link" data-waitlist="Captain Access">Get Captain Access →</a>
       </div>
 
       <div class="price-card fleet-card">
@@ -1093,7 +1117,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <div>
         <div class="bundle-price">$149 <sub>one-time</sub></div>
       </div>
-      <a href="#" class="bundle-cta">Choose your track →</a>
+      <a href="#waitlist" class="bundle-cta waitlist-link" data-waitlist="Career Track Bundle">Choose your track →</a>
     </div>
 
     <!-- PRICING NOTES -->
@@ -1166,8 +1190,8 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <a href="#how">How it works</a>
         <a href="#managers">For managers</a>
         <a href="#pricing">Pricing</a>
-        <a href="#">L.O.L.A. — Field Guide</a>
-        <a href="#">J.A.N.E.T. — Assessments</a>
+        <a href="#waitlist" class="waitlist-link" data-waitlist="L.O.L.A. Field Guide">L.O.L.A. — Field Guide</a>
+        <a href="#waitlist" class="waitlist-link" data-waitlist="J.A.N.E.T. Assessments">J.A.N.E.T. — Assessments</a>
         <a href="mailto:hello@stationdelta.dev">Contact</a>
       </div>
     </div>
@@ -1177,6 +1201,39 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div class="footer-copy">J.A.N.E.T. is always watching · She notes this without comment</div>
   </div>
 </footer>
+
+<!-- LAUNCH WAITLIST MODAL -->
+<div id="waitlist-modal" class="waitlist-modal" aria-hidden="true">
+  <div class="waitlist-card" role="dialog" aria-modal="true" aria-labelledby="waitlist-title">
+    <div class="waitlist-top">
+      <div id="waitlist-title" class="waitlist-title">Join The Launch Waitlist</div>
+      <button class="waitlist-close" type="button" onclick="closeWaitlistModal()">Close</button>
+    </div>
+    <div class="waitlist-body">
+      <div class="waitlist-lead">
+        This section is still in build mode. Add your email and we will notify you when it is ready.
+        <strong>No spam. Just launch updates and early-access invites.</strong>
+      </div>
+      <div id="waitlist-target" class="waitlist-target">Requested Access: General Launch Updates</div>
+      <form class="waitlist-form" onsubmit="submitWaitlist(event)">
+        <label>
+          <div class="waitlist-label">Email</div>
+          <input id="waitlist-email" class="waitlist-input" type="email" required placeholder="you@company.com" autocomplete="email">
+        </label>
+        <label>
+          <div class="waitlist-label">Optional role</div>
+          <input id="waitlist-role" class="waitlist-input" type="text" placeholder="Engineer, Team Lead, Hiring Manager..." autocomplete="organization-title">
+        </label>
+        <div class="waitlist-help">We open your email app with a pre-filled message so your signup is sent directly to the Station Delta inbox.</div>
+        <div class="waitlist-actions">
+          <button class="waitlist-btn" type="submit">Notify Me</button>
+          <button class="waitlist-btn secondary" type="button" onclick="closeWaitlistModal()">Not now</button>
+        </div>
+        <div id="waitlist-status" class="waitlist-status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
 const TRACK_PLACEMENT_QUIZ = {
@@ -1258,6 +1315,7 @@ const JANET_TRACK_SELECTOR = {
 };
 
 const janetQuizState = { i: 0, answers: [] };
+const waitlistState = { target: "General Launch Updates" };
 
 function showTrackPlacementQuizWithJanet() {
   janetQuizState.i = 0;
@@ -1384,6 +1442,66 @@ document.addEventListener("keydown", (e) => {
 
 document.getElementById("janet-track-quiz").addEventListener("click", (e) => {
   if (e.target.id === "janet-track-quiz") closeTrackPlacementQuiz();
+});
+
+function openWaitlistModal(targetLabel) {
+  waitlistState.target = targetLabel || "General Launch Updates";
+  const modal = document.getElementById("waitlist-modal");
+  const target = document.getElementById("waitlist-target");
+  const status = document.getElementById("waitlist-status");
+  const email = document.getElementById("waitlist-email");
+  const role = document.getElementById("waitlist-role");
+  target.textContent = `Requested Access: ${waitlistState.target}`;
+  status.textContent = "";
+  role.value = "";
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+  setTimeout(() => email.focus(), 80);
+}
+
+function closeWaitlistModal() {
+  const modal = document.getElementById("waitlist-modal");
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function submitWaitlist(event) {
+  event.preventDefault();
+  const emailEl = document.getElementById("waitlist-email");
+  const roleEl = document.getElementById("waitlist-role");
+  const statusEl = document.getElementById("waitlist-status");
+  const email = (emailEl.value || "").trim();
+  const role = (roleEl.value || "").trim();
+  if (!email || !email.includes("@")) {
+    statusEl.textContent = "Please enter a valid email.";
+    statusEl.style.color = "var(--red)";
+    return;
+  }
+
+  const subject = encodeURIComponent(`Station Delta Waitlist — ${waitlistState.target}`);
+  const body = encodeURIComponent(
+    `Please add me to the Station Delta waitlist.\n\nEmail: ${email}\nInterest: ${waitlistState.target}\nRole: ${role || "Not provided"}\nSource: station-delta-one.vercel.app`
+  );
+  statusEl.textContent = "Opening your email app to complete signup...";
+  statusEl.style.color = "var(--green-m)";
+  window.location.href = `mailto:hello@stationdelta.dev?subject=${subject}&body=${body}`;
+  setTimeout(closeWaitlistModal, 450);
+}
+
+document.querySelectorAll(".waitlist-link").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const target = e.currentTarget.getAttribute("data-waitlist");
+    openWaitlistModal(target);
+  });
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeWaitlistModal();
+});
+
+document.getElementById("waitlist-modal").addEventListener("click", (e) => {
+  if (e.target.id === "waitlist-modal") closeWaitlistModal();
 });
 </script>
 
