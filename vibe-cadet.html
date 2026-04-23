@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
  
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
  
 /* ── TOPBAR ── */
 #topbar{
@@ -151,14 +151,40 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .lola-strip-sep{color:var(--muted);margin:0 6px;opacity:.4}
 
 /* ── TERMINAL PANEL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height: 100%;           /* ← ADD THIS (explicit height) */
-  min-height: 0;          /* ← ADD THIS (important for nested flex) */}}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height:100%;min-height:0}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
 .mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
 #term-path span{color:var(--blue)}
+
+#action-rail{
+  display:grid;
+  grid-template-columns:minmax(360px, 1.35fr) minmax(260px, .75fr);
+  gap:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  align-items:start;
+}
+#term-panel #obj-card,
+#term-panel #lola-sec{
+  border:1px solid var(--border);
+  border-radius:var(--r8);
+  background:var(--s2);
+}
+#term-panel #obj-card{
+  max-height:none;
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+}
+#term-panel #lola-sec{
+  padding:12px 14px;
+  max-height:208px;
+  overflow-y:auto;
+}
 
 /* ── FIX COLLAPSING JIT / REAL WORLD / HINT / DIAGNOSIS BLOCKS ── */
 #output > * {
@@ -186,16 +212,16 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── SPLIT OUTPUT: static top half + scrollable bottom half ── */
 /* The two divs share the flex:1 space left after titlebar + input-row */
 #output-static{
-  flex:1;              /* top half — grows to fill 50% via sibling split */
+  flex-shrink:0;
   overflow-y:auto;
-  padding:16px 20px 10px;
+  max-height:132px;
+  padding:12px 20px 10px;
   display:flex;
   flex-direction:column;
   gap:0;
   scroll-behavior:smooth;
-  border-bottom:2px solid var(--b2);
-  background:var(--bg);
-  min-height:0;
+  border-bottom:1px solid var(--b2);
+  background:var(--surface);
 }
 
 #output-static::-webkit-scrollbar{width:3px}
@@ -221,9 +247,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* ── LIVE TERMINAL (scrollable, bottom half) ── */
 #output{
-  flex:1;              /* bottom half — matches output-static flex:1 so they're equal */
+  flex:1 1 auto;
   overflow-y:auto;
-  padding:12px 20px;
+  padding:16px 20px;
   display:flex;
   flex-direction:column;
   gap:0;
@@ -235,7 +261,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
  
 /* output line types */
-.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln{font-size:14px;line-height:1.72;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
 .ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--green)}
 .ln-ok{color:var(--green)}
 .ln-err{color:var(--red)}
@@ -257,14 +283,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* teach block */
 .teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
 .teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
-.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body{font-size:13px;line-height:1.82;color:var(--text)}
 .teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
 .teach-body b{color:var(--text);font-weight:500}
  
 /* concept card */
 .concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
 .concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
-.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd{padding:11px 13px;font-size:13px;line-height:1.8;color:var(--text)}
 .concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
 .ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
 .ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
@@ -289,9 +315,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 /* quiz */
 .quiz{margin:10px 0;border:1px solid var(--amber-d);border-radius:var(--r8);background:var(--amber-bg);padding:13px;animation:slideIn .25s ease}
-.quiz-q{font-size:12px;color:var(--amber);margin-bottom:10px;font-weight:500;line-height:1.6}
+.quiz-q{font-size:13px;color:var(--amber);margin-bottom:10px;font-weight:500;line-height:1.7}
 .quiz-opts{display:flex;flex-direction:column;gap:6px}
-.qopt{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r4);padding:8px 12px;font-size:12px;cursor:pointer;color:var(--text);transition:all .15s;text-align:left;font-family:var(--mono)}
+.qopt{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r4);padding:10px 12px;font-size:13px;cursor:pointer;color:var(--text);transition:all .15s;text-align:left;font-family:var(--mono)}
 .qopt:hover:not(:disabled){border-color:var(--amber-d);background:var(--s2)}
 .qopt.correct{border-color:var(--green);background:var(--green-bg);color:var(--green)}
 .qopt.wrong{border-color:var(--red-d);background:var(--red-bg);color:var(--red);opacity:.55}
@@ -400,13 +426,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 /* ── INPUT ROW ── */
 #input-row{flex-shrink: 0;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
-#prompt-pre{font-size:13px;color:var(--gold);white-space:nowrap;user-select:none}
-#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--gold)}
+#prompt-pre{font-size:14px;color:var(--green);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
 #input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
 
 /* ── RIGHT PANEL ── */
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#right #active-cmds{border-top:none}
  
 /* ── OBJECTIVE CARD (NOW SCROLLABLE) ── */
 #obj-card{
@@ -422,8 +449,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* objective content */
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
-#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
-#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.35}
+#obj-context{font-size:13px;color:var(--muted2);line-height:1.72;margin-bottom:10px}
+#obj-context code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:12px}
 #obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
 #obj-cmd-row{display:flex;align-items:center;gap:8px}
 #obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
@@ -455,7 +483,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
 #lola-online{font-size:10px;color:var(--green);margin-left:auto}
 #lola-online::before{content:'● '}
-#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+#lola-msg{font-size:13px;line-height:1.72;color:var(--text);padding-left:32px}
+#lola-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
  
 /* crew */
 #crew-sec{flex:1;overflow-y:auto;padding:11px 13px;min-height:0}
@@ -533,6 +562,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .grad-ct{font-family:var(--display);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
 .grad-name{font-family:var(--display);font-size:20px;font-weight:900;color:var(--green);margin-bottom:4px}
 .grad-sub{font-size:11px;color:var(--muted2)}
+.checkpoint-box{background:var(--s2);border:1px solid var(--blue-d);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:700}
+.checkpoint-title{font-family:var(--display);font-size:18px;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
+.checkpoint-next b{color:var(--blue)}
 .skills-list{text-align:left;font-size:12px;color:var(--muted2);line-height:2;margin-bottom:16px}
 .skills-list span{color:var(--green);margin-right:6px}
  
@@ -609,6 +644,31 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="term-path">cadet@vibe-ship — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
+    <div id="action-rail">
+      <div id="obj-card">
+        <div id="obj-phase-label">Phase 1 of 9</div>
+        <div id="obj-title">Find your location</div>
+        <div id="obj-context">Before anything else, you need to know where you are.</div>
+        <div id="obj-cmd-label">Expected command</div>
+        <div id="obj-cmd-row">
+          <div id="obj-cmd-val" class="blurred">pwd</div>
+          <button id="obj-reveal" onclick="revealCmd()">show</button>
+        </div>
+        <div id="obj-meta">
+          <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+          <span id="obj-score">Score: <span id="score-n">100</span></span>
+        </div>
+        <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+      </div>
+      <div id="lola-sec">
+        <div id="lola-hd">
+          <div id="lola-avatar">L</div>
+          <div id="lola-name">L.O.L.A.</div>
+          <div id="lola-online">ready</div>
+        </div>
+        <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
+      </div>
+    </div>
     <div id="output-static" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" onclick="focusCmd(event)"></div>
@@ -621,31 +681,6 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
   <!-- RIGHT PANEL -->
   <div id="right">
-    <div id="obj-card">
-      <div id="obj-phase-label">Phase 1 of 9</div>
-      <div id="obj-title">Find your location</div>
-      <div id="obj-context">Before anything else, you need to know where you are.</div>
-      <div id="obj-cmd-label">Expected command</div>
-      <div id="obj-cmd-row">
-        <div id="obj-cmd-val" class="blurred">pwd</div>
-        <button id="obj-reveal" onclick="revealCmd()">show</button>
-      </div>
-      <div id="obj-meta">
-        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
-        <span id="obj-score">Score: <span id="score-n">100</span></span>
-      </div>
-      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
-    </div>
- 
-    <div id="lola-sec">
-      <div id="lola-hd">
-        <div id="lola-avatar">L</div>
-        <div id="lola-name">L.O.L.A.</div>
-        <div id="lola-online">ready</div>
-      </div>
-      <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
-    </div>
- 
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Learn your first command to unlock it here</span></div>
@@ -742,7 +777,25 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
   </div>
 </div>
- 
+
+<!-- PHASE CHECKPOINT -->
+<div id="phase-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--blue)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Terminal Navigation complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is saved automatically.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>File Operations</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
 <!-- ACHIEVEMENTS -->
 <div id="ach-modal" class="modal">
   <div class="mbox">
@@ -809,7 +862,12 @@ let G = {
   bossActive:false,
   bossStep:0,
   bossScore:0,
+  pendingPhaseStart:false,
+  analytics:null,
 };
+
+const COURSE_ID='vibe-cadet-gold';
+const CADET_SAVE_KEY='vibe_cadet_gold_v1';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -1017,8 +1075,10 @@ const LOLA_STRIP = {
 /* ── LOLA STRIP ENGINE ── */
 let _stripRotateInterval = null;
 
-function setLolaStrip(stepId){
-  const msgs = LOLA_STRIP[stepId];
+function setLolaStrip(stepOrId){
+  const msgs = typeof stepOrId === 'object'
+    ? (stepOrId.lola_strip || LOLA_STRIP[stepOrId.id])
+    : LOLA_STRIP[stepOrId];
   const inner = document.getElementById('lola-strip-inner');
   if(!inner) return;
 
@@ -1203,7 +1263,7 @@ const DIAGNOSE = {
 const SPACED_CALLBACKS = {
   2: {q:'Before we dive in — cold recall from Phase 1. What single command prints your exact current location in the filesystem?', answer:'pwd', hint:'P _ D'},
   3: {q:'Quick recall from Phase 2: you want to write "Hello world" into a file called notes.txt, creating it if it doesn\'t exist. What\'s the exact command?', answer:'echo', acceptFn:(v)=>v.startsWith('echo')&&v.includes('>')&&v.includes('notes.txt'), hint:'echo "..." > ...'},
-  4: {q:'Phase 3 recall: you\'ve modified a file and want to snapshot it into Git history. What are the two commands you must run in order?', answer:'git add then git commit', acceptFn:(v)=>v.includes('git add')&&v.includes('commit')||v==='git add . && git commit -m'||v.includes('add')&&v.includes('commit'), hint:'git ___ . && git ___ -m "..."'},
+  4: {q:'Phase 3 recall: you\'ve modified a file and want to snapshot it into Git history. What are the two commands you must run in order?', answer:'git add then git commit', acceptFn:(v)=>includesInOrder(v,['git add','git commit'])||includesInOrder(v,['add','commit']), hint:'git ___ . && git ___ -m "..."'},
   5: {q:'Quick check: your teammate just cloned your repository. The node_modules folder is missing. What\'s the ONE command they run to restore it?', answer:'bun install', acceptFn:(v)=>v.includes('bun install')||v.includes('npm install'), hint:'bun ___'},
   6: {q:'Phase 5 recall: you want to count how many lines in logs.txt contain the word "ERROR". Build the pipeline.', answer:'cat logs.txt | grep ERROR | wc -l', acceptFn:(v)=>v.includes('logs.txt')&&v.includes('grep')&&v.includes('wc'), hint:'cat ... | grep ... | wc -l'},
   7: {q:'Git recall: what command tells you the current state of your repository — which files are staged, modified, or untracked?', answer:'git status', acceptFn:(v)=>v==='git status'||v==='git status -s', hint:'git ___'},
@@ -1214,8 +1274,9 @@ const SPACED_CALLBACKS = {
 const CHALLENGES = {
   1: {
     title:'Navigation Challenge',
-    scenario:'The ship\'s navigation computer is lost. You\'ve just SSH\'d into an unfamiliar server. Using ONLY what you\'ve learned, show: (1) where you are, and (2) what files are in this directory.',
-    acceptFn:(v)=>v.includes('pwd')||v.includes('ls'),
+    scenario:'The ship\'s navigation computer is lost. You\'ve just SSH\'d into an unfamiliar server. Using ONLY what you\'ve learned, show: (1) where you are, and (2) what files are in this directory. Type both answers separated by a space.',
+    acceptFn:(v)=>includesInOrder(v,['pwd','ls']),
+    retryHint:'Run the same mental sequence you use on any unfamiliar machine: orient first, then inspect.',
     successMsg:'Correct approach! In a real scenario you\'d run pwd first, then ls -la to see everything including hidden files.',
     unlockMsg:'Challenge complete: you can orient yourself on any unfamiliar system.'
   },
@@ -1223,6 +1284,7 @@ const CHALLENGES = {
     title:'File Operations Challenge',
     scenario:'The mission log file was corrupted. Create a new one called mission-log.txt and write "STATUS: OPERATIONAL" into it — using terminal commands only.',
     acceptFn:(v)=>(v.startsWith('touch')&&v.includes('mission-log'))||(v.startsWith('echo')&&v.includes('mission-log')&&v.includes('>')),
+    retryHint:'Focus on the goal state: file exists and contains text. One command can do both if you use redirection.',
     successMsg:'Mission log created! Note: echo "..." > file.txt does both steps at once — it creates the file AND writes to it.',
     unlockMsg:'Challenge complete: you can create and populate files without ever opening an editor.'
   },
@@ -1230,6 +1292,7 @@ const CHALLENGES = {
     title:'Git Challenge',
     scenario:'You\'ve edited three files but only want to commit changes to README.md. The others are work-in-progress. What\'s your exact sequence of commands?',
     acceptFn:(v)=>(v.includes('git add readme')||v.includes('git add README'))&&v.includes('commit'),
+    retryHint:'Think precision over speed: stage only one file, then snapshot.',
     successMsg:'Exactly right! git add README.md (specific file) then git commit -m "message". This is the precision that makes Git history clean and professional.',
     unlockMsg:'Challenge complete: you understand selective staging — the mark of a professional Git workflow.'
   },
@@ -1237,6 +1300,7 @@ const CHALLENGES = {
     title:'Log Analysis Challenge',
     scenario:'Someone reported three CRITICAL errors happened on this ship yesterday afternoon. Prove the count. The log file is logs.txt.',
     acceptFn:(v)=>v.includes('cat logs.txt')&&v.includes('grep')&&(v.toLowerCase().includes('critical'))&&v.includes('wc'),
+    retryHint:'Use the pipeline pattern exactly: read, filter, then count.',
     successMsg:'Pipeline correct! cat → grep → wc -l is the exact pattern used in real ops work to count incidents.',
     unlockMsg:'Challenge complete: you can build data pipelines from scratch without step-by-step guidance.'
   },
@@ -1246,14 +1310,15 @@ const CHALLENGES = {
 const BREAKIT = {
   2: {
     title:'Something\'s wrong with this command',
-    scenario:'A junior dev on your team ran this and got no output:\n\ncat manifest.txt > grep "Mission"\n\nWhat\'s wrong? Fix it.',
+    scenario:'A junior dev on your team tried to write to the file with this command:\n\necho "Mission: Escape Pod" manifest.txt\n\nIt printed to the screen but did not save anything. What\'s wrong? Fix it.',
     diagnose:(v)=>{
       const vl=v.toLowerCase();
-      if((vl.includes('cat manifest.txt')&&vl.includes('|')&&vl.includes('grep'))||(vl.includes('pipe')||vl.includes('should be |')||vl.includes('replace > with |'))) return true;
+      if(vl.startsWith('echo')&&vl.includes('>')&&vl.includes('manifest.txt')) return true;
       return false;
     },
-    solution:'cat manifest.txt | grep "Mission"',
-    explanation:'The bug: <code>></code> is a redirect (writes to a file), not a pipe. <code>cat manifest.txt > grep</code> would create a file called "grep" containing manifest\'s contents! The fix is <code>|</code> (pipe), which passes output to the next command.',
+    solution:'echo "Mission: Escape Pod" > manifest.txt',
+    explanation:'The bug: <code>echo</code> prints text, but without <code>></code> nothing gets written to a file. <code>></code> is the redirect operator that sends the output into <code>manifest.txt</code>. This keeps Phase 2 focused on the file-writing pattern you just learned.',
+    retryHint:'You are very close. Ask: where does echo output go if you do not include a redirect operator?'
   },
   4: {
     title:'Dependency install is failing',
@@ -1264,6 +1329,7 @@ const BREAKIT = {
     },
     solution:'bun add hono',
     explanation:'<code>bun hono</code> is not a valid command. To install a new package, use <code>bun add packagename</code>. <code>bun install</code> (no args) installs existing deps from package.json. <code>bun add</code> adds a new one.',
+    retryHint:'Think subcommand pattern: the tool is bun, then the action you want is add.'
   },
 };
  
@@ -1274,17 +1340,17 @@ const PHASES = [null,
  
 /* ── P1: Terminal Navigation ── */
 {title:'Terminal Navigation',
- lolaIntro:"Hello Cadet, I'm your Logistical Organization & Learning Assistant, but you can call me L.O.L.A. The SS StackOverflow has docked. Before anything else, you need to know how to move around. The prompt, at the bottom of your screen, is your primary interface — let's start with your GPS.",
+ lolaIntro:"Hello Cadet, I'm your Logistical Organization & Learning Assistant, but you can call me L.O.L.A. I am your teacher in the box to the right. Before each objective, look for two things: what the terminal word means, and what you are about to do with it. A <b>command</b> is an instruction you type. Sometimes commands also take an <b>argument</b> like a file or folder name. Later you will also see <b>flags</b> like <code>-la</code> and <b>subcommands</b> like <code>git init</code>. First, let's learn how to orient yourself.",
  steps:[
-  {id:'p1s1', obj:'Find out where you are', ctx:'Every terminal session starts somewhere in the filesystem. Print your current location (or Working Directory). You do this by typing a command.',
+  {id:'p1s1', obj:'Find out where you are', ctx:'Every terminal session starts somewhere in the filesystem. Your first job is to ask: where am I? Type a <b>command</b> into the prompt at the bottom. If you want help, type <code>man</code> to see a list of commands.',
    cmd:['pwd'], accept:['pwd'],
    hint:'Type: pwd — stands for "print working directory"',
    out:'/home/cadet/projects',
    unlockCmd:'pwd',
    jit:{title:'What is a filesystem path?',body:'Your computer stores files in a tree of folders. A <b>path</b> is the address of any file or folder, written with slashes: <code>/home/cadet/projects</code>. The leading <code>/</code> is the <b>root</b> — the very top of the tree. Everything lives inside root.'},
-   bridge:{title:'This is used every day',body:'Developers type <code>pwd</code> dozens of times a day — especially after <code>cd</code>-ing (changing directory) around a complex project. You\'ll also see paths in error messages like <code>Error: cannot find /home/cadet/projects/src/app.ts</code>. Knowing how to read paths means you can find the problem instantly.',tags:['Linux','macOS','WSL','Docker containers']},
+   bridge:{title:'This first COMMAND is used every day',body:'Developers type <code>pwd</code> dozens of times a day — especially after <code>cd</code>-ing (changing directory) around a complex project. You\'ll also see paths in error messages like <code>Error: cannot find /home/cadet/projects/src/app.ts</code>. Knowing how to read paths means you can find the problem instantly.',tags:['Linux','macOS','WSL','Docker containers']},
    teach:{title:'What pwd does',body:'<b>pwd</b> = <b>P</b>rint <b>W</b>orking <b>D</b>irectory. It shows your exact location in the filesystem as an <b>absolute path</b> — starting from root <code>/</code>. Run it whenever you feel lost.'}},
-  {id:'p1s2', obj:'List the files in this directory', ctx:'Now see what\'s in your current folder. This is the most-used terminal command. You can type <code>man</> to see commands available, or use the MAN PAGES or GLOSSARY above for help. ',
+  {id:'p1s2', obj:'List, <code>ls</code> the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
    cmd:['ls','eza','ls -la','ls -l','ls -a','ls -lah'],
    accept:['ls','eza','ls -la','ls -l','ls -a','ls -lah','ls --all'],
    hint:'Type: ls (or try ls -la for full details)',
@@ -1295,7 +1361,7 @@ const PHASES = [null,
    teach:{title:'ls — your flashlight',body:'<code>ls</code> lists every file and folder here. Add flags for more power:<br><code>ls -a</code> — shows hidden files (starting with <code>.</code>)<br><code>ls -l</code> — long format with sizes, dates, permissions<br><code>ls -la</code> — both combined.'},
    concept:{icon:'🚩',title:'How flags work',body:'A <b>flag</b> modifies a command. Short flags use one dash: <code>-l</code>. Long flags use two: <code>--all</code>. You can chain short flags: <code>ls -la</code> = long format + all files.',
     examples:[{l:'List all files',c:'ls -a'},{l:'Long format',c:'ls -l'},{l:'Combined',c:'ls -la'},{l:'Human sizes',c:'ls -lah'}]}},
-  {id:'p1s3', obj:'Navigate into game_v1', ctx:'Move your terminal session into the project directory.',
+  {id:'p1s3', obj:'Navigate into game_v1', ctx:'Move (change directories) your terminal session into the project directory (game_v1). This is a COMMAND followed by a filename. Remember to use a space between the two.',
    cmd:['cd game_v1','cd game_v1/'],
    accept:['cd game_v1','cd game_v1/'],
    hint:'Type: cd game_v1',
@@ -1317,7 +1383,7 @@ const PHASES = [null,
  lolaIntro:"Creating and editing files from the terminal is faster than any GUI and fully automatable. Let's build that muscle.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1', obj:'Create a file called manifest.txt', ctx:'Create a new empty file without opening any editor.',
+  {id:'p2s1', obj:'Create a file called manifest.txt', ctx:'Create a new empty file without opening any editor. We will use a COMMAND followed by a file name, check your <code>man</code> for the right one.',
    cmd:['touch manifest.txt'], accept:['touch manifest.txt'],
    hint:'Type: touch manifest.txt',
    out:'manifest.txt created (0 bytes)',
@@ -1325,7 +1391,7 @@ const PHASES = [null,
    jit:{title:'Why create files from the terminal?',body:'The terminal lets you create files <i>programmatically</i> — in scripts, loops, and automated pipelines. <code>touch manifest.txt</code> creates an empty file in one keystroke. You can create 100 files with one command: <code>touch file{1..100}.txt</code>'},
    bridge:{title:'Used in build scripts and automation',body:'Build pipelines on services like GitHub Actions, Vercel, and Docker create files this way constantly — lock files, manifests, config files.',tags:['CI/CD','Automation','DevOps','Shell scripts']},
    teach:{title:'touch — create or timestamp',body:'<code>touch</code> creates an empty file if it doesn\'t exist — or updates its timestamp if it does. Key file commands:<br><code>rm filename</code> — delete a file<br><code>cp src dest</code> — copy it<br><code>mv src dest</code> — move or rename it<br><code>mkdir dirname</code> — create a folder'}},
-  {id:'p2s2', obj:'Write the content "Mission: Escape Pod" into manifest.txt', ctx:'Use echo with output redirection to write text into the file.',
+  {id:'p2s2', obj:'Write the content "Mission: Escape Pod" into manifest.txt', ctx:'Use <code>echo</code> with output redirection to write text into the file. The words between quotation marks are a <b>string</b> — plain text exactly as typed. Pattern: <code>command "string" > filename</code>.',
    cmd:['echo "Mission: Escape Pod" > manifest.txt'],
    accept:['echo "> manifest.txt'],
    acceptFn: v => v.startsWith('echo') && v.includes('> manifest.txt'),
@@ -1337,7 +1403,7 @@ const PHASES = [null,
    teach:{title:'echo and output redirection',body:'<code>echo</code> prints text to the terminal. The <code>></code> redirects that output into a file instead — overwriting it. Use <code>>></code> to append. This is I/O redirection — one of the most powerful Unix concepts.'},
    concept:{icon:'↔️',title:'I/O Redirection',body:'Every command has output (stdout). You can redirect it with special symbols.',
     examples:[{l:'Overwrite file',c:'echo "hi" > file.txt'},{l:'Append to file',c:'echo "more" >> file.txt'},{l:'Print file',c:'cat file.txt'},{l:'Filter output',c:'ls | grep .txt'}]}},
-  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly.',
+  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly. This COMMAND actually means concentrate',
    cmd:['cat manifest.txt'], accept:['cat manifest.txt'],
    hint:'Type: cat manifest.txt',
    out:'Mission: Escape Pod',
@@ -1359,7 +1425,7 @@ const PHASES = [null,
  lolaIntro:"Every professional developer uses Git. It tracks every change to your code, lets you collaborate without conflict, and means you never lose work. Non-negotiable knowledge.",
  spacedRep:SPACED_CALLBACKS[3],
  steps:[
-  {id:'p3s1', obj:'Initialize a Git repository', ctx:'Turn this folder into a Git repo so Git can start tracking changes.',
+  {id:'p3s1', obj:'Initialize a Git repository', ctx:'Turn this folder into a Git repo so Git can start tracking changes. This is your first <b>command + subcommand</b> pattern: <code>git</code> is the command, <code>init</code> is the subcommand.',
    cmd:['git init'], accept:['git init'],
    hint:'Type: git init',
    out:'Initialized empty Git repository in ~/projects/game_v1/.git/',
@@ -1369,14 +1435,14 @@ const PHASES = [null,
    teach:{title:'git init — birth of a repository',body:'<code>git init</code> created a hidden <code>.git/</code> folder. That folder IS the repository. Run <code>ls -a</code> to see it. <b>Never delete .git</b> unless you want to destroy all history.'},
    concept:{icon:'⏳',title:'Why version control?',body:'Without Git: you save "backup_v2_FINAL_really_final.zip". With Git: every change is tracked with a message, author, and timestamp. Jump back to any point. See who changed what.',
     examples:[{l:'See full history',c:'git log --oneline'},{l:'See what changed',c:'git diff'},{l:'Jump to any commit',c:'git checkout abc123'},{l:'Undo last commit',c:'git revert HEAD'}]}},
-  {id:'p3s2', obj:'Check repository status', ctx:'See which files Git knows about.',
+  {id:'p3s2', obj:'Check repository status', ctx:'See which files Git knows about. We are going to use a SUBCOMMAND that checks the status.',
    cmd:['git status','git status -s'], accept:['git status','git status -s'],
    hint:'Type: git status',
    out:'On branch main\n\nUntracked files:\n  manifest.txt\n\nNothing added to commit yet',
    jit:{title:'What does "untracked" mean?',body:'Git sees <code>manifest.txt</code> exists in the folder, but hasn\'t been told to track it yet. Think of Git as a photographer — <b>untracked</b> means it\'s in the room but not in the photo. You have to explicitly add files with <code>git add</code>.'},
    bridge:{title:'git status is your first reflex',body:'Before every <code>git add</code>, <code>git commit</code>, or <code>git push</code>, professional developers run <code>git status</code>. It prevents accidents.',tags:['Daily workflow','Code review','Team collaboration']},
    teach:{title:'git status — your compass',body:'<code>git status</code> is your most-used Git command. It shows: <b>untracked</b> files, <b>staged</b> files, <b>modified</b> files. Run it constantly — before and after every Git operation.'}},
-  {id:'p3s3', obj:'Stage manifest.txt', ctx:'Add the file to Git\'s staging area — the queue before committing.',
+  {id:'p3s3', obj:'Stage manifest.txt', ctx:'Add the file to Git\'s staging area — the queue before committing. Here we use a COMMAND and SUBCOMMAND to add it followed by the file name.',
    cmd:['git add manifest.txt','git add .','git add -A'],
    accept:['git add manifest.txt','git add .','git add -a','git add --all'],
    hint:'Type: git add manifest.txt — or "git add ." to stage everything',
@@ -1384,7 +1450,7 @@ const PHASES = [null,
    jit:{title:'Why does staging exist?',body:'Imagine you changed 5 files but only want to commit 2 of them. Staging (<code>git add</code>) is a "pre-commit holding area." You explicitly choose what goes into each commit. This makes your history clean and meaningful.'},
    bridge:{title:'Clean commits tell a story',body:'When teammates review your code or you debug a problem 6 months later, commit history is your documentary. The staging area is what makes precise, meaningful commits possible.',tags:['Code review','Git history','Team standards','Open source']},
    teach:{title:'The staging area — why it exists',body:'Git\'s two-step process: <b>stage</b> then <b>commit</b>. Staging (<code>git add</code>) lets you pick exactly which changes go into a commit. <code>git add .</code> stages everything in the current folder.'}},
-  {id:'p3s4', obj:'Commit the staged file', ctx:'Create a permanent snapshot with a descriptive message.',
+  {id:'p3s4', obj:'Commit the staged file with "Add mission manifest" tag.', ctx:'Create a permanent snapshot with a descriptive message. We are going to use a COMMAND and SUBCOMMAND and add a flag before our message. The <code>-m</code> flag tells it to add this message to my file, followed by the staged file.',
    cmd:['git commit -m'],
    acceptFn: v => v.startsWith('git commit -m') && v.length > 14,
    accept:['git commit -m'],
@@ -1506,14 +1572,14 @@ const PHASES = [null,
  lolaIntro:"Here's where vibe coding gets its name. Instead of doing everything yourself, you build a crew of AI agents — each with a role. I'll show you how to create, wire, and direct them.",
  spacedRep:SPACED_CALLBACKS[6],
  steps:[
-  {id:'p6s1', obj:'Check current agent status', ctx:'Before creating agents, see what\'s running.',
+  {id:'p6s1', obj:'Check current agent status', ctx:'Before creating agents, see what\'s running. In this sim, <code>vibe</code> is the command family for the AI-agent runtime. Think of it like <code>git</code>, <code>docker</code>, or <code>kubectl</code>: one tool name, then subcommands like <code>status</code>, <code>create</code>, and <code>deploy</code>.',
    cmd:['vibe status','vibe agents','vibe ls'],
    accept:['vibe status','vibe agents','vibe ls','vibe list'],
    hint:'Type: vibe status',
    out:'VIBE AGENT RUNTIME v2.0\nActive agents: 0\nMCP connections: 0\nStatus: ready to initialize',
    unlockCmd:'vibe',
    jit:{title:'What makes an AI agent different from a chatbot?',body:'A chatbot <i>responds</i>. An AI agent <i>acts</i>. An agent has access to <b>tools</b> — functions it can call to do real things: read your filesystem, run shell commands, search the web, call APIs. When you give it a goal, it decides which tools to use, in what order, until the goal is complete.'},
-   bridge:{title:'Agents are reshaping how software gets built',body:'Claude Code, GitHub Copilot Workspace, Devin, Cursor — all of these are agent systems. Understanding how to create and direct agents is a new core developer skill.',tags:['Claude Code','Cursor','Devin','GitHub Copilot','Future of dev']},
+   bridge:{title:'What a real-world command might look like',body:'<code>vibe status</code> is the simulation stand-in for checking an AI tool runtime. In the real world, the exact command depends on the tool: <code>docker ps</code>, <code>kubectl get pods</code>, <code>gh auth status</code>, <code>claude --help</code>, or a web dashboard. The transferable pattern is: <b>tool name + status/list subcommand</b>.',tags:['CLI tools','Agents','Docker','kubectl','Real-world pattern']},
    teach:{title:'What is an AI agent?',body:'An AI agent = an AI model + a set of <b>tools</b> it can use autonomously. The model decides when to use each tool. Common tools: read/write files, run shell commands, search the web, call APIs.'}},
   {id:'p6s2', obj:'Create a Manager agent named Captain', ctx:'The manager agent coordinates the crew — it breaks big goals into sub-tasks.',
    cmd:['vibe create --role manager --name Captain'],
@@ -1854,7 +1920,17 @@ const EASTER = {
  
 /* ── CUSTOM ACCEPTS ── */
 function norm(s){return s.toLowerCase().trim().replace(/\s+/g,' ')}
- 
+
+function includesInOrder(value, parts){
+  let idx=0;
+  for(const part of parts){
+    const found=value.indexOf(part, idx);
+    if(found===-1) return false;
+    idx=found+part.length;
+  }
+  return true;
+}
+
 function matchesStep(input, step){
   const n=norm(input);
   if(step.acceptFn){return step.acceptFn(n)||step.acceptFn(input.trim())}
@@ -1864,6 +1940,15 @@ function matchesStep(input, step){
     if(n.startsWith(an) && (an.endsWith('-m')||an.endsWith('echo'))) return true;
   }
   return false;
+}
+
+function buildShuffledOptions(q){
+  const order=q.opts.map((opt,idx)=>({opt,idx}));
+  for(let i=order.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [order[i],order[j]]=[order[j],order[i]];
+  }
+  return order;
 }
  
 /* ════ J.A.N.E.T. PERSONALITY LINES ════ */
@@ -1903,7 +1988,9 @@ function showJanetQuizWithQ(q){
   return new Promise(res=>{
     const uid='jq'+Date.now();
     _quizFeedbackMap[uid]=q.fb;
-    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const order=buildShuffledOptions(q);
+    const correctIndex=order.findIndex(item=>item.idx===q.correct);
+    const opts=order.map((item,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${correctIndex},'${uid}')">${String.fromCharCode(65+i)}. ${item.opt}</button>`).join('');
     const intro=janetIntro();
     const w=document.createElement('div');
     w.className='janet-arrival';w.id=uid;
@@ -2197,13 +2284,7 @@ document.addEventListener('click',e=>{
 function appendLine(text, cls='ln-sys'){
   const d=document.createElement('div');
   d.className='ln '+cls;
-  if(cls.includes('ln-cmd')){
-    const now = new Date();
-    const ts = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] `;
-    d.textContent = ts + text;
-  } else {
-    d.textContent=text;
-  }
+  d.textContent=text;
   $out.appendChild(d);
   $out.scrollTop=$out.scrollHeight;
   return d;
@@ -2214,15 +2295,6 @@ function appendLineS(text, cls='ln-sys'){
   const d=document.createElement('div');
   d.className='ln '+cls;
   d.textContent=text;
-  $outS.appendChild(d);
-  $outS.scrollTop=$outS.scrollHeight;
-  return d;
-}
-
-function appendHTMLS(html, cls='ln'){
-  const d=document.createElement('div');
-  d.className='ln '+cls;
-  d.innerHTML=html;
   $outS.appendChild(d);
   $outS.scrollTop=$outS.scrollHeight;
   return d;
@@ -2300,6 +2372,12 @@ function toggleHint(btn){
   btn.classList.toggle('open');
   btn.nextElementSibling.classList.toggle('open');
 }
+
+function renderStaticStep(step){
+  $outS.innerHTML='';
+  appendLineS(`▸ ${step.obj}`,'ln-info');
+  if(!G.hard && !G.practitioner) showHint(step.hint);
+}
  
 /* ── SMART DIAGNOSIS BLOCK ── */
 function showDiagnosis(stepId, input){
@@ -2313,13 +2391,21 @@ function showDiagnosis(stepId, input){
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
   return true;
 }
+
+function lolaRetryMsg(step, tries){
+  if(tries===1) return `L.O.L.A.: Good effort. Anchor to the objective: ${step.obj}`;
+  if(tries===2) return 'L.O.L.A.: You are close. Make one adjustment, then run it again.';
+  return `L.O.L.A.: Attempt ${tries}. Use "show" for exact syntax if needed, then run it once from memory.`;
+}
  
 /* ── QUIZ ── */
 let firstQuizAttempt=true;
 function showQuiz(q){
   return new Promise(res=>{
     const uid='q'+Date.now();
-    const opts=q.opts.map((o,i)=>`<button class="qopt" onclick="answerQuiz(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const order=buildShuffledOptions(q);
+    const correctIndex=order.findIndex(item=>item.idx===q.correct);
+    const opts=order.map((item,i)=>`<button class="qopt" onclick="answerQuiz(this,${i},${correctIndex},'${uid}')">${String.fromCharCode(65+i)}. ${item.opt}</button>`).join('');
     const w=document.createElement('div');
     w.className='quiz';
     w.id=uid;
@@ -2461,20 +2547,6 @@ const CMD_META = {
   'export': {label:'export',desc:'Set env variable'},
   'vibe':   {label:'vibe', desc:'AI orchestration'},
   'prompt': {label:'prompt',desc:'Send agent prompt'},
-  'ssh':    {label:'ssh',  desc:'Secure remote shell'},
-  'scp':    {label:'scp',  desc:'Copy files over SSH'},
-  'chmod':  {label:'chmod',desc:'Change file permissions'},
-  'curl':   {label:'curl', desc:'Make HTTP/API requests'},
-  'jq':     {label:'jq',   desc:'Process JSON from CLI'},
-  'docker': {label:'docker',desc:'Container runtime commands'},
-  'kill':   {label:'kill', desc:'Terminate process by PID'},
-  'tee':    {label:'tee',  desc:'Split output to file and stream'},
-  'ps':     {label:'ps',   desc:'Inspect running processes'},
-  'git stash': {label:'git stash', desc:'Store local changes temporarily'},
-  'git fetch': {label:'git fetch', desc:'Fetch remote refs safely'},
-  'git rebase': {label:'git rebase', desc:'Replay commits on new base'},
-  'git bisect': {label:'git bisect', desc:'Binary search breaking commit'},
-  'git cherry-pick': {label:'git cherry-pick', desc:'Apply one commit selectively'},
 };
  
 function unlockCmd(key){
@@ -2548,10 +2620,225 @@ function addAgent(role,name){
 }
  
 /* ── SAVE / LOAD ── */
-function save(){localStorage.setItem('vca_v4',JSON.stringify(G))}
+function makeSessionId(){
+  if(typeof crypto!=='undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+}
+
+function freshAnalytics(){
+  return {
+    version:1,
+    courseId:COURSE_ID,
+    sessionId:makeSessionId(),
+    sessionStartedAt:Date.now(),
+    lastEventAt:null,
+    events:[],
+    phases:{},
+    steps:{},
+  };
+}
+
+function ensureAnalytics(){
+  if(!G.analytics || typeof G.analytics!=='object') G.analytics=freshAnalytics();
+  const a=G.analytics;
+  if(!a.version) a.version=1;
+  if(!a.courseId) a.courseId=COURSE_ID;
+  if(!a.sessionId) a.sessionId=makeSessionId();
+  if(!a.sessionStartedAt) a.sessionStartedAt=Date.now();
+  if(!Array.isArray(a.events)) a.events=[];
+  if(!a.phases || typeof a.phases!=='object') a.phases={};
+  if(!a.steps || typeof a.steps!=='object') a.steps={};
+}
+
+function analyticsEvent(type, payload={}){
+  ensureAnalytics();
+  const evt={type,ts:Date.now(),phase:G.phase,step:G.step,...payload};
+  G.analytics.events.push(evt);
+  if(G.analytics.events.length>1800) G.analytics.events.shift();
+  G.analytics.lastEventAt=evt.ts;
+}
+
+function stepKeyFromState(stepObj){
+  if(stepObj?.id) return stepObj.id;
+  return `p${G.phase}s${G.step+1}`;
+}
+
+function phaseKey(phaseNum){ return `p${phaseNum}`; }
+
+function ensurePhaseRecord(phaseNum, phaseObj){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  const rec=G.analytics.phases[key] || {
+    phase:phaseNum,
+    title:phaseObj?.title || '',
+    startedAt:null,
+    completedAt:null,
+    durationMs:null,
+  };
+  if(phaseObj?.title) rec.title=phaseObj.title;
+  G.analytics.phases[key]=rec;
+  return rec;
+}
+
+function ensureStepRecord(stepObj, phaseObj){
+  const key=stepKeyFromState(stepObj);
+  ensureAnalytics();
+  const rec=G.analytics.steps[key] || {
+    stepId:key,
+    phase:G.phase,
+    phaseTitle:phaseObj?.title || '',
+    objective:stepObj?.obj || '',
+    startedAt:null,
+    firstCorrectAt:null,
+    completedAt:null,
+    ttrMs:null,
+    attempts:0,
+    wrongAttempts:0,
+    commandCount:0,
+    lastInput:'',
+  };
+  rec.phase=G.phase;
+  if(phaseObj?.title) rec.phaseTitle=phaseObj.title;
+  if(stepObj?.obj) rec.objective=stepObj.obj;
+  G.analytics.steps[key]=rec;
+  return rec;
+}
+
+function markPhaseStart(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('phase_started',{phaseId:phaseKey(phaseNum),title:rec.title});
+  }
+}
+
+function markPhaseComplete(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.completedAt=Date.now();
+  rec.durationMs=Math.max(0, rec.completedAt-rec.startedAt);
+  analyticsEvent('phase_completed',{phaseId:phaseKey(phaseNum),title:rec.title,durationMs:rec.durationMs});
+}
+
+function markStepStart(stepObj, phaseObj){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('step_started',{stepId:rec.stepId,objective:rec.objective});
+  }
+}
+
+function markStepAttempt(stepObj, phaseObj, input, correct){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.attempts += 1;
+  rec.commandCount += 1;
+  rec.lastInput = (input||'').slice(0,160);
+  if(!correct) rec.wrongAttempts += 1;
+  analyticsEvent('step_attempt',{stepId:rec.stepId,correct,input:rec.lastInput});
+  if(correct){
+    const now=Date.now();
+    if(!rec.firstCorrectAt) rec.firstCorrectAt=now;
+    rec.completedAt=now;
+    rec.ttrMs=Math.max(0, now-rec.startedAt);
+    analyticsEvent('step_completed',{stepId:rec.stepId,ttrMs:rec.ttrMs,attempts:rec.attempts});
+  }
+}
+
+function getTTRReport(){
+  ensureAnalytics();
+  return Object.values(G.analytics.steps)
+    .sort((a,b)=>(a.phase-b.phase)||a.stepId.localeCompare(b.stepId))
+    .map(s=>({
+      stepId:s.stepId,
+      phase:s.phase,
+      phaseTitle:s.phaseTitle,
+      objective:s.objective,
+      attempts:s.attempts,
+      wrongAttempts:s.wrongAttempts,
+      ttrSeconds:s.ttrMs==null?null:Math.round(s.ttrMs/1000),
+    }));
+}
+
+function getHeatmapReport(){
+  ensureAnalytics();
+  return Object.values(G.analytics.steps)
+    .sort((a,b)=>(a.phase-b.phase)||a.stepId.localeCompare(b.stepId))
+    .map(s=>{
+      const timePenalty=Math.min(40, Math.round((s.ttrMs||0)/30000));
+      const errorPenalty=Math.min(50, s.wrongAttempts*10);
+      const mastery=Math.max(0, 100-timePenalty-errorPenalty);
+      return {
+        stepId:s.stepId,
+        phase:s.phase,
+        objective:s.objective,
+        masteryScore:mastery,
+        intensity:100-mastery,
+      };
+    });
+}
+
+function getGanttReport(){
+  ensureAnalytics();
+  return {
+    phases:Object.values(G.analytics.phases)
+      .sort((a,b)=>a.phase-b.phase)
+      .map(p=>({
+        id:phaseKey(p.phase),
+        label:`Phase ${p.phase}: ${p.title||''}`.trim(),
+        startTs:p.startedAt,
+        endTs:p.completedAt,
+        durationMinutes:p.durationMs==null?null:Math.round(p.durationMs/60000),
+      })),
+    steps:Object.values(G.analytics.steps)
+      .sort((a,b)=>(a.phase-b.phase)||a.stepId.localeCompare(b.stepId))
+      .map(s=>({
+        id:s.stepId,
+        phase:s.phase,
+        label:s.objective,
+        startTs:s.startedAt,
+        endTs:s.completedAt,
+        durationSeconds:s.ttrMs==null?null:Math.round(s.ttrMs/1000),
+      })),
+  };
+}
+
+function getAnalyticsSnapshot(){
+  ensureAnalytics();
+  return JSON.parse(JSON.stringify({
+    meta:{
+      courseId:COURSE_ID,
+      generatedAt:new Date().toISOString(),
+      learner:G.name,
+      phase:G.phase,
+      step:G.step,
+    },
+    raw:G.analytics,
+    ttr:getTTRReport(),
+    heatmap:getHeatmapReport(),
+    gantt:getGanttReport(),
+  }));
+}
+
+window.vibeAnalytics={
+  getRaw:()=>JSON.parse(JSON.stringify(G.analytics||{})),
+  getTTRReport,
+  getHeatmapReport,
+  getGanttReport,
+  getSnapshot:getAnalyticsSnapshot,
+  exportJSON:()=>JSON.stringify(getAnalyticsSnapshot(),null,2),
+};
+
+function save(){
+  ensureAnalytics();
+  localStorage.setItem(CADET_SAVE_KEY,JSON.stringify(G));
+}
 function loadSave(){
-  const raw=localStorage.getItem('vca_v4');
+  const raw=localStorage.getItem(CADET_SAVE_KEY);
   if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
+  ensureAnalytics();
 }
  
 /* ── CAREER LOG ── */
@@ -2563,6 +2850,25 @@ function addCareerEntry(phaseIdx){
 }
  
 /* ── UI SYNC ── */
+function sidebarTeachForStep(step){
+  const pre=step.pre_step_concept || PRE_STEP_CONCEPTS[step.id];
+  if(pre) return pre;
+  if(step.jit) return {title:step.jit.title, body:step.jit.body, icon:'📘'};
+  if(step.teach) return {title:step.teach.title, body:step.teach.body, icon:'📚'};
+  return {
+    title:'What you are about to do',
+    body:step.ctx,
+    icon:'→'
+  };
+}
+
+function lolaMessageForStep(step, phase){
+  const teach=sidebarTeachForStep(step);
+  if(teach?.body) return teach.body;
+  if(step.ctx) return step.ctx;
+  return phase?.lolaIntro || '';
+}
+
 function syncObjCard(){
   if(G.sandbox){
     document.getElementById('obj-phase-label').textContent='SANDBOX MODE';
@@ -2575,7 +2881,8 @@ function syncObjCard(){
   const s=ph.steps[G.step];if(!s)return;
   document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of ${PHASES.length-1} — ${ph.title}`;
   document.getElementById('obj-title').textContent=s.obj;
-  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-context').innerHTML=s.ctx;
+  document.getElementById('obj-cmd-row').style.display='flex';
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('obj-reveal').textContent='show';
@@ -2605,7 +2912,15 @@ function syncDots(){
   track.appendChild(sep2);
 }
  
-function setLola(msg){document.getElementById('lola-msg').textContent=msg}
+function setLola(msg){document.getElementById('lola-msg').innerHTML=msg}
+function openPhaseCheckpoint(completedPhase, nextPhase){
+  const completedIndex=PHASES.findIndex(p=>p===completedPhase);
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
+  document.getElementById('phase-modal-title').textContent=`${completedPhase.title} complete`;
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is already saved, so you can pause here and come back when you are ready.';
+  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>`;
+  openModal('phase-modal');
+}
 function setLolaStripGeneric(tag, msg){
   const inner=document.getElementById('lola-strip-inner');
   if(!inner)return;
@@ -2621,6 +2936,13 @@ function revealCmd(){
   telem('Hint revealed by user');
   G.phaseReveal=true;
 }
+
+function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.pendingPhaseStart=false;
+  save();
+  startPhase();
+}
  
 /* ═══════════════════════════════════════════════════════════════
    MAIN COMMAND PROCESSOR
@@ -2628,6 +2950,10 @@ function revealCmd(){
 async function processCmd(raw){
   const val=raw.trim();
   if(!val)return;
+  const ph=PHASES[G.phase];
+  const s=ph?.steps?.[G.step];
+  if(s) markStepStart(s, ph);
+  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive,inCapstone:!!G.capstoneActive});
  
   G.cmdHistory.unshift(val);
   if(G.cmdHistory.length>60)G.cmdHistory.pop();
@@ -2645,6 +2971,28 @@ async function processCmd(raw){
   if(vl.startsWith('man ')){
     const k=vl.slice(4).trim();
     if(!showManPage(k)) appendLine(`man: no entry for '${k}'. Type 'man' to list all.`,'ln-err');
+    syncObjCard();return;
+  }
+  if(vl==='analytics ttr'){
+    const rows=getTTRReport().slice(-8);
+    appendLine('Recent TTR rows (latest 8):','ln-info');
+    rows.forEach(r=>appendLine(`${r.stepId} | attempts:${r.attempts} | wrong:${r.wrongAttempts} | ttr:${r.ttrSeconds??'—'}s`,'ln-code'));
+    syncObjCard();return;
+  }
+  if(vl==='analytics heatmap'){
+    const rows=getHeatmapReport().slice(-8);
+    appendLine('Recent heatmap rows (latest 8):','ln-info');
+    rows.forEach(r=>appendLine(`${r.stepId} | mastery:${r.masteryScore} | intensity:${r.intensity}`,'ln-code'));
+    syncObjCard();return;
+  }
+  if(vl==='analytics gantt'){
+    const g=getGanttReport();
+    appendLine(`Gantt summary: ${g.phases.length} phases, ${g.steps.length} steps tracked.`,'ln-info');
+    g.phases.forEach(p=>appendLine(`${p.id} | ${p.durationMinutes??'—'}m | ${p.label}`,'ln-code'));
+    syncObjCard();return;
+  }
+  if(vl==='analytics export'){
+    appendLine('Analytics JSON ready in browser console as window.vibeAnalytics.exportJSON()','ln-success');
     syncObjCard();return;
   }
  
@@ -2671,7 +3019,7 @@ async function processCmd(raw){
       if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
       return;
     } else {
-      appendLine('Not quite — read the scenario again and think about what you\'ve learned so far.','ln-warn');
+      appendLine(`L.O.L.A.: Not yet. ${ch.retryHint || 'Re-read the objective and choose the command pattern that directly creates the target result.'}`,'ln-warn');
       return;
     }
   }
@@ -2691,7 +3039,7 @@ async function processCmd(raw){
       if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
       return;
     } else {
-      appendLine('Not quite — study the broken command carefully. What\'s wrong with it?','ln-warn');
+      appendLine(`L.O.L.A.: Almost there. ${bi.retryHint || 'Inspect the broken command token by token and fix the one incorrect or missing part.'}`,'ln-warn');
       return;
     }
   }
@@ -2705,11 +3053,10 @@ async function processCmd(raw){
   }
  
   // ── OBJECTIVE MATCHING ──
-  const ph=PHASES[G.phase];
-  const s=ph.steps[G.step];
+  if(!ph || !s) return;
  
   if(matchesStep(val,s)){
-    await handleCorrect(s,ph);
+    await handleCorrect(s,ph,val);
     syncObjCard();
     return;
   }
@@ -2721,7 +3068,7 @@ async function processCmd(raw){
   }
  
   // ── WRONG ANSWER FALLTHROUGH ──
-  handleWrong(val,s);
+  handleWrong(val,s,ph);
   syncObjCard();
 }
  
@@ -2765,7 +3112,8 @@ function handlePersistentCmd(vl, val){
   return false;
 }
  
-async function handleCorrect(s, ph){
+async function handleCorrect(s, ph, input){
+  markStepAttempt(s, ph, input, true);
   G.tries = 0;
   G.score = Math.max(G.score, 0);
  
@@ -2800,14 +3148,13 @@ async function handleCorrect(s, ph){
     await completePhase();
   } else {
     const next = ph.steps[G.step];
+    markStepStart(next, ph);
     blank();
-    appendHTMLS(`▸ Next: ${next.obj}`, 'ln-info');
-    if (!G.hard && !G.practitioner) showHint(next.hint);
-    showPreStepConcept(next.id);
+    renderStaticStep(next);
     
     // FORCE both sidebar + L.O.L.A. to update (this fixes the missing context)
-    setLola(next.ctx);
-    setLolaStrip(next.id);
+    setLola(lolaMessageForStep(next, ph));
+    setLolaStrip(next);
     syncObjCard();
     
     save();
@@ -2818,7 +3165,8 @@ async function handleCorrect(s, ph){
   syncObjCard();
 }
  
-function handleWrong(val, s){
+function handleWrong(val, s, ph){
+  markStepAttempt(s, ph, val, false);
   G.tries++;
   G.score=Math.max(0,G.score-5);
   document.getElementById('tries-n').textContent=G.tries;
@@ -2840,57 +3188,20 @@ function handleWrong(val, s){
   }
  
   if(G.tries===1){
-    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
+    if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
   } else if(G.tries===2){
-    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
+    if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
     if(!diagnosed) showHint(s.hint);
   } else if(G.tries>=3){
-    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
+    if(!diagnosed) appendLine(lolaRetryMsg(s, G.tries),'ln-warn');
     telem(`Struggling: phase ${G.phase} step ${G.step}, ${G.tries} attempts`);
   }
   save();
 }
-
-const CADET_RETRY_COACH = {
-  p1s1:[
-    'L.O.L.A.: You are learning the right rhythm. First objective: print your location with the shortest command.',
-    'L.O.L.A.: Close. Think “print working directory.” That phrase maps directly to one command.',
-    'L.O.L.A.: Use the "show" button in the objective card, run it once, then repeat from memory.'
-  ],
-  p1s2:[
-    'L.O.L.A.: Good attempt. This step is only about listing files in the current folder.',
-    'L.O.L.A.: You are close. Start with the base listing command first, then we add flags later.',
-    'L.O.L.A.: Use the "show" button in the objective card, then retype it without looking.'
-  ],
-  p1s3:[
-    'L.O.L.A.: Nice effort. We are changing directory into a specific folder.',
-    'L.O.L.A.: Keep the pattern: command + folder name. Destination is game_v1.',
-    'L.O.L.A.: Click the "show" button in the objective card, run it, then run it again from recall.'
-  ],
-  p2s1:[
-    'L.O.L.A.: Strong try. This step creates a blank file only.',
-    'L.O.L.A.: You are one token away. Use the file-creation command with manifest.txt.',
-    'L.O.L.A.: Use the objective-card "show" button, then run it once more from memory.'
-  ],
-  p2s2:[
-    'L.O.L.A.: Great attempt. Goal state is text written into the file, not just printed on screen.',
-    'L.O.L.A.: Keep this pattern: command + "string" + redirect + filename.',
-    'L.O.L.A.: Click "show" in the objective card, then retype the full command yourself.'
-  ]
-};
-
-function cadetRetryMsg(step, tries){
-  const lane = step?.id ? CADET_RETRY_COACH[step.id] : null;
-  if(lane && lane.length){
-    return lane[Math.min(Math.max(tries,1)-1, lane.length-1)];
-  }
-  if(tries===1) return `L.O.L.A.: Good effort. Anchor to the objective: ${step.obj}`;
-  if(tries===2) return 'L.O.L.A.: You are close. Make one adjustment and run it again.';
-  return `L.O.L.A.: Attempt ${tries}. Use the "show" button in the objective card if needed, then rerun from memory.`;
-}
  
 async function completePhase(){
   const ph=PHASES[G.phase];
+  markPhaseComplete(G.phase, ph);
   G.completedPhases.push(G.phase);
   addCareerEntry(G.phase - 1);
  
@@ -2926,31 +3237,38 @@ async function completePhase(){
   }
  
   G.phase++;G.step=0;G.tries=0;
+  G.pendingPhaseStart=true;
  
   if(G.phase<=PHASES.length-1){
-    setTimeout(startPhase,900);
+    const nextPh=PHASES[G.phase];
+    save();
+    openPhaseCheckpoint(ph, nextPh);
   }
   syncDots();save();
 }
- 
+
 function startPhase(){
+  if(G.pendingPhaseStart){
+    G.pendingPhaseStart=false;
+    save();
+  }
   const ph=PHASES[G.phase];
+  markPhaseStart(G.phase, ph);
   $outS.innerHTML=''; // clear static zone for fresh phase content
-  divlineS();
-  appendLineS(`┌── PHASE ${G.phase} OF ${PHASES.length-1}: ${ph.title.toUpperCase()} ──`,'ln-info');
-  blankS();
  
   // Spaced repetition callback
   const sr = ph.spacedRep;
   if(sr && !G.expert){
-    typedLine('L.O.L.A.: '+ph.lolaIntro,'ln-lola',$outS).then(async()=>{
+    setLola(ph.lolaIntro);
+    delay(50).then(async()=>{
       blank();
       await showSpacedRep(sr);
       blank();
       continuePhaseStart(ph);
     });
   } else {
-    typedLine('L.O.L.A.: '+ph.lolaIntro,'ln-lola',$outS).then(()=>continuePhaseStart(ph));
+    setLola(ph.lolaIntro);
+    continuePhaseStart(ph);
   }
 }
  
@@ -2962,20 +3280,20 @@ const PRE_STEP_CONCEPTS = {
   // First step ever — show what the filesystem looks like
   p1s1: {
     icon:'🗂️',
-    title:'Your filesystem — a quick map',
-    body:'Files live in a tree of folders. Here\'s where you are:\n\n<code>/</code>  (root — top of everything)\n└── <code>home/</code>\n    └── <code>cadet/</code>  ← your home\n        └── <code>projects/</code>  ← you are HERE\n            ├── <code>game_v1/</code>\n            ├── <code>README.txt</code>\n            └── <code>.env</code>  (hidden file)\n\nA path like <code>/home/cadet/projects</code> is your address in this tree.'
+    title:'Command, prompt, path',
+    body:'A <b>command</b> is an instruction you type into the terminal.\n\nThe <code>$</code> prompt means the computer is waiting for input.\n\nYour first command is <code>pwd</code>. It prints your current <b>path</b> — your address inside the file tree.\n\nExample path: <code>/home/cadet/projects</code>'
   },
   // Redirect operator — completely new syntax, must teach before use
   p2s2: {
     icon:'↪',
     title:'New operator: <code>></code> (redirect)',
-    body:'Without <code>></code>, <code>echo "hello"</code> just prints to screen.\nWith <code>></code>, it writes INTO a file: <code>echo "hello" > file.txt</code>\n\nUse <code>>></code> to APPEND instead of overwrite.\n\nThe <code>></code> key is Shift+. — it points toward the destination.'
+    body:'Without <code>></code>, <code>echo "hello"</code> just prints to screen.\nWith <code>></code>, it writes INTO a file: <code>echo "hello" > file.txt</code>\n\nThe text inside quotes is a <b>string</b> — exact text you want written.\n\nUse <code>>></code> to APPEND instead of overwrite.\n\nThe <code>></code> key is Shift+. — it points toward the destination.'
   },
   // git init one-time vs ongoing
   p3s1: {
     icon:'⏳',
-    title:'Starting Git — one-time setup',
-    body:'<code>git init</code> creates a hidden <code>.git/</code> folder. That folder IS your repository — every commit, branch, and piece of history lives there.\n\nYou only run <code>git init</code> ONCE per project. After that, use <code>git add</code> and <code>git commit</code> to save your work.'
+    title:'Command + subcommand',
+    body:'<code>git</code> is the main command. <code>init</code> is the <b>subcommand</b> — it tells Git which action to run.\n\nYou will see this pattern constantly:\n<code>git status</code>\n<code>git add file.txt</code>\n<code>git commit -m "message"</code>\n\nSame command family, different subcommands.'
   },
   // Merge conflict — warn before the shock of seeing conflict markers
   p3s5: {
@@ -3002,6 +3320,11 @@ const PRE_STEP_CONCEPTS = {
     body:'The pipe <code>|</code> takes the output of the left command and feeds it as input to the right command.\n\n<code>cat logs.txt | grep CRITICAL</code>\n→ read file, then filter for lines containing "CRITICAL"\n\nKeyboard: the pipe key is <b>Shift + \\</b> — usually above Enter. Look for the vertical bar character.'
   },
   // double-dash flags — p6s2 is first time they see --flag syntax
+  p6s1: {
+    icon:'🧭',
+    title:'What is <code>vibe</code>?',
+    body:'In this simulation, <code>vibe</code> is the command-line tool for the AI-agent system.\n\nThink of it like:\n<code>git status</code> — check repo state\n<code>docker ps</code> — check running containers\n<code>kubectl get pods</code> — check cluster workloads\n\nSo <code>vibe status</code> means: "show me the current state of the agent runtime."\n\nThe exact tool name may change in the real world, but the pattern stays the same: <b>tool name + status/list command</b>.'
+  },
   p6s2: {
     icon:'🚩',
     title:'New syntax: <code>--</code> named flags',
@@ -3027,30 +3350,31 @@ const PRE_STEP_CONCEPTS = {
   },
 };
 
+// Normalize legacy maps into per-step fields expected by the master prompt.
+for(const ph of PHASES){
+  if(!ph || !ph.steps) continue;
+  for(const step of ph.steps){
+    if(!step || !step.id) continue;
+    if(!step.pre_step_concept && PRE_STEP_CONCEPTS[step.id]) step.pre_step_concept = PRE_STEP_CONCEPTS[step.id];
+    if(!step.lola_strip && LOLA_STRIP[step.id]) step.lola_strip = LOLA_STRIP[step.id];
+  }
+}
+
 function showPreStepConcept(stepId){
-  if(G.hard || G.practitioner || G.expert) return; // Explorer mode only
-  const pc = PRE_STEP_CONCEPTS[stepId];
-  if(!pc) return;
-  const w = document.createElement('div');
-  w.className = 'teach';
-  w.style.borderLeftColor = 'var(--amber)';
-  w.style.background = 'var(--amber-bg)';
-  w.innerHTML = `<div class="teach-title" style="color:var(--amber)">${pc.icon} Before you type — ${pc.title}</div><div class="teach-body" style="white-space:pre-line">${pc.body}</div>`;
-  $outS.appendChild(w);
-  $outS.scrollTop = $outS.scrollHeight;
+  // Intentionally disabled.
+  // Pre-step teaching is routed through L.O.L.A. + strip to avoid
+  // repeating guidance in multiple places at once.
+  return;
 }
 
 function continuePhaseStart(ph){
-  blankS();
   const s=ph.steps[0];
-  appendHTMLS(`▸ ${s.obj}`,'ln-info');
-  if(!G.hard && !G.practitioner) showHint(s.hint);
-  // Show JIT card for the first step so context is visible before the player answers
+  markStepStart(s, ph);
+  renderStaticStep(s);
   if(s.jit && !G.hard) showJIT(s.jit);
   if(s.bridge && !G.hard) showBridge(s.bridge);
-// Show pre-step concept for steps that introduce brand-new syntax
-  showPreStepConcept(s.id);
-  setLola(s.ctx);
+  setLola(lolaMessageForStep(s, ph));
+  setLolaStrip(s);
   syncObjCard();
   syncDots();
   telem(`Phase ${G.phase} started: ${ph.title}`);
@@ -3169,7 +3493,7 @@ function handleCapstone(val){
     G.capstoneStep++;
     setTimeout(showCapstoneStep,700);
   } else {
-    appendLine('Not quite — think about what you\'ve learned and try again.','ln-warn');
+    appendLine('L.O.L.A.: Keep going. Re-state the objective in one sentence, then choose the command sequence that proves that outcome.','ln-warn');
   }
 }
  
@@ -3214,7 +3538,7 @@ $cmd.addEventListener('keydown',e=>{
     $cmd.value=G.histIdx>=0?G.cmdHistory[G.histIdx]:'';
   } else if(e.key==='Tab'){
     e.preventDefault();
-    if(G.sandbox)return;
+    if(G.sandbox||G.capstoneActive)return;
     const ph=PHASES[G.phase];if(!ph)return;
     const s=ph.steps[G.step];if(!s||!s.cmd)return;
     const partial=$cmd.value;
@@ -3282,15 +3606,14 @@ function renderCareerModal(){
  
 function doRestart(){
   if(confirm('Restart the entire Academy from scratch?')){
-    localStorage.removeItem('vca_v4');
+    localStorage.removeItem(CADET_SAVE_KEY);
     location.reload();
   }
 }
  
 function shareGrad(){
   const txt=`Just graduated Vibe Cadet Academy v4 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
-  const launchUrl = `${window.location.origin}/vibe-cadet.html`;
-  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
   closeModal('grad-modal');
 }
  
@@ -3379,7 +3702,6 @@ function resumeSession(){
  
   $outS.innerHTML='';
   appendLineS(`Welcome back, ${G.name}. Progress restored.`,'ln-lola');
-  blankS();
   renderUnlockedCmds();
   if(G.sandbox){
     appendLineS('You have graduated. Sandbox mode — explore freely.','ln-success');
@@ -3387,13 +3709,19 @@ function resumeSession(){
   } else if(G.bossActive){
     appendLineS('You were mid-assessment. J.A.N.E.T. is waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
+  } else if(G.pendingPhaseStart){
+    const ph=PHASES[G.phase];
+    renderStaticStep(ph.steps[0]);
+    setLola('Checkpoint reached. You finished a phase, and this is a good place to pause. When you are ready, start the next phase from the checkpoint dialog.');
+    openPhaseCheckpoint(PHASES[G.phase-1], ph);
   } else {
     const ph=PHASES[G.phase];
     const s=ph.steps[G.step];
-    appendLineS(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
-    appendLineS(`Current objective: ${s.obj}`,'ln-info');
-    if(!G.hard && !G.practitioner) showHint(s.hint);
-    setLola(s.ctx);
+    markPhaseStart(G.phase, ph);
+    markStepStart(s, ph);
+    renderStaticStep(s);
+    setLola(lolaMessageForStep(s, ph));
+    setLolaStrip(s);
   }
   syncDots();syncObjCard();
   $cmd.focus();
