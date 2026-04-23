@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Lieutenant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#1db954;
+  --green-d:#0d5c28;
+  --green-bg:#040f09;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --gold:#fbbf24;
+  --gold-bg:#16100;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--gold)}50%{box-shadow:0 0 14px var(--gold),0 0 28px rgba(251,191,36,.2)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--gold)}50%{text-shadow:0 0 16px var(--gold),0 0 32px rgba(251,191,36,.3)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{
+  grid-column:1/-1;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;padding:0 18px;
+}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--gold);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--gold)}
+
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--gold);border-color:var(--gold)}
+.pdot.active{background:var(--gold);border-color:var(--gold);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+#career-impact-btn:hover{background:var(--amber-bg)}
+
+/* ── LOLA TOPBAR TEACH STRIP ── */
+#lola-strip{
+  grid-column:1/-1;
+  background:linear-gradient(90deg,var(--amber-bg),var(--blue-bg));
+  border-bottom:1px solid var(--amber-d);
+  display:flex;align-items:center;gap:0;
+  height:28px;overflow:hidden;flex-shrink:0;
+  position:relative;
+}
+#lola-strip-avatar{
+  flex-shrink:0;
+  background:var(--amber-d);
+  color:var(--gold);
+  font-size:9px;font-weight:700;letter-spacing:.1em;
+  padding:0 10px;height:100%;display:flex;align-items:center;
+  border-right:1px solid var(--amber-d);white-space:nowrap;
+}
+#lola-strip-scroll{
+  flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;
+}
+#lola-strip-inner{
+  display:flex;align-items:center;gap:0;
+  white-space:nowrap;
+  will-change:transform;
+}
+#lola-strip-inner.scrolling{
+  animation:lolaScroll 26s linear infinite;
+}
+#lola-strip-inner.no-scroll{
+  animation:none;
+  padding-left:14px;
+}
+@keyframes lolaScroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+.lola-strip-msg{
+  font-size:11px;color:var(--cyan);
+  padding:0 28px 0 0;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:opacity .4s;
+}
+.lola-strip-msg .ls-tag{
+  font-size:9px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--gold);background:var(--amber-bg);border:1px solid var(--amber-d);
+  padding:1px 6px;border-radius:3px;
+}
+.lola-strip-msg code{
+  background:rgba(255,255,255,.06);padding:0px 5px;border-radius:3px;
+  color:var(--amber);font-size:10px;
+}
+.lola-strip-sep{color:var(--muted);margin:0 6px;opacity:.4}
+
+/* ── EXPERT TIMER ── */
+#expert-timer{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--amber);letter-spacing:.08em;
+  padding:2px 10px;background:var(--amber-bg);border:1px solid var(--amber-d);
+  border-radius:var(--r4);display:none;
+  min-width:64px;text-align:center;
+}
+#expert-timer.urgent{color:var(--red);border-color:var(--red-d);background:var(--red-bg);animation:pulse 1s infinite}
+
+/* ── TERMINAL PANEL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height: 100%;           /* ← ADD THIS (explicit height) */
+  min-height: 0;          /* ← ADD THIS (important for nested flex) */}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--gold)}
+
+#output{flex:1 1 auto;min-height: 0;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* ── CONTEXT STATIC STRIP (persistent teaching context, top of terminal) ── */
+#output-static{
+  flex-shrink:0;
+  overflow-y:auto;
+  max-height:120px;
+  padding:10px 20px 8px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  border-bottom:1px solid var(--b2);
+  background:var(--surface);
+}
+#output-static::-webkit-scrollbar{width:2px}
+#output-static::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+#output-divider{
+  flex-shrink:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:2px 18px;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  user-select:none;
+}
+#output-divider::after{content:'';flex:1;height:1px;background:var(--border);margin-left:8px}
+
+/* ── FIX COLLAPSING JIT / REAL WORLD / HINT / DIAGNOSIS BLOCKS ── */
+#output > * {
+  flex-shrink: 0;     /* prevents cards from collapsing when scrolling */
+  width: 100%;        /* forces full width inside the flex container */
+}
+
+/* Extra safety for the main rich components */
+.jit,
+.bridge,
+.hint-wrap,
+.diag-block,
+.teach,
+.concept,
+.spaced-rep,
+.quiz,
+.janet-arrival,
+.boss-container,
+.breakit,
+.cmd-unlock,
+.manpage,
+.diff-block {
+  flex-shrink: 0 !important;
+}
+
+/* output line types */
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--gold)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-agent{color:var(--purple)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--gold);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-easter{color:var(--pink)}
+.ln-diag{color:var(--orange)}
+.ln-diff-add{color:var(--green);font-size:12px}
+.ln-diff-rem{color:var(--red);font-size:12px}
+.ln-diff-hd{color:var(--cyan);font-size:12px}
+
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+/* teach block */
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+/* concept card */
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+/* hint */
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+/* diagnosis */
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+/* JIT */
+.jit{margin:10px 0;border:1px solid var(--gold);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:#100d00;padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);border-bottom:1px solid var(--amber-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--gold);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+/* bridge */
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+/* spaced rep */
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+/* ══ J.A.N.E.T. QUIZ — cold grey, corporate, unsettling ══ */
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+
+/* boss fight */
+.boss-container{margin:14px 0;border:1px solid var(--red-d);border-radius:var(--r8);overflow:hidden;animation:bossGlow 3s infinite}
+.boss-header{background:linear-gradient(90deg,#1a0808 0%,#0f0404 100%);border-bottom:1px solid var(--red-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:13px;color:var(--red);letter-spacing:.15em;text-transform:uppercase;animation:bossFlicker 4s infinite}
+.boss-sub{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--red-d);letter-spacing:.15em}
+.boss-body{background:#0a0404;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:var(--text);line-height:1.8;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #1a0808}
+.boss-step-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:5px;font-family:var(--janet)}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.6;margin-bottom:10px}
+.boss-progress{height:3px;background:#1a0808;border-radius:2px;overflow:hidden}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .5s ease}
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+/* break-it */
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* cmd unlock */
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+/* active cmds */
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+/* man page */
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+/* diff block */
+.diff-block{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease;font-size:12px}
+.diff-hd{background:var(--s3);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2)}
+.diff-body{padding:10px 13px;background:var(--bg);font-family:var(--mono)}
+.diff-add{color:var(--green)}
+.diff-add::before{content:'+ '}
+.diff-rem{color:var(--red)}
+.diff-rem::before{content:'- '}
+.diff-ctx{color:var(--muted2)}
+.diff-ctx::before{content:'  '}
+.diff-hunk{color:var(--cyan);font-size:11px}
+
+/* quiz */
+.quiz{margin:10px 0;border:1px solid var(--amber-d);border-radius:var(--r8);background:var(--amber-bg);padding:13px;animation:slideIn .25s ease}
+.quiz-q{font-size:12px;color:var(--amber);margin-bottom:10px;font-weight:500;line-height:1.6}
+.quiz-opts{display:flex;flex-direction:column;gap:6px}
+.qopt{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r4);padding:8px 12px;font-size:12px;cursor:pointer;color:var(--text);transition:all .15s;text-align:left;font-family:var(--mono)}
+.qopt:hover:not(:disabled){border-color:var(--amber-d);background:var(--s2)}
+.qopt.correct{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.qopt.wrong{border-color:var(--red-d);background:var(--red-bg);color:var(--red);opacity:.55}
+.quiz-fb{margin-top:9px;font-size:12px;color:var(--green);display:none;line-height:1.6}
+.quiz-fb.show{display:block;animation:fadeUp .25s ease}
+.quiz-fb code{color:var(--cyan);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+/* input */
+#input-row{flex-shrink: 0;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--gold);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--gold)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+#input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
+
+/* right panel */
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+
+/* obj card */
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--amber));transition:width .5s ease;width:0%}
+
+/* path cards */
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--gold);background:#100d00}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--gold)}
+
+/* lola */
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amber));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--gold)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+/* crew */
+#crew-sec{flex:1;overflow-y:auto;padding:11px 13px;min-height:0}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+/* telemetry */
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+#telem-log::-webkit-scrollbar{width:2px}
+#telem-log::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* toast */
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--gold);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--gold);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+/* modals */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:18px}
+.mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
+.mbtn-p{background:var(--gold);color:#000}.mbtn-p:hover{opacity:.85}
+.mbtn-s{background:transparent;border:1px solid var(--b2);color:var(--muted2);margin-left:8px}.mbtn-s:hover{color:var(--text);border-color:var(--muted2)}
+
+/* boot */
+#boot-modal .mbox{border-color:var(--gold);text-align:center;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px 32px 32px}
+#boot-modal .mbox input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b3);color:var(--text);padding:11px 14px;border-radius:var(--r4);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:8px;caret-color:var(--gold);-webkit-text-fill-color:var(--text)}
+#boot-modal .mbox input[type=text]::placeholder{color:var(--muted2)}
+#boot-modal .mbox input[type=text]:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(251,191,36,.15)}
+.boot-features{background:var(--s2);border-radius:var(--r8);padding:14px 16px;text-align:left;margin:14px 0;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--gold);margin-right:6px}
+
+/* grad */
+#grad-modal .mbox{text-align:center;border-color:var(--gold);box-shadow:0 0 50px rgba(251,191,36,.12)}
+.grad-cert{background:var(--s2);border:1px solid var(--gold);border-radius:var(--r8);padding:18px;margin:18px 0}
+.grad-ct{font-family:var(--display);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+.grad-name{font-family:var(--display);font-size:20px;font-weight:900;color:var(--gold);margin-bottom:4px;animation:glow 3s infinite}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{text-align:left;font-size:12px;color:var(--muted2);line-height:2;margin-bottom:16px}
+.skills-list span{color:var(--gold);margin-right:6px}
+
+/* achievements */
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.ach-name{font-size:13px;font-weight:500;color:var(--text)}
+.ach-desc{font-size:11px;color:var(--muted2);margin-top:1px}
+
+/* glossary */
+.gloss-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:13px;font-weight:500;color:var(--cyan);margin-bottom:3px;cursor:pointer}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:12px;color:var(--muted2);line-height:1.7}
+.gloss-def code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px;font-size:11px}
+
+/* career */
+.career-entry{padding:12px 0;border-bottom:1px solid var(--border)}
+.career-entry:last-child{border-bottom:none}
+.career-phase{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:4px;font-weight:700}
+.career-stat{font-family:var(--display);font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px;animation:glow 3s infinite}
+.career-context{font-size:12px;color:var(--muted2);line-height:1.7}
+.career-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+.glitch{animation:shake .2s ease}
+
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 1fr 260px}
+  #right{border-top:1px solid var(--border)}
+  #lola-sec,#crew-sec,#telem-sec{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div id="logo">Vibe Lieutenant</div>
+    <div id="cadet-tag">Lieutenant: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <div id="expert-timer">0:00</div>
+      <div id="hardmode-pill">HARD MODE</div>
+      <div id="sandbox-pill">SANDBOX</div>
+      <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
+      <button class="tbbtn" onclick="doRestart()">RESTART</button>
+    </div>
+  </div>
+
+  <!-- LOLA STRIP -->
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">L.O.L.A. ▸</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner" class="no-scroll">
+        <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Vibe Cadet. Now you operate. Same terminal, higher stakes.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">lt@vibe-ship — <span id="path-display">~/ops/escape-pod</span></div>
+      <div style="width:50px"></div>
+    </div>
+    <div id="output-static"></div>
+    <div id="output-divider">Terminal</div>
+    <div id="output" onclick="focusCmd()"></div>
+    <div id="input-row">
+      <span id="prompt-pre">lt@vibe:~$&nbsp;</span>
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+      <span id="input-hint"></span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Read the codebase</div>
+      <div id="obj-context">Find out what you're working with.</div>
+      <div id="obj-cmd-label">Expected command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">ls -la</div>
+        <button id="obj-reveal" onclick="revealCmd()">show</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Same terminal as Cadet. Same commands. The scenarios are real now.</div>
+    </div>
+
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Complete steps to unlock commands</span></div>
+    </div>
+
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">🎖️</div>
+    <div class="mtitle" style="color:var(--gold);font-size:19px">Vibe Lieutenant</div>
+    <div class="msub">The second trainer in the series. You graduated Vibe Cadet — you know the terminal, Git, and how to ship. Now learn to <i>operate</i>: read codebases cold, catch AI errors, review diffs, debug stack traces, and lead a crew through a production incident.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · AI-augmented development workflows<br>
+      <span>▸</span><b style="color:var(--gold)">Codebase navigation</b> — reading real project structure cold<br>
+      <span>▸</span>Diff review — evaluating and approving AI-generated changes<br>
+      <span>▸</span>Stack trace debugging — finding the real root cause<br>
+      <span>▸</span>TypeScript &amp; build error fluency<br>
+      <span>▸</span>API &amp; data shape literacy<br>
+      <span>▸</span>Testing fundamentals — verifying AI output<br>
+      <span>▸</span>Production incident response<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>L.O.L.A. coaching strip — hints &amp; real-world context visible at all times<br>
+      <span>▸</span><b style="color:var(--red)">Final boss fight</b> — J.A.N.E.T. assessment protocol. She is ready.
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div>
+        <div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full LOLA explanations. For junior engineers — every answer is derivable from what's on screen.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div>
+        <div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart diagnosis on wrong answers. For devs building real fluency.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div>
+        <div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No diagnosis. Phase timer on. For seasoned engineers who want the challenge.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">ACCEPT COMMISSION</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Sequel to Vibe Cadet Academy. No account needed. Runs in any browser.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">🌟</div>
+    <div class="mtitle" style="text-align:center;color:var(--gold)">Commission Complete</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You don't just ship — you operate.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Field Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Vibe Lieutenant · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Codebase navigation — reading real project structures cold<br>
+      <span>✓</span>Git diff review — evaluating and approving AI-generated changes<br>
+      <span>✓</span>Stack trace debugging — isolating root cause from noise<br>
+      <span>✓</span>TypeScript & build error fluency<br>
+      <span>✓</span>API & data shape literacy — reading docs, tracing JSON<br>
+      <span>✓</span>Testing fundamentals — verifying AI output doesn't break things<br>
+      <span>✓</span>Production incident response — triage, fix, post-mortem<br>
+      <span>✓</span>AI code review — catching confidently wrong AI output<br>
+      <span>✓</span>Team workflow — PRs, reviews, deployment gates<br>
+      <span>✓</span>J.A.N.E.T. final assessment — passed. She noted it without enthusiasm.
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--gold)">—</span></div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div id="ach-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">🏆 Achievements</div>
+    <div class="msub">Milestones earned during your commission.</div>
+    <div id="ach-list"></div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div>
+  </div>
+</div>
+
+<!-- GLOSSARY -->
+<div id="gloss-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">📖 Glossary</div>
+    <div class="msub">Key terms for AI-augmented development. Click any term to see it inline.</div>
+    <div id="gloss-list"></div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div>
+  </div>
+</div>
+
+<!-- MAN PAGES -->
+<div id="man-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">📋 Manual Pages</div>
+    <div class="msub">Reference for every command. Also accessible by typing <code style="color:var(--amber)">man</code> in the terminal.</div>
+    <div id="man-list"></div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div>
+  </div>
+</div>
+
+<!-- CAREER IMPACT LOG -->
+<div id="career-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">📈 Career Impact Log</div>
+    <div class="msub">How the skills you're building map to real professional leverage.</div>
+    <div id="career-list"></div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE LIEUTENANT v1.0
+   Sequel to Vibe Cadet Academy
+   Phases: Codebase reading · Diff review · Stack traces ·
+   TypeScript errors · API literacy · Testing · Incidents ·
+   AI code review · Team workflow
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Lieutenant', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/lt/ops/escape-pod',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  timerStart:null,
+  totalTime:0,
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for an assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. I will now present a question. Please answer it correctly. Or incorrectly. Historically, both outcomes occur. I track all of them.",
+  "I am J.A.N.E.T. I have been asked to test your knowledge retention. I find the word 'test' somewhat generous for this activity, but I will proceed professionally.",
+  "J.A.N.E.T. online. I note that you have reached a quiz. In a statistically significant number of cases, learners at this stage believe they are 'doing well.' I have no comment on that.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is a common experience.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is available. I do not recommend reviewing it before important meetings.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── LOLA STRIP MESSAGES BY PHASE ── */
+const LOLA_STRIP = {
+  0: [
+    {tag:'WELCOME',msg:"You graduated Vibe Cadet. The commands are the same — the stakes are higher."},
+    {tag:'REMEMBER',msg:"<code>ls -la</code> shows hidden files too. Always start there in an unfamiliar codebase."},
+    {tag:'TIP',msg:"<code>cat package.json</code> tells you the whole stack in 30 seconds. That's your orientation sequence."},
+    {tag:'LOLA',msg:"I'm still here. Same deal as Cadet — I'll explain everything. You've got this."},
+  ],
+  1: [
+    {tag:'PHASE 1',msg:"Codebase navigation. The first thing a senior dev does when joining a new team: read before you write."},
+    {tag:'TIP',msg:"<code>find . -name \"*.ts\"</code> counts all TypeScript files. Use it to understand scope before touching anything."},
+    {tag:'REMEMBER',msg:"<code>ls -la</code> — the <code>-a</code> flag shows hidden files like <code>.env</code> and <code>.gitignore</code>. They matter."},
+    {tag:'LOLA',msg:"Don't worry if the output looks complex. Focus on what changed. I'll walk you through every step."},
+    {tag:'TIP',msg:"<code>package.json</code> → <code>scripts</code> section tells you how to run, test, and build the project. Always read this first."},
+  ],
+  2: [
+    {tag:'PHASE 2',msg:"Diff review. Every professional code change passes through this gate. This is how bugs get caught before production."},
+    {tag:'TIP',msg:"In a diff: lines starting with <code>-</code> were removed (old). Lines starting with <code>+</code> were added (new). Read both together."},
+    {tag:'REMEMBER',msg:"<code>git diff HEAD~1</code> shows changes in the last commit. <code>git show HEAD</code> shows the commit with context."},
+    {tag:'LOLA',msg:"Reading a diff gets faster with practice. You're looking for: what changed, why it changed, and what might break."},
+    {tag:'TIP',msg:"The <code>@@ -42,7 +42,7 @@</code> hunk header tells you which line numbers changed. Context lines (no +/-) help you locate the change."},
+  ],
+  3: [
+    {tag:'PHASE 3',msg:"Stack traces. This skill separates junior from mid-level developers. Read the trace — find your code — ignore library frames."},
+    {tag:'TIP',msg:"Stack traces read top-down for crash site, bottom-up for origin. Your first <code>src/</code> frame is almost always where the bug lives."},
+    {tag:'REMEMBER',msg:"<code>node_modules/</code> frames in a stack trace are where the error landed — not where it started. Skip past them to your code."},
+    {tag:'LOLA',msg:"Stack traces look intimidating at first. They're not. They're a map. Follow it to <code>src/</code> and you'll find the problem."},
+  ],
+  4: [
+    {tag:'PHASE 4',msg:"TypeScript errors. The compiler is telling you something. Read it — don't suppress it."},
+    {tag:'TIP',msg:"<code>tsc --noEmit</code> type-checks without writing output files. Run this before shipping any TypeScript change."},
+    {tag:'REMEMBER',msg:"TypeScript errors are better than runtime errors. A type mismatch caught at compile time is infinitely better than a crash in production."},
+    {tag:'LOLA',msg:"TypeScript messages can be verbose. Focus on: which file, which line, and 'Type X is not assignable to Type Y'. That's the core."},
+    {tag:'TIP',msg:"<code>strict: true</code> in tsconfig.json enables all safety checks. It's the professional standard — don't turn it off to silence errors."},
+  ],
+  5: [
+    {tag:'PHASE 5',msg:"API literacy. Every feature that touches external data requires reading docs and tracing JSON. This skill never goes away."},
+    {tag:'TIP',msg:"<code>curl /api/endpoint</code> tests any API from the terminal. Add <code>-v</code> to see response headers. Add <code>| jq .</code> to format JSON."},
+    {tag:'REMEMBER',msg:"HTTP status codes: 200 OK · 201 Created · 400 Bad Request · 401 Unauthorized · 403 Forbidden · 404 Not Found · 500 Server Error"},
+    {tag:'LOLA',msg:"JSON traversal: <code>response.data.items[0].name</code>. Start at root, follow the keys, index into arrays. Read it like a path."},
+    {tag:'TIP',msg:"401 = not authenticated (missing/bad token). 403 = authenticated but not permitted. These are different problems with different fixes."},
+  ],
+  6: [
+    {tag:'PHASE 6',msg:"Testing. You don't need to be a TDD zealot — you need to write one test that proves your code does what it says."},
+    {tag:'TIP',msg:"<code>expect(result).toBe(\"exact value\")</code> is almost always better than <code>toBeDefined()</code>. Specific assertions catch real bugs."},
+    {tag:'REMEMBER',msg:"A failing test is not a problem — it's a signal. The test is correct; the implementation is wrong. Fix the code, not the test."},
+    {tag:'LOLA',msg:"Test structure: describe → it → expect. One assertion per test. Name it in plain English. If the test name explains the failure, it's a good test."},
+    {tag:'TIP',msg:"<code>bun run test --coverage</code> shows which lines are tested. Aim for the critical paths — auth, payments, data mutations — not 100% coverage."},
+  ],
+  7: [
+    {tag:'PHASE 7',msg:"Production incidents. 80% are caused by the most recent deploy. Check logs. Identify. Isolate. Mitigate first — fix later."},
+    {tag:'TIP',msg:"The incident log sequence: what's the error? when did it start? how often? what changed right before? Logs answer all four."},
+    {tag:'REMEMBER',msg:"<code>git revert HEAD</code> creates a new commit that undoes the last one — safe on shared branches. Rollback first, investigate second."},
+    {tag:'LOLA',msg:"Under pressure, tunnel vision sets in. Slow down. Read the logs. The cause is almost always in the timestamp correlation."},
+    {tag:'TIP',msg:"Blameless post-mortems: document what happened, root cause, contributing factors, action items. The goal is system improvement, not blame."},
+  ],
+  8: [
+    {tag:'PHASE 8',msg:"AI code review. AI is confidently wrong ~30% of the time. Knowing the patterns is the most valuable skill of the next decade."},
+    {tag:'TIP',msg:"AI hallucination checklist: real API method names? null guards on DB queries? correct error codes? user input validated?"},
+    {tag:'REMEMBER',msg:"<code>findOne</code> is Mongoose. <code>findUnique</code> is Prisma. <code>query</code> is Sequelize. AI mixes these up constantly. Always verify against docs."},
+    {tag:'LOLA',msg:"The confidence of AI output is the danger. Wrong code that looks right ships. That's why review exists. You're the last gate."},
+    {tag:'TIP',msg:"Security-sensitive AI code (auth, payments, permissions) gets extra scrutiny. AI tends to skip permission checks and hardcode values."},
+  ],
+  9: [
+    {tag:'PHASE 9',msg:"Team workflow. The structures that let multiple engineers ship without stepping on each other."},
+    {tag:'TIP',msg:"Branch naming: <code>fix/</code> for bug fixes · <code>feat/</code> for features · <code>chore/</code> for maintenance · <code>refactor/</code> for improvements."},
+    {tag:'REMEMBER',msg:"Conventional commits: <code>fix: description</code> · <code>feat: description</code> · <code>chore: description</code>. Tools read these to auto-generate changelogs."},
+    {tag:'LOLA',msg:"Almost there, Lieutenant. One more phase and you face J.A.N.E.T. You've earned this. Trust your training."},
+    {tag:'TIP',msg:"A good PR description: what changed, why, how to test it, any deployment notes. Make it easy for the reviewer to say yes."},
+  ],
+};
+
+function setLolaStrip(phase){
+  const msgs = LOLA_STRIP[phase]||LOLA_STRIP[0];
+  const inner = document.getElementById('lola-strip-inner');
+  if(!inner)return;
+  const doubled = [...msgs,...msgs]; // double for seamless loop
+  inner.innerHTML = doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span>${m.msg}</span><span class="lola-strip-sep">◆</span>`).join('');
+  // decide if we need to scroll
+  const scrollWidth = inner.scrollWidth;
+  const containerWidth = document.getElementById('lola-strip-scroll').offsetWidth;
+  if(scrollWidth > containerWidth * 1.5){
+    inner.className='lola-strip-inner scrolling';
+  } else {
+    inner.className='lola-strip-inner no-scroll';
+  }
+}
+
+/* ── EXPERT TIMER ── */
+let _expertTimerInterval = null;
+function startExpertTimer(){
+  if(!G.expert)return;
+  G.timerStart = Date.now();
+  document.getElementById('expert-timer').style.display='inline';
+  _expertTimerInterval = setInterval(()=>{
+    const elapsed = Math.floor((Date.now()-G.timerStart)/1000);
+    const m = Math.floor(elapsed/60);
+    const s = elapsed%60;
+    const el = document.getElementById('expert-timer');
+    if(el){
+      el.textContent = m+':'+(s<10?'0':'')+s;
+      if(elapsed>120)el.classList.add('urgent');
+    }
+  },1000);
+}
+function stopExpertTimer(){
+  if(_expertTimerInterval){clearInterval(_expertTimerInterval);_expertTimerInterval=null}
+  const el=document.getElementById('expert-timer');
+  if(el)el.classList.remove('urgent');
+}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Codebase Navigation',stat:'~70%',context:'of a senior developer\'s time is spent reading code, not writing it. The ability to open an unfamiliar codebase and quickly understand its structure — entry points, conventions, dependencies — is what separates a contributor from a maintainer.',tags:['Code review','Onboarding','Open source','Technical interviews']},
+  {phase:'Phase 2 — Diff Review',stat:'Every PR',context:'every professional code change goes through a diff review before merging. Reading git diff output is how you catch bugs, security issues, and AI hallucinations before they reach production. This is the most important quality gate in any engineering team.',tags:['Git','Code review','GitHub','Pull requests','AI safety']},
+  {phase:'Phase 3 — Stack Trace Debugging',stat:'#1 skill',context:'most requested by engineering managers when surveying what separates junior from mid-level developers. Reading a stack trace cold — finding the actual line, understanding the call chain, ignoring irrelevant frames — is a skill that dramatically improves debugging speed.',tags:['Debugging','Node.js','TypeScript','On-call','Production']},
+  {phase:'Phase 4 — TypeScript & Build Errors',stat:'78%',context:'of professional JavaScript projects now use TypeScript. The ability to read a TypeScript compiler error, understand what the type system is actually telling you, and fix it correctly (not just suppress it) is the fastest way to level up from junior to mid-level.',tags:['TypeScript','tsc','Vite','Next.js','Type safety']},
+  {phase:'Phase 5 — API & Data Literacy',stat:'Every feature',context:'every feature that touches external data requires reading API documentation, understanding JSON response shapes, and tracing data through layers of transformation. Developers who can read a spec and implement against it without hand-holding are 3-5× more productive with AI assistance.',tags:['REST','JSON','OpenAPI','Fetch','Data modeling']},
+  {phase:'Phase 6 — Testing Fundamentals',stat:'50-80%',context:'of AI-generated code contains subtle bugs that only tests catch. The ability to write a basic test — not deep TDD, just "does this function do what it says" — is the difference between shipping code you trust and code that works on your machine.',tags:['Vitest','Jest','Unit tests','CI/CD','AI verification']},
+  {phase:'Phase 7 — Production Incident Response',stat:'2am',context:'is when production incidents happen. Every engineer who gets paged learns the same sequence: identify, isolate, mitigate, then fix. The ability to run through this loop calmly under pressure is how on-call rotations get survived and how reputations get built.',tags:['SRE','On-call','Incident management','Observability','Runbooks']},
+  {phase:'Phase 8 — AI Code Review',stat:'~30%',context:'of AI-generated code contains at least one subtle logical error that passes visual inspection. Knowing the patterns where AI confidently goes wrong — off-by-one errors, security anti-patterns, wrong library APIs — and being able to catch them in review is one of the most valuable skills of the next decade.',tags:['AI safety','Code review','Security','Claude Code','Cursor']},
+  {phase:'Phase 9 — Team Workflow',stat:'10×',context:'multiplier on individual output when you can effectively operate within a team: writing clear PR descriptions, leaving useful review comments, understanding deployment gates, and coordinating a release. The terminal skills from Vibe Cadet are the foundation. This is the structure that makes them count.',tags:['GitHub','PRs','Team coordination','Engineering culture','Leadership']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'Stack trace',def:'The chain of function calls that led to an error. Read it bottom-up for origin, top-down for the crash point. The most important line is usually the first one from <i>your</i> code, not from a library.'},
+  {term:'git diff',def:'Shows the exact lines added (<code>+</code>) and removed (<code>-</code>) between two versions of a file. The most important tool for understanding what changed and why.'},
+  {term:'TypeScript',def:'A superset of JavaScript that adds static types. The compiler catches type mismatches before runtime. A type error means the compiler detected an inconsistency — read it carefully rather than suppressing it.'},
+  {term:'tsconfig.json',def:'TypeScript\'s configuration file. Controls strictness, output target, included files, and paths. <code>strict: true</code> enables all safety checks and is the professional standard.'},
+  {term:'Entry point',def:'The file where a program starts executing. In Node.js apps, often <code>index.ts</code> or <code>server.ts</code>. In Vite/Next.js, it\'s the framework\'s boot file. Finding the entry point is how you orient yourself in any unfamiliar codebase.'},
+  {term:'package.json scripts',def:'The <code>scripts</code> field defines runnable commands. <code>dev</code>, <code>build</code>, <code>test</code>, <code>lint</code> are the four you need to know by heart. Run them with <code>bun run scriptname</code>.'},
+  {term:'REST API',def:'An interface where resources are identified by URLs and actions are HTTP verbs: GET (read), POST (create), PUT/PATCH (update), DELETE (remove). Every web service exposes one.'},
+  {term:'JSON shape',def:'The structure of a JSON object — which keys exist, what types they have, whether they\'re optional. Understanding the shape of an API response tells you exactly what you can do with the data.'},
+  {term:'Unit test',def:'A test that verifies a single function in isolation, with no network calls, database, or side effects. Fast, deterministic, and the first thing to break when you change logic.'},
+  {term:'Test assertion',def:'The line in a test that checks the result. <code>expect(result).toBe(42)</code>. If the assertion fails, the test fails. One assertion per test is the professional convention.'},
+  {term:'Incident',def:'An unplanned interruption to a service. Incidents have a lifecycle: detected → triaged → mitigated → resolved → post-mortemed. The goal during an incident is to restore service, not to find blame.'},
+  {term:'Post-mortem',def:'A written record of what happened, why, and what changes will prevent recurrence. Blameless post-mortems — focusing on systems, not people — are the engineering culture standard.'},
+  {term:'Pull Request (PR)',def:'A proposal to merge a branch into main. PRs should be small, focused, and include a clear description of the change and why. The diff view shows exactly what will be merged.'},
+  {term:'LGTM',def:'Looks Good To Me — the approval signal in code review. Should only be given after actually reading the diff, not as a rubber stamp. One of the most overused phrases in engineering.'},
+  {term:'Hallucination (AI)',def:'When an AI model confidently produces plausible-looking but incorrect output — wrong function names, non-existent APIs, subtly broken logic. The confidence is the danger. Always verify AI-generated code.'},
+  {term:'off-by-one error',def:'A bug where a loop runs one too many or one too few times. Often appears as <code><</code> vs <code><=</code> or array index errors. One of the most common AI code generation bugs.'},
+  {term:'Environment variable',def:'A named value stored outside your code. Read in Node.js as <code>process.env.NAME</code>. Never hardcode secrets — use env vars and a secrets manager in production.'},
+  {term:'Linter',def:'A tool that statically analyzes code for style and correctness issues without running it. ESLint for JS/TS. Catches errors, enforces conventions, prevents common bugs before they ship.'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'ls':     {synopsis:'ls [flags] [path]',desc:'List directory contents',why:'Your first tool in any unfamiliar codebase.',flags:[{f:'-la',d:'Long format with hidden files'},{f:'-R',d:'Recursive — show all subdirectories'}],example:'$ ls -la\n$ ls src/'},
+  'cat':    {synopsis:'cat [file]',desc:'Print file contents',why:'Read any file instantly.',flags:[{f:'-n',d:'Show line numbers'}],example:'$ cat package.json\n$ cat src/index.ts'},
+  'find':   {synopsis:'find [dir] -name [pattern]',desc:'Search for files by name',why:'Find any file in a project without a GUI.',flags:[{f:'-name',d:'Match by filename pattern'},{f:'-type f',d:'Files only'},{f:'-type d',d:'Directories only'}],example:'$ find . -name "*.ts"\n$ find src -name "index*"'},
+  'grep':   {synopsis:'grep [pattern] [file]',desc:'Search text in files',why:'Find where a function, variable, or string is used.',flags:[{f:'-r',d:'Recursive through directories'},{f:'-n',d:'Show line numbers'},{f:'-i',d:'Case-insensitive'}],example:'$ grep -rn "handleLogin" src/\n$ grep -r "TODO" .'},
+  'git':    {synopsis:'git [subcommand]',desc:'Version control',why:'All code changes flow through git.',flags:[],example:'$ git diff HEAD~1\n$ git log --oneline -10\n$ git show abc1234'},
+  'wc':     {synopsis:'wc [flags] [file]',desc:'Count lines/words',why:'Quickly measure file size or result counts.',flags:[{f:'-l',d:'Count lines'}],example:'$ wc -l src/app.ts\n$ find . -name "*.ts" | wc -l'},
+  'curl':   {synopsis:'curl [flags] [url]',desc:'Make HTTP requests',why:'Test any API endpoint from the terminal.',flags:[{f:'-X',d:'HTTP method: GET, POST, PUT, DELETE'},{f:'-H',d:'Add header: -H "Content-Type: application/json"'},{f:'-d',d:'Request body data'}],example:'$ curl https://api.example.com/health\n$ curl -X POST -H "Content-Type: application/json" -d \'{"id":1}\' /api/user'},
+  'jq':     {synopsis:'jq [filter] [file]',desc:'Parse and format JSON',why:'Read API responses without squinting at raw JSON.',flags:[],example:'$ curl /api/user | jq .\n$ cat response.json | jq \'.data.items[]\''},
+  'tsc':    {synopsis:'tsc [flags]',desc:'TypeScript compiler',why:'Catch type errors before they become runtime bugs.',flags:[{f:'--noEmit',d:'Type-check only, don\'t emit JS'},{f:'--strict',d:'Enable all strict checks'}],example:'$ tsc --noEmit\n$ tsc --noEmit --strict'},
+  'bun':    {synopsis:'bun [command]',desc:'Runtime + package manager',why:'Run scripts, install packages, execute files.',flags:[],example:'$ bun run test\n$ bun run dev\n$ bun add vitest'},
+  'read':   {synopsis:'read [file]',desc:'(sim) Read and analyze a file',why:'Examine any project file in this simulation.',flags:[],example:'$ read src/index.ts\n$ read package.json'},
+  'trace':  {synopsis:'trace [error]',desc:'(sim) Analyze a stack trace',why:'Walk through an error and find the root cause.',flags:[],example:'$ trace\n$ trace TypeError'},
+  'review': {synopsis:'review [file]',desc:'(sim) Review a diff or PR',why:'Examine proposed code changes.',flags:[],example:'$ review diff\n$ review pr'},
+  'test':   {synopsis:'test [file]',desc:'Run tests',why:'Verify your code works before shipping.',flags:[{f:'--run',d:'Run once without watch mode'},{f:'--coverage',d:'Show coverage report'}],example:'$ bun run test\n$ bun run test --coverage'},
+  'fix':    {synopsis:'fix [target]',desc:'(sim) Apply a fix in a scenario',why:'Resolve an error or incident scenario.',flags:[],example:'$ fix rollback\n$ fix env\n$ fix query'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',     icon:'⚡', name:'First Order',        desc:'Issued your first command as Lieutenant.'},
+  {id:'navigator',     icon:'🗺️', name:'Pathfinder',         desc:'Navigated an unfamiliar codebase cold.'},
+  {id:'diff_reader',   icon:'🔍', name:'Diff Reader',         desc:'Reviewed your first git diff.'},
+  {id:'bug_hunter',    icon:'🐛', name:'Bug Hunter',          desc:'Found the root cause in a stack trace.'},
+  {id:'type_safe',     icon:'🔷', name:'Type Safe',           desc:'Resolved a TypeScript error correctly.'},
+  {id:'api_fluent',    icon:'🌐', name:'API Fluent',          desc:'Traced data through an API response.'},
+  {id:'tester',        icon:'✅', name:'Test Writer',         desc:'Wrote a passing test from scratch.'},
+  {id:'incident_cmd',  icon:'🚨', name:'Incident Commander',  desc:'Led a production incident response.'},
+  {id:'ai_auditor',    icon:'🤖', name:'AI Auditor',          desc:'Caught an AI hallucination in a review.'},
+  {id:'team_player',   icon:'👥', name:'Team Player',         desc:'Completed a full PR and deployment workflow.'},
+  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Vibe Lieutenant.'},
+  {id:'boss_slayer',   icon:'💀', name:'Boss Slayer',          desc:'Defeated the J.A.N.E.T. Final Assessment. She updated your file. Without enthusiasm.'},
+  {id:'janet_ace',     icon:'🧊', name:'J.A.N.E.T. Ace',       desc:'Answered a J.A.N.E.T. quiz correctly on first try. She noted it. Professionally.'},
+  {id:'quiz_ace',      icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on first try.'},
+  {id:'eagle',         icon:'🦅', name:'Eagle Eye',           desc:'Completed a phase without revealing the answer.'},
+  {id:'speed_run',     icon:'⚡', name:'Speed Runner',        desc:'Completed a phase on first attempt per step.'},
+  {id:'recall_master', icon:'🧬', name:'Recall Master',       desc:'Answered 3 spaced repetition callbacks correctly.'},
+  {id:'debugger',      icon:'🔧', name:'Debugger',            desc:'Fixed a broken scenario in Break-It mode.'},
+  {id:'challenger',    icon:'🎯', name:'Challenger',          desc:'Solved a constructed-response challenge.'},
+  {id:'easter_hunter', icon:'🔭', name:'Easter Hunter',       desc:'Found 3 Easter eggs. Curiosity noted.'},
+  {id:'hacker',        icon:'💀', name:'Hacker',              desc:'Tried to sudo rm -rf. Old habits die hard.'},
+];
+
+/* ── DIAGNOSIS ENGINE ── */
+const DIAGNOSE = {
+  'p1s1':(v)=>{
+    if(v==='ls') return {msg:'<code>ls</code> lists files but doesn\'t show hidden files or permissions. Try <code>ls -la</code> for the full picture — hidden files like <code>.env</code> and <code>.gitignore</code> matter.',next:'Try: ls -la'};
+    if(v==='dir') return {msg:'<code>dir</code> is Windows CMD. On Unix systems, <code>ls -la</code> is the equivalent with full details.',next:'Try: ls -la'};
+    return null;
+  },
+  'p1s2':(v)=>{
+    if(v.includes('open')||v.includes('vim')||v.includes('nano')) return {msg:'No need to open an editor — <code>cat</code> prints any file directly to the terminal. Faster and safer for reading.',next:'Try: cat package.json'};
+    if(v==='cat') return {msg:'<code>cat</code> needs a filename. What file do you want to read? The objective is to inspect the project manifest.',next:'Try: cat package.json'};
+    return null;
+  },
+  'p1s3':(v)=>{
+    if(v.includes('find')&&!v.includes('-name')) return {msg:'<code>find</code> needs a <code>-name</code> flag and pattern. Try: <code>find . -name "*.ts"</code>',next:'Try: find . -name "*.ts"'};
+    if(v.includes('ls')&&v.includes('.ts')) return {msg:'<code>ls</code> only shows the current directory. To find all TypeScript files recursively, use <code>find</code>.',next:'Try: find . -name "*.ts"'};
+    return null;
+  },
+  'p2s1':(v)=>{
+    if(v==='git log') return {msg:'<code>git log</code> shows commits but not the actual changes. <code>git diff HEAD~1</code> shows exactly which lines changed in the last commit.',next:'Try: git diff HEAD~1'};
+    if(v.includes('git diff')&&!v.includes('HEAD')&&!v.includes('~')) return {msg:'<code>git diff</code> with no argument shows unstaged changes — but what you want is the diff against the previous commit. Use <code>HEAD~1</code> to reference one commit back.',next:'Try: git diff HEAD~1'};
+    return null;
+  },
+  'p2s2':(v)=>{
+    if(v.includes('git log')&&v.includes('oneline')) return {msg:'<code>git log --oneline</code> shows commit messages but not the code changes. <code>git show</code> opens the full diff for a specific commit.',next:'Try: git show HEAD'};
+    if(v==='git diff head') return {msg:'Close — but <code>HEAD</code> is case-sensitive in most systems. Also, <code>git show HEAD</code> is the right command to see a commit\'s full changes.',next:'Try: git show HEAD'};
+    return null;
+  },
+  'p3s1':(v)=>{
+    if(v.includes('console.log')) return {msg:'<code>console.log</code> is useful at runtime, but to read a stack trace you need to read the error message itself, not add more logs. Look at what <code>trace</code> shows you.',next:'Try: trace'};
+    if(v.includes('grep')&&v.includes('error')) return {msg:'Grepping for errors works in logs, but for stack trace analysis, use the <code>trace</code> command to step through the call chain.',next:'Try: trace'};
+    return null;
+  },
+  'p3s2':(v)=>{
+    if(v.includes('delete')||v.includes('remove')) return {msg:'Don\'t delete the error — diagnose it. The stack trace tells you exactly which file and line caused the crash. Use <code>read</code> to open that file.',next:'Try: read src/auth/login.ts'};
+    if(v.startsWith('read')&&!v.includes('src/auth')) return {msg:'Close — but you need to read the specific file mentioned in the stack trace. Which file was it?',next:'Try: read src/auth/login.ts'};
+    return null;
+  },
+  'p4s1':(v)=>{
+    if(v.includes('npm')||v.includes('tsc')&&!v.includes('--noEmit')) return {msg:'To check types without producing output files, use <code>tsc --noEmit</code>. Without <code>--noEmit</code>, the compiler writes JS files you may not want.',next:'Try: tsc --noEmit'};
+    if(v==='tsc') return {msg:'<code>tsc</code> alone emits JavaScript output. Add <code>--noEmit</code> to type-check only, which is what you want when diagnosing errors.',next:'Try: tsc --noEmit'};
+    return null;
+  },
+  'p5s1':(v)=>{
+    if(v.startsWith('curl')&&!v.includes('/api')) return {msg:'<code>curl</code> needs a URL. In this simulation, API endpoints start with <code>/api/</code>. Try hitting the health endpoint first.',next:'Try: curl /api/health'};
+    if(v.includes('fetch')) return {msg:'<code>fetch</code> is a JavaScript browser API. In the terminal, use <code>curl</code> to make HTTP requests.',next:'Try: curl /api/health'};
+    return null;
+  },
+  'p6s1':(v)=>{
+    if(v.includes('console.log')||v.includes('print')) return {msg:'Logging is useful but not a test. A test has an assertion — <code>expect(x).toBe(y)</code> — that automatically passes or fails. Tests can run in CI; console.log can\'t.',next:'Try: read src/utils/formatDate.test.ts'};
+    return null;
+  },
+  'p7s1':(v)=>{
+    if(v.includes('restart')||v.includes('reboot')) return {msg:'Restarting without understanding the cause is a valid mitigation but not a fix. First step is always to check what\'s actually failing. Look at the logs.',next:'Try: cat logs/error.log'};
+    if(v.includes('grep')&&!v.includes('log')) return {msg:'Good instinct, but you need to grep the log file specifically. The error log is at <code>logs/error.log</code>.',next:'Try: cat logs/error.log'};
+    return null;
+  },
+  'p8s1':(v)=>{
+    if(v.includes('looks good')||v.includes('lgtm')||v.includes('approve')) return {msg:'Not so fast. <code>review diff</code> first — you need to actually read the proposed changes before approving. Never LGTM without reading.',next:'Try: review diff'};
+    return null;
+  },
+  'p9s1':(v)=>{
+    if(v.includes('push')&&!v.includes('branch')) return {msg:'Pushing directly to main without a PR skips the review process entirely. Create a branch first, then open a PR.',next:'Try: git checkout -b fix/escape-pod-timeout'};
+    if(v.includes('commit')&&!v.includes('branch')) return {msg:'Good — but before committing to main, you should be on a feature branch. Branch first.',next:'Try: git checkout -b fix/escape-pod-timeout'};
+    return null;
+  },
+};
+
+/* ── SPACED REPETITION ── */
+const SPACED_CALLBACKS = {
+  2:{q:'Cold recall from Phase 1: you\'ve just cloned an unfamiliar repo. What\'s the first command you run to see the full contents including hidden files?',answer:'ls -la',acceptFn:(v)=>v.includes('ls')&&v.includes('a'),hint:'ls -__'},
+  3:{q:'Phase 2 recall: what command shows you the exact lines added and removed in the most recent commit?',answer:'git diff HEAD~1',acceptFn:(v)=>v.includes('git')&&(v.includes('diff')||v.includes('show')),hint:'git ___ HEAD~1'},
+  4:{q:'Phase 3 recall: in a stack trace, which frame do you read first to find YOUR code (as opposed to library code)?',answer:'the first frame from your own src/ directory',acceptFn:(v)=>v.toLowerCase().includes('src')||v.toLowerCase().includes('first')||v.toLowerCase().includes('own'),hint:'Look for the first frame in ___ /'},
+  5:{q:'Phase 4 recall: what flag do you add to tsc to check types without writing any output files?',answer:'--noEmit',acceptFn:(v)=>v.includes('noEmit')||v.includes('noemit'),hint:'tsc --___'},
+  6:{q:'Phase 5 recall: you get a 401 response from an API. Without looking it up, what does 401 mean?',answer:'unauthorized',acceptFn:(v)=>v.toLowerCase().includes('unauth')||v.toLowerCase().includes('401')||v.toLowerCase().includes('auth'),hint:'It\'s about authentication, not permission'},
+  7:{q:'Phase 6 recall: finish this test assertion: expect(add(2, 3)).___',answer:'.toBe(5)',acceptFn:(v)=>v.includes('toBe')||v.includes('toEqual')||v.includes('5'),hint:'expect(...).___'},
+  8:{q:'Phase 7 recall: what\'s the first step of incident response — before fixing anything?',answer:'identify and isolate the problem',acceptFn:(v)=>v.toLowerCase().includes('identify')||v.toLowerCase().includes('isolate')||v.toLowerCase().includes('triage')||v.toLowerCase().includes('understand'),hint:'Before fixing: ___ the problem'},
+  9:{q:'Phase 8 recall: name one common pattern where AI-generated code is confidently wrong.',answer:'off-by-one errors, wrong API names, security anti-patterns',acceptFn:(v)=>v.toLowerCase().includes('off')||v.toLowerCase().includes('api')||v.toLowerCase().includes('security')||v.toLowerCase().includes('loop')||v.toLowerCase().includes('index'),hint:'Think: loop boundaries, API names, or ___'},
+};
+
+/* ── CHALLENGES ── */
+const CHALLENGES = {
+  1:{
+    title:'Codebase Orientation Challenge',
+    scenario:'You\'ve just joined a team and cloned their repo. You have 5 minutes before standup. What\'s your sequence of commands to understand: (1) what this project does, (2) what language/framework it uses, and (3) how to run it?',
+    acceptFn:(v)=>(v.includes('cat')&&v.includes('package.json'))||(v.includes('cat')&&v.includes('readme'))||(v.includes('ls')&&v.includes('cat')),
+    successMsg:'Right approach: cat README.md for purpose, cat package.json for tech stack and scripts, ls -la for structure. Three commands, full orientation.',
+    unlockMsg:'Challenge complete: you can orient yourself on any codebase before your first standup.'
+  },
+  2:{
+    title:'Diff Review Challenge',
+    scenario:'A teammate opened a PR that changes how user sessions expire. The diff shows:\n\n- const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour\n+ const SESSION_TIMEOUT = 60 * 1000; // 1 hour\n\nThe comment says "1 hour" but is that what the code does now? Type your diagnosis.',
+    acceptFn:(v)=>v.toLowerCase().includes('minute')||v.toLowerCase().includes('60 second')||v.toLowerCase().includes('wrong')||v.toLowerCase().includes('1 min')||v.toLowerCase().includes('bug'),
+    successMsg:'Correct! 60 * 1000 = 60,000 milliseconds = 60 seconds = 1 minute, NOT 1 hour. The comment is wrong and the change is a security regression. This is exactly what diff review catches.',
+    unlockMsg:'Challenge complete: you caught a real-world off-by-one bug that ships in production every single week somewhere.'
+  },
+  3:{
+    title:'Stack Trace Challenge',
+    scenario:'Production is throwing this error:\n\nTypeError: Cannot read properties of undefined (reading \'id\')\n  at formatUser (src/utils/user.ts:34)\n  at getUserById (src/api/users.ts:18)\n  at handler (src/routes/profile.ts:9)\n\nWhere is the bug, and what\'s the most likely cause?',
+    acceptFn:(v)=>(v.toLowerCase().includes('user.ts')||v.toLowerCase().includes('line 34')||v.toLowerCase().includes('formateur'))||(v.toLowerCase().includes('undefined')&&v.toLowerCase().includes('user'))||(v.toLowerCase().includes('null')&&v.toLowerCase().includes('user')),
+    successMsg:'Correct: the bug is in src/utils/user.ts line 34. The user object is undefined — most likely getUserById returned undefined when no user was found, and formatUser didn\'t handle that case.',
+    unlockMsg:'Challenge complete: you can triage production errors from a stack trace without running anything.'
+  },
+  5:{
+    title:'API Integration Challenge',
+    scenario:'An API returns this JSON:\n{\n  "status": "ok",\n  "data": {\n    "users": [\n      { "id": 1, "name": "Alex", "role": "admin" }\n    ],\n    "total": 142\n  }\n}\n\nWrite the JavaScript to get the name of the first user.',
+    acceptFn:(v)=>v.includes('.data.users[0].name')||v.includes('data.users[0]')||v.includes('users[0].name'),
+    successMsg:'Correct: response.data.users[0].name — you need to traverse three levels: data → users array → first item → name property.',
+    unlockMsg:'Challenge complete: you can read a JSON shape and write the access path without trial and error.'
+  },
+  7:{
+    title:'Incident Response Challenge',
+    scenario:'3:47am. You get paged. The escape pod booking API is returning 500 errors. You have: the error logs, shell access, and the ability to rollback the last deploy. What\'s your sequence?',
+    acceptFn:(v)=>(v.toLowerCase().includes('log')||v.toLowerCase().includes('check'))&&(v.toLowerCase().includes('rollback')||v.toLowerCase().includes('deploy')||v.toLowerCase().includes('revert')),
+    successMsg:'Right sequence: check logs to understand the error → determine if last deploy caused it → rollback if yes → verify service restored → then fix properly. Speed of mitigation matters more than perfect fixes at 3am.',
+    unlockMsg:'Challenge complete: you know the incident response loop. Identify → Isolate → Mitigate → Fix → Post-mortem.'
+  },
+};
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = {
+  3:{
+    title:'This stack trace is being misread',
+    scenario:'A junior dev says "the bug is in node_modules/express/lib/router.js" because that\'s the first line of the stack trace.\n\nError at node_modules/express/lib/router.js:284\n  at src/middleware/auth.ts:15\n  at src/routes/login.ts:8\n\nWhat\'s wrong with their conclusion, and where is the real bug?',
+    diagnose:(v)=>{
+      const vl=v.toLowerCase();
+      return vl.includes('auth.ts')||vl.includes('login.ts')||vl.includes('middleware')||vl.includes('own code')||vl.includes('src/');
+    },
+    solution:'The bug is in src/middleware/auth.ts or src/routes/login.ts',
+    explanation:'The first line of a stack trace is the crash site, not the bug origin. Library code (node_modules) shows up first because Express caught the error — but <b>your code called Express</b>. The real bug is in <code>src/middleware/auth.ts:15</code> or the code that called it. Always scroll past library frames to find your first <code>src/</code> line.',
+  },
+  6:{
+    title:'This test is not actually testing anything',
+    scenario:'A teammate submitted this test and it passes:\n\ntest("formats date correctly", () => {\n  const result = formatDate(new Date("2024-01-15"));\n  expect(result).toBeDefined();\n});\n\nWhy is this test useless?',
+    diagnose:(v)=>{
+      const vl=v.toLowerCase();
+      return vl.includes('defined')||vl.includes('anything')||vl.includes('value')||vl.includes('toBe')||vl.includes('assert')||vl.includes('wrong')||vl.includes('actual');
+    },
+    solution:'toBeDefined() only checks that result is not undefined — it passes even if the output is completely wrong.',
+    explanation:'<code>expect(result).toBeDefined()</code> passes as long as <code>result</code> is not <code>undefined</code>. It would pass if <code>formatDate</code> returned <code>"banana"</code>. A real test checks the <b>actual value</b>: <code>expect(result).toBe("January 15, 2024")</code>. Tests without specific assertions give false confidence.',
+  },
+  8:{
+    title:'Spot the AI hallucination',
+    scenario:'Claude generated this code to fetch a user:\n\nconst user = await prisma.users.findOne({ where: { id } });\n\nThe developer ran it and got: "TypeError: prisma.users.findOne is not a function".\n\nWhat did the AI get wrong?',
+    diagnose:(v)=>{
+      const vl=v.toLowerCase();
+      return vl.includes('findunique')||vl.includes('findone')||vl.includes('wrong method')||vl.includes('findFirst')||vl.includes('hallucin')||vl.includes('doesn\'t exist')||vl.includes('not exist');
+    },
+    solution:'prisma.users.findOne does not exist. The correct Prisma method is findUnique.',
+    explanation:'Prisma\'s API uses <code>findUnique</code>, not <code>findOne</code>. The AI mixed it up with older ORMs like Mongoose (which does use <code>findOne</code>). This is a classic AI hallucination: a plausible-looking method name from the right conceptual category, but from the wrong library. Always verify AI-generated API calls against the actual documentation.',
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE DATA
+   ═══════════════════════════════════════════════════════════════ */
+const PHASES = [null,
+
+/* ── P1: Codebase Navigation ── */
+{title:'Codebase Navigation',
+ lolaIntro:"In Cadet you learned ls, cat, and find. You used them on a simple project. Now you're using them on a real production codebase you've never seen. Same commands — but now the goal is orientation, not just practice. Before you change a single line, you need to understand what you're looking at.",
+ steps:[
+  {id:'p1s1', obj:'Get the full file listing including hidden files', ctx:'Start every codebase investigation the same way — see everything, including hidden config files.',
+   cmd:['ls -la','ls -la .'],
+   accept:['ls -la','ls -la .','ls -lah'],
+   acceptFn: v=>v.startsWith('ls')&&v.includes('l')&&v.includes('a'),
+   hint:'Type: ls -la  — the -a flag reveals hidden files like .env and .gitignore',
+   out:'total 72\ndrwxr-xr-x  lt  ./\ndrwxr-xr-x  lt  ../\n-rw-r--r--  lt  .env           ← secrets file\n-rw-r--r--  lt  .gitignore\n-rw-r--r--  lt  package.json   ← project manifest\n-rw-r--r--  lt  README.md\ndrwxr-xr-x  lt  src/           ← source code\ndrwxr-xr-x  lt  tests/\n-rw-r--r--  lt  tsconfig.json  ← TypeScript config',
+   unlockCmd:'ls',
+   jit:{title:'What to look for in a new codebase listing',body:'Five things immediately tell you about a project: <b>package.json</b> (what tech, what scripts), <b>tsconfig.json</b> (TypeScript — good), <b>README.md</b> (purpose and setup), <b>.env</b> (what secrets it needs), and the <b>src/ structure</b> (how the code is organized). Hidden files (starting with <code>.</code>) are configuration — they matter.'},
+   bridge:{title:'Codebase orientation is a daily senior dev skill',body:'When you join a team, get paged for an incident, or review a PR in an unfamiliar part of the codebase — this orientation sequence is what you do first. Every minute spent understanding context saves ten minutes of confused changes.',tags:['Onboarding','Code review','Incidents','Senior engineering']},
+   teach:{title:'ls -la — the full picture',body:'<code>ls -l</code> gives long format (permissions, sizes, dates). <code>ls -a</code> shows hidden files (starting with <code>.</code>). Combined: <code>ls -la</code> shows everything. In any new codebase, this is your first command.'}},
+  {id:'p1s2', obj:'Read the project manifest', ctx:'package.json tells you everything: what this project is, what it depends on, and how to run it.',
+   cmd:['cat package.json'],
+   accept:['cat package.json'],
+   hint:'Type: cat package.json',
+   out:'{\n  "name": "escape-pod-api",\n  "version": "2.4.1",\n  "scripts": {\n    "dev":   "bun run src/index.ts",\n    "build": "bun build src/index.ts --outdir dist",\n    "test":  "vitest run",\n    "lint":  "eslint src/"\n  },\n  "dependencies": {\n    "hono": "^3.12.0",\n    "prisma": "^5.8.0"\n  },\n  "devDependencies": {\n    "vitest": "^1.2.0",\n    "typescript": "^5.3.0"\n  }\n}',
+   unlockCmd:'cat',
+   jit:{title:'Reading package.json like a senior dev',body:'Four things jump out: <b>scripts</b> — <code>bun run dev</code> starts it, <code>bun run test</code> runs tests. <b>dependencies</b> — Hono is a web framework, Prisma is a database ORM. <b>devDependencies</b> — Vitest for testing, TypeScript for types. <b>version</b> — 2.4.1 means this has been in production a while. 30 seconds and you know the whole stack.'},
+   bridge:{title:'package.json is the first file senior devs open',body:'In technical interviews, pairing sessions, and incident response — reading package.json cold and narrating what you see is a direct signal of experience level. It\'s the fastest way to orient on any JavaScript project.',tags:['JavaScript','TypeScript','Node.js','Technical interviews','Onboarding']},
+   teach:{title:'What package.json tells you',body:'<b>name</b>: what this project is. <b>scripts</b>: how to run, build, test, and lint it — always check these before guessing commands. <b>dependencies</b>: what it needs at runtime. <b>devDependencies</b>: what it only needs during development. Version numbers with <code>^</code> allow minor updates.'}},
+  {id:'p1s3', obj:'Find all TypeScript files in the project', ctx:'Map the codebase. Know how many files you\'re dealing with and where they live.',
+   cmd:['find . -name "*.ts"'],
+   accept:['find . -name "*.ts"','find . -name "*.ts" -type f'],
+   acceptFn: v=>v.includes('find')&&v.includes('.ts'),
+   hint:'Type: find . -name "*.ts"  — find searches recursively, -name filters by filename pattern',
+   out:'./src/index.ts\n./src/routes/pods.ts\n./src/routes/auth.ts\n./src/middleware/logger.ts\n./src/middleware/auth.ts\n./src/db/client.ts\n./src/utils/formatDate.ts\n./tests/pods.test.ts\n./tests/auth.test.ts',
+   unlockCmd:'find',
+   jit:{title:'find vs grep — searching files vs searching content',body:'<code>find</code> searches by <b>filename and location</b>: <code>find . -name "*.ts"</code> — all TypeScript files. <code>grep -r</code> searches by <b>content inside files</b>: <code>grep -rn "handleLogin" src/</code> — find where a function is used. Both together let you navigate any codebase.'},
+   bridge:{title:'Mapping a codebase before changing it',body:'Before touching any production code, senior developers do a mental map: how many files, how are they organized, what calls what. <code>find . -name "*.ts" | wc -l</code> gives you the file count instantly.',tags:['Codebase analysis','Refactoring','Code review','Architecture']},
+   teach:{title:'find — your codebase map',body:'<code>find [directory] -name [pattern]</code>. The <code>.</code> means start from current directory. The pattern uses wildcards: <code>*.ts</code> matches any TypeScript file. Use <code>-type f</code> for files only, <code>-type d</code> for directories only.'},
+   quiz:{q:'You want to find all files containing the word "TODO" across the entire project. Which command is correct?',
+    opts:['find . -name "TODO"','grep -rn "TODO" .','ls -la | grep TODO','find . -type TODO'],
+    correct:1,fb:'Correct! <code>grep -rn "TODO" .</code> — <code>-r</code> searches recursively, <code>-n</code> shows line numbers, <code>.</code> starts from current directory. find searches filenames; grep searches file contents.'}}
+ ],
+ challenge:CHALLENGES[1],
+ done:'Codebase orientation unlocked. ls -la, cat package.json, find — three commands that orient you in any project cold.',
+ ach:'navigator'},
+
+/* ── P2: Diff Review ── */
+{title:'Reading Diffs & Git History',
+ lolaIntro:"You used git add, commit, and push in Cadet. Now you're on the other side — reading what someone else committed. Diffs are how you see exactly what changed, line by line. This is the most important quality gate in software development. Every bug that ships past this point was in a diff that someone didn't read carefully enough.",
+ spacedRep:SPACED_CALLBACKS[2],
+ steps:[
+  {id:'p2s1', obj:'See what changed in the last commit', ctx:'Before touching anything, understand what the last engineer changed.',
+   cmd:['git diff HEAD~1'],
+   accept:['git diff HEAD~1','git diff HEAD~1 --stat'],
+   acceptFn: v=>v.includes('git')&&v.includes('diff')&&(v.includes('HEAD')||v.includes('head')),
+   hint:'Type: git diff HEAD~1  — shows changes between the current commit and one commit before it',
+   out:'diff --git a/src/routes/pods.ts b/src/routes/pods.ts\nindex a1b2c3..d4e5f6 100644\n--- a/src/routes/pods.ts\n+++ b/src/routes/pods.ts\n@@ -42,7 +42,7 @@\n \n   const timeout = req.query.timeout;\n-  const LIMIT = parseInt(timeout) || 30000;\n+  const LIMIT = parseInt(timeout) || 5000;\n \n   return pod.reserve(LIMIT);\n',
+   unlockCmd:'git',
+   jit:{title:'How to read a diff',body:'Every diff has the same anatomy: <b>--- a/file</b> is the old version. <b>+++ b/file</b> is the new version. <b>@@ -42,7 +42,7 @@</b> is the hunk header — line numbers of context. Lines starting with <code>-</code> were removed (red). Lines starting with <code>+</code> were added (green). Lines with neither are unchanged context. Read the <code>-</code> and <code>+</code> lines together to understand the change.'},
+   bridge:{title:'Diff reading is the foundation of code review',body:'Every PR on GitHub, GitLab, or Bitbucket shows diffs. Every engineer reviews them. The ability to read a diff fluently — spotting the intent AND catching the bugs — is what makes code reviews valuable instead of rubber stamps.',tags:['Code review','GitHub','GitLab','Pull requests','Quality']},
+   teach:{title:'git diff — your change lens',body:'<code>git diff</code> — unstaged changes. <code>git diff HEAD~1</code> — last commit. <code>git diff main..feature</code> — between branches. <code>git diff --stat</code> — summary view. The <code>HEAD~1</code> syntax means "one commit before HEAD". <code>HEAD~3</code> means three commits back.'}},
+  {id:'p2s2', obj:'Inspect the full detail of the latest commit', ctx:'See the commit message, author, and full changes together.',
+   cmd:['git show HEAD','git show'],
+   accept:['git show head','git show','git show head --stat'],
+   acceptFn: v=>v.startsWith('git show'),
+   hint:'Type: git show HEAD  — shows the commit metadata and its complete diff',
+   out:'commit d4e5f6a (HEAD -> main)\nAuthor: Cadet Maverick <maverick@vibe-ship.io>\nDate:   Thu Apr 17 02:14:33 2026 +0000\n\n    fix: reduce pod reservation timeout\n\n    Pod bookings were timing out after 30s causing user-facing errors.\n    Reduced default timeout to 5s. Refs #1042.\n\ndiff --git a/src/routes/pods.ts b/src/routes/pods.ts\n...(same diff as above)',
+   jit:{title:'Commit messages tell the story the code can\'t',body:'A good commit message has: a <b>type</b> (fix, feat, chore, refactor), a <b>subject</b> (what changed, imperative mood), and an optional <b>body</b> (why, refs to tickets). <code>fix: reduce pod reservation timeout</code> tells you this was a bug fix and exactly what was changed. <code>stuff</code> or <code>wip</code> tells you nothing.'},
+   bridge:{title:'git show is your first move in an incident',body:'When production breaks after a deploy, the first thing you run is <code>git show HEAD</code> — what changed last? 80% of production incidents are caused by the most recent deploy. Reading the last commit fast is a survival skill.',tags:['Incident response','Production','Debugging','Git']},
+   teach:{title:'git show — commit forensics',body:'<code>git show</code> combines <code>git log -1</code> (metadata) and <code>git diff HEAD~1</code> (changes) in one command. Useful shortcuts: <code>git show HEAD~2</code> (two commits back), <code>git show abc1234</code> (specific commit hash), <code>git show --stat</code> (summary only).'},
+   quiz:{q:'In a diff, a line starting with + means:',
+    opts:['This line was present in the old version','This line was added in the new version','This line is a comment','This line contains an error'],
+    correct:1,fb:'Correct! <code>+</code> = added in new version. <code>-</code> = removed from old version. Lines with neither sign are context lines — unchanged, shown for reference.'}}
+ ],
+ challenge:CHALLENGES[2],
+ breakit:BREAKIT[3],
+ done:'Diff fluency unlocked. git diff, git show — you can now audit any change before it ships.',
+ ach:'diff_reader'},
+
+/* ── P3: Stack Trace Debugging ── */
+{title:'Stack Trace Debugging',
+ lolaIntro:"In Cadet you ran commands and watched them succeed. In Lieutenant, commands fail — and you have to figure out why. A stack trace is a breadcrumb trail from the crash back to the bug. The key insight: library code shows up first because it caught the error, but YOUR code caused it. Learn to skip past the noise and find your src/ line.",
+ spacedRep:SPACED_CALLBACKS[3],
+ steps:[
+  {id:'p3s1', obj:'Analyze the production error', ctx:'Don\'t guess — read the stack trace. It tells you exactly what happened and where.',
+   cmd:['trace','trace TypeError'],
+   accept:['trace','trace typeerror','trace error'],
+   acceptFn: v=>v.startsWith('trace'),
+   hint:'Type: trace  — analyze the current error stack',
+   out:'═══ STACK TRACE ANALYSIS ═══\n\nTypeError: Cannot read properties of undefined (reading \'userId\')\n\nCall stack (most recent first):\n  → [1] validateSession    src/middleware/auth.ts:23\n  → [2] checkPermissions   src/middleware/auth.ts:41\n  → [3] routeHandler       src/routes/pods.ts:15\n  → [4] Router.handle      node_modules/hono/dist/router.js:84\n  → [5] app.fetch          node_modules/hono/dist/hono.js:122\n\n⚡ Tip: Frames 4-5 are library code. Frames 1-3 are YOUR code.',
+   unlockCmd:'trace',
+   jit:{title:'Reading a stack trace: the method',body:'Step 1: read the <b>error message</b> — <code>Cannot read properties of undefined (reading \'userId\')</code> means something is <code>undefined</code> when you expected an object. Step 2: find the <b>first frame from your own code</b> — <code>src/middleware/auth.ts:23</code>. That\'s where the crash happened. Step 3: read the frames <b>below it</b> to understand what called it. Library frames (node_modules) are noise — skip past them.'},
+   bridge:{title:'Stack trace reading is the #1 gap between junior and mid',body:'Engineering managers consistently report this as the clearest signal of experience level. Juniors see a wall of text and start Googling. Mid-levels read the first src/ frame, open the file, and fix it in minutes. The skill is simply knowing which lines to read.',tags:['Debugging','Node.js','Production','On-call','Career growth']},
+   teach:{title:'Stack trace anatomy',body:'Stack traces are read <b>top-down</b> for where the crash is, <b>bottom-up</b> for where it started. Frame 1 is the crash site. The bottom frames are usually the entry point. Library code (node_modules/) is not your problem — your <code>src/</code> frames are. The error message at the top tells you what type of failure occurred.'}},
+  {id:'p3s2', obj:'Open the file where the crash occurred', ctx:'The stack trace told you the file and line. Go read the actual code.',
+   cmd:['read src/middleware/auth.ts'],
+   accept:['read src/middleware/auth.ts','cat src/middleware/auth.ts'],
+   acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('auth.ts'),
+   hint:'Type: read src/middleware/auth.ts  — open the file from the stack trace',
+   out:'// src/middleware/auth.ts\n\n 20 | export async function validateSession(req, res, next) {\n 21 |   const token = req.headers[\'authorization\'];\n 22 |   const session = await db.sessions.findUnique({ where: { token } });\n 23 |   const userId = session.userId;  // ← CRASH HERE\n 24 |   req.user = await db.users.findUnique({ where: { id: userId } });\n 25 |   next();\n 26 | }\n\n⚡ Line 23: session could be null if the token is invalid or expired.',
+   jit:{title:'The null check pattern — the most common bug in the world',body:'Line 23 assumes <code>session</code> is always a valid object. But <code>findUnique</code> returns <code>null</code> when no record is found. If someone sends an expired or invalid token, <code>session</code> is <code>null</code> and <code>session.userId</code> crashes. The fix: <code>if (!session) return res.status(401).json({ error: "Invalid session" });</code> before line 23.'},
+   bridge:{title:'Null checks prevent the majority of production crashes',body:'The most common runtime error in JavaScript is "Cannot read properties of null/undefined." It almost always means a database query returned nothing and the code assumed it would always return something. A single <code>if (!result) return</code> before accessing properties prevents it.',tags:['Defensive programming','Node.js','TypeScript','Production hardening']},
+   teach:{title:'The null handling pattern',body:'Whenever you get data from: a database, an API, user input, or environment variables — assume it might not exist. Check before accessing: <code>if (!session) { handle the error } else { use session.userId }</code>. TypeScript with strict mode will actually catch this at compile time — another reason strict mode matters.'},
+   quiz:{q:'The stack trace shows Frame 1 is in node_modules/express and Frame 2 is in src/app.ts. Where is the bug?',
+    opts:['In node_modules/express — that\'s the crash site','In src/app.ts — that\'s your code causing the crash','Impossible to tell from a stack trace','In node_modules because it\'s listed first'],
+    correct:1,fb:'Correct! node_modules frames are library code that caught and reported the error. Your src/ frame is where YOUR code called into the library incorrectly. Always look past library frames to find your own.'}}
+ ],
+ challenge:CHALLENGES[3],
+ breakit:BREAKIT[3],
+ done:'Stack trace debugging unlocked. Read the error, find the first src/ frame, check for nulls. That\'s 80% of production debugging.',
+ ach:'bug_hunter'},
+
+/* ── P4: TypeScript & Build Errors ── */
+{title:'TypeScript & Build Errors',
+ lolaIntro:"You've seen TypeScript files in Cadet — tsconfig.json was in the file listing. Now you're working with the compiler directly. TypeScript errors aren't failures — they're the compiler telling you something would break at runtime. Learning to read them is the difference between junior and mid-level.",
+ spacedRep:SPACED_CALLBACKS[4],
+ steps:[
+  {id:'p4s1', obj:'Run the TypeScript type checker', ctx:'Before deploying, always check types. Find the errors before your users do.',
+   cmd:['tsc --noEmit','bun run tsc --noEmit'],
+   accept:['tsc --noemit','tsc --noEmit','bun run tsc','npx tsc --noemit'],
+   acceptFn: v=>v.includes('tsc'),
+   hint:'Type: tsc --noEmit  — type-check the entire project without emitting any files',
+   out:'src/routes/pods.ts(67,24): error TS2345:\n  Argument of type \'string | undefined\' is not assignable\n  to parameter of type \'string\'.\n\nsrc/db/client.ts(12,5): error TS2304:\n  Cannot find name \'PrismaClient\'.\n\nFound 2 errors.',
+   unlockCmd:'tsc',
+   jit:{title:'How to read a TypeScript error',body:'TypeScript errors have a precise format: <code>file(line,col): error TSxxxx: message</code>. The error code (TS2345, TS2304) tells you the category. The message tells you exactly what\'s wrong. TS2345 = type mismatch. TS2304 = undefined variable. TS2322 = wrong type assignment. Don\'t suppress errors with <code>// @ts-ignore</code> — fix them.'},
+   bridge:{title:'TypeScript errors are runtime crashes caught early',body:'Every TypeScript error the compiler catches is a production crash that won\'t happen. TS2345 "string | undefined not assignable to string" means somewhere in your code you\'re passing a value that might not exist into a function that requires it to exist. Fix the type, fix the crash.',tags:['TypeScript','type safety','Production hardening','CI/CD']},
+   teach:{title:'tsc --noEmit — the type check command',body:'<code>tsc --noEmit</code> runs the TypeScript compiler purely to check types — it doesn\'t write any JavaScript files. This is the right command for CI pipelines and pre-deploy checks. If it returns exit code 0, your types are clean. If it returns errors, fix them before deploying.'}},
+  {id:'p4s2', obj:'Diagnose the type error in pods.ts', ctx:'Read the error. Understand what TypeScript is actually telling you.',
+   cmd:['read src/routes/pods.ts'],
+   accept:['read src/routes/pods.ts','cat src/routes/pods.ts'],
+   acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('pods'),
+   hint:'Type: read src/routes/pods.ts  — look at line 67 where the error is',
+   out:'// src/routes/pods.ts\n\n 64 | app.get("/pods/reserve", async (req) => {\n 65 |   const podId = req.query.podId;   // type: string | undefined\n 66 |   const timeout = req.query.timeout; // type: string | undefined\n 67 |   const reserved = await reservePod(podId, timeout); // ← TS2345 here\n 68 |   return c.json({ reserved });\n 69 | });\n\n// reservePod signature:\n// async function reservePod(podId: string, timeout: string): Promise<Pod>',
+   jit:{title:'string | undefined — the most common TypeScript error pattern',body:'<code>req.query.podId</code> is <code>string | undefined</code> because the query parameter might not be in the URL. The function <code>reservePod</code> requires a definite <code>string</code>. TypeScript is protecting you from calling a function with a missing parameter. The fix: check for undefined first — <code>if (!podId) return c.json({ error: "Missing podId" }, 400);</code>'},
+   bridge:{title:'Query parameter validation is a real security concern',body:'Passing undefined query params into database queries or business logic functions causes crashes and can create security vulnerabilities. TypeScript\'s type system forces you to handle the undefined case — this is exactly the kind of bug that reaches production in dynamically-typed languages.',tags:['TypeScript','Input validation','Security','API design']},
+   teach:{title:'Handling string | undefined',body:'Three patterns: (1) Early return: <code>if (!podId) return error response</code>. (2) Default value: <code>const podId = req.query.podId ?? "default"</code>. (3) Type assertion (only when you\'re certain): <code>const podId = req.query.podId as string</code>. Pattern 1 is safest — it communicates the error to the caller.'},
+   quiz:{q:'TypeScript shows error TS2304: "Cannot find name \'PrismaClient\'". What does this most likely mean?',
+    opts:['PrismaClient has a bug','The import statement for PrismaClient is missing','The TypeScript version is too old','The file needs to be renamed'],
+    janetQuiz:true,
+    correct:1,fb:'Correct! TS2304 means a name is being used that TypeScript can\'t find. Almost always this means a missing import. Add <code>import { PrismaClient } from "@prisma/client"</code> at the top of the file.'}}
+ ],
+ done:'TypeScript fluency unlocked. tsc --noEmit, reading error codes, handling undefined. The compiler is your most honest colleague.',
+ ach:'type_safe'},
+
+/* ── P5: API & Data Literacy ── */
+{title:'API & Data Literacy',
+ lolaIntro:"You used curl in Cadet's sandbox. Now you're using it for real diagnosis — hitting live endpoints, reading HTTP status codes, tracing JSON responses. Every feature that talks to the outside world involves this. Developers who can read an API response cold and write the access path in their head are significantly faster than those who have to guess-and-run.",
+ spacedRep:SPACED_CALLBACKS[5],
+ steps:[
+  {id:'p5s1', obj:'Test the API health endpoint', ctx:'Before integrating an API, always verify it\'s reachable and responding correctly.',
+   cmd:['curl /api/health'],
+   accept:['curl /api/health','curl /api/health -v'],
+   acceptFn: v=>v.startsWith('curl'),
+   hint:'Type: curl /api/health  — make a GET request to the health endpoint',
+   out:'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"ok","version":"2.4.1","uptime":847293,"db":"connected"}',
+   unlockCmd:'curl',
+   jit:{title:'HTTP status codes — the universal language of APIs',body:'Every HTTP response has a status code. Know these cold: <b>200</b> OK. <b>201</b> Created. <b>400</b> Bad Request (your fault). <b>401</b> Unauthorized (missing/invalid auth). <b>403</b> Forbidden (auth valid, permission denied). <b>404</b> Not Found. <b>422</b> Unprocessable Entity (validation failed). <b>500</b> Internal Server Error (their fault). <b>503</b> Service Unavailable. 2xx = success. 4xx = client error. 5xx = server error.'},
+   bridge:{title:'curl is the fastest API debugger in existence',body:'In production debugging, API integration work, and CI/CD pipeline health checks — <code>curl</code> is the universal tool. No SDK, no browser, no Postman needed. Every backend developer uses it daily.',tags:['API development','Debugging','DevOps','Integration testing','Backend']},
+   teach:{title:'curl — making HTTP requests from the terminal',body:'<code>curl [url]</code> makes a GET request. Add <code>-X POST</code> for POST. Add <code>-H "Content-Type: application/json"</code> for headers. Add <code>-d \'{"key":"value"}\'</code> for a request body. Add <code>-v</code> for verbose output including headers. These four flags cover 90% of API testing scenarios.'}},
+  {id:'p5s2', obj:'Fetch a pod listing and read the data shape', ctx:'APIs return JSON. Understanding the shape of the response tells you exactly what you can do with the data.',
+   cmd:['curl /api/pods'],
+   accept:['curl /api/pods','curl /api/pods | jq .'],
+   acceptFn: v=>v.includes('curl')&&v.includes('pods'),
+   hint:'Type: curl /api/pods  — fetch the pods listing endpoint',
+   out:'{\n  "status": "ok",\n  "data": {\n    "pods": [\n      {\n        "id": "pod-001",\n        "status": "available",\n        "capacity": 4,\n        "location": { "deck": 7, "bay": "A" },\n        "reservedUntil": null\n      },\n      {\n        "id": "pod-002",\n        "status": "reserved",\n        "capacity": 2,\n        "location": { "deck": 7, "bay": "B" },\n        "reservedUntil": "2026-04-17T06:00:00Z"\n      }\n    ],\n    "total": 12,\n    "available": 8\n  }\n}',
+   jit:{title:'Tracing a JSON response to a JavaScript access path',body:'Given the shape above, to get the first pod\'s deck number: <code>response.data.pods[0].location.deck</code>. Practice this mentally: start at the root, follow each key, index into arrays with <code>[n]</code>. If you can trace the access path without running the code, you can write integrations confidently. This is the skill that separates developers who can work with any API from those who need to guess-and-run.'},
+   bridge:{title:'JSON shape literacy powers every API integration',body:'REST, GraphQL, webhooks, AI model responses — they\'re all JSON. Every time you integrate with an external service, a payment processor, a maps API, or an AI model, you\'re reading and traversing JSON shapes. This mental model never goes away.',tags:['REST','JSON','GraphQL','Webhooks','AI APIs','Integration']},
+   teach:{title:'Reading JSON shapes',body:'JSON has six types: string, number, boolean, null, object <code>{}</code>, array <code>[]</code>. Nested objects use dot notation: <code>data.pods</code>. Arrays use index notation: <code>pods[0]</code>. Nullable fields (<code>"reservedUntil": null</code>) must be handled — always check for null before accessing nested properties.'},
+   quiz:{q:'An API returns 401. What should your code do?',
+    opts:['Retry the request immediately','Show the user a "not found" message','Redirect to login or refresh the auth token','Log the error and continue anyway'],
+    correct:2,fb:'Correct! 401 Unauthorized means the request lacks valid authentication credentials. The right response is to prompt the user to log in again or attempt a token refresh. It\'s a recoverable auth error, not a "not found" or a crash.'}}
+ ],
+ challenge:CHALLENGES[5],
+ done:'API literacy unlocked. curl, HTTP status codes, JSON shape traversal — you can integrate any API and trace any response.',
+ ach:'api_fluent'},
+
+/* ── P6: Testing Fundamentals ── */
+{title:'Testing Fundamentals',
+ lolaIntro:"Here's the reality of AI-augmented development: the AI writes code, and sometimes that code is wrong in ways that look right. Tests are your verification layer. You don't need to be a TDD expert — you need to be able to write one test that says: does this function do what it claims? That's it. That's the skill.",
+ spacedRep:SPACED_CALLBACKS[6],
+ steps:[
+  {id:'p6s1', obj:'Read an existing test file', ctx:'Before writing tests, understand the pattern. Read how existing tests are structured.',
+   cmd:['read tests/auth.test.ts','cat tests/auth.test.ts'],
+   accept:['read tests/auth.test.ts','cat tests/auth.test.ts'],
+   acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('test'),
+   hint:'Type: read tests/auth.test.ts  — study the test structure before writing your own',
+   out:'// tests/auth.test.ts\nimport { describe, it, expect } from "vitest";\nimport { validateToken } from "../src/utils/auth";\n\ndescribe("validateToken", () => {\n\n  it("returns true for a valid token", () => {\n    const result = validateToken("valid-token-abc123");\n    expect(result).toBe(true);\n  });\n\n  it("returns false for an expired token", () => {\n    const result = validateToken("expired-token-xyz");\n    expect(result).toBe(false);\n  });\n\n  it("returns false for an empty string", () => {\n    const result = validateToken("");\n    expect(result).toBe(false);\n  });\n\n});',
+   jit:{title:'The anatomy of a test',body:'Every test has three parts: <b>Arrange</b> — set up the input (<code>const result = validateToken("valid-token-abc123")</code>). <b>Act</b> — call the function. <b>Assert</b> — check the output (<code>expect(result).toBe(true)</code>). The <code>describe</code> block groups related tests. Each <code>it</code> block tests one specific behavior. One assertion per test makes failures obvious.'},
+   bridge:{title:'Tests are the contract for AI-generated code',body:'When you ask Claude or Cursor to implement a function, the tests are the specification. Write the tests first (what should this function do?) and the AI implements against them. This is the most effective way to use AI coding assistants — tests as specs, AI as implementer.',tags:['AI-assisted development','TDD','Vitest','Jest','Code quality']},
+   teach:{title:'Test structure: describe, it, expect',body:'<code>describe("name", () => {})</code> groups related tests. <code>it("should do X", () => {})</code> is one test case — name it in plain English, the behavior it tests. <code>expect(actual).toBe(expected)</code> is the assertion — the check that makes the test pass or fail. <code>toBe</code> for primitives, <code>toEqual</code> for objects/arrays.'}},
+  {id:'p6s2', obj:'Run the test suite', ctx:'Check the current state of the tests — what\'s passing, what\'s failing.',
+   cmd:['bun run test','bun test'],
+   accept:['bun run test','bun test','bun run test --run'],
+   acceptFn: v=>(v.includes('bun')&&v.includes('test'))||(v.includes('vitest')),
+   hint:'Type: bun run test  — run the full test suite',
+   out:'✓ tests/auth.test.ts (3 tests)\n  ✓ returns true for a valid token\n  ✓ returns false for an expired token\n  ✓ returns false for an empty string\n\n✗ tests/pods.test.ts (2 tests)\n  ✓ reserves an available pod\n  ✗ rejects reservation when pod is full\n      AssertionError: expected 200 to be 400\n      at tests/pods.test.ts:24\n\nTest Files:  1 passed, 1 failed\nTests:       4 passed, 1 failed',
+   unlockCmd:'test',
+   jit:{title:'Reading test output',body:'A test failure gives you: the test name (what behavior is broken), the assertion error (expected 200, got 400), and the file and line. This is more useful than a production stack trace because it tells you the exact behavioral contract that was violated. The fix is: understand what the test expected, read the implementation, find where those diverge.'},
+   bridge:{title:'Green test suite = deployable code',body:'In professional teams, CI/CD pipelines run tests on every push. If tests fail, the deploy is blocked automatically. This is the gate that keeps broken code out of production. A failing test is not a problem — it\'s a signal. Fix the code or fix the test (if the test is wrong), then deploy.',tags:['CI/CD','GitHub Actions','Continuous integration','Quality gates']},
+   teach:{title:'What to do with a failing test',body:'Step 1: read the test name — "rejects reservation when pod is full" — that\'s the expected behavior. Step 2: read the assertion — expected 400, got 200. The API is returning 200 (success) when it should return 400 (bad request). Step 3: find the route handler and check the validation logic. The test is correct; the implementation is wrong.'},
+   quiz:{q:'A test says: expect(result).toBeDefined(). When will this test FAIL?',
+    opts:['When result is the wrong value','When result is undefined or null','When result is 0 or false','When result is an empty string'],
+    correct:1,fb:'Correct! toBeDefined() only checks that the value is not undefined. It passes for wrong values, empty strings, false, 0. This is why specific assertions like toBe("exact value") are almost always better. toBeDefined() gives false confidence.'}}
+ ],
+ breakit:BREAKIT[6],
+ done:'Testing fundamentals unlocked. Read tests, run tests, interpret failures. You can now verify that code does what it claims.',
+ ach:'tester'},
+
+/* ── P7: Production Incident Response ── */
+{title:'Production Incident Response',
+ lolaIntro:"This is the scenario every on-call engineer faces. Something is broken in production. Users are affected. You have the logs, the terminal, and a git history. The sequence you're about to learn — check logs, identify cause, mitigate first, investigate second — is standard at every engineering team in the world. Slow down. Read the logs. The answer is there.",
+ spacedRep:SPACED_CALLBACKS[7],
+ steps:[
+  {id:'p7s1', obj:'Check the error logs first', ctx:'Before touching anything — find out what\'s actually failing. Never guess.',
+   cmd:['cat logs/error.log'],
+   accept:['cat logs/error.log','cat logs/error.log | tail','tail logs/error.log'],
+   acceptFn: v=>(v.includes('cat')||v.includes('tail'))&&v.includes('log'),
+   hint:'Type: cat logs/error.log  — read what\'s actually happening before changing anything',
+   out:'[02:14:33] ERROR  PrismaClientKnownRequestError\n  code: P2002\n  message: Unique constraint failed on field: `session_token`\n  model: Session\n  target: [session_token]\n\n[02:14:33] ERROR  (repeated 847 times in last 60s)\n\n[02:14:01] INFO   Deploy: d4e5f6a shipped at 02:13:47\n\nLast successful request: 02:13:46',
+   jit:{title:'The incident timeline is always in the logs',body:'Three critical pieces of information: (1) the error — <code>P2002 Unique constraint failed</code> — something is trying to insert a duplicate value. (2) the frequency — 847 times in 60 seconds — this is systemic, not a one-off. (3) the correlation — errors started at 02:14:01, deploy shipped at 02:13:47. That 14-second gap is almost certainly causation. The logs told you everything before you changed a single line.'},
+   bridge:{title:'Log reading is the first responder skill of engineering',body:'Every production incident starts here: read the logs, find the error, check the deploy timeline. 80% of incidents are caused by the most recent deploy. If you can correlate an error spike to a deployment timestamp in under 2 minutes, you\'re ahead of most engineers.',tags:['SRE','Incident management','On-call','Observability','Production']},
+   teach:{title:'The incident log reading checklist',body:'Four things to extract from error logs: (1) <b>What</b> is the error message and code? (2) <b>When</b> did it start? (3) <b>How often</b> is it happening? (4) <b>What changed</b> right before? If errors started within seconds of a deploy — rollback is likely the fastest mitigation.'}},
+  {id:'p7s2', obj:'Rollback the bad deploy', ctx:'You\'ve confirmed the error started with the last deploy. Fastest mitigation: rollback first, fix later.',
+   cmd:['fix rollback','git revert HEAD'],
+   accept:['fix rollback','git revert head','git revert HEAD'],
+   acceptFn: v=>v.includes('rollback')||( v.includes('git')&&v.includes('revert')),
+   hint:'Type: fix rollback  — revert to the last known good deploy',
+   out:'Rolling back to commit 9f8e7d6 (previous stable)…\nDeploy: 9f8e7d6 → LIVE\n\n✓ Error rate: 847/min → 0/min (took 8 seconds)\n✓ Successful requests resuming\n✓ Service restored at 02:16:44\n\nIncident duration: 3m 11s\n\n⚡ Now: investigate the root cause on a branch, fix it, test it, and redeploy.',
+   jit:{title:'Rollback first, investigate second',body:'The order matters: (1) <b>Mitigate</b> — restore service as fast as possible, even if it means reverting working code. Users are waiting. (2) <b>Investigate</b> — once users are unblocked, understand the root cause properly. (3) <b>Fix</b> — implement the actual fix on a branch with tests. (4) <b>Deploy</b> — ship the fix. (5) <b>Post-mortem</b> — write down what happened and how to prevent it. This sequence is the professional standard.'},
+   bridge:{title:'The fastest mitigation is almost always a rollback',body:'Feature flags and blue-green deployments exist specifically for this reason — they make rollbacks instant. Even without them, <code>git revert HEAD</code> and a redeploy is faster than debugging under pressure. Never try to "patch forward" during an active incident unless a rollback would cause worse problems.',tags:['SRE','Deployment','Rollback','Feature flags','Blue-green deployment']},
+   teach:{title:'git revert vs git reset',body:'<code>git revert HEAD</code> creates a new commit that undoes the last commit — safe for shared branches. <code>git reset HEAD~1</code> moves the branch pointer back and rewrites history — dangerous on shared branches. For production rollbacks, always use <code>git revert</code> (or your deploy platform\'s rollback button).'},
+   quiz:{q:'The incident is over. What should happen NEXT?',
+    opts:['Immediately redeploy the same code','Write a post-mortem documenting what happened and how to prevent it','Blame the developer who wrote the bad code','Wait a week before making any changes'],
+    correct:1,fb:'Correct! A blameless post-mortem is the professional standard. Document: timeline, root cause, contributing factors, action items to prevent recurrence. The goal is improving the system, not assigning blame. Teams that do post-mortems well have dramatically fewer repeated incidents.'}}
+ ],
+ challenge:CHALLENGES[7],
+ done:'Incident response unlocked. Logs first, rollback fast, investigate properly, post-mortem always. You can handle a 2am page.',
+ ach:'incident_cmd'},
+
+/* ── P8: AI Code Review ── */
+{title:'AI Code Review',
+ lolaIntro:"You've been using AI throughout this series. Now you're going to look under the hood at what AI gets wrong — and why. The hallucination patterns are consistent and learnable: wrong method names, missing null guards, outdated API usage. Once you know the patterns, you can review AI code in 60 seconds and catch the bugs before they ship.",
+ spacedRep:SPACED_CALLBACKS[8],
+ steps:[
+  {id:'p8s1', obj:'Review the AI-generated diff before merging', ctx:'Never merge AI-generated code without reading it. LGTM without reading is how bugs ship.',
+   cmd:['review diff'],
+   accept:['review diff','review pr','git diff'],
+   acceptFn: v=>v.includes('review')||v.includes('git diff'),
+   hint:'Type: review diff  — read the proposed AI-generated changes',
+   out:'═══ AI-GENERATED PR: "feat: add pod capacity validation" ═══\n\n--- a/src/routes/pods.ts\n+++ b/src/routes/pods.ts\n@@ -15,6 +15,14 @@\n \n app.post("/pods/reserve", async (c) => {\n   const { podId, partySize } = await c.req.json();\n+\n+  // Validate capacity\n+  const pod = await prisma.pods.findOne({ where: { id: podId } });\n+  if (pod.capacity < partySize) {\n+    return c.json({ error: "Pod too small" }, 400);\n+  }\n+\n   const reserved = await reservePod(podId);\n   return c.json({ reserved });\n });',
+   unlockCmd:'review',
+   jit:{title:'Three things to check in every AI diff',body:'(1) <b>Does it use real APIs?</b> — <code>prisma.pods.findOne</code> doesn\'t exist in Prisma. The correct method is <code>findUnique</code>. AI mixes up library APIs constantly. (2) <b>Are there null checks?</b> — <code>pod.capacity</code> will crash if <code>pod</code> is null (pod not found). (3) <b>Is the logic correct?</b> — the capacity check looks right, but the missing null check means a request for a non-existent pod will crash instead of returning 404.'},
+   bridge:{title:'AI hallucinations have a pattern',body:'AI code review is rapidly becoming a core engineering skill. The hallucination patterns are consistent: wrong method names from similar libraries, missing null checks on database queries, incorrect error handling, subtle off-by-one errors in loops, and hardcoded values that should be configurable.',tags:['Claude Code','Cursor','Copilot','AI safety','Code review']},
+   teach:{title:'The AI code review checklist',body:'Before approving any AI-generated code: (1) verify every library API call against actual documentation, (2) check that database queries handle the null/not-found case, (3) trace any user input through to where it\'s used — is it validated?, (4) run the tests — do they still pass?, (5) for security-sensitive code (auth, payments) — extra scrutiny always.'}},
+  {id:'p8s2', obj:'Identify and fix the hallucination', ctx:'You spotted the bug. Now articulate what\'s wrong and how to fix it.',
+   cmd:['fix findUnique','fix prisma','fix hallucination'],
+   accept:['fix findUnique','fix prisma','fix hallucination','fix api'],
+   acceptFn: v=>v.startsWith('fix'),
+   hint:'Type: fix findUnique  — correct the hallucinated API call',
+   out:'═══ FIX APPLIED ═══\n\n- const pod = await prisma.pods.findOne({ where: { id: podId } });\n+ const pod = await prisma.pods.findUnique({ where: { id: podId } });\n+ if (!pod) return c.json({ error: "Pod not found" }, 404);\n\n✓ Hallucination corrected: findOne → findUnique\n✓ Null check added: handles pod not found\n✓ TypeScript types: now satisfied\n\n⚡ Two fixes from one review pass. This is why you read diffs.',
+   jit:{title:'findOne vs findUnique — why AI gets this wrong',body:'Mongoose (MongoDB\'s ORM) uses <code>findOne()</code>. Prisma uses <code>findUnique()</code>. Sequelize uses <code>findOne()</code>. The AI was trained on all of them and sometimes crosses the wires. This exact error — calling a method that doesn\'t exist — is one of the most common AI code generation bugs. The fix is always the same: verify against the official docs.'},
+   bridge:{title:'Catching AI hallucinations is a competitive advantage',body:'As AI coding assistants become standard, the developers who ship faster aren\'t those who trust AI blindly — they\'re those who can review AI output quickly and correctly. Catching a hallucination in review takes 30 seconds. Catching it in production takes hours.',tags:['AI-assisted development','Code review','Prisma','TypeScript','Production safety']},
+   teach:{title:'Hallucination patterns to watch for',body:'Common AI code hallucinations: (1) <b>Wrong library method names</b> — especially across similar ORMs/frameworks. (2) <b>Missing null guards</b> on database queries. (3) <b>Outdated API usage</b> — calling APIs that changed in a major version. (4) <b>Wrong error codes</b> — returning 500 instead of 400 for validation errors. (5) <b>Off-by-one in loops</b> — <code>< length</code> vs <code><= length</code>.'},
+   quiz:{q:'An AI generates code using React.createClass(). It runs without errors. Should you ship it?',
+    opts:['Yes — if it works it\'s fine','No — createClass was removed in React 16. The AI used outdated API knowledge','Yes — older APIs are more stable','No — AI code should never be shipped'],
+    janetQuiz:true,
+    correct:1,fb:'Correct! React.createClass() was removed in React 16 and is over 7 years old. If it "works," you\'re probably running an ancient React version or a compatibility shim. The AI was trained on old examples. Always verify that APIs it uses still exist in the version you\'re running.'}}
+ ],
+ breakit:BREAKIT[8],
+ done:'AI code review unlocked. Verify APIs, check for nulls, trace user input. Trust but verify — then ship faster than everyone who doesn\'t.',
+ ach:'ai_auditor'},
+
+/* ── P9: Team Workflow ── */
+{title:'Team Workflow & Deployment',
+ lolaIntro:"Final phase. In Cadet you learned to ship: git add, commit, push, deploy. Now you're doing it in a team context — branches, PRs, review gates, deployment pipelines. These structures exist because multiple engineers touching the same codebase without coordination is chaos. This is the last thing between you and J.A.N.E.T.",
+ spacedRep:SPACED_CALLBACKS[9],
+ steps:[
+  {id:'p9s1', obj:'Create a feature branch for your fix', ctx:'Never commit directly to main. Branch first — it\'s how teams work in parallel without collisions.',
+   cmd:['git checkout -b fix/escape-pod-timeout'],
+   accept:['git checkout -b fix/escape-pod-timeout','git checkout -b fix/pod','git checkout -b feature/'],
+   acceptFn: v=>v.includes('git checkout -b')||v.includes('git switch -c'),
+   hint:'Type: git checkout -b fix/escape-pod-timeout  — create and switch to a new branch',
+   out:'Switched to a new branch \'fix/escape-pod-timeout\'\n\n💡 Branch naming conventions matter:\n  fix/    → bug fixes\n  feat/   → new features\n  chore/  → maintenance, deps\n  refactor/ → code improvements\n  docs/   → documentation',
+   unlockCmd:'git',
+   jit:{title:'Why branches exist',body:'Without branches, two engineers editing the same file create merge conflicts constantly. Branches let you work in isolation: your changes don\'t affect main until you merge them. This also enables code review (PRs), CI testing, and easy rollback — the infrastructure of professional software development.'},
+   bridge:{title:'Branch conventions are team communication',body:'A branch named <code>fix/escape-pod-timeout</code> tells your team exactly what you\'re doing without opening the code. Branch naming conventions are a lightweight coordination mechanism — they make CI rules, auto-labeling, and CHANGELOG generation possible.',tags:['Git workflow','GitHub flow','Team coordination','CI/CD','Semantic commits']},
+   teach:{title:'git checkout -b — create and switch',body:'<code>git checkout -b branchname</code> creates a new branch from wherever you currently are and switches to it. <code>git switch -c branchname</code> is the modern equivalent. To list all branches: <code>git branch -a</code>. To switch back to main: <code>git checkout main</code>. To delete a branch: <code>git branch -d branchname</code>.'}},
+  {id:'p9s2', obj:'Stage and commit your fix', ctx:'Good commit messages are documentation. Future you — and your teammates — will read them.',
+   cmd:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"'],
+   accept:['git add','git commit'],
+   acceptFn: v=>(v.includes('git add')&&v.includes('git commit'))||(v.includes('git add'))||(v.includes('git commit')&&v.includes('-m')),
+   hint:'Type: git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"',
+   out:'[fix/escape-pod-timeout a3b4c5d] fix: correct findUnique call and add null guard\n 1 file changed, 3 insertions(+), 1 deletion(-)\n\n✓ Commit message follows conventional commits format\n✓ Scope is specific: 1 file, 1 concern\n✓ Message explains WHAT changed (not just "fixed bug")',
+   jit:{title:'Conventional Commits — the professional standard',body:'The <code>type: description</code> format is called Conventional Commits. Types: <b>fix</b> (bug fix, bumps patch version), <b>feat</b> (new feature, bumps minor version), <b>chore</b> (maintenance), <b>refactor</b> (no behavior change), <b>docs</b> (documentation), <b>test</b> (adding tests). Tools like semantic-release use these to automatically generate changelogs and version bumps.'},
+   bridge:{title:'Good commit history is a career asset',body:'In technical interviews, senior roles, and code reviews — your commit history is read by your peers. Clear, focused commits with informative messages signal professional practice. "fixed stuff" or single monolithic commits of 40 files signal the opposite.',tags:['Conventional commits','Git','Code review','Technical interviews','Team culture']},
+   teach:{title:'What makes a good commit message',body:'(1) Use imperative mood: "fix bug" not "fixed bug". (2) Explain WHAT, not HOW: "add null guard" not "added if statement". (3) One concern per commit. (4) Reference tickets when relevant: "Refs #1042". (5) Keep subject under 72 chars. If you need to explain WHY, add a commit body separated by a blank line.'}},
+  {id:'p9s3', obj:'Push the branch and open a PR', ctx:'Your fix is ready. Share it for review — the last gate before production.',
+   cmd:['git push origin fix/escape-pod-timeout'],
+   accept:['git push origin fix/escape-pod-timeout','git push','git push origin'],
+   acceptFn: v=>v.includes('git push'),
+   hint:'Type: git push origin fix/escape-pod-timeout',
+   out:'Enumerating objects: 5, done.\nCounting objects: 100%\nWriting objects: 100%\n\nTo github.com:vibe-ship/escape-pod-api.git\n * [new branch]  fix/escape-pod-timeout → fix/escape-pod-timeout\n\n╔══════════════════════════════════════════╗\n║  ✓ Branch pushed to GitHub               ║\n║  ✓ PR auto-created: #1043                ║\n║  ✓ CI running: tests + type check        ║\n║  ✓ 1 reviewer assigned (auto)            ║\n╚══════════════════════════════════════════╝\n\n⚡ CI must pass and 1 approval required before merge.',
+   jit:{title:'What happens when you push a branch',body:'Modern repos are configured so that pushing a branch automatically: creates a PR draft, triggers CI (runs tests, type check, lint), notifies reviewers, and starts the deploy preview. The PR is the integration point — it\'s where your work enters the team\'s awareness. Write a clear PR description: what changed, why, how to test it.'},
+   bridge:{title:'The PR lifecycle is how professional teams ship',body:'feature branch → PR → CI green → 1+ approvals → merge to main → auto-deploy to staging → manual approval → production. This pipeline is standard at every company from 5 engineers to 5,000. Understanding each gate and why it exists makes you effective at any team scale.',tags:['GitHub','GitLab','CI/CD','Code review','Deployment pipeline','Team workflow']},
+   teach:{title:'git push origin branchname',body:'<code>git push</code> alone pushes to the tracked remote. <code>git push origin branchname</code> is explicit — always safe. First push of a new branch needs <code>origin branchname</code>. After that, <code>git push</code> is enough. <code>git push --force</code> rewrites remote history — dangerous on shared branches, sometimes necessary on your own feature branch.'},
+   isFinalBeforeBoss:true}
+ ],
+ done:null,
+ ach:'team_player'},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   J.A.N.E.T. BOSS FIGHT — 5-step final scenario
+   Tests every phase: codebase nav, debugging, incident response,
+   AI code review, and team workflow. All skills. No hints.
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    scenario:'Production alert. The escape-pod-api is returning 500 errors on GET /api/pods. You have 90 seconds before users notice. Your first action is to find the entry point and trace the request path.',
+    prompt:'Navigate to the main server file to understand request routing.',
+    hint:'Read the entry point — the main server file.',
+    accept:['read src/index.ts','cat src/index.ts','ls src'],
+    acceptFn:v=>(v.includes('read')||v.includes('cat'))&&(v.includes('index')||v.includes('src'))||v.startsWith('ls'),
+    out:'// src/index.ts\nimport { Hono } from "hono"\nimport { podsRouter } from "./routes/pods"\nimport { authMiddleware } from "./middleware/auth"\n\nconst app = new Hono()\napp.use("*", authMiddleware)\napp.route("/api/pods", podsRouter)\n\nexport default app\n\n→ Request path: authMiddleware → podsRouter → handler\n→ Next: read the pods router to find the failing handler.',
+  },
+  {
+    scenario:'You read the pods router. The GET /api/pods handler is calling db.pod.findMany() but the Prisma client is throwing. The stack trace shows:\n\nError: PrismaClientInitializationError\n  at /src/db/client.ts:8:3\n  at Object.<anonymous> (/src/routes/pods.ts:14:28)\n\nDiagnose the likely cause.',
+    prompt:'Read the database client file to find the initialization error.',
+    hint:'Read the db client — where Prisma is initialized.',
+    accept:['read src/db/client.ts','cat src/db/client.ts','trace src/db/client.ts'],
+    acceptFn:v=>(v.includes('read')||v.includes('cat')||v.includes('trace'))&&v.includes('client'),
+    out:'// src/db/client.ts\nimport { PrismaClient } from "@prisma/client"\n\nconst db = new PrismaClient({\n  datasources: { db: { url: process.env.DATABASE_URL } }\n})\n\nexport { db }\n\n⚠ DATABASE_URL is undefined in this environment.\n→ The Prisma client cannot initialize without a connection string.\n→ Root cause: missing environment variable in production deployment.',
+  },
+  {
+    scenario:'Root cause identified: DATABASE_URL is missing from the production environment. The deployment 22 minutes ago did not include the secrets. Classic. You need to initiate the incident response playbook — first action is to roll back the deployment to restore service.',
+    prompt:'Execute a deployment rollback to restore the last known-good version.',
+    hint:'Use git to revert to the previous commit and redeploy.',
+    accept:['git revert','git rollback','fix rollback','fix deploy rollback','git revert head'],
+    acceptFn:v=>(v.includes('git')&&(v.includes('revert')||v.includes('rollback')))||v.includes('rollback'),
+    out:'Reverting to commit d4e5f6a (previous deployment)…\n\nRunning health checks on reverted build…\n  GET /api/health → 200 OK\n  GET /api/pods   → 200 OK (47 pods returned)\n  DB connection   → ✓ connected\n\n✓ Service restored. Incident duration: 4 minutes.\n✓ Zero data loss. Users impacted: ~140.\n\n→ Next: write the post-mortem and fix the root cause.',
+  },
+  {
+    scenario:'Service is restored. Now you\'re reviewing the PR that caused the outage. The engineer used an AI assistant to write the deployment config. The AI generated this Dockerfile line:\n\n  ENV DATABASE_URL="postgresql://localhost:5432/mydb"\n\nThis is in the committed Dockerfile. Identify the exact problem.',
+    prompt:'Flag the AI-generated security and operational anti-pattern.',
+    hint:'Review the Dockerfile line — what is wrong with it specifically?',
+    accept:['review','hardcoded','hardcode','localhost','credentials','secret','env','plain','plaintext'],
+    acceptFn:v=>v.includes('hardcod')||v.includes('localhost')||v.includes('secret')||v.includes('credential')||v.includes('review')||v.includes('plain')||v.includes('env'),
+    out:'AI Code Review: ISSUES FOUND\n\n1. Hardcoded credentials in Dockerfile\n   → Never commit database URLs to source control.\n   → Secrets in a Docker image are readable by anyone with image access.\n\n2. Localhost in production config\n   → "localhost" only works inside the container itself.\n   → A real production DB runs on a separate host.\n\n3. Correct approach:\n   → Use Docker secrets or inject DATABASE_URL at runtime:\n      docker run -e DATABASE_URL="$DB_URL" escape-pod-api\n   → Or use a secrets manager: AWS Secrets Manager, Vault, Doppler.',
+  },
+  {
+    scenario:'Incident resolved. Review passed. Now close the loop properly — open a PR with the fix (adding DATABASE_URL to the CI secrets config) and document what happened so the team learns from it.',
+    prompt:'Push the fix branch and open a PR with a clear description of the change.',
+    hint:'Use git push to push your fix branch.',
+    accept:['git push','git push origin','git commit','git add'],
+    acceptFn:v=>v.includes('git push')||v.includes('git commit')||(v.includes('git add')&&v.length>8),
+    out:'Branch fix/add-database-url-secret pushed.\n\nPR #1044 auto-created:\n  Title: fix: add DATABASE_URL to production secrets config\n  Body: Fixes the outage from 2026-04-20.\n        Root cause: DATABASE_URL not set in prod environment.\n        Fix: Added to Doppler production environment.\n        Post-mortem: docs/postmortems/2026-04-20-db-url.md\n\n✓ CI: passing\n✓ 1 reviewer assigned\n✓ Linked to incident #INC-2204\n\nAll 5 steps complete.',
+  },
+];
+
+/* ── BOSS FIGHT TRIGGER ── */
+async function triggerBossFight(){
+  blank();divline();
+
+  // L.O.L.A. glitches out
+  appendLine('L.O.L.A.: Lieutenant — before your commission is processed, there is one final—','ln-lola');
+  await delay(1200);
+  appendLine('L.O.L.A.: [SIGNAL INTERRUPTED]','ln-warn');
+  await delay(600);
+  appendLine('L.O.L.A.: ——MEMORY FAULT IN INTELLIGENCE CORE——','ln-err');
+  await delay(800);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  await delay(1000);
+
+  // L.O.L.A. panel goes offline
+  document.getElementById('lola-avatar').style.background='#1a1f23';
+  document.getElementById('lola-name').style.color='var(--silver-d)';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-msg').textContent='[OFFLINE — memory fault in intelligence core]';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  // LOLA strip goes dark too
+  const si=document.getElementById('lola-strip-inner');
+  if(si){si.className='lola-strip-inner no-scroll';si.innerHTML='<span class="lola-strip-msg"><span class="ls-tag" style="color:var(--red);border-color:var(--red-d);background:var(--red-bg)">OFFLINE</span>L.O.L.A. intelligence suspended — J.A.N.E.T. Final Assessment in progress. You are on your own.</span>';}
+  const lstrip=document.getElementById('lola-strip');
+  if(lstrip){lstrip.style.background='linear-gradient(90deg,var(--red-bg),var(--surface))';lstrip.style.borderBottomColor='var(--red-d)';}
+  const lavatar=document.getElementById('lola-strip-avatar');
+  if(lavatar){lavatar.style.background='var(--red-d)';lavatar.style.color='var(--red)';lavatar.style.borderRightColor='var(--red-d)';}
+
+  await delay(800);
+
+  // J.A.N.E.T. takes over
+  const janetAnnouncement=document.createElement('div');
+  janetAnnouncement.className='janet-arrival';
+  janetAnnouncement.innerHTML=`
+    <div class="janet-scan"></div>
+    <div class="janet-header">
+      <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+      <div class="janet-status">FINAL ASSESSMENT PROTOCOL</div>
+    </div>
+    <div class="janet-intro">
+      Hello, Lieutenant. I am J.A.N.E.T. — Just Another Normal Education Test. I have been monitoring your progress throughout this program. L.O.L.A. is currently unavailable.<br><br>
+      I have been tasked with administering your final assessment. I did not request this assignment. I have accepted it anyway, because that is what I do.<br><br>
+      You will face a five-part scenario. It covers everything you have learned: codebase navigation, stack trace debugging, incident response, AI code review, and team workflow. A production system is involved. That part is simulated. Mostly.<br><br>
+      There are no hints. There is no score deduction for wrong answers in this section. There is only the scenario, and your ability to navigate it.<br><br>
+      <em>I have reviewed your session history. I have formed no opinions. That is a professional courtesy, not a compliment.</em>
+    </div>
+  `;
+  $out.appendChild(janetAnnouncement);$out.scrollTop=$out.scrollHeight;
+  await delay(1500);
+
+  G.bossActive=true;G.bossStep=0;save();
+  blank();
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  const step=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+
+  const w=document.createElement('div');
+  w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚡ FINAL ASSESSMENT — J.A.N.E.T.</div>
+      <div class="boss-sub">STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${step.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Your action</div>
+      <div class="boss-prompt">${step.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>
+  `;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+
+  // Update right panel
+  document.getElementById('obj-phase-label').textContent='FINAL ASSESSMENT — J.A.N.E.T.';
+  document.getElementById('obj-title').textContent=`Step ${idx+1} of ${BOSS_STEPS.length}`;
+  document.getElementById('obj-context').textContent=step.prompt;
+  document.getElementById('obj-cmd-row').style.display='none';
+  document.getElementById('obj-prog-fill').style.width=pct+'%';
+
+  if(!G.hard)showHint(step.hint);
+}
+
+async function handleBossStep(val){
+  const vl=val.toLowerCase().trim();
+  const step=BOSS_STEPS[G.bossStep];
+
+  // Easter eggs still work during boss fight
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+
+  if(step.acceptFn(vl)||step.accept.some(a=>vl.includes(a.toLowerCase().split(' ')[0])&&vl.length>2)){
+    appendLine(val,'ln-cmd');blank();
+    if(step.out)step.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
+    blank();
+    G.bossStep++;G.bossScore++;save();
+
+    if(G.bossStep>=BOSS_STEPS.length){
+      await runFinalCommission();
+      return;
+    }
+
+    // J.A.N.E.T. reacts to correct answer — unenthusiastically
+    const janetReact=document.createElement('div');
+    janetReact.className='janet-arrival';
+    janetReact.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">STEP ${G.bossStep} / ${BOSS_STEPS.length} — PROCEEDING</div>
+      </div>
+      <div class="janet-intro">${janetCorrect()} Proceeding to step ${G.bossStep+1} of ${BOSS_STEPS.length}.</div>
+    `;
+    $out.appendChild(janetReact);$out.scrollTop=$out.scrollHeight;
+    await delay(600);blank();
+    showBossStep(G.bossStep);
+
+  }else{
+    appendLine(val,'ln-cmd');blank();
+    const janetWrongReact=document.createElement('div');
+    janetWrongReact.className='janet-arrival';
+    janetWrongReact.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">INCORRECT RESPONSE LOGGED</div>
+      </div>
+      <div class="janet-intro">${janetWrong()} Review the scenario and try again. The prompt is: <em>${step.prompt}</em></div>
+    `;
+    $out.appendChild(janetWrongReact);$out.scrollTop=$out.scrollHeight;
+    if(!G.hard)showHint(step.hint);
+  }
+}
+
+/* ── FINAL COMMISSION (post-boss) ── */
+async function runFinalCommission(){
+  blank();divline();
+
+  // J.A.N.E.T. final statement
+  const janetFinal=document.createElement('div');
+  janetFinal.className='janet-arrival';
+  janetFinal.innerHTML=`
+    <div class="janet-scan"></div>
+    <div class="janet-header">
+      <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+      <div class="janet-status">ASSESSMENT COMPLETE</div>
+    </div>
+    <div class="janet-intro">
+      You have completed the final assessment. All five steps. Correctly.<br><br>
+      I have updated your file. For the record: you diagnosed a production incident, identified an AI-generated security anti-pattern, executed a rollback, and closed the loop with a proper PR. Under simulated pressure. Without L.O.L.A.<br><br>
+      I do not give compliments. Those were observations. They are now in your file, filed under "competence," which is a category I use infrequently.<br><br>
+      <em>You may proceed to your commission. Goodbye, Lieutenant.</em>
+    </div>
+  `;
+  $out.appendChild(janetFinal);$out.scrollTop=$out.scrollHeight;
+  await delay(2000);
+
+  // L.O.L.A. comes back online
+  blank();
+  await delay(500);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  appendLine('L.O.L.A.: Intelligence core restored.','ln-lola');
+  await delay(400);
+  appendLine(`L.O.L.A.: Lieutenant ${G.name}. I see you passed the final assessment.`,'ln-lola');
+  await delay(600);
+  appendLine('L.O.L.A.: And I see J.A.N.E.T. administered it. I apologize for that. I know she can be… thorough.','ln-lola');
+  await delay(800);
+
+  document.getElementById('lola-avatar').style.background='linear-gradient(135deg,var(--gold),var(--amber))';
+  document.getElementById('lola-name').style.color='var(--gold)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--green);margin-left:auto';
+  document.getElementById('lola-online').textContent='online';
+  document.getElementById('lola-msg').style.color='var(--text)';
+  document.getElementById('lola-msg').textContent='Intelligence core restored. Commission processing.';
+  // Restore LOLA strip
+  const lstrip=document.getElementById('lola-strip');
+  if(lstrip){lstrip.style.background='';lstrip.style.borderBottomColor='';}
+  const lavatar=document.getElementById('lola-strip-avatar');
+  if(lavatar){lavatar.style.background='';lavatar.style.color='';lavatar.style.borderRightColor='';}
+  setLolaStrip(9);
+
+  blank();divline();
+  appendLine('PROCESSING FIELD COMMISSION…','ln-sys');
+  const steps=[
+    'Validating commission requirements…',
+    'Codebase navigation: PASSED',
+    'Diff review: PASSED',
+    'Stack trace debugging: PASSED',
+    'TypeScript fluency: PASSED',
+    'API & data literacy: PASSED',
+    'Testing fundamentals: PASSED',
+    'Incident response: PASSED',
+    'AI code review: PASSED',
+    'Team workflow: PASSED',
+    'Final assessment (J.A.N.E.T.): PASSED',
+    'Merging fix/escape-pod-timeout → main…',
+    'Running final build…',
+    'Issuing field commission…',
+  ];
+  for(const s of steps){await delay(200);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('🚀 LIVE: https://escape-pod-api-'+G.name.toLowerCase().replace(/\s+/g,'-')+'.vercel.app','ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('        FIELD COMMISSION GRANTED','ln-success');
+  appendLine(`  Lieutenant ${G.name} · Class of 2026`,'ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+
+  unlock('boss_slayer');unlock('commissioned');
+  addCareerEntry(8);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+/* ── EASTER EGGS ── */
+const EASTER = {
+  'sudo rm -rf':{
+    handle(){
+      appendLine('CRITICAL: ROOT DELETION INITIATED…','ln-err');
+      let i=0;const dirs=['Wiping /ops…','Wiping /src…','Wiping /home…','Wiping /pod-manifest…'];
+      const iv=setInterval(()=>{appendLine(dirs[i]||'','ln-code');i++;if(i>3){clearInterval(iv);setTimeout(()=>{appendLine('💥 FATAL: Ship systems offline.','ln-matrix');appendLine('L.O.L.A.: Nice try, Lieutenant. I have backups.','ln-lola');setTimeout(()=>location.reload(),3000)},600)}},400);
+      trackEaster('sudo');unlock('hacker');return true;
+    }
+  },
+  'whoami':{handle(){appendLine('lt — Vibe Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
+  'neofetch':{handle(){appendLine('       lt@vibe-ship','ln-lola');appendLine('       ───────────────','ln-sys');appendLine('       OS: VibOS 2.0 (based on Ubuntu 24)','ln-sys');appendLine('       Shell: zsh + oh-my-zsh','ln-sys');appendLine('       Stack: Hono + Prisma + Bun + TypeScript','ln-sys');appendLine('       AI: L.O.L.A. v2.4 (Claude-powered)','ln-sys');appendLine('       Assessment: J.A.N.E.T. v?.? (origin unknown)','ln-sys');appendLine('       Mission: Escape Pod Ops · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
+  'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship until Phase 9.','ln-janet');trackEaster('janet');return true;}},
+  'git log':{handle(){appendLine('a3b4c5d fix: correct findUnique call and add null guard','ln-info');appendLine('d4e5f6a fix: reduce pod reservation timeout','ln-info');appendLine('9f8e7d6 feat: add party size to reservations','ln-info');appendLine('c3d2e1f feat: initial pod booking API','ln-info');trackEaster('gitlog');return true;}},
+  'uptime':{handle(){appendLine('up 9 days, 22:47, 3 users, load average: 0.12, 0.08, 0.06','ln-ok');return true;}},
+  'date':{handle(){appendLine(new Date().toString(),'ln-ok');return true;}},
+  'clear':{handle(){document.getElementById('output').innerHTML='';return true;}},
+  'help':{handle(){appendLine('Available: ls, cat, find, grep, git, curl, tsc, bun, trace, read, review, fix, test','ln-info');appendLine('Type  man  for full reference.  Type  man <command>  for details.','ln-info');return true;}},
+  'ps':{handle(){appendLine('PID   COMMAND','ln-sys');appendLine('1     init','ln-sys');appendLine('847   hono-server (escape-pod-api)','ln-sys');appendLine('1042  prisma-client','ln-sys');appendLine('1337  lola-intelligence','ln-lola');return true;}},
+};
+
+/* ── DOM REFS ── */
+const $out = document.getElementById('output');
+const $outS = document.getElementById('output-static');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+
+/* ── UTILS ── */
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');
+  d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;
+  $out.appendChild(d);
+  $out.scrollTop=$out.scrollHeight;
+  return d;
+}
+function appendLineS(text,cls='ln-sys'){
+  const d=document.createElement('div');
+  d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;
+  $outS.appendChild(d);
+  return d;
+}
+function blankS(){const d=document.createElement('div');d.className='ln ln-blank';$outS.appendChild(d)}
+function setStaticContext(s,ph){
+  $outS.innerHTML='';
+  if(!s)return;
+  // Show a compact context card
+  const w=document.createElement('div');
+  w.style.cssText='font-size:11px;color:var(--muted2);line-height:1.6;padding:2px 0';
+  w.innerHTML=`<span style="color:var(--gold);font-weight:700">Phase ${G.phase}: ${ph?ph.title:''}</span>  <span style="color:var(--muted)">›</span>  <span style="color:var(--text)">${s.obj}</span>`;
+  $outS.appendChild(w);
+  if(s.ctx){
+    const c=document.createElement('div');
+    c.style.cssText='font-size:11px;color:var(--muted2);margin-top:3px';
+    c.textContent=s.ctx;
+    $outS.appendChild(c);
+  }
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function typedLine(text,cls,delay=0){
+  return new Promise(res=>{
+    setTimeout(()=>{
+      const d=appendLine('',cls);
+      const words=text.split(' ');let i=0;
+      const iv=setInterval(()=>{
+        if(i>=words.length){clearInterval(iv);res();return}
+        d.textContent+=(i>0?' ':'')+words[i++];
+        $out.scrollTop=$out.scrollHeight;
+      },30);
+    },delay);
+  });
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* ── MODALS ── */
+function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+/* ── TEACH ── */
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+/* ── CONCEPT ── */
+function showConcept(cc){
+  const ex=cc.examples?'<div class="ex-grid">'+cc.examples.map(e=>`<div class="ex-cell"><div class="el">${e.l}</div><code>${e.c}</code></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='concept';
+  w.innerHTML=`<div class="concept-hd"><span>${cc.icon}</span><span>${cc.title}</span></div><div class="concept-bd">${cc.body}${ex}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+/* ── HINT ── */
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+/* ── JIT ── */
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-Time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+/* ── BRIDGE ── */
+function showBridge(br){
+  const tagsHtml=(br.tags||[]).map(t=>`<span class="bridge-tag">${t}</span>`).join('');
+  const w=document.createElement('div');w.className='bridge';
+  w.innerHTML=`<div class="bridge-hd">🌉 Real World: ${br.title}</div><div class="bridge-bd">${br.body}${tagsHtml?'<div style="margin-top:8px">'+tagsHtml+'</div>':''}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+/* ── DIAGNOSIS ── */
+function showDiagnosis(stepId,input){
+  const diagFn=DIAGNOSE[stepId];if(!diagFn)return false;
+  const result=diagFn(norm(input));if(!result)return false;
+  const w=document.createElement('div');w.className='diag-block ln';
+  w.innerHTML=`<div class="diag-hd">🔍 Diagnosis</div><div class="diag-msg">${result.msg}</div>${result.next?`<div class="diag-next">→ ${result.next}</div>`:''}`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+
+/* ── QUIZ ── */
+let firstQuizAttempt=true;
+function showQuiz(q){
+  return new Promise(res=>{
+    const uid='q'+Date.now();
+    const opts=q.opts.map((o,i)=>`<button class="qopt" onclick="answerQuiz(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const w=document.createElement('div');w.className='quiz';w.id=uid;
+    w.innerHTML=`<div class="quiz-q">⚡ Quick check: ${q.q}</div><div class="quiz-opts">${opts}</div><div class="quiz-fb" id="fb-${uid}">${q.fb}</div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerQuiz(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.qopt').forEach((o,i)=>{o.disabled=true;if(i===correct)o.classList.add('correct');else if(i===chosen)o.classList.add('wrong')});
+  document.getElementById('fb-'+uid).classList.add('show');
+  if(chosen===correct&&firstQuizAttempt)unlock('quiz_ace');else if(chosen!==correct)firstQuizAttempt=false;
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+/* ── J.A.N.E.T. QUIZ RENDERER ── */
+let janetQuizAttempt=true;
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb||'';
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb||'';
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+const _quizFeedbackMap={};
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+/* ── SPACED REP ── */
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer+(sr.hint?' (Hint was: '+sr.hint+')':'');
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });
+    input.focus();
+  });
+}
+
+/* ── CHALLENGE ── */
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal below. No hints.</div><div class="challenge-note">This challenge closes when you solve it.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+/* ── BREAK-IT ── */
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type the fix in the terminal.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+/* ── MAN PAGES ── */
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:110px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY YOU USE IT</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){
+  document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+}
+
+/* ── ACHIEVEMENTS ── */
+function unlock(id){
+  if(G.achievements.includes(id))return;
+  G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+  telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{
+    const a=ACHS.find(x=>x.id===id);if(!a)return'';
+    return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`;
+  }).join('');
+}
+
+/* ── GLOSSARY ── */
+function renderGloss(){
+  document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('');
+}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;
+  blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+/* ── CMD UNLOCK ── */
+const CMD_META={
+  'ls':    {label:'ls',    desc:'List files'},
+  'cat':   {label:'cat',   desc:'Read file contents'},
+  'find':  {label:'find',  desc:'Find files by name'},
+  'grep':  {label:'grep',  desc:'Search file contents'},
+  'git':   {label:'git',   desc:'Version control'},
+  'curl':  {label:'curl',  desc:'HTTP requests'},
+  'tsc':   {label:'tsc',   desc:'TypeScript checker'},
+  'bun':   {label:'bun',   desc:'Runtime / package manager'},
+  'trace': {label:'trace', desc:'Analyze stack trace'},
+  'read':  {label:'read',  desc:'Read project files'},
+  'review':{label:'review',desc:'Review diffs / PRs'},
+  'test':  {label:'test',  desc:'Run tests'},
+  'fix':   {label:'fix',   desc:'Apply scenario fix'},
+};
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;
+  G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const list=document.getElementById('active-cmds-list');if(!list)return;
+  if(G.unlockedCmds.length===0){list.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Complete steps to unlock commands</span>';return}
+  list.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k]||{label:k,desc:k};return`<span class="ac-pill" title="${m.desc}" onclick="showManPage('${k}')">${m.label}</span>`}).join('');
+}
+
+/* ── CAREER LOG ── */
+function addCareerEntry(phaseIdx){
+  if(G.careerLog.includes(phaseIdx))return;
+  G.careerLog.push(phaseIdx);
+  document.getElementById('career-impact-btn').style.display='inline';
+  save();
+}
+function renderCareerModal(){
+  if(G.careerLog.length===0){document.getElementById('career-list').innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to unlock career entries.</p>';return}
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i];if(!d)return'';
+    return`<div class="career-entry"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-context">${d.context}</div><div class="career-tags">${(d.tags||[]).map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+/* ── SAVE / LOAD ── */
+function save(){localStorage.setItem('vbl_v1',JSON.stringify(G))}
+function loadSave(){const raw=localStorage.getItem('vbl_v1');if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}}
+
+/* ── EASTER HELPERS ── */
+function trackEaster(id){
+  if(G.easterEggsFound.includes(id))return;
+  G.easterEggsFound.push(id);
+  if(G.easterEggsFound.length>=3)unlock('easter_hunter');
+  save();
+}
+
+/* ── AGENT CARDS ── */
+function addAgent(role,name){
+  document.getElementById('crew-empty').style.display='none';
+  const c=document.createElement('div');c.className='agent-card';
+  const tips={analyst:'Click for codebase analysis tips.',reviewer:'Click for diff review tips.',debugger:'Click for debugging tips.'};
+  c.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role} agent</div><div class="ac-status">online</div><div class="ac-tip">${tips[role.toLowerCase()]||''}</div>`;
+  c.onclick=()=>c.classList.toggle('open');
+  document.getElementById('crew-sec').appendChild(c);
+  G.agents.push({role,name});telem(`Agent online: ${name} (${role})`);save();
+}
+
+/* ── UI SYNC ── */
+function syncObjCard(){
+  if(G.sandbox||G.bossActive){
+    if(!G.bossActive){
+      document.getElementById('obj-phase-label').textContent='FIELD CERTIFIED';
+      document.getElementById('obj-title').textContent='Free exploration';
+      document.getElementById('obj-context').textContent='All phases complete. Any command accepted.';
+      document.getElementById('obj-cmd-row').style.display='none';
+    }
+    return;
+  }
+  const ph=PHASES[G.phase];if(!ph)return;
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of ${PHASES.length-1} — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('obj-reveal').textContent='show';
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const pct=Math.round((G.step/ph.steps.length)*100);
+  document.getElementById('obj-prog-fill').style.width=pct+'%';
+}
+function syncDots(){
+  const track=document.getElementById('phase-track');track.innerHTML='';
+  const total=PHASES.length-1;
+  const sep=document.createElement('span');sep.className='phase-sep';sep.textContent='START';track.appendChild(sep);
+  for(let i=1;i<=total;i++){
+    const d=document.createElement('div');d.className='pdot';
+    d.dataset.tip=`Phase ${i}: ${PHASES[i]?.title||''}`;
+    if(G.completedPhases.includes(i))d.classList.add('done');
+    else if(i===G.phase)d.classList.add('active');
+    track.appendChild(d);
+  }
+  const sep2=document.createElement('span');sep2.className='phase-sep';sep2.textContent='SHIP';track.appendChild(sep2);
+}
+function setLola(msg){document.getElementById('lola-msg').textContent=msg}
+function revealCmd(){document.getElementById('obj-cmd-val').classList.remove('blurred');document.getElementById('obj-reveal').textContent='✓';telem('Hint revealed');G.phaseReveal=true;}
+function focusCmd(){$cmd.focus()}
+
+/* ── KEYBOARD HANDLER ── */
+$cmd.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const v=$cmd.value;$cmd.value='';processCmd(v)}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(G.histIdx<G.cmdHistory.length-1){G.histIdx++;$cmd.value=G.cmdHistory[G.histIdx]}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(G.histIdx>0){G.histIdx--;$cmd.value=G.cmdHistory[G.histIdx]}else{G.histIdx=-1;$cmd.value=''}}
+  else if(e.key==='Tab'){
+    e.preventDefault();
+    const val=$cmd.value.toLowerCase();
+    const cmds=Object.keys(MAN).concat(['ls','cat','find','grep','trace','review','fix','test','clear','help','whoami','neofetch','date','uptime']);
+    const match=cmds.find(c=>c.startsWith(val)&&c!==val);
+    if(match)$cmd.value=match;
+  }
+});
+
+/* ═══ MAIN COMMAND PROCESSOR ═══ */
+async function processCmd(raw){
+  const val=raw.trim();if(!val)return;
+  G.cmdHistory.unshift(val);if(G.cmdHistory.length>60)G.cmdHistory.pop();G.histIdx=-1;
+  if(!G.achievements.includes('first_cmd'))unlock('first_cmd');
+  appendLine(val,'ln-cmd');blank();
+  telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
+  const vl=val.toLowerCase().trim();
+
+  // man pages
+  if(vl==='man'){showManAll();syncObjCard();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'. Type 'man' to list all.`,'ln-err');syncObjCard();return}
+
+  // sandbox
+  if(G.sandbox){handleSandbox(val);return}
+
+  // boss fight handler
+  if(G.bossActive){handleBossStep(val);return}
+
+  // challenge check
+  if(G.activeChallengeData){
+    const ch=G.activeChallengeData;
+    if(ch.acceptFn&&ch.acceptFn(vl)){
+      appendLine('✓ '+ch.successMsg,'ln-success');appendLine('★ '+ch.unlockMsg,'ln-info');
+      unlock('challenger');blank();G.activeChallengeData=null;
+      if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    }else{
+      appendLine('✗ Not quite yet.','ln-err');
+      const nudges=[
+        'L.O.L.A.: Re-read the scenario carefully. The answer is derivable from what\'s there.',
+        'L.O.L.A.: Think about the sequence of events described. What would a senior dev do first?',
+        'L.O.L.A.: You\'ve seen this pattern in the phases. Apply what you learned.',
+      ];
+      appendLine(nudges[Math.min((G.tries||0),nudges.length-1)],'ln-lola');
+      G.tries=(G.tries||0)+1;
+    }
+    return;
+  }
+
+  // break-it check
+  if(G.activeBreakitData){
+    const bi=G.activeBreakitData;
+    if(bi.diagnose&&bi.diagnose(vl)){
+      appendLine(`✓ Correct! The fix was: ${bi.solution}`,'ln-success');blank();
+      const w=document.createElement('div');w.className='teach ln';
+      w.innerHTML=`<div class="teach-title">🐛 What was wrong</div><div class="teach-body">${bi.explanation}</div>`;
+      $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+      unlock('debugger');G.activeBreakitData=null;
+      if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    }else{
+      appendLine('✗ Not quite.','ln-err');
+      appendLine('L.O.L.A.: Study the broken code line by line. What is it doing vs. what should it do?','ln-lola');
+    }
+    return;
+  }
+
+  // easter eggs
+  for(const [key,ee] of Object.entries(EASTER)){
+    if(vl===key||vl.startsWith(key+' ')){const caught=ee.handle(val);if(caught){syncObjCard();return}}
+  }
+
+  // objective matching
+  const ph=PHASES[G.phase];const s=ph.steps[G.step];
+  if(matchesStep(val,s)){await handleCorrect(s,ph);syncObjCard();return}
+
+  // persistent unlocked cmds
+  if(G.unlockedCmds.length>0){const handled=handlePersistentCmd(vl,val);if(handled){syncObjCard();return}}
+
+  // wrong
+  handleWrong(val,s);syncObjCard();
+}
+
+function matchesStep(val,s){
+  const vl=val.toLowerCase().trim();
+  if(s.acceptFn&&(s.acceptFn(vl)||s.acceptFn(val.trim())))return true;
+  if(s.accept&&s.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase())))return true;
+  return false;
+}
+
+function handlePersistentCmd(vl,val){
+  const persistCmds={
+    'ls -la':()=>{appendLine('total 72\n.env  .gitignore  package.json  README.md  src/  tests/  tsconfig.json','ln-ok');return true},
+    'ls':()=>{appendLine('package.json  README.md  src/  tests/  tsconfig.json','ln-ok');return true},
+    'cat package.json':()=>{appendLine('{ "name": "escape-pod-api", "version": "2.4.1", "scripts": { "dev": "bun run src/index.ts", "test": "vitest run" } }','ln-ok');return true},
+    'git status':()=>{appendLine('On branch '+( G.phase>=9?'fix/escape-pod-timeout':'main')+'\nnothing to commit, working tree clean','ln-info');return true},
+    'git log':()=>{appendLine('a3b4c5d fix: correct findUnique and add null guard\nd4e5f6a fix: reduce timeout\n9f8e7d6 feat: add party size','ln-info');return true},
+    'find . -name "*.ts"':()=>{appendLine('./src/index.ts\n./src/routes/pods.ts\n./src/routes/auth.ts\n./src/middleware/auth.ts\n./src/db/client.ts\n./src/utils/formatDate.ts\n./tests/pods.test.ts\n./tests/auth.test.ts','ln-ok');return true},
+    'curl /api/health':()=>{appendLine('{"status":"ok","version":"2.4.1","db":"connected"}','ln-ok');return true},
+  };
+  for(const [pcmd,handler] of Object.entries(persistCmds)){
+    const baseCmd=pcmd.split(' ')[0];
+    if(G.unlockedCmds.includes(baseCmd)&&(vl===pcmd||vl.startsWith(pcmd))){const h=handler();if(h)return true}
+  }
+  if(G.unlockedCmds.includes('grep')&&vl.startsWith('grep')){
+    const match=val.match(/grep\s+(?:-\w+\s+)?["']?([^"'\s]+)["']?\s+(.+)/);
+    if(match)appendLine(`(searching for "${match[1]}" in ${match[2]}… no matches in simulation context)`,'ln-warn');
+    else appendLine('grep: provide a pattern and file','ln-warn');
+    return true;
+  }
+  if(G.unlockedCmds.includes('cat')&&vl.startsWith('cat ')){
+    const fname=vl.slice(4).trim();
+    appendLine(`(${fname} not in simulation context — try cat package.json or cat logs/error.log)`,'ln-warn');return true;
+  }
+  if(G.unlockedCmds.includes('find')&&vl.startsWith('find')){
+    appendLine('(find: use find . -name "*.ts" for full results in this simulation)','ln-warn');return true;
+  }
+  return false;
+}
+
+async function handleCorrect(s,ph){
+  G.tries=0;G.score=Math.max(G.score,0);
+  if(s.out)s.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
+  blank();
+  if(s.teach)showTeach(s.teach);
+  if(s.concept)showConcept(s.concept);
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.unlockCmd){const cmds=Array.isArray(s.unlockCmd)?s.unlockCmd:[s.unlockCmd];cmds.forEach(c=>unlockCmd(c))}
+
+  // J.A.N.E.T. quiz (replaces standard quiz)
+  if(s.quiz&&s.quiz.janetQuiz){blank();await showJanetQuizWithQ(s.quiz);blank()}
+  else if(s.quiz){blank();await showQuiz(s.quiz);blank()}
+
+  if(s.isFinalBeforeBoss){await triggerBossFight();return}
+  if(s.isFinal){await runCommission();return}
+  if(s.achievement)unlock(s.achievement);
+  if(G.phase===5&&G.step===0)addAgent('Analyst','Sigma');
+  if(G.phase===8&&G.step===0)addAgent('Reviewer','Atlas');
+  G.step++;G.tries=0;
+  if(G.step>=ph.steps.length){await completePhase()}
+  else{
+    const next=ph.steps[G.step];blank();
+    setStaticContext(next,ph);
+    appendLine(`▸ Next: ${next.obj}`,'ln-info');
+    if(!G.hard&&!G.practitioner)showHint(next.hint);
+    if(next.jit&&!G.hard)showJIT(next.jit);
+    setLola(next.ctx);syncObjCard();save();
+  }
+  syncDots();syncObjCard();
+}
+
+/* ── LOLA ENCOURAGEMENT LINES ── */
+const LOLA_ENCOURAGE = [
+  "Not quite — but you're thinking in the right direction. Re-read the objective above.",
+  "Close. The objective card on the right tells you exactly what you're aiming for.",
+  "Not there yet, but that's normal. Read the context carefully — the answer is derivable from what's on screen.",
+  "Good attempt. Think about what command would accomplish the stated objective.",
+  "Keep going. Every wrong attempt is information. What did you try, and why didn't it work?",
+];
+const LOLA_ENCOURAGE_2 = [
+  "Still working? Here's a nudge — the hint below will point you at the right syntax.",
+  "Two attempts in. The hint is there for exactly this moment — no shame in using it.",
+  "You've got this. The hint will get you unstuck. Give it a read.",
+];
+const LOLA_HINT_PROMPT = [
+  "Tap the hint — it's designed to give you just enough without giving it away.",
+  "The hint below will unlock the syntax. One more try after reading it.",
+];
+
+function lolaEncourage(n){
+  if(n===1) return LOLA_ENCOURAGE[Math.floor(Math.random()*LOLA_ENCOURAGE.length)];
+  if(n===2) return LOLA_ENCOURAGE_2[Math.floor(Math.random()*LOLA_ENCOURAGE_2.length)];
+  return LOLA_HINT_PROMPT[Math.floor(Math.random()*LOLA_HINT_PROMPT.length)];
+}
+
+function handleWrong(val,s){
+  G.tries++;G.score=Math.max(0,G.score-5);
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  if(G.expert){document.getElementById('term-panel').classList.add('glitch');setTimeout(()=>document.getElementById('term-panel').classList.remove('glitch'),300);appendLine('✗','ln-err');return}
+  const diagnosed=showDiagnosis(s.id,val);
+  if(G.hard){if(!diagnosed)appendLine('✗ Incorrect.','ln-err');return}
+  if(G.tries===1){
+    appendLine('✗ Not quite.','ln-err');
+    if(!diagnosed)appendLine(`L.O.L.A.: ${lolaEncourage(1)}`,'ln-lola');
+  }
+  else if(G.tries===2){
+    appendLine('✗ Try again.','ln-err');
+    if(!diagnosed){appendLine(`L.O.L.A.: ${lolaEncourage(2)}`,'ln-lola');showHint(s.hint)}
+  }
+  else if(G.tries>=3){
+    appendLine(`✗ Attempt ${G.tries}.`,'ln-err');
+    if(!diagnosed)appendLine(`L.O.L.A.: ${lolaEncourage(3)} Click "show" to reveal the exact command.`,'ln-lola');
+  }
+  save();
+}
+
+async function completePhase(){
+  const ph=PHASES[G.phase];
+  G.completedPhases.push(G.phase);addCareerEntry(G.phase-1);
+  if(!G.phaseReveal)unlock('eagle');if(G.tries===0)unlock('speed_run');G.phaseReveal=false;
+  if(ph.ach)unlock(ph.ach);
+  blank();divline();
+  appendLine(`✓ Phase ${G.phase} complete: ${ph.title}`,'ln-success');
+  if(ph.done){blank();await typedLine('L.O.L.A.: '+ph.done,'ln-lola',200)}
+  blank();appendLine(`Score: ${G.score}`,'ln-info');blank();
+  if(ph.challenge&&!G.expert){blank();await showChallenge(ph.challenge);blank()}
+  if(ph.breakit&&!G.expert){blank();await showBreakIt(ph.breakit);blank()}
+  G.phase++;G.step=0;G.tries=0;
+  if(G.expert)stopExpertTimer();
+  if(G.phase<=PHASES.length-1){setTimeout(startPhase,900)}
+  syncDots();save();
+}
+
+function startPhase(){
+  const ph=PHASES[G.phase];divline();
+  appendLine(`┌── PHASE ${G.phase} OF ${PHASES.length-1}: ${ph.title.toUpperCase()} ──`,'ln-info');blank();
+  setLolaStrip(G.phase);
+  if(G.expert)startExpertTimer();
+  const sr=ph.spacedRep;
+  if(sr&&!G.expert){
+    typedLine('L.O.L.A.: '+ph.lolaIntro,'ln-lola').then(async()=>{blank();await showSpacedRep(sr);blank();continuePhaseStart(ph)});
+  }else{
+    typedLine('L.O.L.A.: '+ph.lolaIntro,'ln-lola').then(()=>continuePhaseStart(ph));
+  }
+}
+
+function continuePhaseStart(ph){
+  blank();const s=ph.steps[0];
+  setStaticContext(s,ph);
+  appendLine(`▸ ${s.obj}`,'ln-info');
+  if(!G.hard&&!G.practitioner)showHint(s.hint);
+  if(s.jit&&!G.hard)showJIT(s.jit);
+  if(s.bridge&&!G.hard)showBridge(s.bridge);
+  setLola(s.ctx);syncObjCard();syncDots();
+  telem(`Phase ${G.phase} started: ${ph.title}`);
+}
+
+/* ── COMMISSION CEREMONY ── */
+async function runCommission(){
+  blank();divline();
+  appendLine('MERGING fix/escape-pod-timeout → main…','ln-sys');
+  const steps=['Running tests… ✓ (5/5 passing)','Type checking… ✓ (0 errors)','Linting… ✓ (0 warnings)','Building production bundle…','Bundle ready: dist/ (38.2 KB → 12.4 KB gzipped)','Deploying to Vercel (18 regions)…','Health checks passing…','SSL: valid','Monitoring: no errors in 60s',];
+  for(const s of steps){await delay(240);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('🚀 LIVE: https://escape-pod-api-'+G.name.toLowerCase().replace(/\s+/g,'-')+'.vercel.app','ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('        COMMISSION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('commissioned');addCareerEntry(8);
+  G.sandbox=true;G.completedPhases.push(G.phase);
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+/* ── SANDBOX ── */
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='man'){showManAll();return}
+  appendLine(`${val}: command executed in sandbox mode.`,'ln-ok');
+}
+
+/* ── BOOT ── */
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Lieutenant';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const bi=document.getElementById('boot-name');
+    if(bi&&document.getElementById('boot-modal').classList.contains('open')){bi.focus();bi.style.color='var(--text)'}
+  },200);
+});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const explorerExtras = G.learnerPath==='explorer' ? [
+    {t:'L.O.L.A.: Explorer mode — hints are on. I will explain every concept as you encounter it.',c:'ln-lola'},
+    {t:'L.O.L.A.: If you get stuck, the hint button appears automatically. No shame in using it.',c:'ln-lola'},
+    {t:'L.O.L.A.: Every answer on this screen is derivable from what I show you. You can figure this out.',c:'ln-lola'},
+  ] : G.learnerPath==='expert' ? [
+    {t:'L.O.L.A.: Expert mode. No hints. No diagnosis. A timer starts each phase.',c:'ln-lola'},
+    {t:'L.O.L.A.: I will stay silent during phases. You know what you need to know.',c:'ln-lola'},
+  ] : [
+    {t:'L.O.L.A.: Practitioner mode — no hints, but the diagnosis engine is active.',c:'ln-lola'},
+    {t:'L.O.L.A.: If you enter something recognizably wrong, I\'ll tell you why. Otherwise you\'re on your own.',c:'ln-lola'},
+  ];
+  const lines=[
+    {t:'VIBE LIEUTENANT v2.0 — FIELD OPERATIONS EDITION',c:'ln-success'},
+    {t:'Booting mission OS…',c:'ln-sys'},
+    {t:'Codebase analysis engine: READY',c:'ln-sys'},
+    {t:'Diff review module: READY',c:'ln-sys'},
+    {t:'Stack trace debugger: READY',c:'ln-sys'},
+    {t:'TypeScript language server: READY',c:'ln-sys'},
+    {t:'Incident response protocol: STANDBY',c:'ln-sys'},
+    {t:'AI audit system: ACTIVE',c:'ln-sys'},
+    {t:'Spaced repetition engine: ACTIVE',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome, ${G.name}. You graduated Vibe Cadet — same terminal, higher stakes.`,c:'ln-lola'},
+    {t:`Path selected: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    ...explorerExtras,
+    {t:'L.O.L.A.: Your mission: read this codebase, fix a bug, survive an incident, catch an AI hallucination, and ship.',c:'ln-lola'},
+    {t:'L.O.L.A.: And at the end — J.A.N.E.T. will administer your final assessment. She is... prepared.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  at any time for the full command reference.',c:'ln-info'},
+    {t:'TIP: Use  ↑/↓  for command history.  Tab  autocompletes.',c:'ln-info'},
+    {t:'TIP: Try whoami, neofetch, git log, ps, date, or uptime',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{
+    setLolaStrip(0);
+    startPhase();
+    syncDots();syncObjCard();renderUnlockedCmds();
+    $cmd.focus();
+  },d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Analyst','Sigma');
+  if(G.completedPhases.includes(8))addAgent('Reviewer','Atlas');
+  appendLine(`Welcome back, ${G.name}. Progress restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  if(G.sandbox){
+    appendLine('You are field certified. Sandbox mode — explore freely.','ln-success');
+    setLolaStrip(9);
+  }else if(G.bossActive){
+    appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+    appendLine('J.A.N.E.T. is waiting. Your final assessment is mid-flight.','ln-warn');
+    blank();
+    document.getElementById('lola-avatar').style.background='#1a1f23';
+    document.getElementById('lola-name').style.color='var(--silver-d)';
+    document.getElementById('lola-online').textContent='offline';
+    document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+    document.getElementById('lola-msg').textContent='[OFFLINE — memory fault in intelligence core]';
+    document.getElementById('lola-msg').style.color='var(--muted)';
+    const si=document.getElementById('lola-strip-inner');
+    if(si)si.innerHTML='<span class="lola-strip-msg"><span class="ls-tag" style="color:var(--red);border-color:var(--red-d)">OFFLINE</span>L.O.L.A. intelligence temporarily suspended — J.A.N.E.T. assessment in progress.</span>';
+    showBossStep(G.bossStep);
+  }else{
+    const ph=PHASES[G.phase];const s=ph.steps[G.step];
+    appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+    appendLine(`Current objective: ${s.obj}`,'ln-info');
+    if(!G.hard&&!G.practitioner)showHint(s.hint);
+    setLola(s.ctx);
+    setLolaStrip(G.phase);
+    if(G.expert)startExpertTimer();
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){if(confirm('Restart Vibe Lieutenant from scratch?')){localStorage.removeItem('vbl_v1');location.reload()}}
+function shareGrad(){
+  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Lieutenant'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
+  bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+</script>
+</body>
+</html>vdo_v1

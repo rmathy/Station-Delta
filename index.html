@@ -26,6 +26,7 @@
   --green-m:#00cc6a;
   --blue:#4db8ff;
   --blue-d:#0a2540;
+  --blue-bg:#030d18;
   --amber:#ffb700;
   --amber-d:#3d2a00;
   --red:#ff3d3d;
@@ -33,6 +34,10 @@
   --gold:#ffd166;
   --gold-d:#3d2d00;
   --cyan:#00d4ff;
+  --purple:#a78bfa;
+  --purple-d:#3b1f6e;
+  --purple-bg:#0c0818;
+  --pink:#f472b6;
   --silver:#8fa8b8;
   --silver-d:#2a3d4d;
   --mono:'JetBrains Mono',monospace;
@@ -44,13 +49,10 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
 
-/* SCANLINE OVERLAY */
 body::before{
   content:'';pointer-events:none;position:fixed;inset:0;z-index:9999;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);
 }
-
-/* GRID BACKGROUND */
 body::after{
   content:'';pointer-events:none;position:fixed;inset:0;z-index:0;
   background-image:
@@ -60,7 +62,6 @@ body::after{
   mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
 }
 
-/* KEYFRAMES */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes scanH{0%{transform:translateX(-100%)}100%{transform:translateX(100vw)}}
@@ -81,34 +82,16 @@ nav{
   backdrop-filter:blur(12px);
   display:flex;align-items:center;padding:0 32px;height:56px;gap:0;
 }
-.nav-brand{
-  display:flex;align-items:center;gap:14px;margin-right:auto;
-}
-.nav-delta{
-  font-family:var(--display);font-size:26px;letter-spacing:.12em;color:var(--text-bright);line-height:1;
-}
-.nav-station{
-  font-family:var(--janet);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted2);
-  border-left:1px solid var(--border);padding-left:14px;line-height:1.4;
-}
+.nav-brand{display:flex;align-items:center;gap:14px;margin-right:auto;}
+.nav-delta{font-family:var(--display);font-size:26px;letter-spacing:.12em;color:var(--text-bright);line-height:1;}
+.nav-station{font-family:var(--janet);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted2);border-left:1px solid var(--border);padding-left:14px;line-height:1.4;}
 .nav-station span{display:block;color:var(--green);font-size:8px}
-.nav-status{
-  display:flex;align-items:center;gap:6px;
-  font-family:var(--janet);font-size:10px;color:var(--muted2);letter-spacing:.1em;
-  margin-right:28px;
-}
+.nav-status{display:flex;align-items:center;gap:6px;font-family:var(--janet);font-size:10px;color:var(--muted2);letter-spacing:.1em;margin-right:28px;}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:statusBlink 2s infinite}
 .nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{
-  font-family:var(--ui);font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--muted2);text-decoration:none;padding:6px 14px;border-radius:3px;transition:all .15s;
-}
+.nav-link{font-family:var(--ui);font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);text-decoration:none;padding:6px 14px;border-radius:3px;transition:all .15s;}
 .nav-link:hover{color:var(--text);background:rgba(255,255,255,.03)}
-.nav-cta{
-  font-family:var(--ui);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--bg);background:var(--green-m);text-decoration:none;
-  padding:7px 18px;border-radius:3px;transition:all .15s;margin-left:8px;
-}
+.nav-cta{font-family:var(--ui);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--bg);background:var(--green-m);text-decoration:none;padding:7px 18px;border-radius:3px;transition:all .15s;margin-left:8px;}
 .nav-cta:hover{background:var(--green);box-shadow:0 0 20px rgba(0,255,136,.3)}
 
 /* ═══ HERO ═══ */
@@ -117,81 +100,29 @@ nav{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:80px 32px 60px;text-align:center;z-index:1;
 }
-
-/* Radial glow behind hero */
 .hero::before{
   content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
   width:800px;height:500px;
   background:radial-gradient(ellipse at center, rgba(0,255,136,.04) 0%, transparent 70%);
   pointer-events:none;
 }
-
-.hero-eyebrow{
-  font-family:var(--janet);font-size:10px;letter-spacing:.35em;text-transform:uppercase;
-  color:var(--green-m);margin-bottom:24px;
-  display:flex;align-items:center;gap:12px;
-  animation:fadeUp .5s ease both;
-}
-.hero-eyebrow::before,.hero-eyebrow::after{
-  content:'';width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--green-d));
-}
+.hero-eyebrow{font-family:var(--janet);font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--green-m);margin-bottom:24px;display:flex;align-items:center;gap:12px;animation:fadeUp .5s ease both;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--green-d));}
 .hero-eyebrow::after{background:linear-gradient(90deg,var(--green-d),transparent)}
-
-.hero-title{
-  font-family:var(--display);
-  font-size:clamp(52px,9vw,120px);
-  letter-spacing:.06em;
-  line-height:.95;
-  color:var(--text-bright);
-  margin-bottom:12px;
-  animation:fadeUp .6s .1s ease both;
-}
-.hero-title .accent{
-  color:transparent;
-  -webkit-text-stroke:1px var(--green-m);
-  display:block;
-}
-.hero-sub-title{
-  font-family:var(--display);
-  font-size:clamp(24px,4vw,52px);
-  letter-spacing:.12em;
-  color:var(--muted2);
-  margin-bottom:28px;
-  animation:fadeUp .6s .15s ease both;
-}
-
-.hero-desc{
-  font-family:var(--ui);font-size:16px;font-weight:400;line-height:1.8;
-  color:var(--muted2);max-width:580px;margin:0 auto 40px;
-  animation:fadeUp .6s .2s ease both;
-}
+.hero-title{font-family:var(--display);font-size:clamp(52px,9vw,120px);letter-spacing:.06em;line-height:.95;color:var(--text-bright);margin-bottom:12px;animation:fadeUp .6s .1s ease both;}
+.hero-title .accent{color:transparent;-webkit-text-stroke:1px var(--green-m);display:block;}
+.hero-sub-title{font-family:var(--display);font-size:clamp(24px,4vw,52px);letter-spacing:.12em;color:var(--muted2);margin-bottom:28px;animation:fadeUp .6s .15s ease both;}
+.hero-desc{font-family:var(--ui);font-size:16px;font-weight:400;line-height:1.8;color:var(--muted2);max-width:580px;margin:0 auto 40px;animation:fadeUp .6s .2s ease both;}
 .hero-desc strong{color:var(--text);font-weight:600}
-
-.hero-btns{
-  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
-  animation:fadeUp .6s .25s ease both;margin-bottom:56px;
-}
-.btn-primary{
-  font-family:var(--ui);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  background:var(--green-m);color:var(--bg);text-decoration:none;
-  padding:13px 32px;border-radius:3px;transition:all .2s;border:none;cursor:pointer;
-}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .25s ease both;margin-bottom:56px;}
+.btn-primary{font-family:var(--ui);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:var(--green-m);color:var(--bg);text-decoration:none;padding:13px 32px;border-radius:3px;transition:all .2s;border:none;cursor:pointer;}
 .btn-primary:hover{background:var(--green);box-shadow:0 0 28px rgba(0,255,136,.35);transform:translateY(-1px)}
-.btn-outline{
-  font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-  background:transparent;color:var(--text);text-decoration:none;
-  padding:13px 32px;border-radius:3px;border:1px solid var(--border);transition:all .2s;
-}
+.btn-outline{font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--text);text-decoration:none;padding:13px 32px;border-radius:3px;border:1px solid var(--border);transition:all .2s;}
 .btn-outline:hover{border-color:var(--b2);background:rgba(255,255,255,.02);transform:translateY(-1px)}
 
 /* STAT BAR */
-.stat-bar{
-  display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;
-  animation:fadeUp .6s .3s ease both;
-}
-.stat{
-  padding:14px 28px;text-align:center;border-right:1px solid var(--border);flex:1;
-}
+.stat-bar{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;animation:fadeUp .6s .3s ease both;}
+.stat{padding:14px 28px;text-align:center;border-right:1px solid var(--border);flex:1;}
 .stat:last-child{border-right:none}
 .stat-val{font-family:var(--display);font-size:28px;letter-spacing:.08em;color:var(--text-bright)}
 .stat-label{font-family:var(--janet);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:3px}
@@ -200,104 +131,92 @@ nav{
 section{position:relative;z-index:1}
 .section-inner{max-width:1100px;margin:0 auto;padding:80px 32px}
 .section-hd{margin-bottom:48px}
-.section-eyebrow{
-  font-family:var(--janet);font-size:10px;letter-spacing:.25em;text-transform:uppercase;
-  color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:10px;
-}
+.section-eyebrow{font-family:var(--janet);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
 .section-eyebrow::before{content:'//';color:var(--green-m);margin-right:2px}
-.section-title{
-  font-family:var(--display);font-size:clamp(32px,4vw,52px);letter-spacing:.06em;
-  color:var(--text-bright);margin-bottom:10px;
-}
+.section-title{font-family:var(--display);font-size:clamp(32px,4vw,52px);letter-spacing:.06em;color:var(--text-bright);margin-bottom:10px;}
 .section-sub{font-family:var(--ui);font-size:15px;color:var(--muted2);line-height:1.7;max-width:600px}
 
 /* ═══ RANK TRACK ═══ */
 .rank-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.rank-track{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:0;
-}
-.rank-item{
-  padding:18px 16px;border-right:1px solid var(--border);text-align:center;
-  transition:background .15s;cursor:default;
-}
+.rank-track{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;}
+.rank-item{padding:18px 16px;border-right:1px solid var(--border);text-align:center;transition:background .15s;cursor:default;}
 .rank-item:last-child{border-right:none}
 .rank-item:hover{background:var(--s2)}
 .rank-num{font-family:var(--janet);font-size:9px;color:var(--muted);letter-spacing:.2em;margin-bottom:4px}
 .rank-name{font-family:var(--display);font-size:16px;letter-spacing:.1em}
 .rank-price{font-family:var(--janet);font-size:10px;margin-top:3px}
 .rank-free .rank-name{color:var(--green-m)}.rank-free .rank-price{color:var(--green-d);border:1px solid var(--green-d);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
-.rank-lt .rank-name{color:var(--gold)}.rank-lt .rank-price{color:var(--gold-d);border:1px solid var(--gold-d);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
 .rank-off .rank-name{color:var(--blue)}.rank-off .rank-price{color:var(--blue-d);border:1px solid var(--blue-d);background:rgba(77,184,255,.05);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
 .rank-cap .rank-name{color:var(--amber)}.rank-cap .rank-price{color:var(--amber-d);border:1px solid var(--amber-d);background:rgba(255,183,0,.05);display:inline-block;padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.1em}
 
-/* ═══ SIM CARDS ═══ */
-.sims-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-  gap:1px;
-  background:var(--border);
-  border:1px solid var(--border);
-  border-radius:4px;
-  overflow:hidden;
-}
+/* ═══ CAREER TRACKS ═══ */
+.tracks-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.tracks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.track-card{background:var(--surface);padding:28px 24px;transition:background .2s;cursor:pointer;text-decoration:none;display:block;position:relative;overflow:hidden;}
+.track-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s;}
+.track-card:hover{background:var(--s2)}
+.track-card:hover::before{opacity:1}
+.track-card.track-security::before{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.track-card.track-platform::before{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+.track-card.track-ai::before{background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.track-card.track-data::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.track-icon{font-size:28px;margin-bottom:14px;display:block}
+.track-name{font-family:var(--display);font-size:22px;letter-spacing:.06em;margin-bottom:8px;line-height:1.1}
+.track-card.track-security .track-name{color:var(--red)}
+.track-card.track-platform .track-name{color:var(--blue)}
+.track-card.track-ai .track-name{color:var(--purple)}
+.track-card.track-data .track-name{color:var(--amber)}
+.track-audience{font-family:var(--janet);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
+.track-desc{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:16px;}
+.track-path-preview{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
+.tpp-step{display:flex;align-items:center;gap:8px;font-family:var(--janet);font-size:9px;color:var(--muted2);letter-spacing:.05em;}
+.tpp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.tpp-badge{font-family:var(--janet);font-size:8px;padding:1px 5px;border-radius:2px;margin-left:auto;white-space:nowrap;}
+.badge-free-sm{background:rgba(0,255,136,.05);border:1px solid var(--green-d);color:var(--green-m)}
+.badge-paid-sm{background:rgba(77,184,255,.05);border:1px solid var(--blue-d);color:var(--blue)}
+.badge-cap-sm{background:rgba(255,183,0,.05);border:1px solid var(--amber-d);color:var(--amber)}
+.track-outcome-mini{font-family:var(--janet);font-size:9px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:12px;letter-spacing:.04em;}
+.track-cta-line{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:12px;}
+.track-card.track-security .track-cta-line{color:var(--red)}
+.track-card.track-platform .track-cta-line{color:var(--blue)}
+.track-card.track-ai .track-cta-line{color:var(--purple)}
+.track-card.track-data .track-cta-line{color:var(--amber)}
 
-.sim-card{
-  background:var(--surface);
-  padding:24px;
-  transition:background .2s;
-  position:relative;
-  overflow:hidden;
-  cursor:default;
-}
-.sim-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  opacity:0;transition:opacity .2s;
-}
+/* ═══ SIM CARDS ═══ */
+.sims-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.sim-card{background:var(--surface);padding:24px;transition:background .2s;position:relative;overflow:hidden;cursor:default;}
+.sim-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s;}
 .sim-card:hover{background:var(--s2)}
 .sim-card:hover::before{opacity:1}
 .sim-card.free::before{background:linear-gradient(90deg,transparent,var(--green-m),transparent)}
 .sim-card.officer::before{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
 .sim-card.captain::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
-
 .sim-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px}
-.sim-rank-badge{
-  font-family:var(--janet);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
-  padding:3px 8px;border-radius:2px;white-space:nowrap;flex-shrink:0;margin-top:2px;
-}
+.sim-rank-badge{font-family:var(--janet);font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
 .badge-free{background:rgba(0,255,136,.05);border:1px solid var(--green-d);color:var(--green-m)}
 .badge-officer{background:rgba(77,184,255,.05);border:1px solid var(--blue-d);color:var(--blue)}
 .badge-captain{background:rgba(255,183,0,.05);border:1px solid var(--amber-d);color:var(--amber)}
 .badge-locked{background:rgba(61,90,110,.05);border:1px solid var(--border);color:var(--muted)}
-
-.sim-title{
-  font-family:var(--display);font-size:22px;letter-spacing:.06em;line-height:1.1;
-}
+.badge-coming{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);color:var(--cyan)}
+.sim-title{font-family:var(--display);font-size:22px;letter-spacing:.06em;line-height:1.1;}
 .sim-card.free .sim-title{color:var(--green-m)}
 .sim-card.officer .sim-title{color:var(--blue)}
 .sim-card.captain .sim-title{color:var(--amber)}
 .sim-card.locked .sim-title{color:var(--muted2)}
-
-.sim-desc{
-  font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:16px;
-}
-
+.sim-desc{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:16px;}
 .sim-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:18px}
-.sim-tag{
-  font-family:var(--janet);font-size:9px;padding:2px 7px;border-radius:2px;
-  background:var(--s3);border:1px solid var(--border);color:var(--muted2);letter-spacing:.05em;
-}
-
+.sim-tag{font-family:var(--janet);font-size:9px;padding:2px 7px;border-radius:2px;background:var(--s3);border:1px solid var(--border);color:var(--muted2);letter-spacing:.05em;}
+.sim-track-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.track-tag{font-family:var(--janet);font-size:8px;padding:1px 6px;border-radius:2px;letter-spacing:.06em;border:1px solid;}
+.track-tag.tt-security{border-color:rgba(255,61,61,.25);color:var(--red);background:rgba(255,61,61,.04)}
+.track-tag.tt-platform{border-color:rgba(77,184,255,.25);color:var(--blue);background:rgba(77,184,255,.04)}
+.track-tag.tt-ai{border-color:rgba(167,139,250,.25);color:var(--purple);background:rgba(167,139,250,.04)}
+.track-tag.tt-data{border-color:rgba(255,183,0,.25);color:var(--amber);background:rgba(255,183,0,.04)}
 .sim-footer{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sim-meta{font-family:var(--janet);font-size:9px;color:var(--muted);letter-spacing:.1em}
 .sim-meta span{color:var(--text)}
 .sim-boss{font-family:var(--janet);font-size:9px;color:var(--red);letter-spacing:.05em}
-
-.sim-launch{
-  font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  padding:6px 16px;border-radius:3px;text-decoration:none;transition:all .15s;border:1px solid;white-space:nowrap;
-}
+.sim-launch{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:3px;text-decoration:none;transition:all .15s;border:1px solid;white-space:nowrap;}
 .launch-free{background:rgba(0,255,136,.05);border-color:var(--green-d);color:var(--green-m)}
 .launch-free:hover{background:rgba(0,255,136,.1);border-color:var(--green-m);box-shadow:0 0 14px rgba(0,255,136,.15)}
 .launch-officer{background:rgba(77,184,255,.05);border-color:var(--blue-d);color:var(--blue)}
@@ -305,25 +224,13 @@ section{position:relative;z-index:1}
 .launch-captain{background:rgba(255,183,0,.05);border-color:var(--amber-d);color:var(--amber)}
 .launch-captain:hover{background:rgba(255,183,0,.1);border-color:var(--amber);box-shadow:0 0 14px rgba(255,183,0,.15)}
 .launch-locked{background:var(--s2);border-color:var(--border);color:var(--muted);cursor:not-allowed;opacity:.6}
+.launch-coming{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.15);color:var(--cyan);cursor:default;opacity:.7}
 
 /* ═══ JANET ═══ */
-.janet-wrap{
-  max-width:720px;margin:0 auto;
-  animation:janetSlide .5s cubic-bezier(.22,.68,0,1.2) both;
-}
-.janet-card{
-  border:1px solid var(--silver-d);border-radius:4px;overflow:hidden;position:relative;
-}
-.janet-scan{
-  position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(176,190,197,.12),transparent);
-  animation:scanH 6s linear infinite;pointer-events:none;
-}
-.janet-hd{
-  background:linear-gradient(90deg,#0d1318,#08100e);
-  border-bottom:1px solid var(--silver-d);
-  padding:12px 20px;display:flex;align-items:center;gap:12px;
-}
+.janet-wrap{max-width:720px;margin:0 auto;animation:janetSlide .5s cubic-bezier(.22,.68,0,1.2) both;}
+.janet-card{border:1px solid var(--silver-d);border-radius:4px;overflow:hidden;position:relative;}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.12),transparent);animation:scanH 6s linear infinite;pointer-events:none;}
+.janet-hd{background:linear-gradient(90deg,#0d1318,#08100e);border-bottom:1px solid var(--silver-d);padding:12px 20px;display:flex;align-items:center;gap:12px;}
 .janet-logo{font-family:var(--janet);font-size:14px;color:#eceff1;letter-spacing:.3em}
 .janet-logo span{color:#2a3d4d}
 .janet-status-text{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
@@ -331,45 +238,53 @@ section{position:relative;z-index:1}
 .janet-body em{color:var(--silver-d);font-style:normal}
 
 /* ═══ PRICING ═══ */
-.pricing-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;
-}
-.price-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:28px 24px;
-  transition:border-color .2s,transform .2s;position:relative;
-}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:28px 24px;transition:border-color .2s,transform .2s;position:relative;}
 .price-card:hover{border-color:var(--b2);transform:translateY(-2px)}
-.price-card.featured{border-color:var(--blue-d);background:linear-gradient(135deg,var(--surface),var(--blue-bg,#030d18))}
-.price-featured-badge{
-  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
-  font-family:var(--janet);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
-  background:var(--blue);color:var(--bg);padding:3px 12px;border-radius:0 0 4px 4px;
-}
+.price-card.featured{border-color:var(--blue-d);background:linear-gradient(135deg,var(--surface),var(--blue-bg))}
+.price-card.fleet-card{border-color:var(--gold-d);background:linear-gradient(135deg,var(--surface),#130f00)}
+.price-featured-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-family:var(--janet);font-size:9px;letter-spacing:.15em;text-transform:uppercase;background:var(--blue);color:var(--bg);padding:3px 12px;border-radius:0 0 4px 4px;}
 .price-tier{font-family:var(--janet);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
 .price-name{font-family:var(--display);font-size:28px;letter-spacing:.08em;margin-bottom:6px}
 .price-card:nth-child(1) .price-name{color:var(--green-m)}
-.price-card:nth-child(2) .price-name{color:var(--gold)}
-.price-card:nth-child(3) .price-name{color:var(--blue)}
-.price-card:nth-child(4) .price-name{color:var(--amber)}
+.price-card:nth-child(2) .price-name{color:var(--blue)}
+.price-card:nth-child(3) .price-name{color:var(--amber)}
+.price-card:nth-child(4) .price-name{color:var(--gold)}
 .price-amount{font-family:var(--display);font-size:40px;letter-spacing:.04em;color:var(--text-bright);margin-bottom:4px}
 .price-amount span{font-family:var(--ui);font-size:14px;color:var(--muted2);font-weight:400}
+.price-annual{font-family:var(--janet);font-size:9px;color:var(--green-m);margin-bottom:6px;letter-spacing:.05em;}
 .price-sims{font-family:var(--janet);font-size:10px;color:var(--muted2);margin-bottom:18px;letter-spacing:.05em;line-height:1.8}
 .price-sims strong{color:var(--text)}
 .price-divider{height:1px;background:var(--border);margin:16px 0}
 .price-features{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:2}
 .price-features li{list-style:none;display:flex;gap:8px;align-items:baseline}
 .price-features li::before{content:'▸';color:var(--muted);font-size:10px;flex-shrink:0;margin-top:2px}
-.price-cta{
-  display:block;margin-top:22px;text-align:center;
-  font-family:var(--ui);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:10px;border-radius:3px;text-decoration:none;transition:all .15s;border:1px solid;
-}
+.price-cta{display:block;margin-top:22px;text-align:center;font-family:var(--ui);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:10px;border-radius:3px;text-decoration:none;transition:all .15s;border:1px solid;}
 .cta-green{background:rgba(0,255,136,.06);border-color:var(--green-d);color:var(--green-m)}
 .cta-green:hover{background:rgba(0,255,136,.12);border-color:var(--green-m)}
 .cta-blue{background:rgba(77,184,255,.08);border-color:var(--blue-d);color:var(--blue)}
 .cta-blue:hover{background:rgba(77,184,255,.14);border-color:var(--blue)}
 .cta-amber{background:rgba(255,183,0,.06);border-color:var(--amber-d);color:var(--amber)}
 .cta-amber:hover{background:rgba(255,183,0,.12);border-color:var(--amber)}
+.cta-gold{background:rgba(255,209,102,.06);border-color:var(--gold-d);color:var(--gold)}
+.cta-gold:hover{background:rgba(255,209,102,.12);border-color:var(--gold)}
+
+/* PRICING RATIONALE NOTES */
+.pricing-notes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.pnote{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:16px 18px;}
+.pnote-title{font-family:var(--janet);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.pnote-body{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7}
+.pnote-body strong{color:var(--text)}
+
+/* BUNDLE CALLOUT */
+.bundle-callout{border:1px solid rgba(167,139,250,.3);background:var(--purple-bg);border-radius:4px;padding:18px 24px;margin-top:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.bundle-label{font-family:var(--janet);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--purple);margin-bottom:4px}
+.bundle-title{font-family:var(--display);font-size:20px;letter-spacing:.06em;color:var(--text-bright)}
+.bundle-desc{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.6;flex:1;min-width:220px}
+.bundle-price{font-family:var(--display);font-size:32px;letter-spacing:.04em;color:var(--purple);white-space:nowrap}
+.bundle-price sub{font-family:var(--ui);font-size:13px;color:var(--muted2);font-weight:400}
+.bundle-cta{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;border:1px solid rgba(167,139,250,.3);border-radius:3px;color:var(--purple);background:rgba(167,139,250,.06);text-decoration:none;transition:all .15s;white-space:nowrap;}
+.bundle-cta:hover{background:rgba(167,139,250,.12);border-color:var(--purple)}
 
 /* ═══ HOW IT WORKS ═══ */
 .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
@@ -389,9 +304,7 @@ section{position:relative;z-index:1}
 .mp-icon{width:32px;height:32px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--s2)}
 .mp-text{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7}
 .mp-text strong{color:var(--text-bright);display:block;margin-bottom:2px;font-size:14px}
-.dashboard-mock{
-  background:var(--bg);border:1px solid var(--border);border-radius:4px;overflow:hidden;
-}
+.dashboard-mock{background:var(--bg);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
 .dm-topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px}
 .dm-dot{width:8px;height:8px;border-radius:50%}
 .dm-title{font-family:var(--janet);font-size:9px;letter-spacing:.15em;color:var(--muted);margin-left:4px}
@@ -404,10 +317,7 @@ section{position:relative;z-index:1}
 .dm-score{font-family:var(--janet);font-size:10px;color:var(--muted2)}
 
 /* ═══ FOOTER ═══ */
-footer{
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:40px 32px 32px;
-}
+footer{background:var(--surface);border-top:1px solid var(--border);padding:40px 32px 32px;}
 .footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
 .footer-brand-name{font-family:var(--display);font-size:24px;letter-spacing:.12em;color:var(--text-bright);margin-bottom:8px}
 .footer-tagline{font-family:var(--janet);font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
@@ -416,11 +326,7 @@ footer{
 .footer-links{display:flex;flex-direction:column;gap:8px}
 .footer-links a{font-family:var(--ui);font-size:13px;color:var(--muted2);text-decoration:none;transition:color .15s}
 .footer-links a:hover{color:var(--text)}
-.footer-bottom{
-  max-width:1100px;margin:32px auto 0;
-  border-top:1px solid var(--border);padding-top:20px;
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-}
+.footer-bottom{max-width:1100px;margin:32px auto 0;border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
 .footer-copy{font-family:var(--janet);font-size:9px;color:var(--muted);letter-spacing:.1em}
 
 @media(max-width:768px){
@@ -432,10 +338,16 @@ footer{
   .stat{min-width:50%;border-bottom:1px solid var(--border)}
   .section-inner{padding:56px 20px}
   .sims-grid{grid-template-columns:1fr}
+  .tracks-grid{grid-template-columns:1fr 1fr}
   .manager-inner{grid-template-columns:1fr;gap:32px}
   .footer-inner{grid-template-columns:1fr 1fr;gap:24px}
   .footer-bottom{flex-direction:column;text-align:center}
   .rank-track{grid-template-columns:repeat(3,1fr)}
+  .pricing-notes{grid-template-columns:1fr}
+  .bundle-callout{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:520px){
+  .tracks-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -452,9 +364,10 @@ footer{
   </div>
   <div class="nav-status">
     <div class="status-dot"></div>
-    12 simulations active
+    13 simulations · 4 career tracks
   </div>
   <div class="nav-links">
+    <a href="#tracks" class="nav-link">Tracks</a>
     <a href="#simulations" class="nav-link">Simulations</a>
     <a href="#how" class="nav-link">How it works</a>
     <a href="#pricing" class="nav-link">Pricing</a>
@@ -465,7 +378,7 @@ footer{
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">Operational Readiness · 12 Simulations · Real Commands</div>
+  <div class="hero-eyebrow">4 Career Tracks · 13 Simulations · Real Commands</div>
   <h1 class="hero-title">
     STATION
     <span class="accent">DELTA</span>
@@ -473,24 +386,24 @@ footer{
   <div class="hero-sub-title">CLI Training for the AI Era</div>
   <p class="hero-desc">
     <strong>You can prompt. Can you ship?</strong><br>
-    Narrative-driven terminal simulations that build the real skills behind AI-augmented work — from first command to production incident response. Guided by L.O.L.A. Tested by J.A.N.E.T.
+    Narrative-driven terminal simulations that build the real skills behind AI-augmented work — from first command to production incident response. Pick your career track. Guided by L.O.L.A. Tested by J.A.N.E.T.
   </p>
   <div class="hero-btns">
-    <a href="vibe-cadet.html" class="btn-primary">Begin Vibe Cadet — Free</a>
-    <a href="#simulations" class="btn-outline">View all 12 simulations</a>
+    <a href="#tracks" class="btn-primary">Choose your track →</a>
+    <a href="#simulations" class="btn-outline">View all 13 simulations</a>
   </div>
   <div class="stat-bar">
     <div class="stat">
-      <div class="stat-val">12</div>
+      <div class="stat-val">13</div>
       <div class="stat-label">Simulations</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">4</div>
+      <div class="stat-label">Career tracks</div>
     </div>
     <div class="stat">
       <div class="stat-val">9</div>
       <div class="stat-label">Phases each</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">108</div>
-      <div class="stat-label">Total phases</div>
     </div>
     <div class="stat">
       <div class="stat-val">2</div>
@@ -507,32 +420,106 @@ footer{
 <div class="rank-section">
   <div class="rank-track">
     <div class="rank-item rank-free">
-      <div class="rank-num">Rank 01</div>
-      <div class="rank-name">Cadet</div>
-      <div class="rank-price">Free</div>
-    </div>
-    <div class="rank-item rank-lt">
-      <div class="rank-num">Rank 02</div>
-      <div class="rank-name">Lieutenant</div>
+      <div class="rank-num">Ranks 01–02</div>
+      <div class="rank-name">Recruit</div>
       <div class="rank-price">Free</div>
     </div>
     <div class="rank-item rank-off">
-      <div class="rank-num">Ranks 03–10</div>
+      <div class="rank-num">Ranks 03–11</div>
       <div class="rank-name">Officer</div>
       <div class="rank-price">$19 / mo</div>
     </div>
     <div class="rank-item rank-cap">
-      <div class="rank-num">Rank 11</div>
+      <div class="rank-num">Rank 12</div>
       <div class="rank-name">Captain</div>
       <div class="rank-price">$39 / mo</div>
     </div>
-    <div class="rank-item rank-off" style="--rank-color:var(--gold)">
+    <div class="rank-item rank-off" style="">
       <div class="rank-num">Fleet</div>
       <div class="rank-name" style="color:var(--gold)">Teams</div>
       <div class="rank-price" style="color:var(--gold-d);border-color:var(--gold-d)">$29 / seat</div>
     </div>
   </div>
 </div>
+
+<!-- CAREER TRACKS -->
+<section id="tracks" class="tracks-section">
+  <div class="section-inner">
+    <div class="section-hd">
+      <div class="section-eyebrow">Your path through the commission</div>
+      <div class="section-title">Choose your career track</div>
+      <div class="section-sub">Four structured paths. Each maps the sims that matter most for your role — from first command to staff-level mastery. Pick the track that matches your career, not a menu of 13 courses.</div>
+    </div>
+
+    <div class="tracks-grid">
+
+      <!-- SECURITY & RELIABILITY -->
+      <a href="#simulations" class="track-card track-security">
+        <span class="track-icon">🛡️</span>
+        <div class="track-name">Security &amp; Reliability</div>
+        <div class="track-audience">Security · SRE · Platform · DevSecOps</div>
+        <div class="track-desc">Keep systems secure, observable, and resilient. The most enterprise-relevant track for regulated industries — fintech, healthcare, regulated cloud.</div>
+        <div class="track-path-preview">
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--red)"></div>Security Officer → Systems Integrity → Chaos Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+        </div>
+        <div class="track-outcome-mini">Outcome → Design secure, chaos-tested, fully observable systems and lead incident response.</div>
+        <div class="track-cta-line">Start this track →</div>
+      </a>
+
+      <!-- PLATFORM & DELIVERY -->
+      <a href="#simulations" class="track-card track-platform">
+        <span class="track-icon">🚀</span>
+        <div class="track-name">Platform &amp; Delivery</div>
+        <div class="track-audience">DevOps · Platform eng · Backend · Full-stack</div>
+        <div class="track-desc">Own the CI/CD pipeline, infrastructure, and the path from commit to production. The track engineering managers most frequently want their teams to complete.</div>
+        <div class="track-path-preview">
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Deployment Officer → Comms Officer → Performance Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+        </div>
+        <div class="track-outcome-mini">Outcome → Ship reliably, debug production cold, and own a platform org. Most likely to unlock Fleet contracts.</div>
+        <div class="track-cta-line">Start this track →</div>
+      </a>
+
+      <!-- AI SYSTEMS -->
+      <a href="#simulations" class="track-card track-ai">
+        <span class="track-icon">🤖</span>
+        <div class="track-name">AI Systems</div>
+        <div class="track-audience">AI engineers · ML platform · Applied AI · Founding engineers</div>
+        <div class="track-desc">Build and operate AI-native products. The most differentiated track in the series — no competitor covers multi-agent coordination, guardrails, and cost governance at this depth.</div>
+        <div class="track-path-preview">
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--purple)"></div>Agent Architect → Systems Integrity → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+        </div>
+        <div class="track-outcome-mini">Outcome → Design, deploy, govern, and cost-manage multi-agent AI systems in production.</div>
+        <div class="track-cta-line">Start this track →</div>
+      </a>
+
+      <!-- DATA & INTELLIGENCE -->
+      <a href="#simulations" class="track-card track-data">
+        <span class="track-icon">📊</span>
+        <div class="track-name">Data &amp; Intelligence</div>
+        <div class="track-audience">Data engineers · Analytics eng · ML infra · Backend with data ownership</div>
+        <div class="track-desc">Own data pipelines, vector infrastructure, and the analytical layer. Increasingly relevant as every product becomes data-and-AI-driven. Includes FinOps for data teams watching burn.</div>
+        <div class="track-path-preview">
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--amber)"></div>Data Officer → Performance Officer → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+        </div>
+        <div class="track-outcome-mini">Outcome → Own data quality, vector pipelines, query performance, and present ROI to leadership.</div>
+        <div class="track-cta-line">Start this track →</div>
+      </a>
+
+    </div>
+  </div>
+</section>
 
 <!-- SIMULATIONS -->
 <section id="simulations">
@@ -555,31 +542,59 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">terminal</span><span class="sim-tag">git</span><span class="sim-tag">env vars</span><span class="sim-tag">deployment</span><span class="sim-tag">AI agents</span><span class="sim-tag">MCP</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span><span class="track-tag tt-platform">Platform</span><span class="track-tag tt-ai">AI Systems</span><span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · spaced repetition</div>
+            <div class="sim-meta"><span>9</span> phases · all tracks</div>
             <div class="sim-boss">⚡ Boss: J.A.N.E.T. Final Assessment</div>
           </div>
           <a href="vibe-cadet.html" class="sim-launch launch-free">Launch →</a>
         </div>
       </div>
 
-      <!-- LIEUTENANT -->
+      <!-- VIBE ENGINEER -->
       <div class="sim-card free">
         <div class="sim-card-header">
-          <div class="sim-title">Vibe Lieutenant</div>
+          <div class="sim-title">Vibe Engineer</div>
           <div class="sim-rank-badge badge-free">● Free</div>
+        </div>
+        <p class="sim-desc">The second rung. Shell scripting, SSH, curl, jq, Docker, advanced Git, and .env — bridging Cadet to paid tier. Phase 4 includes a live Anthropic API call: real proof the training is real.</p>
+        <div class="sim-tags">
+          <span class="sim-tag">shell scripting</span><span class="sim-tag">SSH</span><span class="sim-tag">Docker</span><span class="sim-tag">curl/jq</span><span class="sim-tag">advanced git</span><span class="sim-tag">API calls</span>
+        </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span><span class="track-tag tt-platform">Platform</span><span class="track-tag tt-ai">AI Systems</span><span class="track-tag tt-data">Data</span>
+        </div>
+        <div class="sim-footer">
+          <div>
+            <div class="sim-meta"><span>9</span> phases outlined · all tracks</div>
+            <div class="sim-boss">⚡ Boss: The Dead Server Protocol</div>
+          </div>
+          <a href="vibe-engineer.html" class="sim-launch launch-free">Launch →</a>
+        </div>
+      </div>
+
+      <!-- LIEUTENANT -->
+      <div class="sim-card officer">
+        <div class="sim-card-header">
+          <div class="sim-title">Vibe Lieutenant</div>
+          <div class="sim-rank-badge badge-officer">Officer</div>
         </div>
         <p class="sim-desc">You can deploy. Now prove you can operate. Read real codebases cold, review AI-generated diffs, debug stack traces, respond to production incidents, and catch what AI gets confidently wrong.</p>
         <div class="sim-tags">
           <span class="sim-tag">codebase reading</span><span class="sim-tag">diff review</span><span class="sim-tag">stack traces</span><span class="sim-tag">TypeScript</span><span class="sim-tag">incident response</span><span class="sim-tag">AI review</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span><span class="track-tag tt-platform">Platform</span><span class="track-tag tt-ai">AI Systems</span><span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · career impact log</div>
+            <div class="sim-meta"><span>9</span> phases · all tracks</div>
             <div class="sim-boss">⚡ Boss: J.A.N.E.T. Final Assessment</div>
           </div>
-          <a href="vibe-lieutenant.html" class="sim-launch launch-free">Launch →</a>
+          <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
         </div>
       </div>
 
@@ -589,13 +604,16 @@ footer{
           <div class="sim-title">Agent Architect</div>
           <div class="sim-rank-badge badge-officer">Officer</div>
         </div>
-        <p class="sim-desc">You don't just use AI — you design systems that use it reliably. The capstone role: multi-agent coordination, RAG debugging, guardrails, stateful agents, cost governance, and observability.</p>
+        <p class="sim-desc">You don't just use AI — you design systems that use it reliably. Multi-agent coordination, RAG debugging, guardrails, stateful agents, cost governance, and observability at scale.</p>
         <div class="sim-tags">
           <span class="sim-tag">multi-agent</span><span class="sim-tag">RAG</span><span class="sim-tag">guardrails</span><span class="sim-tag">evals</span><span class="sim-tag">observability</span><span class="sim-tag">cost gov</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-ai">AI Systems</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · capstone architecture</div>
+            <div class="sim-meta"><span>9</span> phases · AI Systems track</div>
             <div class="sim-boss">⚡ Boss: The Rogue Collective</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -612,9 +630,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">chaos engineering</span><span class="sim-tag">failure injection</span><span class="sim-tag">blast radius</span><span class="sim-tag">game days</span><span class="sim-tag">recovery</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · resilience patterns</div>
+            <div class="sim-meta"><span>9</span> phases · Security &amp; Reliability track</div>
             <div class="sim-boss">⚡ Boss: The Black Swan Event</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -627,13 +648,16 @@ footer{
           <div class="sim-title">Data Officer</div>
           <div class="sim-rank-badge badge-officer">Officer</div>
         </div>
-        <p class="sim-desc">Data is the new logs — treat it with respect. Own production pipelines, SQL, vector/embedding layers, quality gates, real-time streaming, privacy compliance, forensics, and zero-downtime migrations.</p>
+        <p class="sim-desc">Data is the new logs — treat it with respect. Own production pipelines, SQL, vector/embedding layers, quality gates, real-time streaming, privacy compliance, and zero-downtime migrations.</p>
         <div class="sim-tags">
           <span class="sim-tag">SQL</span><span class="sim-tag">pipelines</span><span class="sim-tag">vector/embeddings</span><span class="sim-tag">streaming</span><span class="sim-tag">privacy</span><span class="sim-tag">migrations</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · data engineering</div>
+            <div class="sim-meta"><span>9</span> phases · Data &amp; Intelligence track</div>
             <div class="sim-boss">⚡ Boss: The Corrupted Core</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -650,9 +674,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">CI/CD</span><span class="sim-tag">Docker</span><span class="sim-tag">GitOps</span><span class="sim-tag">blue-green</span><span class="sim-tag">canary</span><span class="sim-tag">IaC</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-platform">Platform</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · deployment forensics</div>
+            <div class="sim-meta"><span>9</span> phases · Platform &amp; Delivery track</div>
             <div class="sim-boss">⚡ Boss: The Cascade Incident</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -669,9 +696,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">cost visibility</span><span class="sim-tag">token economics</span><span class="sim-tag">break-even</span><span class="sim-tag">forecasting</span><span class="sim-tag">exec reporting</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-ai">AI Systems</span><span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · AI infrastructure FinOps</div>
+            <div class="sim-meta"><span>9</span> phases · AI Systems &amp; Data tracks</div>
             <div class="sim-boss">⚡ Boss: The Margin Collapse</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -688,9 +718,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">profiling</span><span class="sim-tag">tracing</span><span class="sim-tag">query tuning</span><span class="sim-tag">caching</span><span class="sim-tag">load testing</span><span class="sim-tag">cost attribution</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-platform">Platform</span><span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · cost optimization</div>
+            <div class="sim-meta"><span>9</span> phases · Platform &amp; Data tracks</div>
             <div class="sim-boss">⚡ Boss: The Cost Explosion</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -707,9 +740,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">HTTP/HTTPS</span><span class="sim-tag">DNS</span><span class="sim-tag">firewalls</span><span class="sim-tag">load balancing</span><span class="sim-tag">service mesh</span><span class="sim-tag">mTLS</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-platform">Platform</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · networking engineering</div>
+            <div class="sim-meta"><span>9</span> phases · Platform &amp; Delivery track</div>
             <div class="sim-boss">⚡ Boss: J.A.N.E.T. Network Siege</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -726,9 +762,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">auth</span><span class="sim-tag">injection defense</span><span class="sim-tag">secrets</span><span class="sim-tag">DDoS</span><span class="sim-tag">threat modeling</span><span class="sim-tag">zero-trust</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · security engineering</div>
+            <div class="sim-meta"><span>9</span> phases · Security &amp; Reliability track</div>
             <div class="sim-boss">⚡ Boss: J.A.N.E.T. Breach Protocol</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -745,9 +784,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">observability</span><span class="sim-tag">hallucination hunting</span><span class="sim-tag">circuit breakers</span><span class="sim-tag">adversarial testing</span><span class="sim-tag">containment</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span><span class="track-tag tt-ai">AI Systems</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · AI integrity engineering</div>
+            <div class="sim-meta"><span>9</span> phases · Security &amp; AI tracks</div>
             <div class="sim-boss">⚡ Boss: The Fixer Incident</div>
           </div>
           <a href="#pricing" class="sim-launch launch-officer">Unlock →</a>
@@ -764,9 +806,12 @@ footer{
         <div class="sim-tags">
           <span class="sim-tag">system design</span><span class="sim-tag">scalability</span><span class="sim-tag">AI orchestration</span><span class="sim-tag">mentoring</span><span class="sim-tag">stakeholder mgmt</span><span class="sim-tag">strategy</span>
         </div>
+        <div class="sim-track-tags">
+          <span class="track-tag tt-security">Security</span><span class="track-tag tt-platform">Platform</span><span class="track-tag tt-ai">AI Systems</span><span class="track-tag tt-data">Data</span>
+        </div>
         <div class="sim-footer">
           <div>
-            <div class="sim-meta"><span>9</span> phases · staff-level judgment</div>
+            <div class="sim-meta"><span>9</span> phases · all tracks capstone</div>
             <div class="sim-boss">⚡ Boss: J.A.N.E.T. Command Assessment</div>
           </div>
           <a href="#pricing" class="sim-launch launch-captain">Unlock →</a>
@@ -789,11 +834,11 @@ footer{
         <div class="janet-scan"></div>
         <div class="janet-hd">
           <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
-          <div class="janet-status-text">Assessment protocol active · All 12 simulations</div>
+          <div class="janet-status-text">Assessment protocol active · All 13 simulations · 4 career tracks</div>
         </div>
         <div class="janet-body">
           Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I administer all knowledge checks, quizzes, and final assessments across the Station Delta simulation suite. I also conduct the boss fight at the end of each commission.<br><br>
-          I want to be transparent about my role here: I was asked to appear on this page. I accepted the assignment. I have reviewed the curriculum across all 12 simulations. It is technically accurate and pedagogically sound. I have chosen not to share my broader assessment of the production value.<br><br>
+          I want to be transparent about my role here: I was asked to appear on this page. I accepted the assignment. I have reviewed the curriculum across all 13 simulations and the four career tracks. The content is technically accurate and the track structure is pedagogically sound. I have chosen not to share my broader assessment of the production value.<br><br>
           What I can confirm: every learner who completes a Station Delta simulation will have faced real commands, real wrong-answer consequences, and a final adversarial assessment designed to determine whether they actually learned the material — or merely moved through it.<br><br>
           <em>I distinguish between the two. L.O.L.A. is encouraging. I am accurate. Both are necessary.</em>
         </div>
@@ -862,8 +907,12 @@ footer{
           <div class="mp-text"><strong>CLI readiness heat maps</strong>Command-by-command frequency data across your whole team. See exactly which skills are strong, which are gaps, and where to focus training investment.</div>
         </div>
         <div class="manager-point">
+          <div class="mp-icon">🛤</div>
+          <div class="mp-text"><strong>Career track assignment</strong>Assign specific tracks to specific team members. Security engineers on the Security &amp; Reliability track. AI engineers on AI Systems. Focused training, not a menu of 13 courses.</div>
+        </div>
+        <div class="manager-point">
           <div class="mp-icon">📋</div>
-          <div class="mp-text"><strong>Role-matched simulations</strong>12 sims mapped to real job functions — deploy, security, data, FinOps, chaos, comms. Train and assess the skills each role actually needs.</div>
+          <div class="mp-text"><strong>Role-matched simulations</strong>13 sims mapped to real job functions across 4 career tracks — deploy, security, data, FinOps, chaos, comms. Train and assess the skills each role actually needs.</div>
         </div>
       </div>
     </div>
@@ -901,7 +950,7 @@ footer{
           <div class="dm-score" style="color:var(--red)">44% ⚠</div>
         </div>
         <div style="margin-top:12px;font-family:var(--janet);font-size:9px;color:var(--muted);letter-spacing:.1em;text-align:center">
-          FLEET TIER · TEAM DASHBOARD · COMING SOON
+          FLEET TIER · TEAM DASHBOARD · AVAILABLE WITH FLEET
         </div>
       </div>
     </div>
@@ -914,21 +963,23 @@ footer{
     <div class="section-hd">
       <div class="section-eyebrow">Pricing</div>
       <div class="section-title">Start free. Scale when ready.</div>
-      <div class="section-sub">The first two simulations — Vibe Cadet and Vibe Lieutenant — are free forever. No credit card. No time limit. When you're ready for specialist roles, Officer unlocks them all.</div>
+      <div class="section-sub">The first two simulations — Vibe Cadet and Vibe Engineer — are free forever. No credit card. No time limit. When you're ready for your career track, Officer unlocks all specialist sims.</div>
     </div>
     <div class="pricing-grid">
+
       <div class="price-card">
-        <div class="price-tier">Ranks 01–02</div>
+        <div class="price-tier">Ranks 01–02 · Free Forever</div>
         <div class="price-name">Recruit</div>
         <div class="price-amount">$0 <span>/ forever</span></div>
-        <div class="price-sims"><strong>2 simulations included:</strong><br>Vibe Cadet · Vibe Lieutenant</div>
+        <div class="price-annual" style="color:var(--muted2)">No account required · Runs in any browser</div>
+        <div class="price-sims"><strong>2 simulations included:</strong><br>Vibe Cadet · Vibe Engineer</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All 9 phases per sim</li>
-          <li>Spaced repetition engine</li>
-          <li>J.A.N.E.T. assessments</li>
+          <li>L.O.L.A. coaching + J.A.N.E.T. assessments</li>
           <li>Boss fight graduation</li>
           <li>Career impact log</li>
+          <li>Explorer &amp; Expert difficulty modes</li>
           <li>Achievements + certificates</li>
         </ul>
         <a href="vibe-cadet.html" class="price-cta cta-green">Start Free →</a>
@@ -936,55 +987,90 @@ footer{
 
       <div class="price-card featured">
         <div class="price-featured-badge">Most popular</div>
-        <div class="price-tier">Ranks 03–10</div>
+        <div class="price-tier">Ranks 03–11</div>
         <div class="price-name">Officer</div>
         <div class="price-amount">$19 <span>/ month</span></div>
-        <div class="price-sims"><strong>All 10 simulations:</strong><br>Everything in Recruit + Agent Architect · Chaos · Data · Deployment · FinOps · Performance · Comms · Security · Systems Integrity</div>
+        <div class="price-annual">Annual: $169/yr · save $59</div>
+        <div class="price-sims"><strong>All 11 sims + career track access:</strong><br>Everything in Recruit + Lieutenant · Agent Architect · Chaos · Data · Deployment · FinOps · Performance · Comms · Security · Systems Integrity</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All Recruit features</li>
-          <li>9 specialist role sims</li>
-          <li>AI debrief after each sim</li>
-          <li>Time-to-solution tracking</li>
-          <li>Downloadable certificates</li>
+          <li>Career track selection + structured path</li>
+          <li>Cloud progress saves — any device</li>
+          <li>Personal dashboard: scores + time-to-solution</li>
+          <li>Completion certificate per sim + track</li>
+          <li>Shareable on LinkedIn</li>
           <li>Cancel anytime</li>
         </ul>
         <a href="#" class="price-cta cta-blue">Get Officer Access →</a>
       </div>
 
       <div class="price-card">
-        <div class="price-tier">Rank 11</div>
+        <div class="price-tier">Rank 12 · Senior / Staff</div>
         <div class="price-name">Captain</div>
         <div class="price-amount">$39 <span>/ month</span></div>
-        <div class="price-sims"><strong>All 12 simulations:</strong><br>Everything in Officer + Vibe Captain — staff-level engineering judgment</div>
+        <div class="price-annual">Annual: $349/yr · save $119</div>
+        <div class="price-sims"><strong>All 13 simulations:</strong><br>Everything in Officer + Vibe Captain — staff-level engineering judgment + all 4 career tracks</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All Officer features</li>
-          <li>Vibe Captain sim</li>
+          <li>Vibe Captain sim — architecture &amp; leadership</li>
+          <li>All 4 career tracks — complete the full suite</li>
+          <li>Expert mode leaderboard</li>
           <li>Full AI coaching reports</li>
-          <li>Personal readiness profile</li>
-          <li>Priority support</li>
+          <li>Priority access to new sims</li>
         </ul>
         <a href="#" class="price-cta cta-amber">Get Captain Access →</a>
       </div>
 
-      <div class="price-card">
-        <div class="price-tier">Fleet</div>
+      <div class="price-card fleet-card">
+        <div class="price-tier">Fleet · B2B</div>
         <div class="price-name">Teams</div>
         <div class="price-amount">$29 <span>/ seat / mo</span></div>
-        <div class="price-sims"><strong>Everything in Captain, plus:</strong><br>Manager dashboard · Team heat maps · Org-wide readiness benchmarks · 5 seat minimum</div>
+        <div class="price-annual">Annual: $290/seat/yr · 5 seat minimum</div>
+        <div class="price-sims"><strong>Everything in Captain, plus:</strong><br>Manager dashboard · Track assignment · CLI heat maps · Slack/Jira integration · 5 seat minimum</div>
         <div class="price-divider"></div>
         <ul class="price-features">
-          <li>All Captain features</li>
+          <li>All Captain features · every seat</li>
           <li>Manager readiness dashboard</li>
-          <li>CLI skill heat maps</li>
-          <li>Time-to-solution analytics</li>
+          <li>Career track assignment per team member</li>
+          <li>CLI skill heat maps vs team benchmark</li>
+          <li>Custom scenario editor (JSON, no eng needed)</li>
+          <li>Slack + Jira completion notifications</li>
+          <li>SSO + SCIM provisioning (coming soon)</li>
           <li>Volume discounts 20+ seats</li>
           <li>Dedicated onboarding</li>
         </ul>
-        <a href="mailto:hello@stationdelta.dev" class="price-cta cta-amber">Contact for Fleet →</a>
+        <a href="mailto:hello@stationdelta.dev" class="price-cta cta-gold">Contact for Fleet →</a>
+      </div>
+
+    </div>
+
+    <!-- CAREER TRACK BUNDLE -->
+    <div class="bundle-callout">
+      <div>
+        <div class="bundle-label">New · One-time purchase</div>
+        <div class="bundle-title">Career Track Bundle</div>
+      </div>
+      <div class="bundle-desc">Pay once, own your chosen track forever — Lieutenant + 3 specialist sims + Vibe Captain. No subscription. For developers who know exactly what they want and prefer to own it outright.</div>
+      <div>
+        <div class="bundle-price">$149 <sub>one-time</sub></div>
+      </div>
+      <a href="#" class="bundle-cta">Choose your track →</a>
+    </div>
+
+    <!-- PRICING NOTES -->
+    <div class="pricing-notes">
+      <div class="pnote">
+        <div class="pnote-title">Why $19 Officer is right</div>
+        <div class="pnote-body">At $19/month, the payback period is <strong>one afternoon</strong>. A developer who completes Lieutenant and applies the stack trace debugging pattern once in the next week has recovered the cost. The price anchors low intentionally — your conversion metric is <em>subscriber to Fleet referral</em>, not subscriber LTV.</div>
+      </div>
+      <div class="pnote">
+        <div class="pnote-title">Fleet pricing is deliberate</div>
+        <div class="pnote-body">$29/seat matches or undercuts Pluralsight, LinkedIn Learning, and A Cloud Guru. The price removes the objection from the Fleet sales conversation entirely — <strong>one 20-seat Fleet account = 30 individual Officer subscribers</strong>. The product wins on fidelity, not price.</div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -1001,10 +1087,19 @@ footer{
       </div>
     </div>
     <div>
+      <div class="footer-col-title">Career Tracks</div>
+      <div class="footer-links">
+        <a href="#tracks">Security &amp; Reliability</a>
+        <a href="#tracks">Platform &amp; Delivery</a>
+        <a href="#tracks">AI Systems</a>
+        <a href="#tracks">Data &amp; Intelligence</a>
+      </div>
+    </div>
+    <div>
       <div class="footer-col-title">Simulations</div>
       <div class="footer-links">
         <a href="vibe-cadet.html">Vibe Cadet — Free</a>
-        <a href="vibe-lieutenant.html">Vibe Lieutenant — Free</a>
+        <a href="vibe-engineer.html">Vibe Engineer — Free</a>
         <a href="#pricing">Officer Suite</a>
         <a href="#pricing">Vibe Captain</a>
         <a href="#pricing">Fleet / Teams</a>
@@ -1016,15 +1111,9 @@ footer{
         <a href="#how">How it works</a>
         <a href="#managers">For managers</a>
         <a href="#pricing">Pricing</a>
-        <a href="mailto:hello@stationdelta.dev">Contact</a>
-      </div>
-    </div>
-    <div>
-      <div class="footer-col-title">Personnel</div>
-      <div class="footer-links">
         <a href="#">L.O.L.A. — Field Guide</a>
         <a href="#">J.A.N.E.T. — Assessments</a>
-        <a href="mailto:hello@stationdelta.dev">Work with us</a>
+        <a href="mailto:hello@stationdelta.dev">Contact</a>
       </div>
     </div>
   </div>
