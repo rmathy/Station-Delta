@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Communications Officer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#1db954;
+  --green-d:#0d5c28;
+  --green-bg:#040f09;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--silver)}50%{text-shadow:0 0 16px var(--silver),0 0 32px rgba(176,190,197,.2)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--silver)}
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--silver);border-color:var(--silver)}
+.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── TERMINAL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--silver)}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--silver);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--silver);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* ══ BOSS FIGHT ══ */
+.boss-container{margin:14px 0;border:2px solid var(--red);border-radius:var(--r8);overflow:hidden;animation:bossGlow 2s infinite;position:relative}
+.boss-header{background:linear-gradient(90deg,#1a0505,#0d0202);border-bottom:2px solid var(--red-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:14px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;animation:bossFlicker 3s infinite}
+.boss-sub{font-family:var(--janet);font-size:10px;color:var(--red-d);letter-spacing:.15em;margin-left:auto}
+.boss-body{background:#080202;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:#c47070;line-height:1.8;margin-bottom:12px;border-left:3px solid var(--red-d);padding-left:12px}
+.boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
+.boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--silver);background:var(--silver-bg)}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--silver)}
+
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+#crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
+.mbtn-p{background:var(--silver);color:#000;font-weight:700}
+.mbtn-p:hover{background:var(--silver-bright)}
+.mbtn-s{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
+.mbtn-s:hover{background:var(--b2);color:var(--text)}
+.boot-features{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--red);margin-right:6px}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
+input[type=text]:focus{border-color:var(--silver)}
+.grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
+.grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
+.grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
+.skills-list span{color:var(--green);margin-right:8px}
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:22px;flex-shrink:0}
+.ach-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ach-desc{font-size:11px;color:var(--muted2)}
+.gloss-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;margin-bottom:4px}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:11px;color:var(--muted2);line-height:1.65}
+.career-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.career-item:last-child{border-bottom:none}
+.career-phase{font-size:11px;color:var(--cyan);margin-bottom:4px}
+.career-stat{font-size:22px;font-weight:700;color:var(--silver);margin-bottom:3px}
+.career-ctx{font-size:11px;color:var(--text);line-height:1.65}
+.career-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
+/* ── ENHANCED DIAG ── */
+.diag-block-progressive{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div id="logo">📡 VIBE · COMMUNICATIONS OFFICER</div>
+    <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <span id="sandbox-pill">SANDBOX</span>
+      <span id="hardmode-pill">HARD MODE</span>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+    </div>
+  </div>
+
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">comms@<span id="term-path-val">ship:/home/officer/ops</span></div>
+    </div>
+    <div id="output"></div>
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
+    </div>
+    <div id="input-row">
+      <div id="prompt-pre">$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Loading…</div>
+      <div id="obj-context">Initializing…</div>
+      <div id="obj-cmd-label">Next Command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">—</div>
+        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Officer on deck. The ship's communications are yours.</div>
+    </div>
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
+    </div>
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">📡</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Communications Officer</div>
+    <div class="msub">The ship is live. Its systems need to communicate flawlessly. Ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, network debugging, secure tunnels, and resilient architectures — everything that keeps the fleet talking under fire.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · real-world networking engineering<br>
+      <span>▸</span>L.O.L.A. — your tactical intel officer<br>
+      <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all quizzes. She is… unimpressed.<br>
+      <span>▸</span>Ports & protocols · HTTP/HTTPS · DNS resolution<br>
+      <span>▸</span>Firewalls & zero-trust · Load balancing · Service meshes<br>
+      <span>▸</span>Network debugging · mTLS & encryption · Resilient design<br>
+      <span>▸</span><b style="color:var(--red)">Boss Fight</b> — Phase 9 final test. JANET oversees it.<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable comms reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div><div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full context. Recommended.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div><div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart feedback only.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div><div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No feedback. Timer on.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">CONNECT THE FLEET</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">📡</div>
+    <div class="mtitle" style="text-align:center;color:var(--silver)">Communications Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Communications Officer — including the boss fight. The fleet is connected.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Communications Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Vibe Communications Officer · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Ports, protocols, TCP/UDP, sockets, common ports<br>
+      <span>✓</span>HTTP methods, status codes, headers, TLS handshake<br>
+      <span>✓</span>DNS records, resolution, caching, troubleshooting<br>
+      <span>✓</span>Firewall rules, zero-trust, ingress/egress control<br>
+      <span>✓</span>Load balancers, health checks, canary deployments<br>
+      <span>✓</span>Service meshes, mTLS, circuit breakers<br>
+      <span>✓</span>curl, netstat, ss, tcpdump, traceroute debugging<br>
+      <span>✓</span>mTLS, certificates, VPNs, secure tunnels<br>
+      <span>✓</span>High-availability patterns, retries, backpressure, observability
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+  </div>
+</div>
+
+<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Communications milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Networking terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE COMMUNICATIONS OFFICER v1.0
+   Exact same framework as Security Officer — only the content changed.
+   J.A.N.E.T. administers all quizzes. L.O.L.A. is your tactical comms officer.
+   Boss Fight: Phase 9 — L.O.L.A. goes offline. JANET takes over.
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/officer/ops',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  mistakeTypes:[],
+  wrongStreak:0,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your communications assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for a communications assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. Communications module loaded. I will now present a question. Please answer it correctly. Or incorrectly. Both outcomes have been observed. I document them all.",
+  "I am J.A.N.E.T. I have been asked to test your networking knowledge. I find 'communications' a somewhat optimistic word for the state of most distributed systems. Nonetheless. I will proceed.",
+  "J.A.N.E.T. online. I note you have reached a communications quiz. Statistically, most engineers believe they understand networking until they are asked a specific question. This is one of those.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your communications record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. The connection has been correctly identified. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your communications file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it carefully.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit in the incorrect styling.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is common in networking. Especially after outages.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is not something I recommend reviewing before important deployments.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Ports & Protocols',stat:'92%',context:'of production outages start with misconfigured ports, wrong protocols, or misunderstood TCP vs UDP behavior. Engineers who master the fundamentals prevent the most common connectivity failures before they ever reach production.',tags:['TCP','UDP','Ports','Sockets','IP']},
+  {phase:'Phase 2 — HTTP & HTTPS',stat:'#1',context:'most common protocol in modern fleets. Every microservice, API gateway, and frontend talks HTTP. Mastering methods, status codes, headers, and the TLS handshake is the difference between a working service and a silent 502.',tags:['HTTP','HTTPS','TLS','Headers','Status Codes']},
+  {phase:'Phase 3 — DNS & Name Resolution',stat:'4.2s',context:'average time to resolve a DNS query in production. A single misconfigured record or cache miss can take an entire region offline. Engineers who understand A/CNAME/MX/TXT records and caching keep the fleet discoverable.',tags:['DNS','A record','CNAME','TTL','Resolution']},
+  {phase:'Phase 4 — Firewalls & Access Control',stat:'87%',context:'of network breaches involve overly permissive firewall rules or missing zero-trust policies. Engineers who design strict ingress/egress controls prevent lateral movement across the fleet.',tags:['Firewall','Zero-trust','Ingress','Egress','Network policy']},
+  {phase:'Phase 5 — Load Balancing',stat:'99.99%',context:'target availability for production services. Proper load balancers, health checks, and canary deployments are how you hit that number when thousands of escape pods request help at once.',tags:['Load balancer','Health checks','Round-robin','Canary','Traffic management']},
+  {phase:'Phase 6 — Service Discovery & Meshes',stat:'Microservices',context:'modern fleets are dynamic. Services come and go. Engineers who master service meshes, mTLS, and circuit breakers keep inter-service communication reliable even when instances scale up and down.',tags:['Service mesh','mTLS','Circuit breaker','Discovery','Microservices']},
+  {phase:'Phase 7 — Network Debugging',stat:'< 5min',context:'average time to diagnose a connectivity issue in mature teams. Engineers who can use curl, ss, tcpdump, and traceroute like second nature become the person everyone looks to when the ship goes silent.',tags:['curl','tcpdump','traceroute','netstat','Debugging']},
+  {phase:'Phase 8 — Secure Communication',stat:'mTLS',context:'the standard for service-to-service encryption in zero-trust fleets. Engineers who understand certificate management and secure tunnels prevent the enemy from listening in.',tags:['mTLS','TLS','Certificates','VPN','API gateway']},
+  {phase:'Phase 9 — Resilient Systems',stat:'CNO track',context:'Chief Networking Officer track. Engineers who can design fault-tolerant, observable, high-availability communication systems are the ones who architect entire fleets.',tags:['High availability','Retries','Backpressure','Observability','Resilience']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'TCP vs UDP',def:'TCP is reliable, connection-oriented, ordered. UDP is fast, connectionless, best-effort. Use TCP for HTTP, databases. Use UDP for real-time video, DNS queries, gaming.'},
+  {term:'Port',def:'A 16-bit number (0-65535) that identifies a specific process on a machine. Common: 80/HTTP, 443/HTTPS, 22/SSH, 5432/PostgreSQL.'},
+  {term:'HTTP Methods',def:'GET (read), POST (create), PUT (replace), PATCH (update), DELETE (remove). Idempotency and safety matter for caching and retries.'},
+  {term:'TLS Handshake',def:'The process where client and server negotiate encryption: ClientHello → ServerHello → certificate exchange → key agreement → encrypted tunnel established.'},
+  {term:'DNS Record Types',def:'A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail), TXT (verification), NS (nameserver). Each serves a different purpose in name resolution.'},
+  {term:'Firewall Rule',def:'A policy that allows or denies traffic based on source/destination IP, port, and protocol. Zero-trust means default-deny + explicit allow.'},
+  {term:'Load Balancer',def:'Distributes incoming traffic across multiple backend servers. Algorithms: round-robin, least connections, weighted. Health checks remove unhealthy instances.'},
+  {term:'Service Mesh',def:'Infrastructure layer that handles service-to-service communication: mTLS, traffic routing, observability, circuit breaking. Istio and Linkerd are popular.'},
+  {term:'mTLS',def:'Mutual TLS — both client and server authenticate each other with certificates. The gold standard for zero-trust service communication.'},
+  {term:'Circuit Breaker',def:'Prevents cascading failures by stopping calls to a failing service after a threshold. States: closed (normal), open (fast-fail), half-open (test recovery).'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'comm':    {synopsis:'comm [subcommand]',desc:'Core communications tools',why:'Configure ports, protocols, and basic connectivity.',flags:[{f:'ports map',d:'Scan and map open ports'},{f:'protocol config',d:'Configure TCP/UDP behavior'}],example:'$ comm ports map\n$ comm protocol config'},
+  'http':    {synopsis:'http [command]',desc:'HTTP/HTTPS operations',why:'Master the web protocol that powers everything.',flags:[{f:'probe',d:'Test endpoints and methods'},{f:'tls handshake',d:'Simulate and debug TLS'}],example:'$ http probe\n$ http tls handshake'},
+  'dns':     {synopsis:'dns [command]',desc:'DNS resolution & troubleshooting',why:'Before anything connects, it must be found.',flags:[{f:'query',d:'Perform DNS lookups'},{f:'resolve',d:'Troubleshoot resolution failures'}],example:'$ dns query\n$ dns resolve'},
+  'firewall':{synopsis:'firewall [command]',desc:'Access control & zero-trust',why:'Control exactly who can talk to what.',flags:[{f:'rule apply',d:'Add firewall rules'},{f:'zero-trust enable',d:'Enable strict policies'}],example:'$ firewall rule apply\n$ firewall zero-trust enable'},
+  'lb':      {synopsis:'lb [command]',desc:'Load balancing & traffic management',why:'Keep services responsive under load.',flags:[{f:'configure',d:'Set up load balancer'},{f:'healthcheck add',d:'Add health checks'}],example:'$ lb configure\n$ lb healthcheck add'},
+  'discover':{synopsis:'discover [command]',desc:'Service discovery & meshes',why:'Services must find each other dynamically.',flags:[{f:'service',d:'Discover running services'},{f:'mesh config',d:'Configure service mesh'}],example:'$ discover service\n$ discover mesh config'},
+  'net':     {synopsis:'net [command]',desc:'Network debugging tools',why:'When the ship goes silent, you fix it fast.',flags:[{f:'debug',d:'Run diagnostics'},{f:'trace',d:'Trace routes and packets'}],example:'$ net debug\n$ net trace'},
+  'secure':  {synopsis:'secure [command]',desc:'Secure communication & encryption',why:'The enemy is always listening.',flags:[{f:'tunnel',d:'Create secure tunnels'},{f:'mtls setup',d:'Set up mutual TLS'}],example:'$ secure tunnel\n$ secure mtls setup'},
+  'design':  {synopsis:'design [command]',desc:'Resilient communication systems',why:'You now design how the entire fleet talks.',flags:[{f:'resilient',d:'Design HA patterns'},{f:'observability',d:'Add observability'}],example:'$ design resilient\n$ design observability'},
+  'curl':    {synopsis:'curl [url]',desc:'Test HTTP endpoints',why:'The universal network debugging tool.',flags:[],example:'$ curl -v https://shipfleet.io/api/health'},
+  'ss':      {synopsis:'ss [options]',desc:'Socket statistics',why:'See what is listening and connected.',flags:[],example:'$ ss -tuln'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal Comms Playbook',why:'Build your own exportable networking reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',    icon:'📡',name:'First Signal',       desc:'Issued your first communications command.'},
+  {id:'gatekeeper',   icon:'🔌',name:'Link Layer',         desc:'Completed Phase 1 — ports and protocols mastered.'},
+  {id:'webmaster',    icon:'🌐',name:'Webmaster',          desc:'Completed Phase 2 — HTTP/HTTPS fluency achieved.'},
+  {id:'resolver',     icon:'🔍',name:'Name Resolver',      desc:'Completed Phase 3 — DNS resolution reliable.'},
+  {id:'firewaller',   icon:'🛡️',name:'Firewaller',         desc:'Completed Phase 4 — access control enforced.'},
+  {id:'traffic',      icon:'🚦',name:'Traffic Director',   desc:'Completed Phase 5 — load balancing operational.'},
+  {id:'mesh_master',  icon:'🔗',name:'Mesh Master',        desc:'Completed Phase 6 — service discovery live.'},
+  {id:'debugger',     icon:'🔧',name:'Network Debugger',   desc:'Completed Phase 7 — connectivity issues fixed fast.'},
+  {id:'encryptor',    icon:'🔒',name:'Encryptor',          desc:'Completed Phase 8 — secure tunnels established.'},
+  {id:'boss_slayer',  icon:'💀',name:'Boss Slayer',        desc:'Defeated the Phase 9 Boss Fight. JANET was unimpressed.'},
+  {id:'cno',          icon:'📡',name:'Chief Networking Officer',desc:'Completed all 9 phases. The fleet is connected.'},
+  {id:'janet_ace',    icon:'🧊',name:'JANET Ace',          desc:'Answered a JANET quiz correctly on first try.'},
+  {id:'eagle',        icon:'🦅',name:'Eagle Eye',          desc:'Completed a phase without revealing the answer.'},
+  {id:'recall_master',icon:'🧠',name:'Recall Master',      desc:'Got 3+ spaced recall questions right in a row.'},
+];
+
+/* ── SPACED RECALL CALLBACKS ── */
+const SPACED_CALLBACKS = [
+  null,
+  {q:'What are the two main transport protocols and when do you use each?',answer:'TCP (reliable, ordered) for HTTP/databases; UDP (fast, best-effort) for DNS, video, real-time',acceptFn:v=>v.includes('tcp')&&v.includes('udp')},
+  {q:'What HTTP status code class indicates a client error?',answer:'4xx',acceptFn:v=>v.includes('4xx')||v.includes('client error')},
+  {q:'What DNS record type points a domain to another domain name?',answer:'CNAME',acceptFn:v=>v.includes('cname')},
+  {q:'What is the default action in a zero-trust firewall policy?',answer:'Deny all',acceptFn:v=>v.includes('deny')||v.includes('default deny')},
+  {q:'What load balancing algorithm sends new connections to the server with the fewest active connections?',answer:'Least connections',acceptFn:v=>v.includes('least')&&v.includes('connection')},
+  {q:'What pattern prevents a failing service from being flooded after recovery?',answer:'Circuit breaker',acceptFn:v=>v.includes('circuit')||v.includes('breaker')},
+  {q:'What tool shows listening sockets and established connections?',answer:'ss or netstat',acceptFn:v=>v.includes('ss')||v.includes('netstat')},
+  {q:'What does mTLS stand for and why is it used?',answer:'Mutual TLS — both client and server authenticate each other',acceptFn:v=>v.includes('mutual')||v.includes('mtls')},
+  {q:'What three patterns make communication systems resilient?',answer:'Retries, backpressure, circuit breakers',acceptFn:v=>v.includes('retry')||v.includes('backpressure')||v.includes('circuit')},
+];
+
+/* ── SPACED EXIT ── */
+const SPACED_EXIT = [
+  null,
+  {q:'Name three common ports and their default services.',answer:'80 HTTP, 443 HTTPS, 22 SSH, 5432 PostgreSQL',acceptFn:v=>v.includes('80')||v.includes('443')||v.includes('22')||v.includes('5432')},
+  {q:'What is the difference between HTTP/1.1 and HTTP/2?',answer:'HTTP/2 is binary, multiplexed, header compression, server push',acceptFn:v=>v.includes('binary')||v.includes('multiplex')||v.includes('header')},
+  {q:'What happens if DNS TTL is set too low?',answer:'Increased query load on authoritative servers and potential resolution delays',acceptFn:v=>v.includes('ttl')||v.includes('low')||v.includes('query')},
+  {q:'Why is default-deny the foundation of zero-trust networking?',answer:'Only explicitly allowed traffic is permitted — reduces attack surface',acceptFn:v=>v.includes('deny')||v.includes('explicit')},
+  {q:'What are health checks used for in load balancers?',answer:'Automatically remove unhealthy backend instances from rotation',acceptFn:v=>v.includes('health')||v.includes('unhealthy')},
+  {q:'Name two benefits of a service mesh.',answer:'mTLS, traffic routing, observability, circuit breaking — all without changing application code',acceptFn:v=>v.includes('mtls')||v.includes('observ')||v.includes('circuit')},
+  {q:'What does traceroute show you?',answer:'The path packets take and where they are dropped or delayed',acceptFn:v=>v.includes('path')||v.includes('route')||v.includes('hop')},
+  {q:'What is the difference between a VPN and mTLS?',answer:'VPN secures the entire network tunnel; mTLS secures individual service-to-service connections',acceptFn:v=>v.includes('vpn')||v.includes('mtls')||v.includes('tunnel')},
+  {q:'What does backpressure mean in resilient systems?',answer:'Slowing down producers when consumers are overwhelmed to prevent overload',acceptFn:v=>v.includes('backpressure')||v.includes('slow')||v.includes('producer')},
+];
+
+/* ── DEEP DIVE CONTENT ── */
+const DEEP_DIVE = [
+  null,
+  {title:'TCP vs UDP in Production Reality',body:'TCP guarantees delivery and order but adds latency and overhead. UDP is fire-and-forget — perfect for DNS, VoIP, and game traffic. In 2026 fleets, most internal service communication is still TCP (HTTP/gRPC), but QUIC (UDP-based HTTP/3) is rapidly replacing it for external traffic because it eliminates head-of-line blocking and reduces handshake latency.'},
+  {title:'HTTP/2 and HTTP/3 in the Wild',body:'HTTP/2 brought multiplexing and header compression. HTTP/3 (QUIC) runs over UDP and removes the TCP handshake entirely. In practice, HTTP/3 reduces tail latency dramatically for mobile users on flaky networks. The real ops challenge: legacy load balancers and CDNs that still only support HTTP/2 — forcing fallback to older protocols under load.'},
+  {title:'DNS Caching and the 5-Second Rule',body:'Every resolver caches records according to the TTL. Too low = massive query load. Too high = stale records during failovers. Production teams use short TTLs (60s) for critical services with aggressive negative caching and anycast DNS to keep resolution under 50ms even during regional outages.'},
+  {title:'Zero-Trust vs Traditional Firewalls',body:'Traditional firewalls trust internal traffic. Zero-trust assumes every packet — internal or external — is hostile. In practice this means mTLS everywhere, strict network policies enforced by the service mesh, and no "internal only" ports open. The migration pain is real: every service suddenly needs an identity and policy.'},
+  {title:'Canary Deployments Done Right',body:'True canary means routing a small percentage of real production traffic to the new version while monitoring error rates, latency, and business metrics. If anything degrades, the load balancer instantly shifts traffic back. The key is health checks plus observability — not just "the pod started."'},
+  {title:'mTLS in Service Meshes',body:'mTLS is table stakes in zero-trust. The mesh issues short-lived certificates to every workload. Every service-to-service call is mutually authenticated and encrypted. No more plaintext traffic between pods. The operational win: you get automatic encryption and observability with zero application changes.'},
+  {title:'tcpdump in Production',body:'When everything looks fine in metrics but users report failures, tcpdump + Wireshark is still the ultimate truth. Capture on the exact interface, filter by port or IP, and look for retransmits, RSTs, or unexpected FINs. The real skill is knowing when to run it and how to read the output under pressure.'},
+  {title:'Certificate Rotation at Scale',body:'Certificates expire. In a fleet of 500 services, that means thousands of certs rotating daily. The only sustainable way is automated short-lived certs (hours or days) issued by a CA integrated with your service mesh or orchestrator. Manual rotation is a recipe for midnight outages.'},
+  {title:'Resilient Communication Patterns',body:'Retries with exponential backoff + jitter prevent thundering herds. Circuit breakers stop cascading failures. Backpressure (via queues or rate limiting) protects downstream services. Observability (metrics + distributed traces) tells you exactly which link in the chain is breaking. Together they keep the fleet talking even when parts of it are on fire.'},
+];
+
+/* ── WHATIF SCENARIOS ── */
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'What if you used UDP where TCP was required?',alt:'A developer used UDP for an internal API call because "it\'s faster."',outcome:'Result: packets were silently dropped during congestion. The service appeared healthy but 18% of requests never reached the backend. Users saw intermittent 504s for 4 hours before someone ran tcpdump and saw the missing packets.',learning:'UDP is great for real-time, terrible for APIs that need reliability. Know when each protocol is appropriate.'},
+  {title:'What if you skipped the TLS handshake verification?',alt:'To "make debugging easier" the team disabled certificate validation in staging.',outcome:'Result: In production a MITM attack injected malicious responses. The attacker had a valid cert for a subdomain. 47,000 user sessions were hijacked before the anomaly was noticed.',learning:'Never disable TLS verification in production. Even in staging, use proper certs.'},
+  {title:'What if DNS caching was disabled?',alt:'An engineer set TTL=0 on a critical service record "to make changes instant."',outcome:'Result: The authoritative DNS servers were hammered with 800k queries per minute during a traffic spike. Resolution latency jumped from 40ms to 1.8s. The entire region went down.',learning:'DNS caching exists for a reason. Use short but non-zero TTLs and proper negative caching.'},
+  {title:'What if firewall rules were too permissive?',alt:'The team used a broad "internal only" rule instead of least-privilege.',outcome:'Result: A compromised service account could reach every database in the fleet. Lateral movement took 90 seconds. The blast radius was the entire production environment.',learning:'Zero-trust starts with explicit allow rules only. Default-deny is not optional.'},
+  {title:'What if load balancer health checks were missing?',alt:'A new service was added without health checks.',outcome:'Result: The load balancer kept sending traffic to a crashing instance. Error rate spiked to 65%. Users saw 502s for 22 minutes until someone noticed the missing health check config.',learning:'Health checks are not optional. They are how load balancers know who is actually healthy.'},
+  {title:'What if service discovery was static IPs?',alt:'The team hard-coded IP addresses instead of using service discovery.',outcome:'Result: When instances scaled or moved, half the fleet lost connectivity. The outage lasted until manual config updates were pushed to every service.',learning:'In dynamic fleets, discovery (DNS or mesh) is required. Hard-coded IPs do not survive reality.'},
+  {title:'What if you never ran tcpdump?',alt:'The team relied only on metrics and logs to debug a connectivity issue.',outcome:'Result: The real problem was a firewall dropping SYN packets. Metrics showed "high latency" but never the root cause. The issue persisted for 6 days.',learning:'Metrics lie. tcpdump tells the truth. Use both.'},
+  {title:'What if certificates were never rotated?',alt:'The team set certs to expire in 10 years "to avoid operational pain."',outcome:'Result: On expiration day the entire service mesh went down. All mTLS connections failed. The fleet was silent for 47 minutes while new certs were issued.',learning:'Short-lived, auto-rotated certificates are mandatory in zero-trust.'},
+  {title:'What if there were no retries or backpressure?',alt:'The team shipped a new service without any resilience patterns.',outcome:'Result: A single slow downstream dependency caused a cascade. The entire fleet hit connection pool exhaustion. Outage lasted 38 minutes.',learning:'Retries + backpressure + circuit breakers are not optional in distributed systems.'},
+];
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = [
+  null,
+  {title:'Wrong Transport Protocol',scenario:'A developer configured an internal API to use UDP "because it\'s faster":\n\nudpSocket.send(data, 0, data.length, 5432, \'backend.service\');\n\nThe backend never receives the data reliably. Why?',acceptFn:v=>v.includes('udp')||v.includes('tcp')||v.includes('reliable'),answer:'UDP is connectionless and offers no delivery guarantees. Use TCP (or QUIC) for APIs that require reliability.'},
+  {title:'Missing TLS Verification',scenario:'In staging, certificate validation was disabled:\n\ncurl --insecure https://staging.api.shipfleet.io\n\nThe team forgot to re-enable it in production. What is the risk?',acceptFn:v=>v.includes('insecure')||v.includes('verify')||v.includes('mitm')||v.includes('tls'),answer:'MITM attacks become possible. An attacker can present a fake certificate and read/modify traffic. Always verify certificates in production.'},
+  {title:'DNS TTL Too Low',scenario:'A critical service record was set with TTL=0:\n\ndns record set service.api 10.0.0.5 ttl=0\n\nDuring peak traffic the authoritative DNS was overwhelmed. What happened?',acceptFn:v=>v.includes('ttl')||v.includes('cache')||v.includes('authoritative'),answer:'Every client queried the authoritative server on every request. This created massive load and increased latency. Use sensible TTLs (60-300s) with proper caching.'},
+  {title:'Overly Permissive Firewall',scenario:'A firewall rule was written as "allow all internal traffic":\n\nfirewall allow 10.0.0.0/8 any any\n\nA compromised pod could reach every database. What is the correct zero-trust approach?',acceptFn:v=>v.includes('deny')||v.includes('least')||v.includes('explicit'),answer:'Default-deny + explicit allow rules per service and port. Zero-trust means no implicit internal trust.'},
+  {title:'Load Balancer Without Health Checks',scenario:'A new backend was added to the load balancer pool with no health checks:\n\nlb add backend 10.0.1.42\n\nThe instance crashed but traffic kept being routed to it. Result?',acceptFn:v=>v.includes('health')||v.includes('check')||v.includes('unhealthy'),answer:'The load balancer continued sending traffic to a dead backend, causing 5xx errors. Health checks must be configured to automatically remove unhealthy instances.'},
+];
+
+/* ── CHALLENGE SCENARIOS ── */
+const CHALLENGES = [
+  null,
+  {title:'Design a TCP Socket Connection',scenario:'You need to connect to a backend service on port 5432 using raw sockets. What are the three steps the kernel performs during a TCP handshake?',acceptFn:v=>v.includes('syn')||v.includes('ack')||v.includes('handshake')||v.includes('three'),answer:'1. Client sends SYN. 2. Server replies SYN-ACK. 3. Client sends ACK. This establishes a reliable, ordered connection.'},
+  {title:'Fix the HTTP/2 Issue',scenario:'An API is returning 502s under load. The load balancer is HTTP/1.1 only and the backend expects HTTP/2. What is the fix?',acceptFn:v=>v.includes('http/2')||v.includes('upgrade')||v.includes('h2c')||v.includes('protocol'),answer:'Enable protocol upgrade (h2c) or switch to a modern load balancer that supports native HTTP/2. Alternatively, terminate TLS at the load balancer and use HTTP/2 between LB and backend.'},
+  {title:'DNS Resolution Failure',scenario:'A service cannot resolve "db.internal". nslookup returns NXDOMAIN. What are the three most likely causes?',acceptFn:v=>v.includes('cname')||v.includes('record')||v.includes('ttl')||v.includes('zone'),answer:'1. Missing A/AAAA record. 2. DNS zone not propagated. 3. Resolver cache is stale or misconfigured. Check the authoritative nameserver first.'},
+  {title:'Firewall Blocking Legitimate Traffic',scenario:'A new service cannot reach the database. The firewall log shows "DROP". How do you fix it in zero-trust?',acceptFn:v=>v.includes('rule')||v.includes('allow')||v.includes('explicit')||v.includes('policy'),answer:'Add an explicit firewall rule allowing traffic from the service\'s identity (or pod CIDR) to the database port. Never use broad "internal" rules.'},
+  {title:'Load Balancer Health Check Failure',scenario:'A backend is healthy but the load balancer marks it unhealthy. The health check endpoint returns 200. What is the likely cause?',acceptFn:v=>v.includes('health')||v.includes('check')||v.includes('path')||v.includes('port'),answer:'The health check is hitting the wrong path, port, or expecting a different status code/body. Verify the exact health check configuration matches what the backend actually returns.'},
+];
+
+/* ── PHASE DATA ── */
+const PHASES = [
+  null,
+  /* Phase 1: Ports & Protocols */
+  {title:'Understanding the Basics – Ports & Protocols',
+   lolaIntro:"The ship can’t fight if it can’t talk to its own systems.",
+   spacedRep:SPACED_CALLBACKS[1],
+   steps:[
+    {id:'p1s1',obj:'Map all open ports and configure basic connectivity',ctx:'The fleet has no idea what ports are listening. Start with the fundamentals.',
+     cmd:['comm ports map'],
+     accept:['comm ports map','comm ports','comm protocol'],
+     acceptFn:v=>v.includes('comm')&&(v.includes('port')||v.includes('protocol')),
+     hint:'Type: comm ports map',
+     out:'PORTS MAPPED:\n\n  22/tcp   → SSH (management)\n  80/tcp   → HTTP (public APIs)\n  443/tcp  → HTTPS (secure APIs)\n  5432/tcp → PostgreSQL (internal DB)\n  8080/tcp → Internal services\n\nTCP configured for reliability. UDP enabled for DNS and real-time traffic.\nSockets bound. Connectivity baseline established.',
+     unlockCmd:'comm',
+     jit:{title:'TCP vs UDP — when to use each',body:'TCP: reliable, ordered, connection-oriented — perfect for APIs and databases. UDP: fast, no handshake, best-effort — perfect for DNS, video, telemetry. Choose wrong and you either waste bandwidth or lose data.'},
+     bridge:{title:'Most outages start with a misconfigured port or protocol',body:'Engineers who master the fundamentals prevent the most common connectivity failures before they ever reach production.',tags:['TCP','UDP','Ports','Sockets']},
+     teach:{title:'The three things every port mapping must verify',body:'(1) Correct protocol (TCP/UDP). (2) Correct port number. (3) Firewall rules allow the traffic. Missing any one breaks communication.'}},
+    {id:'p1s2',obj:'Configure socket options for production traffic',ctx:'Default socket settings cause connection resets under load. Harden them now.',
+     cmd:['comm protocol config'],
+     accept:['comm protocol config','comm protocol'],
+     acceptFn:v=>v.includes('comm')&&v.includes('protocol'),
+     hint:'Type: comm protocol config',
+     out:'SOCKET CONFIGURATION:\n\n  SO_REUSEADDR: enabled\n  SO_KEEPALIVE: enabled (detect dead peers)\n  TCP_NODELAY: enabled (disable Nagle for low latency)\n  TCP_FASTOPEN: enabled (reduce handshake latency)\n  UDP buffer sizes increased for high-throughput services\n\nAll services now use production-grade socket settings.',
+     jit:{title:'Why SO_KEEPALIVE and TCP_NODELAY matter',body:'SO_KEEPALIVE detects dead connections. TCP_NODELAY prevents 200ms delays caused by Nagle\'s algorithm. Both are required for responsive microservices.'},
+     bridge:{title:'Socket configuration is invisible until it breaks',body:'Correct socket options prevent the mysterious connection resets and latency spikes that plague most fleets.',tags:['Sockets','TCP_NODELAY','Keepalive']},
+     teach:{title:'The five socket options every service should set',body:'SO_REUSEADDR, SO_KEEPALIVE, TCP_NODELAY, TCP_FASTOPEN, and proper buffer sizes. These are the difference between "works in dev" and "survives production traffic."'},
+     quiz:{q:'A developer says "UDP is always faster so we should use it everywhere." What is the flaw?',
+      opts:['They are correct — UDP has no overhead','UDP offers no delivery guarantees or ordering','UDP is only faster on local networks','UDP is the same as TCP in practice'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. UDP is connectionless and best-effort. It can lose packets, reorder them, or duplicate them. Use it only when you can tolerate loss (DNS, video, telemetry).'}}],
+   breakit:BREAKIT[1],
+   done:'Ports mapped. Protocols configured. The fleet can now talk.',
+   ach:'gatekeeper'},
+
+  /* Phase 2: HTTP & HTTPS Deep Dive */
+  {title:'HTTP & HTTPS Deep Dive',
+   lolaIntro:"Everything on this ship eventually travels over HTTP. You need to speak it fluently.",
+   spacedRep:SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Probe all HTTP endpoints and verify methods',ctx:'Some services only accept GET. Others expect POST. Map the contract.',
+     cmd:['http probe'],
+     accept:['http probe','http configure'],
+     acceptFn:v=>v.includes('http')&&(v.includes('probe')||v.includes('method')),
+     hint:'Type: http probe',
+     out:'HTTP PROBE COMPLETE:\n\n  GET  /health          → 200 OK\n  POST /api/v1/payments → 201 Created\n  GET  /api/v1/users     → 200 OK\n  PUT  /api/v1/profile   → 200 OK\n\nTLS 1.3 enforced. HTTP/2 enabled. All endpoints now speak modern HTTP.',
+     unlockCmd:'http',
+     jit:{title:'HTTP methods and idempotency',body:'GET, HEAD, OPTIONS are safe and idempotent. PUT, DELETE are idempotent. POST is not. Understanding this prevents duplicate charges and broken retries.'},
+     bridge:{title:'HTTP is the language of the modern fleet',body:'Every frontend, every API gateway, every microservice speaks HTTP. Fluency here is non-negotiable.',tags:['HTTP','Methods','Status Codes']},
+     teach:{title:'The HTTP status code classes you must know',body:'1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error. 429 Too Many Requests and 503 Service Unavailable are your friends in production.'}},
+    {id:'p2s2',obj:'Configure and verify the full TLS handshake',ctx:'Some connections are still using TLS 1.2. Upgrade everything to 1.3.',
+     cmd:['http tls handshake'],
+     accept:['http tls handshake','http tls'],
+     acceptFn:v=>v.includes('http')&&v.includes('tls'),
+     hint:'Type: http tls handshake',
+     out:'TLS HANDSHAKE CONFIGURED:\n\n  Version: TLS 1.3 only\n  Cipher: AES-256-GCM\n  Certificates: auto-rotated every 30 days\n  HSTS: max-age=31536000; includeSubDomains\n  OCSP stapling enabled\n\nAll services now negotiate modern, secure TLS.',
+     jit:{title:'Why TLS 1.3 is dramatically better',body:'Single round-trip handshake, no legacy ciphers, forward secrecy by default, and protection against downgrade attacks. It is the only version you should allow in 2026.'},
+     bridge:{title:'Broken TLS is the #1 cause of "it works in staging" bugs',body:'Engineers who master the TLS handshake prevent the mysterious connection failures that waste entire engineering days.',tags:['TLS','HTTPS','Certificates']},
+     teach:{title:'The TLS handshake in four steps',body:'1. ClientHello. 2. ServerHello + certificate. 3. Key exchange. 4. Finished. Every step must succeed or the connection is rejected.'},
+     quiz:{q:'A service is returning "SSL handshake failed" in production but works locally. What is the most likely cause?',
+      opts:['Wrong port','Expired certificate','TLS version mismatch','Firewall blocking port 443'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. Production load balancers often enforce TLS 1.3 only while local dev still allows 1.2. Always verify the TLS version and cipher suite in production.'}}],
+   breakit:BREAKIT[2],
+   done:'HTTP and HTTPS fully operational. The web layer is fluent.',
+   ach:'webmaster'},
+
+  /* Phase 3: DNS & Name Resolution */
+  {title:'DNS & Name Resolution',
+   lolaIntro:"Before anything can connect, it first has to know where to go.",
+   spacedRep:SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Perform DNS lookups and verify records',ctx:'Services are using IP addresses instead of names. Fix that now.',
+     cmd:['dns query'],
+     accept:['dns query','dns resolve'],
+     acceptFn:v=>v.includes('dns')&&(v.includes('query')||v.includes('resolve')),
+     hint:'Type: dns query',
+     out:'DNS QUERY RESULTS:\n\n  api.shipfleet.io     → A     10.0.0.42\n  db.internal          → A     10.0.1.15\n  cache.internal       → CNAME redis.internal\n  mail.shipfleet.io    → MX    10 mail1.shipfleet.io\n\nAll records validated. Caching configured with 300s TTL.',
+     unlockCmd:'dns',
+     jit:{title:'CNAME vs A records — when to use each',body:'Use A/AAAA for final IP addresses. Use CNAME for aliases (e.g., www → app). Never CNAME the apex domain.'},
+     bridge:{title:'DNS is the phone book of the internet',body:'If DNS fails, nothing else works. Engineers who master DNS keep the fleet discoverable.',tags:['DNS','A record','CNAME','TTL']},
+     teach:{title:'The DNS resolution process in six steps',body:'1. Local cache. 2. Recursive resolver. 3. Root nameserver. 4. TLD nameserver. 5. Authoritative nameserver. 6. Response cached.'}},
+    {id:'p3s2',obj:'Troubleshoot and fix DNS resolution failures',ctx:'Some services cannot resolve internal names. Diagnose and repair.',
+     cmd:['dns resolve'],
+     accept:['dns resolve','dns troubleshoot'],
+     acceptFn:v=>v.includes('dns')&&(v.includes('resolve')||v.includes('troubleshoot')),
+     hint:'Type: dns resolve',
+     out:'DNS TROUBLESHOOTING COMPLETE:\n\n  Fixed: missing internal zone delegation\n  Fixed: stale negative cache on recursive resolver\n  Fixed: incorrect CNAME chain (loop detected)\n\nAll services now resolve correctly. DNS is healthy.',
+     jit:{title:'Negative caching and why it matters',body:'When a record does not exist, resolvers cache the NXDOMAIN response. Too long and you stay broken longer than necessary.'},
+     bridge:{title:'DNS failures are invisible until they are catastrophic',body:'A single bad record can take an entire region offline. Mastering DNS troubleshooting is a career differentiator.',tags:['DNS troubleshooting','Resolution','Caching']},
+     teach:{title:'The three most common DNS failure modes',body:'1. Missing record. 2. Stale cache. 3. Authority misconfiguration. Always check the authoritative nameserver first.'},
+     quiz:{q:'A service cannot resolve "redis.internal" but nslookup works from your laptop. What is the most likely cause?',
+      opts:['Firewall blocking DNS','Recursive resolver cache stale','Service not registered in internal zone','DNS server down'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. In containerized environments the service may not be registered in the internal DNS zone used by the application. The laptop uses public DNS.'}}],
+   breakit:BREAKIT[3],
+   done:'DNS resolution reliable. The fleet knows where everything is.',
+   ach:'resolver'},
+
+  /* Phase 4: Firewalls, Network Security & Access Control */
+  {title:'Firewalls, Network Security & Access Control',
+   lolaIntro:"We can’t have every system talking to every other system freely.",
+   spacedRep:SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Apply strict firewall rules and zero-trust policies',ctx:'Current rules allow too much. Lock it down.',
+     cmd:['firewall rule apply'],
+     accept:['firewall rule apply','firewall zero-trust'],
+     acceptFn:v=>v.includes('firewall')&&(v.includes('rule')||v.includes('zero-trust')),
+     hint:'Type: firewall rule apply',
+     out:'FIREWALL RULES APPLIED:\n\n  Default policy: DENY ALL\n  Explicit allows:\n    • api → db:5432\n    • frontend → api:443\n    • internal services: only mTLS ports\n\nZero-trust enabled. Ingress/egress fully controlled.',
+     unlockCmd:'firewall',
+     jit:{title:'Default-deny is the foundation of zero-trust',body:'Assume nothing is trusted. Only explicitly allowed traffic is permitted. This prevents lateral movement if one service is compromised.'},
+     bridge:{title:'Overly permissive firewalls are the #1 cause of internal breaches',body:'Zero-trust network policies are now table stakes for any serious fleet.',tags:['Zero-trust','Firewall','Network policy']},
+     teach:{title:'The four questions every firewall rule must answer',body:'Who (source)? To whom (destination)? What port/protocol? Why (business justification)? If you cannot answer all four, the rule should not exist.'}},
+    {id:'p4s2',obj:'Enforce mTLS between all internal services',ctx:'Internal traffic is still plaintext. Fix that immediately.',
+     cmd:['firewall zero-trust enable'],
+     accept:['firewall zero-trust enable','firewall mTLS'],
+     acceptFn:v=>v.includes('firewall')&&v.includes('zero-trust'),
+     hint:'Type: firewall zero-trust enable',
+     out:'ZERO-TRUST ENFORCED:\n\n  mTLS required for all internal traffic\n  SPIFFE identities assigned to every workload\n  Network policies enforced at the mesh level\n  All plaintext internal ports now blocked\n\nThe fleet now operates under strict zero-trust principles.',
+     jit:{title:'Why mTLS is required in zero-trust',body:'Every service must prove its identity to every other service. Certificates provide cryptographic proof that cannot be spoofed.'},
+     bridge:{title:'Zero-trust is now the default for any serious architecture',body:'Perimeter-based security died years ago. Engineers who design zero-trust networks are in high demand.',tags:['mTLS','Zero-trust','SPIFFE']},
+     teach:{title:'Zero-trust in practice',body:'Never trust based on network location. Always verify identity, authorization, and encryption for every request — even inside your own VPC.'},
+     quiz:{q:'A developer says "we\'re inside the VPC so we don\'t need mTLS." What is the flaw?',
+      opts:['They are correct — internal traffic is trusted','A compromised service inside the VPC can reach everything','VPC security groups are sufficient','mTLS is only for external traffic'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Once an attacker is inside the network (supply-chain attack, stolen credentials, etc.), they can move laterally without mTLS. Zero-trust removes the concept of "inside."'}}],
+   breakit:BREAKIT[4],
+   done:'Firewalls locked. Zero-trust enforced. The fleet is no longer a free-for-all.',
+   ach:'firewaller'},
+
+  /* Phase 5: Load Balancing & Traffic Management */
+  {title:'Load Balancing & Traffic Management',
+   lolaIntro:"When thousands of escape pods request help at once, someone has to direct the traffic.",
+   spacedRep:SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Configure load balancer with health checks',ctx:'Traffic is not being distributed. Add intelligence.',
+     cmd:['lb configure'],
+     accept:['lb configure','lb healthcheck'],
+     acceptFn:v=>v.includes('lb')&&(v.includes('configure')||v.includes('health')),
+     hint:'Type: lb configure',
+     out:'LOAD BALANCER CONFIGURED:\n\n  Algorithm: least connections\n  Health checks: /health every 10s\n  Canary deployment enabled for new versions\n  Traffic split: 90% stable / 10% canary\n\nServices now stay responsive under load.',
+     unlockCmd:'lb',
+     jit:{title:'Least connections vs round-robin',body:'Least connections sends new traffic to the healthiest server. Round-robin is simpler but can overload a slow instance. Use least connections in production.'},
+     bridge:{title:'Load balancing is how you achieve high availability',body:'Without it, one slow or failing instance takes down the entire service.',tags:['Load balancer','Health checks','Canary']},
+     teach:{title:'The three things a good load balancer must do',body:'(1) Distribute traffic intelligently. (2) Detect and remove unhealthy backends. (3) Support canary/gradual rollouts.'}},
+    {id:'p5s2',obj:'Implement canary deployments and traffic shifting',ctx:'New versions must be tested in production safely.',
+     cmd:['lb healthcheck add'],
+     accept:['lb healthcheck add','lb canary'],
+     acceptFn:v=>v.includes('lb')&&(v.includes('health')||v.includes('canary')),
+     hint:'Type: lb healthcheck add',
+     out:'CANARY DEPLOYMENT ACTIVE:\n\n  5% of traffic routed to new version\n  Monitoring: error rate, latency, business metrics\n  Automatic rollback if degradation detected\n  Full rollout in 30 minutes if healthy\n\nSafe, controlled releases achieved.',
+     jit:{title:'Canary deployments vs blue-green',body:'Canary sends a percentage of real traffic to the new version. Blue-green switches 100% at once. Canary gives you real production feedback with minimal risk.'},
+     bridge:{title:'Canary deployments are how mature teams ship safely',body:'They let you test in production without betting the entire fleet.',tags:['Canary','Traffic management','Rollout']},
+     teach:{title:'Canary best practices',body:'Start at 5-10%, monitor key metrics for 15-30 minutes, then ramp up. Always have automatic rollback on any degradation.'},
+     quiz:{q:'Your new version is receiving 5% of traffic. Error rate is normal but latency is 40% higher. What should you do?',
+      opts:['Immediately roll out to 100%','Wait 30 minutes to see if it stabilizes','Roll back the canary immediately','Increase the percentage to gather more data'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. Higher latency is a clear regression. Roll back the canary immediately to protect users.'}}],
+   breakit:BREAKIT[5],
+   done:'Load balancing and traffic management operational. The fleet stays responsive.',
+   ach:'traffic'},
+
+  /* Phase 6: Service Discovery & Microservices Communication */
+  {title:'Service Discovery & Microservices Communication',
+   lolaIntro:"In a real fleet, services come and go. You need to know how they find each other.",
+   spacedRep:SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Configure service discovery for dynamic instances',ctx:'Hard-coded IPs are failing as services scale.',
+     cmd:['discover service'],
+     accept:['discover service','discover mesh'],
+     acceptFn:v=>v.includes('discover')&&(v.includes('service')||v.includes('mesh')),
+     hint:'Type: discover service',
+     out:'SERVICE DISCOVERY ENABLED:\n\n  DNS-based discovery for internal services\n  Service mesh (Istio) configured\n  mTLS automatically enforced\n  Traffic routing rules applied\n\nServices now find each other dynamically.',
+     unlockCmd:'discover',
+     jit:{title:'DNS vs service mesh discovery',body:'DNS is simple but limited. A service mesh adds mTLS, traffic routing, and observability without changing application code.'},
+     bridge:{title:'Service meshes are the modern way to do microservices',body:'They solve discovery, security, and observability in one layer.',tags:['Service mesh','Discovery','mTLS']},
+     teach:{title:'Service discovery in dynamic environments',body:'Never hard-code IPs. Use DNS or a service mesh so instances can scale, move, or fail without breaking the fleet.'}},
+    {id:'p6s2',obj:'Enable mTLS and circuit breakers in the mesh',ctx:'Service-to-service calls are still insecure and fragile.',
+     cmd:['discover mesh config'],
+     accept:['discover mesh config','discover circuit'],
+     acceptFn:v=>v.includes('discover')&&v.includes('mesh'),
+     hint:'Type: discover mesh config',
+     out:'SERVICE MESH CONFIGURED:\n\n  mTLS enabled for all service-to-service traffic\n  Circuit breakers on every outbound call\n  Retry policies with exponential backoff\n  Observability (metrics + traces) enabled\n\nMicroservices communication is now secure and resilient.',
+     jit:{title:'Circuit breakers prevent cascading failures',body:'When a downstream service is failing, the breaker opens and calls fail fast instead of waiting for timeouts.'},
+     bridge:{title:'mTLS + circuit breakers = resilient microservices',body:'This combination is what keeps fleets alive when individual services fail.',tags:['mTLS','Circuit breaker','Resilience']},
+     teach:{title:'Service mesh superpowers',body:'Automatic mTLS, intelligent routing, circuit breaking, retries, and full observability — all without changing your application code.'},
+     quiz:{q:'A service is failing because it is being flooded with requests from a recovering upstream service. What pattern prevents this?',
+      opts:['Rate limiting','Circuit breaker','Backpressure','Retries with jitter'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. The circuit breaker prevents the thundering herd of retries when a service recovers.'}}],
+   breakit:BREAKIT[5], // reuse a suitable one or adapt
+   done:'Service discovery and mesh communication fully operational.',
+   ach:'mesh_master'},
+
+  /* Phase 7: Debugging Network Issues */
+  {title:'Debugging Network Issues',
+   lolaIntro:"When the ship goes silent, everyone looks at you.",
+   spacedRep:SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Use network debugging tools to diagnose connectivity',ctx:'A service cannot reach the database. Find out why.',
+     cmd:['net debug'],
+     accept:['net debug','net trace'],
+     acceptFn:v=>v.includes('net')&&(v.includes('debug')||v.includes('trace')),
+     hint:'Type: net debug',
+     out:'NETWORK DEBUG COMPLETE:\n\n  ss -tuln → showed correct listening port\n  curl -v → showed connection refused\n  tcpdump → revealed firewall dropping SYN packets\n  traceroute → confirmed path\n\nRoot cause identified: missing firewall rule.',
+     unlockCmd:'net',
+     jit:{title:'The debugging order that actually works',body:'1. ss/netstat (what is listening). 2. curl (can I reach it). 3. tcpdump (what is actually happening on the wire).'},
+     bridge:{title:'Network debugging skill separates juniors from seniors',body:'The person who can fix connectivity issues in minutes becomes indispensable.',tags:['Debugging','tcpdump','traceroute']},
+     teach:{title:'Your network debugging toolkit',body:'curl, ss, netstat, tcpdump, traceroute, dig/nslookup. Master these and you can diagnose any connectivity problem.'}},
+    {id:'p7s2',obj:'Trace and fix a complex routing issue',ctx:'Traffic is being blackholed somewhere in the mesh.',
+     cmd:['net trace'],
+     accept:['net trace','net troubleshoot'],
+     acceptFn:v=>v.includes('net')&&(v.includes('trace')||v.includes('troubleshoot')),
+     hint:'Type: net trace',
+     out:'ROUTING TRACE COMPLETE:\n\n  Packet captured at every hop\n  Identified: misconfigured service mesh virtual service\n  Fixed: traffic now routed correctly\n  Latency reduced from 800ms to 42ms\n\nConnectivity restored.',
+     jit:{title:'traceroute and tcpdump are still the ultimate truth',body:'Metrics can lie. The wire never does.'},
+     bridge:{title:'Fast network debugging is a career superpower',body:'When the fleet is down, the person who can find the problem in minutes saves the day.',tags:['Network debugging','Observability']},
+     teach:{title:'The golden rule of network debugging',body:'Trust the packet, not the logs. Always go to the wire when something doesn\'t add up.'},
+     quiz:{q:'You see high latency but metrics look fine. What is your next step?',
+      opts:['Restart the service','Check the load balancer','Run tcpdump on the affected path','Increase resources'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. Metrics are aggregated and can hide the truth. tcpdump shows exactly what is happening on the wire.'}}],
+   breakit:BREAKIT[5],
+   done:'Network debugging mastered. You can now fix connectivity problems fast.',
+   ach:'debugger'},
+
+  /* Phase 8: Secure Communication & Encryption */
+  {title:'Secure Communication & Encryption',
+   lolaIntro:"The enemy is always listening. Make sure they hear nothing useful.",
+   spacedRep:SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Set up mTLS for all service-to-service traffic',ctx:'Internal traffic is still unencrypted. Secure it now.',
+     cmd:['secure mtls setup'],
+     accept:['secure mtls setup','secure tunnel'],
+     acceptFn:v=>v.includes('secure')&&(v.includes('mtls')||v.includes('tunnel')),
+     hint:'Type: secure mtls setup',
+     out:'mTLS ENABLED FLEET-WIDE:\n\n  SPIFFE identities issued to every workload\n  Mutual TLS enforced on all internal calls\n  Certificates auto-rotated every 4 hours\n  All plaintext internal traffic now blocked\n\nSecure communication established.',
+     unlockCmd:'secure',
+     jit:{title:'mTLS is the modern VPN',body:'Instead of one big tunnel, every service pair has its own cryptographic identity and encrypted channel.'},
+     bridge:{title:'Encryption in transit is no longer optional',body:'mTLS is the standard for zero-trust fleets in 2026.',tags:['mTLS','Encryption','Certificates']},
+     teach:{title:'mTLS in practice',body:'Every service presents a certificate. Every service verifies the other side. No more plaintext between services.'}},
+    {id:'p8s2',obj:'Configure secure tunnels and certificate management',ctx:'External and admin traffic still uses weak encryption.',
+     cmd:['secure tunnel'],
+     accept:['secure tunnel','secure certificate'],
+     acceptFn:v=>v.includes('secure')&&v.includes('tunnel'),
+     hint:'Type: secure tunnel',
+     out:'SECURE TUNNELS CONFIGURED:\n\n  VPN for admin access\n  Certificate authority integrated with mesh\n  Automatic rotation and revocation\n  All external traffic forced through TLS 1.3\n\nEncryption is now comprehensive and automated.',
+     jit:{title:'Certificate rotation at scale',body:'Short-lived certificates + automation is the only way to manage encryption at fleet scale.'},
+     bridge:{title:'Secure communication is a competitive advantage',body:'Companies that get this right avoid breaches and move faster.',tags:['VPN','mTLS','Certificate management']},
+     teach:{title:'The secure communication checklist',body:'mTLS everywhere, short-lived certificates, automatic rotation, VPN for humans, and strict TLS version enforcement.'},
+     quiz:{q:'A service is using a 10-year certificate. What is the risk?',
+      opts:['None — longer is more secure','If compromised, the attacker has long-term access','Rotation is operationally painful','It violates compliance'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. A compromised long-lived certificate gives the attacker permanent access until you manually revoke it. Short-lived certs limit the blast radius.'}}],
+   breakit:BREAKIT[5],
+   done:'Secure communication and encryption fully implemented. The enemy hears nothing useful.',
+   ach:'encryptor'},
+
+  /* Phase 9: Designing Resilient Communication Systems */
+  {title:'Designing Resilient Communication Systems',
+   lolaIntro:"You are no longer just fixing connections. You are designing how the entire ship communicates.",
+   spacedRep:SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Design high-availability communication patterns',ctx:'The fleet must survive individual service failures.',
+     cmd:['design resilient'],
+     accept:['design resilient','design ha'],
+     acceptFn:v=>v.includes('design')&&(v.includes('resilient')||v.includes('ha')),
+     hint:'Type: design resilient',
+     out:'RESILIENT ARCHITECTURE DESIGNED:\n\n  Retries with exponential backoff + jitter\n  Circuit breakers on all outbound calls\n  Backpressure via rate limiting and queues\n  Multi-region failover patterns\n  Full observability (metrics + distributed traces)\n\nThe fleet can now survive partial failures.',
+     unlockCmd:'design',
+     jit:{title:'Retries without jitter cause thundering herds',body:'Add randomness to backoff so all clients don\'t retry at exactly the same time.'},
+     bridge:{title:'Resilient design is what separates good engineers from great ones',body:'Anyone can make it work when everything is healthy. Great engineers make it survive when things break.',tags:['Resilience','High availability','Observability']},
+     teach:{title:'The four pillars of resilient communication',body:'Retries, circuit breakers, backpressure, and observability. Together they keep the fleet talking even when parts of it are on fire.'}},
+    {id:'p9s2',obj:'Implement observability for the entire communication layer',ctx:'You cannot fix what you cannot see. Add full visibility.',
+     cmd:['design observability'],
+     accept:['design observability','design resilient'],
+     acceptFn:v=>v.includes('design')&&v.includes('observ'),
+     hint:'Type: design observability',
+     out:'OBSERVABILITY COMPLETE:\n\n  Distributed tracing across all services\n  Metrics for every hop (latency, error rate, throughput)\n  Logs correlated with traces\n  Alerting on anomalous communication patterns\n\nYou now have complete visibility into how the fleet talks.',
+     jit:{title:'Observability is the new monitoring',body:'Metrics + traces + logs correlated together let you understand the entire request flow, not just individual services.'},
+     bridge:{title:'Designing resilient systems is a CNO-level skill',body:'The engineers who can architect fault-tolerant communication are the ones who lead entire fleets.',tags:['Observability','Tracing','Resilience']},
+     teach:{title:'The three signals of observability',body:'Metrics (what is happening), traces (how requests flow), logs (why it happened). You need all three to debug complex systems.'},
+     isFinalBeforeBoss:true}],
+   done:null,
+   ach:null},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BOSS FIGHT — same structure, comms-themed scenario
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    id:'boss1',
+    scenario:'L.O.L.A. has gone offline. A massive communication storm has flooded the fleet with connection attempts.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The telemetry shows every service is timing out. Read the logs.',
+    prompt:'Read the telemetry logs.',
+    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('telem')||v.includes('trace'),
+    accept:['cat logs/telemetry.log','cat logs/storm.log','net debug'],
+    out:'[03:31:07] TELEMETRY: 1.8 million connection attempts in 45 seconds\n[03:31:07] All services reporting SYN flood from unknown source\n[03:31:08] DNS resolution latency spiked to 4.2s\n[03:31:09] mTLS handshakes failing across the mesh\n[03:31:09] Source: unknown external IPs — not in our allowlist',
+    hint:'Type: cat logs/telemetry.log'
+  },
+  {
+    id:'boss2',
+    scenario:'STEP 2 OF 5: A SYN flood is overwhelming the fleet. Services cannot reach each other.\n\nI note that the load balancers are not dropping the malicious traffic. I note this without offering my opinion on how this happened.\n\nContain this immediately.',
+    prompt:'Execute containment: block the storm.',
+    acceptFn:v=>v.includes('firewall')||v.includes('lb')||v.includes('block')||v.includes('contain'),
+    accept:['firewall rule apply','lb configure','respond contain'],
+    out:'CONTAINMENT EXECUTED:\n\n  ✓ Malicious IPs blocked at WAF and firewall\n  ✓ Rate limiting raised on all public endpoints\n  ✓ Circuit breakers opened to protect internal services\n  ✓ Load balancers now dropping excess connections\n\n[03:33] Storm contained. Fleet stabilizing.',
+    hint:'Type: firewall rule apply'
+  },
+  {
+    id:'boss3',
+    scenario:'STEP 3 OF 5: The flood is stopped. Now determine how the attacker bypassed our DNS and firewall rules.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin the forensic investigation.',
+    prompt:'Begin forensic investigation.',
+    acceptFn:v=>v.includes('net debug')||v.includes('dns')||v.includes('forensic')||v.includes('trace'),
+    accept:['net debug','dns resolve','net trace'],
+    out:'FORENSIC INVESTIGATION:\n\n  Timeline: attacker poisoned internal DNS cache 3 days ago\n  Root cause: missing DNSSEC validation on recursive resolver\n  Attack: forged responses directing traffic to malicious IPs\n  274,000 internal connections were misdirected\n\n  Inventory of impact: services reached wrong backends\n\n  Notification required to fleet operators.',
+    hint:'Type: net debug'
+  },
+  {
+    id:'boss4',
+    scenario:'STEP 4 OF 5: The root cause was a DNS cache poisoning attack. Our recursive resolver had no validation.\n\nI note that this is covered in Phase 3. I note it without irony.\n\nRun a full network audit and implement the systemic fix.',
+    prompt:'Run network audit and fix the root cause.',
+    acceptFn:v=>v.includes('net debug')||v.includes('firewall')||(v.includes('dns')&&v.includes('resolve')),
+    accept:['net debug','firewall rule apply','dns resolve'],
+    out:'NETWORK AUDIT COMPLETE:\n\n  Fixed: DNSSEC validation enabled on all resolvers\n  Fixed: Zero-trust firewall rules tightened\n  Fixed: mTLS enforced everywhere\n  Systemic fix: service mesh now validates all identities\n\nFleet communication is now hardened against cache poisoning.',
+    hint:'Type: net debug'
+  },
+  {
+    id:'boss5',
+    scenario:'STEP 5 OF 5: The attack is contained. The root cause is fixed.\n\nNow you must communicate. The entire fleet was affected. The CNO and bridge crew are waiting.\n\nYou have 90 minutes before the briefing. Write the executive brief and the fleet-wide notification plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most communications officers reveal the true limits of their composure.',
+    prompt:'Write the executive brief and notification plan.',
+    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    accept:['design resilient','policy brief','respond notify'],
+    out:'EXECUTIVE BRIEF: Communication Storm — 2026-04-18\n\nTo: CNO, Bridge Crew\nFrom: Officer '+G.name+'\n\nWhat happened:\n  DNS cache poisoning led to a SYN flood that overwhelmed the fleet.\n  Attack contained in under 3 minutes.\n\nWhat was impacted:\n  Temporary loss of inter-service connectivity\n  No data loss — all traffic was eventually dropped safely\n\nWhat we did:\n  Blocked malicious traffic\n  Fixed DNS validation and firewall rules\n  Rolled out mesh-wide mTLS enforcement\n\nPrevention:\n  DNSSEC now mandatory\n  Zero-trust rules enforced at every layer\n  Continuous network observability enabled\n\nStatus: Contained. Fleet fully operational.',
+    hint:'Type: design resilient  — executive brief and notification plan'
+  },
+];
+
+/* ── DOM REFS & UTILS (identical) ── */
+const $out = document.getElementById('output');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;$out.appendChild(d);$out.scrollTop=$out.scrollHeight;return d;
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — all identical to original, only data changes above */
+
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showBridge(br){
+  const tags=br.tags?br.tags.map(t=>`<span class="bridge-tag">${t}</span>`).join(''):'';
+  const w=document.createElement('div');w.className='bridge ln';
+  w.innerHTML=`<div class="bridge-hd">🌉 Career Bridge: ${br.title}</div><div class="bridge-bd">${br.body}<div style="margin-top:8px">${tags}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+let janetQuizAttempt=true;
+const _quizFeedbackMap={};
+function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
+
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb;
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
+
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:120px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('')}
+
+function unlock(id){
+  if(G.achievements.includes(id))return;G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{const a=ACHS.find(x=>x.id===id);if(!a)return'';return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`}).join('');
+}
+
+function renderGloss(){document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,"\\'")}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('')}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+const CMD_META={
+  'comm':    {label:'comm',    desc:'Ports & protocols'},
+  'http':    {label:'http',    desc:'HTTP/HTTPS'},
+  'dns':     {label:'dns',     desc:'DNS resolution'},
+  'firewall':{label:'firewall',desc:'Access control'},
+  'lb':      {label:'lb',      desc:'Load balancing'},
+  'discover':{label:'discover',desc:'Service discovery'},
+  'net':     {label:'net',     desc:'Network debugging'},
+  'secure':  {label:'secure',  desc:'Secure comms'},
+  'design':  {label:'design',  desc:'Resilient design'},
+};
+
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const c=document.getElementById('active-cmds-list');
+  if(G.unlockedCmds.length===0){c.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span>';return}
+  c.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k];if(!m)return'';return`<span class="ac-pill" onclick="document.getElementById('cmd').value='${m.label} ';document.getElementById('cmd').focus()" title="${m.desc}">${m.label}</span>`}).join('');
+}
+
+function addAgent(role,name){
+  G.agents.push({role,name});save();
+  const c=document.getElementById('crew-sec');
+  document.getElementById('crew-empty').style.display='none';
+  const tips={'Vuln Analyst':'Hunts for connectivity issues.','Pen Tester':'Tests network boundaries.','Threat Analyst':'Monitors for comms threats.'};
+  const d=document.createElement('div');d.className='agent-card';
+  d.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role}</div><div class="ac-status">active</div><div class="ac-tip">${tips[role]||'Comms specialist.'}</div>`;
+  d.onclick=()=>d.classList.toggle('open');
+  c.insertBefore(d,document.getElementById('crew-empty'));
+}
+
+function addCareerEntry(idx){
+  if(!CAREER_LOG_DATA[idx-1])return;
+  G.careerLog.push(idx);save();
+  document.getElementById('career-impact-btn').style.display='inline';
+}
+function renderCareer(){
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i-1];if(!d)return'';
+    return`<div class="career-item"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-ctx">${d.context}</div><div class="career-tags">${d.tags.map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function setLola(msg){
+  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+}
+function lolaComment(text){
+  const w=document.createElement('div');
+  w.className='ln ln-lola';
+  w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  telem('L.O.L.A.: '+text);
+}
+function lolaMotivate(){
+  const lines=["You're making me proud, Officer.","That's exactly how a real Comms Officer thinks.","One more solid move like that…","The fleet feels more connected already."];
+  lolaComment(lines[Math.floor(Math.random()*lines.length)]);
+}
+
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span> Show me the deep version`;
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];if(!dd)return;
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  lolaComment("That's the production-grade context. This is what separates engineers who know networking from engineers who do networking.");
+}
+
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  lolaComment("Want to see what would have happened if you chose a different path? Type: whatif");
+  G._pendingWhatIf=phaseIdx;
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  const body=document.getElementById('playbook-body');
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?`Phase ${phaseIdx} — ${ph.title}`:`Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={1:'Ports, protocols, TCP vs UDP — choose the right tool for the job.',2:'HTTP methods, status codes, TLS 1.3 only.',3:'DNS records, caching, TTLs — the phone book of the fleet.',4:'Default-deny firewall rules + zero-trust.',5:'Load balancers, health checks, canary deployments.',6:'Service meshes, mTLS, circuit breakers.',7:'curl, ss, tcpdump, traceroute — the debugging toolkit.',8:'mTLS everywhere, short-lived certificates.',9:'Retries, backpressure, observability — resilient by design.'};
+  const note=phNotes[phaseIdx]||'Communications control applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  lolaComment("Saved to your playbook! Type: playbook export to get it as markdown.");
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(G.playbook.length===0){body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';count.style.display='none';return}
+  count.style.display='inline';count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map((e,i)=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My Communications Playbook\n*Vibe Communications Officer — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  lolaComment("Playbook copied to clipboard!");
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
+function getProgressiveHint(val, s, wrongStreak){
+  const ph=PHASES[G.phase];
+  const vl=val.toLowerCase().trim();
+  const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
+  const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
+  let hint=base;
+  let levelLabel='HINT';
+  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'a comms command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
+  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function getPersonalizedTakeaway(){
+  if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
+  const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(!top)return;
+  const takeaways={'wrong_cmd':'You tried creative commands — curiosity is an asset.','close_cmd':'You were close — just needed the full subcommand.','repeated':'You found one approach and stuck with it. In networking, if something isn\'t working, the tool itself might be telling you something.'};
+  const key=top[0];
+  const msg=takeaways[key]||'You pushed through. That persistence is exactly what incident response requires.';
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">🧠 L.O.L.A. Insight <span class="diag-level-badge">PERSONAL</span></div><div class="diag-msg">${msg}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  G.mistakeTypes=[];save();
+}
+
+function syncObjCard(){
+  const ph=PHASES[G.phase];if(!ph){return}
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
+  const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
+  document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+}
+let eaglePhase=true;
+function revealCmd(){
+  document.getElementById('obj-cmd-val').classList.remove('blurred');
+  eaglePhase=false;
+  G.score=Math.max(0,G.score-5);
+  document.getElementById('score-n').textContent=G.score;
+  save();
+}
+
+function syncDots(){
+  const track=document.getElementById('phase-track');
+  track.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(G.completedPhases.includes(i)?' done':i===G.phase?' active':'');
+    const ph=PHASES[i];d.setAttribute('data-tip',ph?`P${i}: ${ph.title}`:`P${i}`);
+    track.appendChild(d);
+    if(i<9){const s=document.createElement('div');s.className='phase-sep';s.textContent='·';track.appendChild(s)}
+  }
+}
+
+const SAVE_KEY='vco_v1';
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
+
+const EASTER={
+  'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
+  'whoami':{handle:()=>{appendLine(`Communications Officer ${G.name} · Fleet Comms Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'neofetch':{handle:()=>{appendLine('comms-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-net 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Threat level: nominal','ln-sys')}},
+  'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last outage: contained in 4 minutes','ln-ok')}},
+  'ls':{handle:()=>{appendLine('logs/  configs/  certs/  policies/  runbooks/  mesh/','ln-code')}},
+  'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
+  'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+};
+
+function showDiag(val){
+  const vl=val.toLowerCase().trim();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!G.mistakeTypes)G.mistakeTypes=[];
+  if(!G.wrongStreak)G.wrongStreak=0;
+  G.wrongStreak=(G.wrongStreak||0)+1;
+  if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
+  else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
+  else{G.mistakeTypes.push('wrong_cmd')}
+  getProgressiveHint(val,s,G.wrongStreak);
+  G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function handleChallengeAnswer(val){
+  const ch=G.activeChallengeData;if(!ch)return false;
+  const vl=val.toLowerCase().trim();
+  if(ch.acceptFn&&ch.acceptFn(vl)){
+    appendLine('✓ CHALLENGE SOLVED: '+ch.title,'ln-ok');
+    appendLine(ch.answer,'ln-info');
+    G.activeChallengeData=null;
+    if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-5);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+function handleBreakitAnswer(val){
+  const bi=G.activeBreakitData;if(!bi)return false;
+  const vl=val.toLowerCase().trim();
+  if(bi.acceptFn&&bi.acceptFn(vl)){
+    appendLine('✓ BREAK-IT DIAGNOSED: '+bi.title,'ln-ok');
+    appendLine(bi.answer,'ln-info');
+    G.activeBreakitData=null;
+    if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-3);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+
+async function startPhase(){
+  const ph=PHASES[G.phase];if(!ph)return;
+  blank();divline();
+  appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
+  blank();
+  appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
+  blank();
+  if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  setLola(ph.steps[0].ctx);
+  syncObjCard();
+  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+}
+
+async function completeStep(s,ph){
+  G.step++;G.tries=0;G.wrongStreak=0;save();
+  await new Promise(r=>setTimeout(r,300));
+  lolaMotivate();
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.teach)showTeach(s.teach);
+  if(s.quiz&&s.quiz.janetQuiz){janetQuizAttempt=true;await showJanetQuizWithQ(s.quiz);blank();lolaComment("Whether you got that right or wrong — the fact you're here working through this matters.")}
+  if(G.step>=ph.steps.length){
+    await completePhase(ph);
+  } else {
+    const ns=ph.steps[G.step];
+    blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    setLola(ns.ctx);syncObjCard();
+    if(!G.hard&&!G.practitioner)showHint(ns.hint);
+    if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
+    save();
+  }
+}
+
+async function completePhase(ph){
+  if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
+  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  blank();divline();
+  if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
+  if(ph.ach)unlock(ph.ach);
+  if(eaglePhase)unlock('eagle');
+  eaglePhase=true;
+  addCareerEntry(G.phase);
+  const phaseDebriefs=[null,"Ports and protocols locked.","HTTP fluency achieved.","DNS resolution reliable.","Zero-trust enforced.","Load balancing operational.","Service mesh live.","Network debugging mastered.","Secure tunnels established.","Resilient communication designed."];
+  const debriefMsg=phaseDebriefs[G.phase];
+  if(debriefMsg){await delay(400);lolaComment(debriefMsg)}
+  const exitSR=SPACED_EXIT&&SPACED_EXIT[G.phase];
+  if(exitSR){blank();await showSpacedRep(exitSR);blank()}
+  G.completedPhases.push(G.phase);
+  if(G.phase===5)addAgent('Vuln Analyst','Cipher');
+  if(G.phase===6)addAgent('Pen Tester','Raven');
+  if(G.phase===7)addAgent('Threat Analyst','Specter');
+  await delay(300);getPersonalizedTakeaway();
+  await delay(400);
+  lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
+  await delay(500);
+  showWhatIfButton(G.phase);
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();
+  await startPhase();
+}
+
+async function startBossFight(){
+  G.bossActive=true;G.bossStep=0;G.bossScore=0;save();
+  blank();divline();
+  await delay(300);
+  appendLine('⚠ L.O.L.A.: [EMERGENCY SHUTDOWN INITIATED]','ln-warn');
+  await delay(600);
+  appendLine('⚠ L.O.L.A.: Communication storm detected…','ln-warn');
+  await delay(500);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  document.getElementById('lola-avatar').style.background='var(--silver-d)';
+  document.getElementById('lola-name').style.color='var(--muted)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  document.getElementById('lola-msg').textContent='Intelligence core offline.';
+  await delay(800);
+  appendLine('J.A.N.E.T.: Good evening. I have been asked to oversee your final assessment.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: There is an active communication storm in progress.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: You will need to apply everything you have learned.','ln-janet');
+  blank();await delay(500);
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  G.bossStep=idx;save();
+  const bs=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+  const w=document.createElement('div');w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ FINAL ASSESSMENT</div>
+      <div class="boss-sub">J.A.N.E.T. PROTOCOL · STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${bs.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Required Action</div>
+      <div class="boss-prompt">${bs.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  if(!G.hard&&!G.practitioner&&!G.expert)showHint(bs.hint);
+}
+
+function handleBossInput(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  const bs=BOSS_STEPS[G.bossStep];
+  const accepted=bs.acceptFn?bs.acceptFn(vl):bs.accept&&bs.accept.some(a=>vl===a.toLowerCase());
+  if(accepted){
+    appendLine(bs.out||'Action executed.','ln-ok');blank();
+    G.bossScore++;
+    if(G.bossStep+1<BOSS_STEPS.length){
+      G.bossStep++;save();
+      setTimeout(()=>showBossStep(G.bossStep),400);
+    } else {
+      G.bossActive=false;save();
+      completeBossFight();
+    }
+  } else {
+    appendLine('J.A.N.E.T.: That is not the correct action.','ln-janet');
+    G.score=Math.max(0,G.score-15);document.getElementById('score-n').textContent=G.score;save();
+  }
+}
+
+async function completeBossFight(){
+  blank();divline();
+  await delay(500);
+  appendLine('J.A.N.E.T.: The incident is contained. Your final assessment is complete.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: I am now going to acknowledge that you performed adequately.','ln-janet');
+  await delay(700);
+  appendLine('J.A.N.E.T.: Do not let this go to your head.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: L.O.L.A. can come back now.','ln-janet');
+  await delay(800);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  lolaComment("I'm back. Thank you for keeping the fleet talking.");
+  await delay(600);
+  appendLine(`L.O.L.A.: Officer ${G.name}. The fleet is connected.`,'ln-lola');
+  blank();divline();
+  appendLine('FLEET COMMUNICATION STATUS: ALL 50 SHIPS CONNECTED','ln-sys');
+  const steps=['Validating certification…','Ports & protocols: PASSED','HTTP/HTTPS: PASSED','DNS resolution: PASSED','Zero-trust: PASSED','Load balancing: PASSED','Service discovery: PASSED','Network debugging: PASSED','Secure tunnels: PASSED','Resilient design: PASSED','Final assessment: PASSED','Issuing certification…'];
+  for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('📡 COMMUNICATIONS CERTIFICATION GRANTED','ln-success');
+  appendLine(`Officer ${G.name} — Vibe Communications Officer · Class of 2026`,'ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('      COMMUNICATIONS CERTIFICATION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('boss_slayer');unlock('cno');
+  addCareerEntry(9);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase]){showWhatIf(pendingPhase)}
+    else{appendLine('No what-if scenario available.','ln-info')}
+    return;
+  }
+  appendLine(`${val}: executed.`,'ln-ok');
+}
+
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const lines=[
+    {t:'VIBE COMMUNICATIONS OFFICER v1.0',c:'ln-success'},
+    {t:'Booting fleet communications core…',c:'ln-sys'},
+    {t:'Ports & protocols: READY',c:'ln-sys'},
+    {t:'HTTP/HTTPS stack: READY',c:'ln-sys'},
+    {t:'DNS resolution: READY',c:'ln-sys'},
+    {t:'Firewall & zero-trust: READY',c:'ln-sys'},
+    {t:'Load balancing: STANDBY',c:'ln-sys'},
+    {t:'Service mesh: READY',c:'ln-sys'},
+    {t:'Network debugging tools: LOADED',c:'ln-sys'},
+    {t:'Secure tunnels: READY',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome aboard, Officer ${G.name}. The fleet is live.`,c:'ln-lola'},
+    {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    {t:'Ports. HTTP. DNS. Firewalls. Load balancing. Service discovery. Debugging. Encryption. Resilience.',c:'ln-lola'},
+    {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
+    {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: Try janet, whoami, neofetch, uptime',c:'ln-info'},
+    {t:'TIP: After each step → type  deep  to go deeper. After each phase → playbook save or whatif',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
+  if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
+  if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
+  appendLine(`Welcome back, Officer ${G.name}. Communications restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  renderPlaybook();
+  if(G.sandbox){
+    appendLine('Communications certification complete. Sandbox mode.','ln-success');
+  }else if(G.bossActive){
+    appendLine('Active storm in progress. J.A.N.E.T. is still waiting.','ln-warn');
+    blank();showBossStep(G.bossStep);
+  }else{
+    const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
+    if(ph&&s){
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(s.ctx);
+    }
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){if(confirm('Restart Vibe Communications Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function shareGrad(){
+  const txt=`Just completed Vibe Communications Officer 📡\n\nAll 9 phases: ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, debugging, secure comms, and resilient design.\n\nFree training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
+  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your communications operations?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+</script>
+</body>
+</html>

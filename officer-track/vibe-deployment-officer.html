@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Deployment Officer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#1db954;
+  --green-d:#0d5c28;
+  --green-bg:#040f09;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--silver)}50%{text-shadow:0 0 16px var(--silver),0 0 32px rgba(176,190,197,.2)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--silver)}
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--silver);border-color:var(--silver)}
+.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── TERMINAL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--silver)}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--silver);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--silver);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* ══ BOSS FIGHT ══ */
+.boss-container{margin:14px 0;border:2px solid var(--red);border-radius:var(--r8);overflow:hidden;animation:bossGlow 2s infinite;position:relative}
+.boss-header{background:linear-gradient(90deg,#1a0505,#0d0202);border-bottom:2px solid var(--red-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:14px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;animation:bossFlicker 3s infinite}
+.boss-sub{font-family:var(--janet);font-size:10px;color:var(--red-d);letter-spacing:.15em;margin-left:auto}
+.boss-body{background:#080202;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:#c47070;line-height:1.8;margin-bottom:12px;border-left:3px solid var(--red-d);padding-left:12px}
+.boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
+.boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--silver);background:var(--silver-bg)}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--silver)}
+
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+#crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
+.mbtn-p{background:var(--silver);color:#000;font-weight:700}
+.mbtn-p:hover{background:var(--silver-bright)}
+.mbtn-s{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
+.mbtn-s:hover{background:var(--b2);color:var(--text)}
+.boot-features{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--red);margin-right:6px}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
+input[type=text]:focus{border-color:var(--silver)}
+.grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
+.grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
+.grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
+.skills-list span{color:var(--green);margin-right:8px}
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:22px;flex-shrink:0}
+.ach-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ach-desc{font-size:11px;color:var(--muted2)}
+.gloss-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;margin-bottom:4px}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:11px;color:var(--muted2);line-height:1.65}
+.career-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.career-item:last-child{border-bottom:none}
+.career-phase{font-size:11px;color:var(--cyan);margin-bottom:4px}
+.career-stat{font-size:22px;font-weight:700;color:var(--silver);margin-bottom:3px}
+.career-ctx{font-size:11px;color:var(--text);line-height:1.65}
+.career-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
+/* ── ENHANCED DIAG ── */
+.diag-block-progressive{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div id="logo">🚀 VIBE · DEPLOYMENT OFFICER</div>
+    <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <span id="sandbox-pill">SANDBOX</span>
+      <span id="hardmode-pill">HARD MODE</span>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+    </div>
+  </div>
+
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">deploy@<span id="term-path-val">ship:/home/officer/ops</span></div>
+    </div>
+    <div id="output"></div>
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
+    </div>
+    <div id="input-row">
+      <div id="prompt-pre">$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Loading…</div>
+      <div id="obj-context">Initializing…</div>
+      <div id="obj-cmd-label">Next Command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">—</div>
+        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Officer on deck. The ship's deployments are yours.</div>
+    </div>
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
+    </div>
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">🚀</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Deployment Officer</div>
+    <div class="msub">Code is written. Now make it actually ship. You own the platform & CI/CD layer — turning “it works on my machine” into reliable, observable, zero-downtime production deploys.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · real-world deployment engineering<br>
+      <span>▸</span>L.O.L.A. — your tactical intel officer<br>
+      <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all quizzes. She is… unimpressed.<br>
+      <span>▸</span>Build pipelines · Docker artifacts · GitOps<br>
+      <span>▸</span>Blue-green & canary · IaC · multi-env promotion<br>
+      <span>▸</span>Deployment forensics · the Cascade Incident boss fight<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable deployment reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div><div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full context. Recommended.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div><div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart feedback only.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div><div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No feedback. Timer on.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">SHIP THE FLEET</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">🚀</div>
+    <div class="mtitle" style="text-align:center;color:var(--silver)">Deployment Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Deployment Officer — including the Cascade Incident. The fleet ships reliably.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Deployment Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Vibe Deployment Officer · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Build pipelines, GitHub Actions, CI config<br>
+      <span>✓</span>Docker artifact management & registries<br>
+      <span>✓</span>GitOps with ArgoCD / Flux concepts<br>
+      <span>✓</span>kubectl, Helm, secrets, ConfigMaps<br>
+      <span>✓</span>Blue-green & canary traffic shifting<br>
+      <span>✓</span>Infrastructure as Code (Terraform / Pulumi)<br>
+      <span>✓</span>Multi-environment promotion with gates<br>
+      <span>✓</span>Deployment forensics & rollback<br>
+      <span>✓</span>Resilient zero-downtime deployment architecture
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+  </div>
+</div>
+
+<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Deployment milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Deployment terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE DEPLOYMENT OFFICER v1.0
+   Exact same framework as Security Officer and Communications Officer.
+   Only the content, teaching points, and story have been swapped.
+   J.A.N.E.T. administers all quizzes. L.O.L.A. is your tactical deployment officer.
+   Boss Fight: Phase 9 — The Cascade Incident. L.O.L.A. goes offline. JANET takes over.
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/officer/ops',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  mistakeTypes:[],
+  wrongStreak:0,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your deployment assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for a deployment assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. Deployment module loaded. I will now present a question. Please answer it correctly. Or incorrectly. Both outcomes have been observed. I document them all.",
+  "I am J.A.N.E.T. I have been asked to test your CI/CD knowledge. I find 'deployment' a somewhat optimistic word for the state of most release pipelines. Nonetheless. I will proceed.",
+  "J.A.N.E.T. online. I note you have reached a deployment quiz. Statistically, most engineers believe they understand CI/CD until they are asked a specific question. This is one of those.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your deployment record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. The rollout has been correctly identified. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your deployment file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it carefully.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit in the incorrect styling.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is common in CI/CD. Especially after a bad deploy.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is not something I recommend reviewing before important releases.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Build Pipeline Basics',stat:'95%',context:'of production incidents trace back to broken CI pipelines. Engineers who master git workflows, CI config, and GitHub Actions prevent the majority of “it worked locally” surprises.',tags:['Git','CI/CD','GitHub Actions','Build pipeline']},
+  {phase:'Phase 2 — Artifact Management',stat:'#1',context:'Docker image is the unit of deployment in 2026. Proper tagging, scanning, and registry hygiene are non-negotiable for secure, reproducible releases.',tags:['Docker','Artifact','Registry','Image scanning']},
+  {phase:'Phase 3 — GitOps Foundations',stat:'Zero-downtime',context:'Declarative GitOps (ArgoCD / Flux) has become the standard for production fleets. Engineers who understand pull-based deploys ship safer and faster.',tags:['GitOps','ArgoCD','Flux','Declarative']},
+  {phase:'Phase 4 — Environment & Secret Handling',stat:'$2.8M',context:'average cost of a secret leak in a deployment. Proper ConfigMaps, Secrets, and Helm value handling prevent the most common deployment-time breaches.',tags:['kubectl','Helm','Secrets','ConfigMaps']},
+  {phase:'Phase 5 — Blue-Green & Canary Deployments',stat:'99.99%',context:'target availability. Blue-green and canary patterns with automated rollbacks are how mature teams achieve near-zero downtime.',tags:['Blue-green','Canary','Traffic shifting','Rollback']},
+  {phase:'Phase 6 — Infrastructure as Code',stat:'10×',context:'faster provisioning and fewer configuration drift incidents when using Terraform or Pulumi. IaC is now a baseline skill for any deployment role.',tags:['Terraform','Pulumi','IaC','Plan/Apply']},
+  {phase:'Phase 7 — Multi-Environment Promotion',stat:'Gates',context:'Automated promotion pipelines with manual gates between dev → staging → prod are how enterprises ship safely at scale.',tags:['Promotion','Gates','Multi-env','Pipeline']},
+  {phase:'Phase 8 — Deployment Forensics',stat:'< 3min',context:'average time to diagnose a failed deploy in mature teams. Engineers who can read CI logs, trace artifacts, and rollback fast become the person everyone turns to during incidents.',tags:['Forensics','CI logs','Rollback','Debug']},
+  {phase:'Phase 9 — The Cascade Incident',stat:'CNO track',context:'The engineers who can design, operate, and recover entire deployment platforms during a fleet-wide cascade are positioned for Chief Deployment Officer and platform engineering leadership roles.',tags:['Cascade recovery','Platform engineering','Resilience','Leadership']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'GitOps',def:'A declarative way to manage infrastructure and applications using Git as the single source of truth. Tools like ArgoCD and Flux continuously reconcile the desired state from Git with the live cluster.'},
+  {term:'Blue-Green Deployment',def:'Two identical environments (blue = live, green = new version). Traffic is switched from blue to green after validation. Instant rollback by switching back.'},
+  {term:'Canary Deployment',def:'Gradually shift a percentage of production traffic to the new version while monitoring metrics. If anything degrades, roll back automatically.'},
+  {term:'Helm',def:'The package manager for Kubernetes. Packages Kubernetes manifests into versioned charts with templating and values files for different environments.'},
+  {term:'Terraform',def:'Infrastructure as Code tool that lets you define cloud resources in HCL and apply changes safely with plan/apply workflow.'},
+  {term:'ConfigMap',def:'Kubernetes object that stores non-sensitive configuration data. Injected into pods as environment variables or mounted files.'},
+  {term:'Secret',def:'Kubernetes object that stores sensitive data (passwords, keys, tokens). Base64 encoded but should be encrypted at rest in production.'},
+  {term:'Artifact',def:'The output of a build pipeline — usually a Docker image or OCI artifact — that is versioned, scanned, and deployed to production.'},
+  {term:'Rollback',def:'The process of reverting a deployment to a previous known-good version. In GitOps this is as simple as reverting the Git commit.'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'build':   {synopsis:'build [subcommand]',desc:'CI pipeline & build tools',why:'Turn source code into deployable artifacts.',flags:[{f:'pipeline init',d:'Set up GitHub Actions workflow'},{f:'docker build',d:'Build and tag container image'}],example:'$ build pipeline init\n$ build docker build'},
+  'artifact':{synopsis:'artifact [command]',desc:'Docker images & registries',why:'Manage the unit of deployment.',flags:[{f:'push',d:'Push image to registry'},{f:'scan',d:'Security scan artifact'}],example:'$ artifact push\n$ artifact scan'},
+  'gitops':  {synopsis:'gitops [command]',desc:'Declarative GitOps operations',why:'Keep cluster state in sync with Git.',flags:[{f:'apply',d:'Apply GitOps manifests'},{f:'sync',d:'Force reconciliation'}],example:'$ gitops apply\n$ gitops sync'},
+  'k8s':     {synopsis:'k8s [command]',desc:'Kubernetes & Helm',why:'Deploy and manage applications on the cluster.',flags:[{f:'deploy',d:'kubectl apply / helm upgrade'},{f:'secret create',d:'Create Kubernetes Secret'}],example:'$ k8s deploy\n$ k8s secret create'},
+  'rollout': {synopsis:'rollout [command]',desc:'Blue-green & canary',why:'Safe traffic shifting and rollbacks.',flags:[{f:'canary start',d:'Start canary rollout'},{f:'bluegreen switch',d:'Switch traffic to green'}],example:'$ rollout canary start\n$ rollout bluegreen switch'},
+  'iac':     {synopsis:'iac [command]',desc:'Infrastructure as Code',why:'Provision infrastructure safely.',flags:[{f:'plan',d:'terraform plan / pulumi preview'},{f:'apply',d:'Apply infrastructure changes'}],example:'$ iac plan\n$ iac apply'},
+  'promote': {synopsis:'promote [command]',desc:'Multi-environment promotion',why:'Move changes safely through environments.',flags:[{f:'dev-to-staging',d:'Promote to staging'},{f:'staging-to-prod',d:'Promote to production with gates'}],example:'$ promote dev-to-staging\n$ promote staging-to-prod'},
+  'forensic':{synopsis:'forensic [command]',desc:'Deployment debugging',why:'Investigate why a deploy failed.',flags:[{f:'logs',d:'Read CI logs'},{f:'trace',d:'Trace failed rollout'}],example:'$ forensic logs\n$ forensic trace'},
+  'deploy':  {synopsis:'deploy [command]',desc:'Core deployment commands',why:'Orchestrate the entire release process.',flags:[{f:'status',d:'Show deployment status'},{f:'rollback',d:'Rollback last deployment'}],example:'$ deploy status\n$ deploy rollback'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal Deployment Playbook',why:'Build your own exportable deployment reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',    icon:'🚀',name:'First Push',         desc:'Issued your first deployment command.'},
+  {id:'pipeline',     icon:'🔨',name:'Pipeline Builder',   desc:'Completed Phase 1 — build pipelines mastered.'},
+  {id:'artifact',     icon:'📦',name:'Artifact Keeper',    desc:'Completed Phase 2 — Docker images managed.'},
+  {id:'gitops',       icon:'📋',name:'GitOps Operator',    desc:'Completed Phase 3 — declarative deploys live.'},
+  {id:'k8s_master',   icon:'☸️',name:'K8s Master',         desc:'Completed Phase 4 — environments & secrets secured.'},
+  {id:'canary',       icon:'🐦',name:'Canary Pilot',       desc:'Completed Phase 5 — safe traffic shifting operational.'},
+  {id:'iac',          icon:'🏗️',name:'IaC Engineer',       desc:'Completed Phase 6 — infrastructure as code applied.'},
+  {id:'promoter',     icon:'📈',name:'Promotion Specialist',desc:'Completed Phase 7 — multi-env promotion with gates.'},
+  {id:'forensics',    icon:'🔍',name:'Deployment Detective',desc:'Completed Phase 8 — forensics and rollback mastered.'},
+  {id:'boss_slayer',  icon:'💀',name:'Cascade Slayer',     desc:'Defeated the Phase 9 Cascade Incident. JANET was unimpressed.'},
+  {id:'cdo',          icon:'🚀',name:'Chief Deployment Officer',desc:'Completed all 9 phases. The fleet ships reliably.'},
+  {id:'janet_ace',    icon:'🧊',name:'JANET Ace',          desc:'Answered a JANET quiz correctly on first try.'},
+  {id:'eagle',        icon:'🦅',name:'Eagle Eye',          desc:'Completed a phase without revealing the answer.'},
+  {id:'recall_master',icon:'🧠',name:'Recall Master',      desc:'Got 3+ spaced recall questions right in a row.'},
+];
+
+/* ── SPACED RECALL CALLBACKS ── */
+const SPACED_CALLBACKS = [
+  null,
+  {q:'What is the difference between a GitHub Actions workflow and a GitLab CI .gitlab-ci.yml file?',answer:'Both define CI/CD pipelines. GitHub Actions uses YAML in .github/workflows/, GitLab uses .gitlab-ci.yml at repo root.',acceptFn:v=>v.includes('workflow')||v.includes('gitlab')},
+  {q:'What command builds and tags a Docker image?',answer:'docker build -t myapp:v1 .',acceptFn:v=>v.includes('docker build')||v.includes('tag')},
+  {q:'In GitOps, what continuously reconciles the cluster with Git?',answer:'ArgoCD or Flux',acceptFn:v=>v.includes('argocd')||v.includes('flux')},
+  {q:'What Kubernetes object stores non-sensitive configuration?',answer:'ConfigMap',acceptFn:v=>v.includes('configmap')||v.includes('config map')},
+  {q:'What deployment strategy lets you test a new version with a small percentage of traffic?',answer:'Canary',acceptFn:v=>v.includes('canary')},
+  {q:'What command shows planned infrastructure changes before applying them?',answer:'terraform plan or pulumi preview',acceptFn:v=>v.includes('plan')||v.includes('preview')},
+  {q:'What prevents a bad deploy from reaching production in a multi-environment pipeline?',answer:'Manual approval gates or automated quality gates',acceptFn:v=>v.includes('gate')||v.includes('approval')},
+  {q:'What is the fastest way to investigate a failed GitHub Actions job?',answer:'Check the CI logs and artifact trace',acceptFn:v=>v.includes('logs')||v.includes('trace')},
+  {q:'During a cascade incident, what is the first thing you do?',answer:'Stop new deploys and initiate rollback',acceptFn:v=>v.includes('rollback')||v.includes('stop deploy')},
+];
+
+/* ── SPACED EXIT ── */
+const SPACED_EXIT = [
+  null,
+  {q:'Name two popular CI tools used in modern pipelines.',answer:'GitHub Actions and GitLab CI',acceptFn:v=>v.includes('github')||v.includes('gitlab')||v.includes('actions')},
+  {q:'Why do we scan Docker images before pushing to production?',answer:'To catch vulnerabilities and supply-chain attacks early',acceptFn:v=>v.includes('scan')||v.includes('vulnerab')},
+  {q:'What is the main benefit of GitOps over traditional push-based deployments?',answer:'Git is the single source of truth and changes are pull-based',acceptFn:v=>v.includes('git')||v.includes('pull')||v.includes('source of truth')},
+  {q:'What is the difference between a ConfigMap and a Secret in Kubernetes?',answer:'ConfigMap is for non-sensitive data; Secret is for sensitive data (base64 encoded)',acceptFn:v=>v.includes('configmap')||v.includes('secret')},
+  {q:'What is the key difference between blue-green and canary deployments?',answer:'Blue-green switches 100% of traffic instantly; canary shifts a percentage gradually',acceptFn:v=>v.includes('blue')||v.includes('canary')||v.includes('percentage')},
+  {q:'Why do we run terraform plan before terraform apply?',answer:'To see exactly what will change and catch mistakes before they hit production',acceptFn:v=>v.includes('plan')||v.includes('apply')},
+  {q:'What is a promotion gate in a multi-environment pipeline?',answer:'A manual or automated check that must pass before promoting to the next environment',acceptFn:v=>v.includes('gate')||v.includes('promotion')||v.includes('approval')},
+  {q:'What is the first command you run when a deployment fails?',answer:'Check the CI logs or deployment status',acceptFn:v=>v.includes('logs')||v.includes('status')},
+  {q:'During a cascade incident, what is the safest immediate action?',answer:'Pause all new deploys and roll back the last successful version',acceptFn:v=>v.includes('rollback')||v.includes('pause')||v.includes('stop')},
+];
+
+/* ── DEEP DIVE CONTENT ── */
+const DEEP_DIVE = [
+  null,
+  {title:'GitHub Actions Best Practices in 2026',body:'Use reusable workflows, cache dependencies aggressively, run security scans on every PR, and never store secrets in workflow files. The real production discipline is treating your CI config like code — versioned, reviewed, and tested.'},
+  {title:'Docker Image Tagging Strategy',body:'Never use :latest in production. Use semantic tags (v1.2.3), Git SHA, and build timestamps. Scan every image with Trivy or Grype before pushing. Sign images with cosign for supply-chain security.'},
+  {title:'GitOps in Production Reality',body:'ArgoCD or Flux continuously reconciles Git → cluster. The biggest win is auditability: every change is a Git commit. The biggest pain is drift detection and sync conflicts when multiple teams touch the same manifests.'},
+  {title:'Secrets in Kubernetes — The 2026 Way',body:'Never check secrets into Git. Use external secret stores (AWS Secrets Manager, HashiCorp Vault, or Sealed Secrets) synced into the cluster via operators. Rotate secrets automatically and use short-lived service account tokens.'},
+  {title:'Canary Deployments Done Right',body:'Start at 5%, monitor error rate, latency, and business KPIs for 15–30 minutes. Use Flagger or Argo Rollouts for automated analysis and rollback. The key is observability — not just “the pod started.”'},
+  {title:'Terraform / Pulumi in CI/CD',body:'Always run plan in PRs. Apply only from the main branch after approval. Use remote state backends with locking. Never run terraform destroy in production pipelines unless you really mean it.'},
+  {title:'Multi-Environment Promotion Pipelines',body:'Dev → Staging → Prod with automated quality gates (unit tests, security scans, canary analysis) and manual approval only for Prod. The pipeline should be the same code for every environment — only values change.'},
+  {title:'Deployment Forensics — Reading the Tea Leaves',body:'When a deploy fails, first check CI logs, then kubectl describe, then ArgoCD sync status, then the application logs. The fastest path to root cause is usually “what changed in the last commit?”'},
+  {title:'The Cascade Incident — How to Survive It',body:'A single bad image can take down the entire fleet if your rollout strategy has no blast-radius controls. The fix: progressive delivery with canaries, automated rollbacks, and a “pause all deploys” button in your platform.'},
+];
+
+/* ── WHATIF SCENARIOS ── */
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'What if you skipped CI on every PR?',alt:'A developer merged directly to main without running the pipeline.',outcome:'Result: A syntax error in the Dockerfile broke every subsequent build for 6 hours. The team lost an entire morning of velocity.',learning:'CI on every PR is not optional. It is the first line of defense.'},
+  {title:'What if you pushed :latest to production?',alt:'To “make deploys easier” the team used the :latest tag for their main image.',outcome:'Result: A bad build was pulled by 40% of pods before anyone noticed. Rollback took 47 minutes because there was no immutable tag to fall back to.',learning:'Never use :latest in production. Immutable tags save lives.'},
+  {title:'What if GitOps reconciliation was disabled?',alt:'An engineer turned off ArgoCD auto-sync “to reduce noise.”',outcome:'Result: Manual kubectl apply drifted from Git. Three weeks later the cluster was in an unknown state. The next deploy failed spectacularly.',learning:'GitOps only works when reconciliation is always on. Drift is silent until it hurts.'},
+  {title:'What if secrets were in the Helm values file?',alt:'The team stored database passwords in a Helm values.yaml committed to Git.',outcome:'Result: The secret was exposed in Git history. The database was compromised within 90 minutes. The incident cost $1.2M in remediation and lost trust.',learning:'Secrets belong in a secret store, never in Git.'},
+  {title:'What if canary analysis had no metrics?',alt:'A canary was launched with no automated analysis.',outcome:'Result: The new version had a memory leak. It took 3 hours and 18% error rate before anyone noticed. The rollback was painful.',learning:'Canary without observability is just gambling with production traffic.'},
+];
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = [
+  null,
+  {title:'Broken Dockerfile',scenario:'A developer added this to the Dockerfile:\n\nRUN apt-get update && apt-get install -y curl\n\nThe image size jumped from 180MB to 1.2GB. Why is this dangerous and how do you fix it?',acceptFn:v=>v.includes('multi')||v.includes('stage')||v.includes('slim'),answer:'This is a fat image. Use multi-stage builds: build in one stage, copy only the binary to a slim runtime stage. Reduces attack surface and deploy time.'},
+  {title:'Hard-coded Secret in CI',scenario:'A GitHub Actions workflow contains:\n\nenv:\n  DB_PASSWORD: "supersecret123"\n\nIt was committed to the repo. What is the immediate risk and what must happen now?',acceptFn:v=>v.includes('secret')||v.includes('github')||v.includes('rotate'),answer:'The secret is now public in Git history. Rotate it immediately in the database, then remove it from the workflow and use GitHub Secrets instead.'},
+  {title:'GitOps Drift',scenario:'ArgoCD shows "OutOfSync" but the engineer ran kubectl apply directly on the cluster instead of committing to Git. What will happen next?',acceptFn:v=>v.includes('sync')||v.includes('drift')||v.includes('gitops'),answer:'ArgoCD will revert the manual change on the next reconciliation. Git must be the source of truth. Never kubectl apply in GitOps.'},
+];
+
+/* ── CHALLENGE SCENARIOS ── */
+const CHALLENGES = [
+  null,
+  {title:'Write a GitHub Actions Workflow',scenario:'Create a basic CI workflow that builds a Docker image on every push to main and pushes it to GitHub Container Registry. What are the three required steps?',acceptFn:v=>v.includes('build')||v.includes('push')||v.includes('docker'),answer:'1. Checkout code. 2. Build and tag the Docker image. 3. Login to GHCR and push the image. Use actions/setup-docker and docker/login-action.'},
+  {title:'Fix the Helm Values Leak',scenario:'A Helm values.yaml contains a database password in plaintext and is committed to Git. What is the correct way to handle this in production?',acceptFn:v=>v.includes('secret')||v.includes('external')||v.includes('vault'),answer:'Move the secret to an external secret store (Vault / AWS Secrets Manager) and use an operator (External Secrets Operator) to inject it into the cluster at runtime. Never commit secrets to Git.'},
+  {title:'Design a Canary Rollout',scenario:'You are releasing v2.3.0. Describe the exact steps for a safe canary deployment using Argo Rollouts or Flagger.',acceptFn:v=>v.includes('canary')||v.includes('weight')||v.includes('analysis'),answer:'1. Deploy new version with 5% traffic weight. 2. Run automated analysis on error rate, latency, and business KPIs for 15 minutes. 3. If healthy, increase weight incrementally to 100%. 4. If any metric degrades, automatically roll back.'},
+];
+
+/* ── PHASE DATA ── */
+const PHASES = [
+  null,
+  /* Phase 1: Build Pipeline Basics */
+  {title:'Build Pipeline Basics',
+   lolaIntro:"Code is written. Now make it actually build reliably.",
+   spacedRep:SPACED_CALLBACKS[1],
+   steps:[
+    {id:'p1s1',obj:'Initialize a GitHub Actions build pipeline',ctx:'The repo has no CI. Start with the basics.',
+     cmd:['build pipeline init'],
+     accept:['build pipeline init','build pipeline'],
+     acceptFn:v=>v.includes('build')&&v.includes('pipeline'),
+     hint:'Type: build pipeline init',
+     out:'GITHUB ACTIONS PIPELINE INITIALIZED:\n\n  .github/workflows/ci.yml created\n  Jobs: lint → test → build\n  Triggers: push to main + PRs\n  Caching enabled for npm/go dependencies\n\nPipeline is now running on every commit.',
+     unlockCmd:'build',
+     jit:{title:'Why CI on every PR is non-negotiable',body:'Catching a broken build before it merges prevents “it worked on my machine” surprises in production.'},
+     bridge:{title:'CI pipelines are the first line of defense',body:'Engineers who master build pipelines prevent the majority of release-day surprises.',tags:['CI/CD','GitHub Actions','Build pipeline']},
+     teach:{title:'The minimal viable CI pipeline',body:'Lint → Test → Build. Run on every PR and every push to main. Cache dependencies. Fail fast.'}},
+    {id:'p1s2',obj:'Add Docker build and push to the pipeline',ctx:'The build produces a binary. Now turn it into a container.',
+     cmd:['build docker build'],
+     accept:['build docker build','build docker'],
+     acceptFn:v=>v.includes('build')&&v.includes('docker'),
+     hint:'Type: build docker build',
+     out:'DOCKER BUILD ADDED TO PIPELINE:\n\n  Multi-stage Dockerfile used\n  Image tagged with git SHA + semver\n  Pushed to GitHub Container Registry\n  Vulnerability scan with Trivy added\n\nArtifacts are now versioned and secure.',
+     jit:{title:'Multi-stage Docker builds',body:'Build in one stage, copy only the binary to a slim runtime stage. Dramatically reduces image size and attack surface.'},
+     bridge:{title:'Docker is the unit of deployment in 2026',body:'Every service ships as a container. Mastering artifact management is table stakes.',tags:['Docker','Artifact','Registry']},
+     teach:{title:'The Docker build checklist',body:'Use multi-stage builds, tag with git SHA, scan for vulnerabilities, push to a private registry, never use :latest in production.'},
+     quiz:{q:'A developer says "we can just use :latest in production because it’s simpler." What is the flaw?',
+      opts:['They are correct — simplicity wins',':latest is not immutable and can silently change','It works fine for internal tools','Docker ignores the tag in CI'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. :latest is not immutable. A new build can silently replace what you thought was stable. Always use versioned, immutable tags.'}}],
+   breakit:BREAKIT[1],
+   done:'Build pipeline basics complete. Code now builds reliably.',
+   ach:'pipeline'},
+
+  /* Phase 2: Artifact Management */
+  {title:'Artifact Management',
+   lolaIntro:"The build succeeded. Now turn it into something we can actually ship.",
+   spacedRep:SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Build and push a Docker image to the registry',ctx:'The binary exists. Now package it as a container.',
+     cmd:['artifact push'],
+     accept:['artifact push','artifact build'],
+     acceptFn:v=>v.includes('artifact')&&(v.includes('push')||v.includes('build')),
+     hint:'Type: artifact push',
+     out:'ARTIFACT PUSHED:\n\n  Image: ghcr.io/shipfleet/api:v2.3.0-7f3a9c2\n  Scanned with Trivy — 0 critical vulnerabilities\n  Signed with cosign\n  Pushed to GitHub Container Registry\n\nArtifact is now ready for deployment.',
+     unlockCmd:'artifact',
+     jit:{title:'Why you must scan every image',body:'Supply-chain attacks are real. Trivy or Grype on every build prevents known vulnerabilities from reaching production.'},
+     bridge:{title:'The Docker image is the unit of deployment',body:'Everything downstream depends on having clean, signed, versioned artifacts.',tags:['Docker','Registry','Artifact']},
+     teach:{title:'The artifact management checklist',body:'Build → Scan → Tag with git SHA → Sign → Push to private registry. Never push unverified images.'}},
+    {id:'p2s2',obj:'Configure image scanning and signing in the pipeline',ctx:'Security wants every image scanned before it reaches production.',
+     cmd:['artifact scan'],
+     accept:['artifact scan','artifact sign'],
+     acceptFn:v=>v.includes('artifact')&&(v.includes('scan')||v.includes('sign')),
+     hint:'Type: artifact scan',
+     out:'IMAGE SCANNING & SIGNING ENABLED:\n\n  Trivy scan added to pipeline\n  Cosign signature generated\n  Only signed images can be deployed\n  Policy enforcement via Kyverno in cluster\n\nArtifacts are now verifiable and secure.',
+     jit:{title:'Cosign + Kyverno = supply-chain security',body:'Sign images at build time. Enforce signatures at deployment time with Kyverno. This prevents compromised images from ever running.'},
+     bridge:{title:'Artifact security is now a compliance requirement',body:'SOC 2, PCI, and supply-chain security frameworks all require signed and scanned artifacts.',tags:['Supply-chain security','Cosign','Trivy']},
+     teach:{title:'The three layers of artifact security',body:'(1) Scan at build time. (2) Sign the image. (3) Enforce signature + scan results at deploy time.'},
+     quiz:{q:'An image passes the build but fails the Trivy scan. What should the pipeline do?',
+      opts:['Push it anyway — we can fix later','Fail the build and block the deploy','Ignore the scan — it’s only a recommendation','Let the developer override the failure'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. A failing security scan must block the pipeline. Never push vulnerable images to production.'}}],
+   breakit:BREAKIT[2],
+   done:'Artifact management complete. Images are built, scanned, signed, and ready to ship.',
+   ach:'artifact'},
+
+  /* Phase 3: GitOps Foundations */
+  {title:'GitOps Foundations',
+   lolaIntro:"Declarative deploys. Git is now the source of truth.",
+   spacedRep:SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Deploy an application using GitOps principles',ctx:'Current deploys are push-based and manual. Move to pull-based GitOps.',
+     cmd:['gitops apply'],
+     accept:['gitops apply','gitops sync'],
+     acceptFn:v=>v.includes('gitops')&&(v.includes('apply')||v.includes('sync')),
+     hint:'Type: gitops apply',
+     out:'GITOPS DEPLOYMENT COMPLETE:\n\n  ArgoCD Application created from Git repo\n  Manifests synced to cluster\n  Health checks passing\n  Automatic reconciliation enabled\n\nCluster state now matches Git exactly.',
+     unlockCmd:'gitops',
+     jit:{title:'Push-based vs pull-based deployments',body:'Push-based (kubectl apply) is manual and error-prone. Pull-based (GitOps) is continuous and auditable.'},
+     bridge:{title:'GitOps is the standard for production Kubernetes in 2026',body:'Every change is a Git commit. Every deploy is auditable and reversible.',tags:['GitOps','ArgoCD','Declarative']},
+     teach:{title:'The GitOps workflow',body:'1. Commit manifests to Git. 2. ArgoCD/Flux detects change. 3. Automatically reconciles cluster to match Git. 4. Drift is impossible by design.'}},
+    {id:'p3s2',obj:'Configure automatic sync and health checks',ctx:'The application is deployed. Now make sure it stays in sync.',
+     cmd:['gitops sync'],
+     accept:['gitops sync','gitops health'],
+     acceptFn:v=>v.includes('gitops')&&(v.includes('sync')||v.includes('health')),
+     hint:'Type: gitops sync',
+     out:'AUTOMATIC SYNC ENABLED:\n\n  Reconciliation interval: 3 minutes\n  Health checks on every Deployment, Service, Ingress\n  Prune enabled — removes resources deleted from Git\n  Sync waves and hooks configured for zero-downtime\n\nGitOps is now fully operational.',
+     jit:{title:'Sync waves and hooks',body:'Control the order of resource creation and run pre/post-deploy hooks for database migrations or smoke tests.'},
+     bridge:{title:'GitOps gives you auditability and safety at scale',body:'Every change is visible in Git. Rollbacks are just git revert.',tags:['GitOps','Reconciliation','Health checks']},
+     teach:{title:'GitOps best practices',body:'Keep manifests in a separate repo or folder. Use directories per environment. Enable prune and self-healing.'},
+     quiz:{q:'A developer manually edited a Deployment in the cluster with kubectl edit. What will GitOps do next?',
+      opts:['Nothing — manual changes are allowed','Revert the change on the next reconciliation','Fail the pipeline','Alert the team'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. GitOps will detect drift and automatically revert the manual change to match the desired state in Git.'}}],
+   breakit:BREAKIT[3],
+   done:'GitOps foundations established. The cluster now stays in sync with Git.',
+   ach:'gitops'},
+
+  /* Phase 4: Environment & Secret Handling */
+  {title:'Environment & Secret Handling',
+   lolaIntro:"Different environments need different config. Secrets must never leak.",
+   spacedRep:SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Deploy an application with environment-specific values',ctx:'Hard-coded values are everywhere. Use ConfigMaps and Helm values.',
+     cmd:['k8s deploy'],
+     accept:['k8s deploy','k8s helm'],
+     acceptFn:v=>v.includes('k8s')&&(v.includes('deploy')||v.includes('helm')),
+     hint:'Type: k8s deploy',
+     out:'ENVIRONMENT-SPECIFIC DEPLOYMENT COMPLETE:\n\n  Helm chart deployed with values-dev.yaml\n  ConfigMap injected for environment variables\n  Database connection string from ConfigMap\n  Application now runs with correct environment settings.',
+     unlockCmd:'k8s',
+     jit:{title:'ConfigMap vs Secret',body:'ConfigMap for non-sensitive config. Secret for passwords, keys, tokens. Both can be mounted as files or environment variables.'},
+     bridge:{title:'Environment-specific configuration is a common source of outages',body:'Proper separation of config from code prevents “it worked in staging” surprises.',tags:['ConfigMap','Helm','Environment']},
+     teach:{title:'The correct way to handle configuration',body:'Application code reads from environment variables or mounted files. Never hard-code values. Use Helm values or Kustomize overlays per environment.'}},
+    {id:'p4s2',obj:'Securely manage secrets using Kubernetes Secrets',ctx:'Database credentials are still in code. Move them to proper secrets.',
+     cmd:['k8s secret create'],
+     accept:['k8s secret create','k8s secret'],
+     acceptFn:v=>v.includes('k8s')&&v.includes('secret'),
+     hint:'Type: k8s secret create',
+     out:'SECRETS SECURED:\n\n  Database credentials moved to Kubernetes Secret\n  Injected via environment variables\n  External Secrets Operator syncing from Vault\n  Secret rotation policy enabled\n\nNo more plaintext secrets in code or Helm values.',
+     jit:{title:'External Secrets Operator',body:'Pulls secrets from Vault/AWS Secrets Manager at runtime. Never stores secrets in Git.'},
+     bridge:{title:'Secret leaks during deployment are one of the most common breaches',body:'Proper secret management is both a security and compliance requirement.',tags:['Secrets','Vault','Kubernetes Secrets']},
+     teach:{title:'The secret management golden rule',body:'Never commit secrets to Git. Use a secret store + operator. Rotate secrets regularly. Audit access.'},
+     quiz:{q:'A developer stored a database password in a Helm values.yaml file committed to Git. What is the correct immediate action?',
+      opts:['Delete the file','Rotate the password and remove it from Git','Ignore it — it’s only in dev','Add it to .gitignore'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Rotate the credential first, then remove it from Git history and switch to a proper secret store.'}}],
+   breakit:BREAKIT[4],
+   done:'Environments and secrets are now handled securely and declaratively.',
+   ach:'k8s_master'},
+
+  /* Phase 5: Blue-Green & Canary Deployments */
+  {title:'Blue-Green & Canary Deployments',
+   lolaIntro:"Safe rollouts. Instant rollbacks. Zero downtime.",
+   spacedRep:SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Configure a blue-green deployment',ctx:'Current deploys cause downtime. Implement blue-green.',
+     cmd:['rollout bluegreen'],
+     accept:['rollout bluegreen','rollout blue-green'],
+     acceptFn:v=>v.includes('rollout')&&v.includes('blue'),
+     hint:'Type: rollout bluegreen',
+     out:'BLUE-GREEN DEPLOYMENT CONFIGURED:\n\n  Green version deployed alongside blue\n  Traffic still on blue\n  Smoke tests passed\n  Ready to switch traffic when commanded.',
+     unlockCmd:'rollout',
+     jit:{title:'Blue-green gives instant rollback',body:'Switching traffic is just changing a Service selector or Ingress rule. No pods are deleted until the new version is validated.'},
+     bridge:{title:'Blue-green is the gold standard for zero-downtime deploys',body:'Mature teams use it for every production release.',tags:['Blue-green','Zero-downtime','Rollback']},
+     teach:{title:'Blue-green deployment steps',body:'1. Deploy new version (green). 2. Run smoke tests. 3. Switch traffic. 4. Monitor. 5. Delete old version (blue) after validation.'}},
+    {id:'p5s2',obj:'Implement a canary rollout with traffic shifting',ctx:'Blue-green is all-or-nothing. Add canary for gradual exposure.',
+     cmd:['rollout canary start'],
+     accept:['rollout canary start','rollout canary'],
+     acceptFn:v=>v.includes('rollout')&&v.includes('canary'),
+     hint:'Type: rollout canary start',
+     out:'CANARY ROLLOUT STARTED:\n\n  5% traffic shifted to new version\n  Automated analysis running (error rate, latency, business metrics)\n  Rollback threshold configured\n  Full rollout in 30 minutes if healthy.',
+     jit:{title:'Canary analysis is the key',body:'Use real production metrics — not just pod readiness. Error rate, latency, and business KPIs must all stay healthy.'},
+     bridge:{title:'Canary deployments let you test in production safely',body:'The only way to truly validate a change is with real traffic.',tags:['Canary','Traffic shifting','Progressive delivery']},
+     teach:{title:'Canary best practices',body:'Start small (5%), monitor for 15–30 minutes, increase gradually. Automatic rollback on any degradation. Use Flagger or Argo Rollouts for automation.'},
+     quiz:{q:'During a canary rollout the error rate on the new version jumps 300%. What should happen?',
+      opts:['Continue the rollout — it might be a temporary spike','Manually increase traffic to gather more data','Automatically roll back the canary','Ignore the metric because it’s only 5% traffic'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. Any significant degradation during a canary must trigger an automatic rollback. Protecting users is more important than finishing the rollout.'}}],
+   breakit:BREAKIT[5],
+   done:'Blue-green and canary deployments operational. Safe, controlled releases achieved.',
+   ach:'canary'},
+
+  /* Phase 6: Infrastructure as Code */
+  {title:'Infrastructure as Code',
+   lolaIntro:"Infrastructure should be code, not clicks.",
+   spacedRep:SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Run a Terraform plan and apply',ctx:'Infrastructure is still being created manually. Move to IaC.',
+     cmd:['iac plan'],
+     accept:['iac plan','iac terraform'],
+     acceptFn:v=>v.includes('iac')&&(v.includes('plan')||v.includes('apply')),
+     hint:'Type: iac plan',
+     out:'TERRAFORM PLAN COMPLETE:\n\n  12 resources to be created\n  No destructive changes detected\n  Approved and applied\n\nInfrastructure now managed as code.',
+     unlockCmd:'iac',
+     jit:{title:'terraform plan is your safety net',body:'Always review the plan before applying. Catch mistakes before they hit production.'},
+     bridge:{title:'IaC prevents configuration drift and enables reproducibility',body:'Every environment can be spun up identically from the same code.',tags:['Terraform','IaC','Infrastructure as Code']},
+     teach:{title:'Terraform workflow',body:'terraform init → terraform plan → code review → terraform apply. Use remote state with locking.'}},
+    {id:'p6s2',obj:'Add infrastructure changes through IaC',ctx:'A new database instance is needed. Provision it with Terraform.',
+     cmd:['iac apply'],
+     accept:['iac apply','iac pulumi'],
+     acceptFn:v=>v.includes('iac')&&v.includes('apply'),
+     hint:'Type: iac apply',
+     out:'INFRASTRUCTURE APPLIED:\n\n  New RDS instance provisioned via Terraform\n  Security groups and networking configured\n  Secrets stored in AWS Secrets Manager\n  All changes audited in Git\n\nInfrastructure is now fully declarative.',
+     jit:{title:'Pulumi vs Terraform',body:'Both are excellent. Terraform is declarative HCL. Pulumi lets you use real programming languages. Choose based on team preference.'},
+     bridge:{title:'IaC is now a baseline skill for any deployment role',body:'ClickOps is no longer acceptable in production environments.',tags:['IaC','Terraform','Pulumi']},
+     teach:{title:'IaC best practices',body:'Use modules, remote state with locking, plan in PRs, apply only from main after approval. Never run terraform destroy in production pipelines.'},
+     quiz:{q:'A developer ran terraform apply directly from their laptop instead of through CI. What is the risk?',
+      opts:['None — it’s the same code','Local state can get out of sync with remote state','It bypasses code review and audit trail','All of the above'],
+      janetQuiz:true,
+      correct:3,fb:'Correct. All of the above. IaC must go through CI/CD with code review and remote state locking.'}}],
+   breakit:BREAKIT[5],
+   done:'Infrastructure as Code is now the way we provision everything.',
+   ach:'iac'},
+
+  /* Phase 7: Multi-Environment Promotion */
+  {title:'Multi-Environment Promotion',
+   lolaIntro:"Changes must flow safely from dev → staging → prod.",
+   spacedRep:SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Promote an application from dev to staging',ctx:'The change is ready. Promote it through environments.',
+     cmd:['promote dev-to-staging'],
+     accept:['promote dev-to-staging','promote staging'],
+     acceptFn:v=>v.includes('promote')&&(v.includes('dev')||v.includes('staging')),
+     hint:'Type: promote dev-to-staging',
+     out:'PROMOTION TO STAGING COMPLETE:\n\n  Image v2.3.1 promoted\n  Helm values updated in Git\n  ArgoCD synced staging environment\n  Automated tests passed in staging\n\nReady for production gate.',
+     unlockCmd:'promote',
+     jit:{title:'Why promotion pipelines matter',body:'They enforce consistency and quality gates between environments.'},
+     bridge:{title:'Multi-environment promotion is how enterprises ship safely at scale',body:'Automated gates + manual approval for prod is the standard.',tags:['Promotion','Multi-environment','Gates']},
+     teach:{title:'The promotion pipeline',body:'Dev → automated tests → staging → manual approval gate → production. Same pipeline code for every environment.'}},
+    {id:'p7s2',obj:'Promote to production with manual approval gate',ctx:'Staging looks good. Now safely promote to prod.',
+     cmd:['promote staging-to-prod'],
+     accept:['promote staging-to-prod','promote prod'],
+     acceptFn:v=>v.includes('promote')&&(v.includes('staging')||v.includes('prod')),
+     hint:'Type: promote staging-to-prod',
+     out:'PRODUCTION PROMOTION COMPLETE:\n\n  Manual approval gate passed\n  Canary rollout started in production\n  Monitoring active\n  Full rollout completed successfully\n\nChange is now live in production with zero downtime.',
+     jit:{title:'Manual approval gates for production',body:'Even with perfect automation, a human should still approve the final step into production.'},
+     bridge:{title:'Promotion pipelines with gates are how you achieve high availability',body:'They prevent bad changes from reaching customers.',tags:['Promotion pipeline','Approval gates','Prod safety']},
+     teach:{title:'Production promotion best practices',body:'Automated quality gates + manual approval + canary rollout + automatic rollback on any degradation.'},
+     quiz:{q:'A change passed all automated gates but the on-call engineer is uncomfortable with the business impact. What should happen?',
+      opts:['Force the promotion anyway','Wait 24 hours','The engineer should reject the gate and request changes','Merge it into prod manually'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. The human gate exists for exactly this reason. If the on-call engineer is uncomfortable, the promotion should be rejected and changes requested.'}}],
+   breakit:BREAKIT[5],
+   done:'Multi-environment promotion with gates is now operational.',
+   ach:'promoter'},
+
+  /* Phase 8: Deployment Forensics */
+  {title:'Deployment Forensics',
+   lolaIntro:"When a deploy fails, you are the detective.",
+   spacedRep:SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Investigate a failed deployment',ctx:'The latest deploy is failing. Find out why.',
+     cmd:['forensic logs'],
+     accept:['forensic logs','forensic trace'],
+     acceptFn:v=>v.includes('forensic')&&(v.includes('logs')||v.includes('trace')),
+     hint:'Type: forensic logs',
+     out:'DEPLOYMENT FORENSICS COMPLETE:\n\n  CI logs analyzed — unit test failure in step 3\n  ArgoCD sync status shows missing ConfigMap\n  Root cause: missing environment variable in values file\n  Rollback executed successfully\n\nIssue documented and fixed in Git.',
+     unlockCmd:'forensic',
+     jit:{title:'The deployment forensics checklist',body:'1. CI logs. 2. ArgoCD sync status. 3. Application logs. 4. Kubernetes events. 5. What changed in the last commit.'},
+     bridge:{title:'Fast deployment forensics separates good platform teams from great ones',body:'The person who can find the problem in minutes saves the day.',tags:['Forensics','CI logs','Rollback']},
+     teach:{title:'How to investigate a failed deploy',body:'Start with the CI logs, then the GitOps sync status, then the application itself. Always ask: what changed in the last commit?'}},
+    {id:'p8s2',obj:'Execute a clean rollback',ctx:'The deploy is bad. Roll it back safely.',
+     cmd:['deploy rollback'],
+     accept:['deploy rollback','forensic rollback'],
+     acceptFn:v=>v.includes('rollback')||v.includes('deploy'),
+     hint:'Type: deploy rollback',
+     out:'ROLLBACK EXECUTED:\n\n  Previous version restored via Git revert\n  ArgoCD reconciled to previous commit\n  Traffic switched back to stable version\n  Monitoring confirmed healthy\n\nDeploy incident resolved in under 4 minutes.',
+     jit:{title:'Git revert is the safest rollback',body:'In GitOps, rolling back is literally just reverting the Git commit that caused the problem.'},
+     bridge:{title:'Rollback skill is invisible until you need it',body:'The best deployment engineers have practiced rollback until it is muscle memory.',tags:['Rollback','Forensics','Incident response']},
+     teach:{title:'Rollback best practices',body:'Always have a one-command rollback. Test it regularly. In GitOps, it’s just git revert + push.'},
+     quiz:{q:'A deployment failed. The on-call engineer wants to “debug it in production” instead of rolling back. What should you do?',
+      opts:['Let them debug','Insist on rollback first, then debug','Roll forward with a hotfix','Ignore the failure'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Rollback first, then debug. Protecting customers is always priority one.'}}],
+   breakit:BREAKIT[5],
+   done:'Deployment forensics and rollback mastered. You can now investigate and recover from failed deploys fast.',
+   ach:'forensics'},
+
+  /* Phase 9: The Cascade Incident (Boss Fight) */
+  {title:'The Cascade Incident',
+   lolaIntro:"The entire fleet is stuck in a broken deploy loop during peak traffic. Restore service while J.A.N.E.T. times you.",
+   spacedRep:SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Stop all new deployments and pause the pipeline',ctx:'A bad image is being deployed everywhere. Stop the bleeding.',
+     cmd:['deploy pause'],
+     accept:['deploy pause','deploy stop'],
+     acceptFn:v=>v.includes('deploy')&&(v.includes('pause')||v.includes('stop')),
+     hint:'Type: deploy pause',
+     out:'ALL DEPLOYMENTS PAUSED:\n\n  CI pipeline halted\n  ArgoCD sync disabled\n  New image pushes blocked\n  Fleet stabilized at last known good version.',
+     unlockCmd:'deploy',
+     jit:{title:'Pause first, then investigate',body:'During a cascade, stopping new changes is the only way to regain control.'},
+     bridge:{title:'Cascade incidents separate platform engineers from everyone else',body:'The ones who can restore service under pressure become legends.',tags:['Cascade','Incident response','Platform engineering']},
+     teach:{title:'The cascade incident playbook',body:'1. Pause everything. 2. Roll back to last known good. 3. Investigate root cause. 4. Fix and re-enable gradually.'}},
+    {id:'p9s2',obj:'Execute a full fleet rollback and restore service',ctx:'The bad deploy is everywhere. Roll everything back now.',
+     cmd:['deploy rollback'],
+     accept:['deploy rollback','deploy restore'],
+     acceptFn:v=>v.includes('rollback')||v.includes('restore'),
+     hint:'Type: deploy rollback',
+     out:'FLEET ROLLBACK COMPLETE:\n\n  All services reverted to previous stable version\n  Traffic restored\n  Monitoring shows healthy\n  Root cause (bad image) identified and blocked\n\nThe fleet is back online.',
+     isFinalBeforeBoss:true}],
+   done:null,
+   ach:null},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BOSS FIGHT — The Cascade Incident
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    id:'boss1',
+    scenario:'L.O.L.A. has gone offline. A bad image has triggered a cascade failure across the entire fleet.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The CI logs show every service is deploying the same broken image. Read the logs.',
+    prompt:'Read the CI and deployment logs.',
+    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('forensic')||v.includes('trace'),
+    accept:['cat logs/ci.log','cat logs/deploy.log','forensic logs'],
+    out:'[03:31:07] CI LOG: v2.4.0 pushed with failing health check\n[03:31:07] Every ArgoCD Application is syncing v2.4.0\n[03:31:08] 47 services now reporting 502 errors\n[03:31:09] Cascade in progress — traffic shifting failed',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss2',
+    scenario:'STEP 2 OF 5: A bad image is being deployed everywhere. The fleet is in a cascade.\n\nI note that the promotion pipeline had no canary analysis. I note this without offering my opinion on how this happened.\n\nContain this immediately.',
+    prompt:'Pause all deployments and stop the cascade.',
+    acceptFn:v=>v.includes('deploy')&&(v.includes('pause')||v.includes('stop')),
+    accept:['deploy pause','deploy stop'],
+    out:'CONTAINMENT EXECUTED:\n\n  ✓ All CI pipelines paused\n  ✓ ArgoCD sync disabled fleet-wide\n  ✓ New image pushes blocked\n  ✓ Rollback to v2.3.9 initiated\n\n[03:33] Cascade contained. Fleet stabilizing.',
+    hint:'Type: deploy pause'
+  },
+  {
+    id:'boss3',
+    scenario:'STEP 3 OF 5: The cascade is stopped. Now determine how the bad image got promoted to production.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin the forensic investigation.',
+    prompt:'Begin forensic investigation.',
+    acceptFn:v=>v.includes('forensic')||v.includes('logs')||v.includes('trace')||v.includes('git'),
+    accept:['forensic logs','forensic trace'],
+    out:'FORENSIC INVESTIGATION:\n\n  Root cause: missing canary analysis gate in promotion pipeline\n  Bad image passed manual approval because metrics were not checked\n  274 services received the failing image\n\n  Immediate action: rollback completed\n  Systemic fix required.',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss4',
+    scenario:'STEP 4 OF 5: The root cause was a missing canary gate in the promotion pipeline.\n\nI note that this is covered in Phase 5. I note it without irony.\n\nRun a full deployment audit and implement the systemic fix.',
+    prompt:'Run deployment audit and fix the root cause.',
+    acceptFn:v=>v.includes('forensic')||v.includes('deploy')||(v.includes('rollout')&&v.includes('canary')),
+    accept:['forensic logs','deploy rollback','rollout canary'],
+    out:'DEPLOYMENT AUDIT COMPLETE:\n\n  Fixed: canary analysis gate added to promotion pipeline\n  Fixed: automatic rollback on any degradation\n  Fixed: promotion now requires metrics approval\n  All services restored to stable version\n\nFleet deployment system is now hardened.',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss5',
+    scenario:'STEP 5 OF 5: The cascade is contained. The root cause is fixed.\n\nNow you must communicate. The entire fleet was affected. The CNO and bridge crew are waiting.\n\nYou have 90 minutes before the briefing. Write the executive brief and the fleet-wide notification plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most deployment officers reveal the true limits of their composure.',
+    prompt:'Write the executive brief and notification plan.',
+    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    accept:['design resilient','policy brief','respond notify'],
+    out:'EXECUTIVE BRIEF: Cascade Incident — 2026-04-20\n\nTo: CNO, Bridge Crew\nFrom: Officer '+G.name+'\n\nWhat happened:\n  A bad image bypassed canary analysis and was promoted to production.\n  Contained in under 4 minutes.\n\nWhat we did:\n  Paused all pipelines\n  Rolled back to last known good version\n  Added missing canary gate and automatic rollback\n\nPrevention:\n  Promotion pipeline now enforces metrics-based approval\n  All rollouts now use canary analysis by default\n\nStatus: Contained. Fleet fully operational.',
+    hint:'Type: design resilient  — executive brief and notification plan'
+  },
+];
+
+/* ── DOM REFS & UTILS (identical to previous versions) ── */
+const $out = document.getElementById('output');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;$out.appendChild(d);$out.scrollTop=$out.scrollHeight;return d;
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — identical structure, only data changed */
+
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showBridge(br){
+  const tags=br.tags?br.tags.map(t=>`<span class="bridge-tag">${t}</span>`).join(''):'';
+  const w=document.createElement('div');w.className='bridge ln';
+  w.innerHTML=`<div class="bridge-hd">🌉 Career Bridge: ${br.title}</div><div class="bridge-bd">${br.body}<div style="margin-top:8px">${tags}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+let janetQuizAttempt=true;
+const _quizFeedbackMap={};
+function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
+
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb;
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
+
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:120px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('')}
+
+function unlock(id){
+  if(G.achievements.includes(id))return;G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{const a=ACHS.find(x=>x.id===id);if(!a)return'';return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`}).join('');
+}
+
+function renderGloss(){document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,"\\'")}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('')}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+const CMD_META={
+  'build':   {label:'build',   desc:'CI pipeline'},
+  'artifact':{label:'artifact',desc:'Docker artifacts'},
+  'gitops':  {label:'gitops',  desc:'GitOps'},
+  'k8s':     {label:'k8s',     desc:'Kubernetes & Helm'},
+  'rollout': {label:'rollout', desc:'Blue-green & canary'},
+  'iac':     {label:'iac',     desc:'Infrastructure as Code'},
+  'promote': {label:'promote', desc:'Multi-env promotion'},
+  'forensic':{label:'forensic',desc:'Deployment forensics'},
+  'deploy':  {label:'deploy',  desc:'Core deployment'},
+};
+
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const c=document.getElementById('active-cmds-list');
+  if(G.unlockedCmds.length===0){c.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span>';return}
+  c.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k];if(!m)return'';return`<span class="ac-pill" onclick="document.getElementById('cmd').value='${m.label} ';document.getElementById('cmd').focus()" title="${m.desc}">${m.label}</span>`}).join('');
+}
+
+function addAgent(role,name){
+  G.agents.push({role,name});save();
+  const c=document.getElementById('crew-sec');
+  document.getElementById('crew-empty').style.display='none';
+  const tips={'Vuln Analyst':'Hunts for deployment issues.','Pen Tester':'Tests rollout safety.','Threat Analyst':'Monitors for deployment threats.'};
+  const d=document.createElement('div');d.className='agent-card';
+  d.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role}</div><div class="ac-status">active</div><div class="ac-tip">${tips[role]||'Deployment specialist.'}</div>`;
+  d.onclick=()=>d.classList.toggle('open');
+  c.insertBefore(d,document.getElementById('crew-empty'));
+}
+
+function addCareerEntry(idx){
+  if(!CAREER_LOG_DATA[idx-1])return;
+  G.careerLog.push(idx);save();
+  document.getElementById('career-impact-btn').style.display='inline';
+}
+function renderCareer(){
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i-1];if(!d)return'';
+    return`<div class="career-item"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-ctx">${d.context}</div><div class="career-tags">${d.tags.map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function setLola(msg){
+  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+}
+function lolaComment(text){
+  const w=document.createElement('div');
+  w.className='ln ln-lola';
+  w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  telem('L.O.L.A.: '+text);
+}
+function lolaMotivate(){
+  const lines=["You're making me proud, Officer.","That's exactly how a real Deployment Officer thinks.","One more solid move like that…","The fleet is shipping cleaner already."];
+  lolaComment(lines[Math.floor(Math.random()*lines.length)]);
+}
+
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span> Show me the deep version`;
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];if(!dd)return;
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  lolaComment("That's the production-grade context. This is what separates engineers who know deployment from engineers who do deployment.");
+}
+
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  lolaComment("Want to see what would have happened if you chose a different path? Type: whatif");
+  G._pendingWhatIf=phaseIdx;
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  const body=document.getElementById('playbook-body');
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?`Phase ${phaseIdx} — ${ph.title}`:`Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={1:'CI on every PR. Cache dependencies. Fail fast.',2:'Scan, sign, and version every Docker image.',3:'Git is the source of truth. Reconciliation is continuous.',4:'Config in ConfigMaps, secrets in secret stores.',5:'Blue-green for instant rollback, canary for gradual exposure.',6:'terraform plan in PRs, apply only from main.',7:'Automated gates + manual approval for prod.',8:'Logs first, then sync status, then application.',9:'Pause, rollback, investigate, fix, re-enable gradually.'};
+  const note=phNotes[phaseIdx]||'Deployment control applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  lolaComment("Saved to your playbook! Type: playbook export to get it as markdown.");
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(G.playbook.length===0){body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';count.style.display='none';return}
+  count.style.display='inline';count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map((e,i)=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My Deployment Playbook\n*Vibe Deployment Officer — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  lolaComment("Playbook copied to clipboard!");
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
+function getProgressiveHint(val, s, wrongStreak){
+  const ph=PHASES[G.phase];
+  const vl=val.toLowerCase().trim();
+  const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
+  const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
+  let hint=base;
+  let levelLabel='HINT';
+  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'a deploy command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
+  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function getPersonalizedTakeaway(){
+  if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
+  const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(!top)return;
+  const takeaways={'wrong_cmd':'You tried creative commands — curiosity is an asset.','close_cmd':'You were close — just needed the full subcommand.','repeated':'You found one approach and stuck with it. In deployment, if something isn\'t working, the pipeline itself might be telling you something.'};
+  const key=top[0];
+  const msg=takeaways[key]||'You pushed through. That persistence is exactly what incident response requires.';
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">🧠 L.O.L.A. Insight <span class="diag-level-badge">PERSONAL</span></div><div class="diag-msg">${msg}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  G.mistakeTypes=[];save();
+}
+
+function syncObjCard(){
+  const ph=PHASES[G.phase];if(!ph){return}
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
+  const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
+  document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+}
+let eaglePhase=true;
+function revealCmd(){
+  document.getElementById('obj-cmd-val').classList.remove('blurred');
+  eaglePhase=false;
+  G.score=Math.max(0,G.score-5);
+  document.getElementById('score-n').textContent=G.score;
+  save();
+}
+
+function syncDots(){
+  const track=document.getElementById('phase-track');
+  track.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(G.completedPhases.includes(i)?' done':i===G.phase?' active':'');
+    const ph=PHASES[i];d.setAttribute('data-tip',ph?`P${i}: ${ph.title}`:`P${i}`);
+    track.appendChild(d);
+    if(i<9){const s=document.createElement('div');s.className='phase-sep';s.textContent='·';track.appendChild(s)}
+  }
+}
+
+const SAVE_KEY='vdo_v1';
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
+
+const EASTER={
+  'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
+  'whoami':{handle:()=>{appendLine(`Deployment Officer ${G.name} · Fleet Platform Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'neofetch':{handle:()=>{appendLine('deploy-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-platform 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Threat level: nominal','ln-sys')}},
+  'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last cascade: contained in 4 minutes','ln-ok')}},
+  'ls':{handle:()=>{appendLine('logs/  pipelines/  charts/  terraform/  manifests/  secrets/','ln-code')}},
+  'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
+  'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+};
+
+function showDiag(val){
+  const vl=val.toLowerCase().trim();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!G.mistakeTypes)G.mistakeTypes=[];
+  if(!G.wrongStreak)G.wrongStreak=0;
+  G.wrongStreak=(G.wrongStreak||0)+1;
+  if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
+  else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
+  else{G.mistakeTypes.push('wrong_cmd')}
+  getProgressiveHint(val,s,G.wrongStreak);
+  G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function handleChallengeAnswer(val){
+  const ch=G.activeChallengeData;if(!ch)return false;
+  const vl=val.toLowerCase().trim();
+  if(ch.acceptFn&&ch.acceptFn(vl)){
+    appendLine('✓ CHALLENGE SOLVED: '+ch.title,'ln-ok');
+    appendLine(ch.answer,'ln-info');
+    G.activeChallengeData=null;
+    if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-5);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+function handleBreakitAnswer(val){
+  const bi=G.activeBreakitData;if(!bi)return false;
+  const vl=val.toLowerCase().trim();
+  if(bi.acceptFn&&bi.acceptFn(vl)){
+    appendLine('✓ BREAK-IT DIAGNOSED: '+bi.title,'ln-ok');
+    appendLine(bi.answer,'ln-info');
+    G.activeBreakitData=null;
+    if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-3);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+
+async function startPhase(){
+  const ph=PHASES[G.phase];if(!ph)return;
+  blank();divline();
+  appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
+  blank();
+  appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
+  blank();
+  if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  setLola(ph.steps[0].ctx);
+  syncObjCard();
+  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+}
+
+async function completeStep(s,ph){
+  G.step++;G.tries=0;G.wrongStreak=0;save();
+  await new Promise(r=>setTimeout(r,300));
+  lolaMotivate();
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.teach)showTeach(s.teach);
+  if(s.quiz&&s.quiz.janetQuiz){janetQuizAttempt=true;await showJanetQuizWithQ(s.quiz);blank();lolaComment("Whether you got that right or wrong — the fact you're here working through this matters.")}
+  if(G.step>=ph.steps.length){
+    await completePhase(ph);
+  } else {
+    const ns=ph.steps[G.step];
+    blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    setLola(ns.ctx);syncObjCard();
+    if(!G.hard&&!G.practitioner)showHint(ns.hint);
+    if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
+    save();
+  }
+}
+
+async function completePhase(ph){
+  if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
+  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  blank();divline();
+  if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
+  if(ph.ach)unlock(ph.ach);
+  if(eaglePhase)unlock('eagle');
+  eaglePhase=true;
+  addCareerEntry(G.phase);
+  const phaseDebriefs=[null,"Build pipeline live.","Artifacts secured.","GitOps active.","Environments and secrets hardened.","Safe rollouts operational.","Infrastructure as code applied.","Multi-environment promotion with gates.","Deployment forensics mastered.","The fleet survived the cascade."];
+  const debriefMsg=phaseDebriefs[G.phase];
+  if(debriefMsg){await delay(400);lolaComment(debriefMsg)}
+  const exitSR=SPACED_EXIT&&SPACED_EXIT[G.phase];
+  if(exitSR){blank();await showSpacedRep(exitSR);blank()}
+  G.completedPhases.push(G.phase);
+  if(G.phase===5)addAgent('Vuln Analyst','Cipher');
+  if(G.phase===6)addAgent('Pen Tester','Raven');
+  if(G.phase===7)addAgent('Threat Analyst','Specter');
+  await delay(300);getPersonalizedTakeaway();
+  await delay(400);
+  lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
+  await delay(500);
+  showWhatIfButton(G.phase);
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();
+  await startPhase();
+}
+
+async function startBossFight(){
+  G.bossActive=true;G.bossStep=0;G.bossScore=0;save();
+  blank();divline();
+  await delay(300);
+  appendLine('⚠ L.O.L.A.: [EMERGENCY SHUTDOWN INITIATED]','ln-warn');
+  await delay(600);
+  appendLine('⚠ L.O.L.A.: Cascade incident detected…','ln-warn');
+  await delay(500);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  document.getElementById('lola-avatar').style.background='var(--silver-d)';
+  document.getElementById('lola-name').style.color='var(--muted)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  document.getElementById('lola-msg').textContent='Intelligence core offline.';
+  await delay(800);
+  appendLine('J.A.N.E.T.: Good evening. I have been asked to oversee your final assessment.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: There is an active cascade incident in progress.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: You will need to apply everything you have learned.','ln-janet');
+  blank();await delay(500);
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  G.bossStep=idx;save();
+  const bs=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+  const w=document.createElement('div');w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ FINAL ASSESSMENT</div>
+      <div class="boss-sub">J.A.N.E.T. PROTOCOL · STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${bs.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Required Action</div>
+      <div class="boss-prompt">${bs.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  if(!G.hard&&!G.practitioner&&!G.expert)showHint(bs.hint);
+}
+
+function handleBossInput(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  const bs=BOSS_STEPS[G.bossStep];
+  const accepted=bs.acceptFn?bs.acceptFn(vl):bs.accept&&bs.accept.some(a=>vl===a.toLowerCase());
+  if(accepted){
+    appendLine(bs.out||'Action executed.','ln-ok');blank();
+    G.bossScore++;
+    if(G.bossStep+1<BOSS_STEPS.length){
+      G.bossStep++;save();
+      setTimeout(()=>showBossStep(G.bossStep),400);
+    } else {
+      G.bossActive=false;save();
+      completeBossFight();
+    }
+  } else {
+    appendLine('J.A.N.E.T.: That is not the correct action.','ln-janet');
+    G.score=Math.max(0,G.score-15);document.getElementById('score-n').textContent=G.score;save();
+  }
+}
+
+async function completeBossFight(){
+  blank();divline();
+  await delay(500);
+  appendLine('J.A.N.E.T.: The incident is contained. Your final assessment is complete.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: I am now going to acknowledge that you performed adequately.','ln-janet');
+  await delay(700);
+  appendLine('J.A.N.E.T.: Do not let this go to your head.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: L.O.L.A. can come back now.','ln-janet');
+  await delay(800);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  lolaComment("I'm back. Thank you for keeping the fleet shipping.");
+  await delay(600);
+  appendLine(`L.O.L.A.: Officer ${G.name}. The fleet is shipping reliably.`,'ln-lola');
+  blank();divline();
+  appendLine('FLEET DEPLOYMENT STATUS: ALL 50 SHIPS SHIPPING','ln-sys');
+  const steps=['Validating certification…','Build pipelines: PASSED','Artifact management: PASSED','GitOps: PASSED','Environments & secrets: PASSED','Blue-green & canary: PASSED','Infrastructure as Code: PASSED','Multi-env promotion: PASSED','Deployment forensics: PASSED','Cascade recovery: PASSED','Final assessment: PASSED','Issuing certification…'];
+  for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('🚀 DEPLOYMENT CERTIFICATION GRANTED','ln-success');
+  appendLine(`Officer ${G.name} — Vibe Deployment Officer · Class of 2026`,'ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('      DEPLOYMENT CERTIFICATION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('boss_slayer');unlock('cdo');
+  addCareerEntry(9);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase]){showWhatIf(pendingPhase)}
+    else{appendLine('No what-if scenario available.','ln-info')}
+    return;
+  }
+  appendLine(`${val}: executed.`,'ln-ok');
+}
+
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const lines=[
+    {t:'VIBE DEPLOYMENT OFFICER v1.0',c:'ln-success'},
+    {t:'Booting fleet deployment core…',c:'ln-sys'},
+    {t:'Build pipelines: READY',c:'ln-sys'},
+    {t:'Artifact management: READY',c:'ln-sys'},
+    {t:'GitOps engine: READY',c:'ln-sys'},
+    {t:'Kubernetes & Helm: READY',c:'ln-sys'},
+    {t:'Blue-green & canary: STANDBY',c:'ln-sys'},
+    {t:'Infrastructure as Code: READY',c:'ln-sys'},
+    {t:'Multi-env promotion: READY',c:'ln-sys'},
+    {t:'Deployment forensics: LOADED',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome aboard, Officer ${G.name}. The fleet is ready to ship.`,c:'ln-lola'},
+    {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    {t:'Build. Artifact. GitOps. Environments. Rollouts. IaC. Promotion. Forensics. Resilience.',c:'ln-lola'},
+    {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
+    {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: Try janet, whoami, neofetch, uptime',c:'ln-info'},
+    {t:'TIP: After each step → type  deep  to go deeper. After each phase → playbook save or whatif',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
+  if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
+  if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
+  appendLine(`Welcome back, Officer ${G.name}. Deployment systems restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  renderPlaybook();
+  if(G.sandbox){
+    appendLine('Deployment certification complete. Sandbox mode.','ln-success');
+  }else if(G.bossActive){
+    appendLine('Active cascade in progress. J.A.N.E.T. is still waiting.','ln-warn');
+    blank();showBossStep(G.bossStep);
+  }else{
+    const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
+    if(ph&&s){
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(s.ctx);
+    }
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){if(confirm('Restart Vibe Deployment Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function shareGrad(){
+  const txt=`Just completed Vibe Deployment Officer 🚀\n\nAll 9 phases: build pipelines, artifact management, GitOps, environments & secrets, blue-green & canary, IaC, multi-env promotion, deployment forensics, and surviving the cascade.\n\nFree training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
+  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your deployment operations?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+</script>
+</body>
+</html>

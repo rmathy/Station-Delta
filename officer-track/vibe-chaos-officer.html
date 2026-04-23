@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Chaos Officer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#1db954;
+  --green-d:#0d5c28;
+  --green-bg:#040f09;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--silver)}50%{text-shadow:0 0 16px var(--silver),0 0 32px rgba(176,190,197,.2)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--silver)}
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--silver);border-color:var(--silver)}
+.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── TERMINAL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--silver)}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--silver);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--silver);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* ══ BOSS FIGHT ══ */
+.boss-container{margin:14px 0;border:2px solid var(--red);border-radius:var(--r8);overflow:hidden;animation:bossGlow 2s infinite;position:relative}
+.boss-header{background:linear-gradient(90deg,#1a0505,#0d0202);border-bottom:2px solid var(--red-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:14px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;animation:bossFlicker 3s infinite}
+.boss-sub{font-family:var(--janet);font-size:10px;color:var(--red-d);letter-spacing:.15em;margin-left:auto}
+.boss-body{background:#080202;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:#c47070;line-height:1.8;margin-bottom:12px;border-left:3px solid var(--red-d);padding-left:12px}
+.boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
+.boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--silver);background:var(--silver-bg)}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--silver)}
+
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+#crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
+.mbtn-p{background:var(--silver);color:#000;font-weight:700}
+.mbtn-p:hover{background:var(--silver-bright)}
+.mbtn-s{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
+.mbtn-s:hover{background:var(--b2);color:var(--text)}
+.boot-features{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--red);margin-right:6px}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
+input[type=text]:focus{border-color:var(--silver)}
+.grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
+.grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
+.grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
+.skills-list span{color:var(--green);margin-right:8px}
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:22px;flex-shrink:0}
+.ach-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ach-desc{font-size:11px;color:var(--muted2)}
+.gloss-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;margin-bottom:4px}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:11px;color:var(--muted2);line-height:1.65}
+.career-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.career-item:last-child{border-bottom:none}
+.career-phase{font-size:11px;color:var(--cyan);margin-bottom:4px}
+.career-stat{font-size:22px;font-weight:700;color:var(--silver);margin-bottom:3px}
+.career-ctx{font-size:11px;color:var(--text);line-height:1.65}
+.career-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
+/* ── ENHANCED DIAG ── */
+.diag-block-progressive{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div id="logo">💥 VIBE · CHAOS OFFICER</div>
+    <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <span id="sandbox-pill">SANDBOX</span>
+      <span id="hardmode-pill">HARD MODE</span>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+    </div>
+  </div>
+
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">chaos@<span id="term-path-val">ship:/home/officer/ops</span></div>
+    </div>
+    <div id="output"></div>
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
+    </div>
+    <div id="input-row">
+      <div id="prompt-pre">$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Loading…</div>
+      <div id="obj-context">Initializing…</div>
+      <div id="obj-cmd-label">Next Command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">—</div>
+        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Officer on deck. The ship's chaos is yours to command.</div>
+    </div>
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
+    </div>
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">💥</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Chaos Officer</div>
+    <div class="msub">Break it before production does. You are the resilience & failure-injection specialist — the one who intentionally creates chaos to make the fleet unbreakable.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · real-world chaos engineering<br>
+      <span>▸</span>L.O.L.A. — your tactical intel officer<br>
+      <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all quizzes. She is… unimpressed.<br>
+      <span>▸</span>Chaos fundamentals · targeted failure injection · blast radius mapping<br>
+      <span>▸</span>Resilience patterns · game days · advanced fault injection<br>
+      <span>▸</span>Recovery automation · post-mortem mastery · The Black Swan Event<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable chaos reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div><div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full context. Recommended.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div><div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart feedback only.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div><div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No feedback. Timer on.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">UNLEASH CHAOS</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">💥</div>
+    <div class="mtitle" style="text-align:center;color:var(--silver)">Chaos Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Chaos Officer — including the Black Swan Event. The fleet is now unbreakable.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Chaos Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Vibe Chaos Officer · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Chaos engineering fundamentals and mindset<br>
+      <span>✓</span>Targeted failure injection (pods, network, CPU)<br>
+      <span>✓</span>Blast radius mapping and observability impact<br>
+      <span>✓</span>Resilience patterns: retries, backoff, bulkheads<br>
+      <span>✓</span>Game days and scheduled chaos scenarios<br>
+      <span>✓</span>Advanced fault injection (Gremlin-style)<br>
+      <span>✓</span>Recovery automation and self-healing<br>
+      <span>✓</span>Post-mortem mastery and lesson extraction<br>
+      <span>✓</span>Full chaos resilience under live pressure
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+  </div>
+</div>
+
+<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Chaos milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Chaos engineering terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE CHAOS OFFICER v1.0
+   Exact same framework as all previous Vibe titles.
+   J.A.N.E.T. administers all quizzes. L.O.L.A. is your tactical chaos officer.
+   Boss Fight: Phase 9 — The Black Swan Event. L.O.L.A. goes offline. JANET takes over.
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/officer/ops',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  mistakeTypes:[],
+  wrongStreak:0,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your chaos assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for a chaos assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. Chaos module loaded. I will now present a question. Please answer it correctly. Or incorrectly. Both outcomes have been observed. I document them all.",
+  "I am J.A.N.E.T. I have been asked to test your chaos engineering knowledge. I find 'chaos' a somewhat optimistic word for the state of most production systems. Nonetheless. I will proceed.",
+  "J.A.N.E.T. online. I note you have reached a chaos quiz. Statistically, most engineers believe they understand failure until they are asked a specific question. This is one of those.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your chaos record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. The failure has been correctly identified. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your chaos file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it carefully.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit in the incorrect styling.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is common in chaos engineering. Especially after a Black Swan.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is not something I recommend reviewing before important game days.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Chaos Fundamentals',stat:'100%',context:'of production outages are caused by unknown weaknesses. Chaos engineers who master the mindset prevent disasters by breaking things on purpose.',tags:['Chaos Engineering','Failure Injection','Resilience']},
+  {phase:'Phase 2 — Targeted Failure Injection',stat:'10×',context:'faster discovery of hidden weaknesses. Engineers who can reliably kill pods, delay networks, and spike CPU find problems before production does.',tags:['Kill Scripts','Network Delay','CPU Spike']},
+  {phase:'Phase 3 — Blast Radius Mapping',stat:'Precise',context:'mapping exactly how far a failure spreads. Mature teams know their blast radius before they ever run a real experiment.',tags:['Blast Radius','Observability','Impact Analysis']},
+  {phase:'Phase 4 — Resilience Patterns',stat:'Zero Downtime',context:'Retries, backoff, bulkheads, and rate limiting turn fragile systems into antifragile ones.',tags:['Retries','Backoff','Bulkheads','Rate Limiting']},
+  {phase:'Phase 5 — Game Days',stat:'Quarterly',context:'Scheduled chaos exercises with live monitoring build muscle memory and team confidence.',tags:['Game Days','Chaos Drills','Live Testing']},
+  {phase:'Phase 6 — Advanced Fault Injection',stat:'Gremlin',context:'Gremlin-style attacks on services, databases, and AI calls simulate real-world Black Swan events.',tags:['Advanced Chaos','Gremlin','Fault Injection']},
+  {phase:'Phase 7 — Recovery Automation',stat:'Self-Healing',context:'Automated recovery scripts and circuit breakers turn incidents into non-events.',tags:['Self-Healing','Recovery Scripts','Automation']},
+  {phase:'Phase 8 — Post-Mortem Mastery',stat:'Blameless',context:'Blameless post-mortems that turn every chaos experiment into permanent system improvement.',tags:['Post-Mortem','Root Cause','Lessons Learned']},
+  {phase:'Phase 9 — The Black Swan Event',stat:'CChaos track',context:'Engineers who can contain multiple cascading failures under live pressure become Chaos Officers and platform resilience leaders.',tags:['Black Swan','Cascade Recovery','Resilience Leadership']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'Chaos Engineering',def:'The discipline of intentionally breaking systems in production (or production-like environments) to build confidence in their ability to withstand real failures.'},
+  {term:'Blast Radius',def:'The potential impact scope of a failure. Good chaos experiments start with the smallest possible blast radius and expand only when safe.'},
+  {term:'Circuit Breaker',def:'A resilience pattern that stops calls to a failing service and falls back to a safe alternative, preventing cascade failures.'},
+  {term:'Bulkhead',def:'Isolating resources so that a failure in one part of the system does not affect the rest (like watertight compartments on a ship).'},
+  {term:'Game Day',def:'A scheduled, controlled chaos exercise where the team practices failure injection and recovery with live monitoring.'},
+  {term:'Black Swan Event',def:'A rare, high-impact failure that was previously considered extremely unlikely. Chaos engineering prepares you for them.'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'chaos':   {synopsis:'chaos [command]',desc:'Chaos engineering tools',why:'Intentionally break things to make the system stronger.',flags:[{f:'kill pod',d:'Terminate a random pod'},{f:'delay network',d:'Inject network latency'}],example:'$ chaos kill pod\n$ chaos delay network'},
+  'inject':  {synopsis:'inject [command]',desc:'Targeted failure injection',why:'Simulate real-world failures on demand.',flags:[{f:'cpu spike',d:'Spike CPU on a service'},{f:'db failure',d:'Simulate database outage'}],example:'$ inject cpu spike\n$ inject db failure'},
+  'blast':   {synopsis:'blast [command]',desc:'Blast radius mapping',why:'Understand how far a failure spreads.',flags:[{f:'map',d:'Run experiment and map impact'},{f:'observe',d:'Read observability during blast'}],example:'$ blast map\n$ blast observe'},
+  'resilient':{synopsis:'resilient [command]',desc:'Resilience pattern testing',why:'Test retries, backoff, bulkheads, and rate limiting.',flags:[{f:'test retry',d:'Test retry logic'},{f:'test bulkhead',d:'Test bulkhead isolation'}],example:'$ resilient test retry\n$ resilient test bulkhead'},
+  'gameday': {synopsis:'gameday [command]',desc:'Scheduled chaos scenarios',why:'Run full game days with live monitoring.',flags:[{f:'start',d:'Begin a game day scenario'},{f:'monitor',d:'Live monitoring during game day'}],example:'$ gameday start\n$ gameday monitor'},
+  'forensic':{synopsis:'forensic [command]',desc:'Post-chaos forensics',why:'Reconstruct experiments and extract lessons.',flags:[{f:'timeline',d:'Reconstruct timeline'},{f:'rootcause',d:'Blameless root cause'}],example:'$ forensic timeline\n$ forensic rootcause'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal Chaos Playbook',why:'Build your own exportable chaos reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',    icon:'💥',name:'First Break',        desc:'Issued your first chaos command.'},
+  {id:'chaos_fund',   icon:'🔧',name:'Chaos Initiate',     desc:'Completed Phase 1 — chaos fundamentals.'},
+  {id:'injector',     icon:'⚡',name:'Failure Injector',    desc:'Completed Phase 2 — targeted failure injection.'},
+  {id:'blastradius',  icon:'🌍',name:'Blast Radius Mapper',desc:'Completed Phase 3 — blast radius mapping.'},
+  {id:'resilient',    icon:'🛡️',name:'Resilience Engineer',desc:'Completed Phase 4 — resilience patterns tested.'},
+  {id:'gameday',      icon:'📅',name:'Game Day Veteran',   desc:'Completed Phase 5 — game days executed.'},
+  {id:'advanced',     icon:'🧪',name:'Advanced Chaos',     desc:'Completed Phase 6 — advanced fault injection.'},
+  {id:'recover',      icon:'🔄',name:'Recovery Automator', desc:'Completed Phase 7 — self-healing scripts live.'},
+  {id:'postmortem',   icon:'📋',name:'Post-Mortem Master', desc:'Completed Phase 8 — forensics mastery.'},
+  {id:'blackswan',    icon:'🦢',name:'Black Swan Slayer',  desc:'Defeated the Phase 9 Black Swan Event. JANET was unimpressed.'},
+  {id:'chaoslord',    icon:'💥',name:'Chief Chaos Officer',desc:'Completed all 9 phases. The fleet is unbreakable.'},
+  {id:'janet_ace',    icon:'🧊',name:'JANET Ace',          desc:'Answered a JANET quiz correctly on first try.'},
+  {id:'eagle',        icon:'🦅',name:'Eagle Eye',          desc:'Completed a phase without revealing the answer.'},
+  {id:'recall_master',icon:'🧠',name:'Recall Master',      desc:'Got 3+ spaced recall questions right in a row.'},
+];
+
+/* ── SPACED RECALL CALLBACKS ── */
+const SPACED_CALLBACKS = [
+  null,
+  {q:'What is the first rule of chaos engineering?',answer:'Start with the smallest possible blast radius',acceptFn:v=>v.includes('blast')||v.includes('smallest')},
+  {q:'What does a circuit breaker do when it opens?',answer:'Stops calls to the failing service and falls back to a safe alternative',acceptFn:v=>v.includes('stop')||v.includes('fallback')},
+  {q:'What is the purpose of a game day?',answer:'Practice failure injection and recovery with the full team under controlled conditions',acceptFn:v=>v.includes('practice')||v.includes('game day')},
+  {q:'What is the safest way to roll back after a chaos experiment?',answer:'Revert the Git commit that introduced the change (in GitOps)',acceptFn:v=>v.includes('revert')||v.includes('git')},
+  {q:'Name two common resilience patterns.',answer:'Retries with backoff and bulkheads',acceptFn:v=>v.includes('retry')||v.includes('bulkhead')},
+  {q:'What should you do immediately when a chaos experiment causes an outage?',answer:'Stop the experiment and restore from the last known good state',acceptFn:v=>v.includes('stop')||v.includes('restore')},
+  {q:'What is the goal of post-chaos forensics?',answer:'Extract systemic lessons and improve resilience without assigning blame',acceptFn:v=>v.includes('lesson')||v.includes('systemic')},
+  {q:'During a Black Swan event, what is the first priority?',answer:'Contain the blast radius and protect the rest of the fleet',acceptFn:v=>v.includes('contain')||v.includes('blast')},
+];
+
+/* ── SPACED EXIT ── */
+const SPACED_EXIT = [
+  null,
+  {q:'What is the difference between monitoring and chaos engineering?',answer:'Monitoring tells you when something is broken. Chaos engineering tells you what will break before it happens.',acceptFn:v=>v.includes('chaos')||v.includes('monitoring')},
+  {q:'Why do we run chaos experiments in production-like environments?',answer:'Only real production traffic and scale reveal the true weaknesses.',acceptFn:v=>v.includes('production')||v.includes('scale')},
+  {q:'What is the most important output of a game day?',answer:'Lessons learned and improved resilience patterns, not just "it survived."',acceptFn:v=>v.includes('lesson')||v.includes('resilience')},
+];
+
+/* ── DEEP DIVE CONTENT ── */
+const DEEP_DIVE = [
+  null,
+  {title:'The Chaos Mindset in Production',body:'Chaos engineering is not about breaking things for fun — it is about building unbreakable systems by exposing weaknesses before they matter. The best chaos engineers start small, measure everything, and turn every experiment into a permanent improvement.'},
+  {title:'Targeted Failure Injection Techniques',body:'Killing pods, injecting network latency, spiking CPU, and dropping database connections are the most common experiments. The key is to run them in a controlled way with observability so you can measure the exact blast radius.'},
+  {title:'Blast Radius Mapping in Practice',body:'Before any experiment, map exactly which services, databases, and users will be affected. Use feature flags, canary regions, or low-traffic environments to limit impact while still learning real lessons.'},
+  {title:'Resilience Patterns That Actually Work',body:'Retries with exponential backoff + jitter prevent thundering herds. Bulkheads isolate failures. Rate limiting protects downstream services. These patterns turn fragile systems into antifragile ones.'},
+  {title:'Running Effective Game Days',body:'Schedule them quarterly. Involve the full on-call team. Have clear success criteria and rollback plans. The goal is not to prove the system is perfect — it is to prove the team can recover quickly when it isn\'t.'},
+  {title:'Advanced Fault Injection (Gremlin Style)',body:'Simulate region failures, database outages, AI hallucinations, and network partitions. The most valuable experiments are the ones that feel slightly too scary to run.'},
+  {title:'Recovery Automation That Actually Works',body:'Self-healing scripts, automatic circuit breakers, and one-click rollbacks turn potential disasters into non-events. The best recovery is the one that happens before anyone wakes up.'},
+  {title:'Blameless Post-Mortems for Chaos Experiments',body:'Focus on what the system allowed to happen, not what the engineer did. Every chaos experiment should end with concrete, measurable improvements to resilience patterns or observability.'},
+  {title:'Surviving the Black Swan Event',body:'When multiple failures hit simultaneously, the only thing that matters is blast radius control and recovery speed. The teams that practice chaos regularly are the ones that survive when the Black Swan arrives.'},
+];
+
+/* ── WHATIF SCENARIOS ── */
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'What if you never ran chaos experiments?',alt:'The team relied only on monitoring and "it has never failed before."',outcome:'Result: A subtle network partition during peak traffic caused a 3-hour outage that could have been caught in a 5-minute experiment.',learning:'Chaos finds the problems monitoring misses.'},
+  {title:'What if you injected failures without observability?',alt:'The team ran pod kills but had no metrics or logs during the experiment.',outcome:'Result: They had no idea what broke or how far the failure spread. The experiment taught them nothing.',learning:'Without observability, chaos is just random destruction.'},
+  {title:'What if resilience patterns were never tested?',alt:'Retries and circuit breakers were implemented but never exercised.',outcome:'Result: When the real failure hit, the patterns didn\'t work as expected and the outage lasted longer than it should have.',learning:'Untested resilience is just wishful thinking.'},
+];
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = [
+  null,
+  {title:'Missing Blast Radius Control',scenario:'A chaos experiment killed 40% of pods in production without any traffic shifting or canary setup.\n\nThe entire fleet went down. What went wrong?',acceptFn:v=>v.includes('blast')||v.includes('radius')||v.includes('canary'),answer:'No blast radius control. Always start with the smallest possible scope and use traffic shifting or feature flags.'},
+  {title:'No Observability During Experiment',scenario:'A network delay experiment was run but there were no real-time metrics or logs.\n\nThe team had no idea what broke. Why was this experiment useless?',acceptFn:v=>v.includes('observ')||v.includes('metric')||v.includes('log'),answer:'Without observability you cannot measure impact or learn anything. Chaos without metrics is just random breaking.'},
+  {title:'Untested Circuit Breaker',scenario:'A circuit breaker was added but never tested with real failure injection.\n\nWhen the real failure happened, the breaker never triggered.',acceptFn:v=>v.includes('test')||v.includes('breaker')||v.includes('inject'),answer:'Resilience patterns must be tested with chaos experiments. Untested code is unproven code.'},
+];
+
+/* ── CHALLENGE SCENARIOS ── */
+const CHALLENGES = [
+  null,
+  {title:'Design a Safe Chaos Experiment',scenario:'You want to test pod failure resilience. Describe the exact steps for a safe experiment with minimal blast radius.',acceptFn:v=>v.includes('canary')||v.includes('blast')||v.includes('scope'),answer:'1. Run on a single low-traffic pod or canary region. 2. Have observability and rollback ready. 3. Measure impact before expanding scope.'},
+  {title:'Write a Basic Failure Injection Script',scenario:'Write the core of a script that randomly kills one pod in a deployment. What safety checks would you include?',acceptFn:v=>v.includes('kill')||v.includes('pod')||v.includes('safety'),answer:'Check that the deployment has multiple replicas, confirm it is not production peak hours, have an immediate rollback command ready.'},
+];
+
+/* ── PHASE DATA ── */
+const PHASES = [
+  null,
+  /* Phase 1: Chaos Fundamentals */
+  {title:'Chaos Fundamentals',
+   lolaIntro:"Break it before production does.",
+   spacedRep:SPACED_CALLBACKS[1],
+   steps:[
+    {id:'p1s1',obj:'Run your first chaos experiment',ctx:'The fleet has never been intentionally broken. Start small.',
+     cmd:['chaos kill'],
+     accept:['chaos kill','chaos basic'],
+     acceptFn:v=>v.includes('chaos')&&(v.includes('kill')||v.includes('basic')),
+     hint:'Type: chaos kill',
+     out:'FIRST CHAOS EXPERIMENT COMPLETE:\n\n  Random pod killed in test namespace\n  Blast radius: 1 pod\n  Observability impact logged\n  System recovered automatically\n\nChaos mindset initiated.',
+     unlockCmd:'chaos',
+     jit:{title:'The chaos mindset',body:'We break things on purpose so production doesn’t break them by accident.'},
+     bridge:{title:'Chaos engineering is proactive resilience',body:'Most teams wait for production to break them. You break it first.',tags:['Chaos Engineering','Failure Injection']},
+     teach:{title:'The first rule of chaos',body:'Start with the smallest possible blast radius. Measure everything. Have a rollback ready.'}},
+    {id:'p1s2',obj:'Configure basic observability for chaos experiments',ctx:'You broke something. Now make sure you can see what happened.',
+     cmd:['chaos observe'],
+     accept:['chaos observe','chaos monitor'],
+     acceptFn:v=>v.includes('chaos')&&(v.includes('observe')||v.includes('monitor')),
+     hint:'Type: chaos observe',
+     out:'CHAOS OBSERVABILITY ENABLED:\n\n  Real-time metrics during experiments\n  Correlation IDs added to all logs\n  Blast radius dashboard active\n  Automatic rollback trigger ready\n\nYou can now see exactly what you broke.',
+     jit:{title:'Observability is the eyes of chaos engineering',body:'Without it, you are just randomly breaking things with no learning.'},
+     bridge:{title:'Chaos without observability is just random destruction',body:'Good chaos engineers measure impact before, during, and after every experiment.',tags:['Observability','Chaos']},
+     teach:{title:'What to measure during chaos',body:'Error rate, latency, throughput, user impact, and recovery time. Everything that matters in production.'},
+     quiz:{q:'You ran a chaos experiment but had no metrics. What did you actually learn?',
+      opts:['Nothing useful','How the system behaves under failure','The exact blast radius','How fast the team can respond'],
+      janetQuiz:true,
+      correct:0,fb:'Correct. Without observability you learned nothing. Chaos engineering is about learning, not just breaking.'}}],
+   breakit:BREAKIT[1],
+   done:'Chaos fundamentals established. You are now dangerous in the best possible way.',
+   ach:'chaos_fund'},
+
+  /* Phase 2: Targeted Failure Injection */
+  {title:'Targeted Failure Injection',
+   lolaIntro:"Kill pods, delay network, spike CPU. Break it on purpose.",
+   spacedRep:SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Inject a pod failure',ctx:'Kill one pod and watch what happens.',
+     cmd:['inject kill pod'],
+     accept:['inject kill pod','inject pod'],
+     acceptFn:v=>v.includes('inject')&&(v.includes('kill')||v.includes('pod')),
+     hint:'Type: inject kill pod',
+     out:'TARGETED POD KILL COMPLETE:\n\n  One pod terminated in test deployment\n  New pod spun up automatically\n  No user impact detected\n  Recovery time: 8 seconds\n\nTargeted failure injection successful.',
+     unlockCmd:'inject',
+     jit:{title:'Pod kills are the most common chaos experiment',body:'They simulate the most frequent real-world failure: a container dying.'},
+     bridge:{title:'Targeted injection finds weaknesses fast',body:'One well-placed failure can reveal missing resilience patterns.',tags:['Failure Injection','Pod Kill']},
+     teach:{title:'Safe pod kill checklist',body:'Run in non-production first. Have observability. Confirm multiple replicas exist. Have rollback ready.'}},
+    {id:'p2s2',obj:'Inject network latency and packet loss',ctx:'Make the network unreliable and see how the system reacts.',
+     cmd:['inject network delay'],
+     accept:['inject network delay','inject latency'],
+     acceptFn:v=>v.includes('inject')&&(v.includes('network')||v.includes('delay')||v.includes('latency')),
+     hint:'Type: inject network delay',
+     out:'NETWORK CHAOS INJECTED:\n\n  200ms latency + 1% packet loss applied\n  Retries and timeouts exercised\n  Circuit breakers triggered correctly\n  No user-visible outage\n\nNetwork resilience validated.',
+     jit:{title:'Network chaos is the great equalizer',body:'It exposes assumptions about latency, timeouts, and retries that "works on my machine" never reveals.'},
+     bridge:{title:'Network injection is essential for microservices',body:'Distributed systems live and die by the network.',tags:['Network Chaos','Latency Injection']},
+     teach:{title:'Common network chaos experiments',body:'Latency, packet loss, bandwidth limits, and complete partition. Test them all.'},
+     quiz:{q:'You injected 500ms latency. The system handled it with retries. What does this prove?',
+      opts:['The system is unbreakable','Retries are working as designed','You still need to test longer delays and partitions','All of the above'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. One successful test does not prove resilience. You must test the edge cases too.'}}],
+   breakit:BREAKIT[2],
+   done:'Targeted failure injection mastered. You can now break specific things on command.',
+   ach:'injector'},
+
+  /* Phase 3: Blast Radius Mapping */
+  {title:'Blast Radius Mapping',
+   lolaIntro:"Run experiments and read observability impact.",
+   spacedRep:SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Run a chaos experiment and map the blast radius',ctx:'Break something small. See how far it spreads.',
+     cmd:['blast map'],
+     accept:['blast map','blast radius'],
+     acceptFn:v=>v.includes('blast')&&(v.includes('map')||v.includes('radius')),
+     hint:'Type: blast map',
+     out:'BLAST RADIUS MAPPED:\n\n  Experiment: single pod kill\n  Impact: 1 service affected\n  Downstream: 0 services impacted\n  User impact: 0\n  Recovery time: 12 seconds\n\nBlast radius is well contained.',
+     unlockCmd:'blast',
+     jit:{title:'Blast radius is everything in chaos engineering',body:'If you don\'t know how far failure will spread, you are gambling with production.'},
+     bridge:{title:'Mapping blast radius prevents disasters',body:'You learn exactly what will break before it actually does.',tags:['Blast Radius','Chaos Mapping']},
+     teach:{title:'How to map blast radius',body:'Run the smallest possible experiment. Watch metrics, logs, and downstream services. Document everything.'}},
+    {id:'p3s2',obj:'Expand the experiment and re-map the blast radius',ctx:'Now make it bigger. See what breaks.',
+     cmd:['blast expand'],
+     accept:['blast expand','blast observe'],
+     acceptFn:v=>v.includes('blast')&&(v.includes('expand')||v.includes('observe')),
+     hint:'Type: blast expand',
+     out:'EXPANDED BLAST RADIUS MAPPED:\n\n  Experiment: 10% pod kill\n  Impact: 2 services affected\n  Downstream: circuit breakers prevented cascade\n  User impact: minimal\n  Recovery time: 28 seconds\n\nYou now understand the limits of the system.',
+     jit:{title:'Gradual expansion is the safe way to learn',body:'Start tiny. Measure. Expand. Measure again. Never jump to 100% on day one.'},
+     bridge:{title:'Blast radius mapping turns fear into confidence',body:'You know exactly what the system can handle.',tags:['Blast Radius','Observability']},
+     teach:{title:'The blast radius expansion rule',body:'Never increase scope until you fully understand the current impact. Measure everything.'},
+     quiz:{q:'You ran a 1% experiment with no impact. Can you safely run a 50% experiment next?',
+      opts:['Yes — it worked at 1%','No — you must understand the full blast radius first','Only if you have rollback ready','Only during off-peak hours'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Understand the full blast radius before scaling up. One small success does not prove safety at scale.'}}],
+   breakit:BREAKIT[3],
+   done:'Blast radius mapping complete. You now know exactly how far chaos spreads.',
+   ach:'blastradius'},
+
+  /* Phase 4: Resilience Patterns */
+  {title:'Resilience Patterns',
+   lolaIntro:"Retries, backoff, bulkheads, rate limiting in practice.",
+   spacedRep:SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Test retry logic with backoff',ctx:'When a service fails, does the system retry intelligently?',
+     cmd:['resilient test retry'],
+     accept:['resilient test retry','resilient retry'],
+     acceptFn:v=>v.includes('resilient')&&(v.includes('retry')||v.includes('backoff')),
+     hint:'Type: resilient test retry',
+     out:'RETRY LOGIC TESTED:\n\n  Exponential backoff with jitter working\n  Max retries respected\n  No thundering herd observed\n  Fallback triggered correctly\n\nRetry resilience validated.',
+     unlockCmd:'resilient',
+     jit:{title:'Retries without jitter cause thundering herds',body:'Add randomness so all clients don\'t retry at exactly the same moment.'},
+     bridge:{title:'Retries are the most common resilience pattern',body:'And also the most commonly misimplemented.',tags:['Retries','Backoff','Resilience']},
+     teach:{title:'Retry best practices',body:'Exponential backoff + jitter. Max retries. Circuit breaker integration. Never retry on 4xx errors.'}},
+    {id:'p4s2',obj:'Test bulkhead isolation',ctx:'If one part of the system fails, does it take everything with it?',
+     cmd:['resilient test bulkhead'],
+     accept:['resilient test bulkhead','resilient bulkhead'],
+     acceptFn:v=>v.includes('resilient')&&v.includes('bulkhead'),
+     hint:'Type: resilient test bulkhead',
+     out:'BULKHEAD ISOLATION TESTED:\n\n  Failure isolated to one thread pool\n  Other services unaffected\n  Bulkhead limits respected\n  Graceful degradation observed\n\nBulkhead pattern working as designed.',
+     jit:{title:'Bulkheads prevent cascade failures',body:'Like watertight compartments on a ship — one flooded section doesn\'t sink the whole vessel.'},
+     bridge:{title:'Bulkheads are your last line of defense',body:'When everything else fails, bulkheads keep the rest of the system alive.',tags:['Bulkheads','Isolation','Resilience']},
+     teach:{title:'Bulkhead implementation',body:'Separate thread pools, connection pools, or rate limiters per downstream service.'},
+     quiz:{q:'A downstream service is failing. Your bulkhead is working. What happens to the rest of the system?',
+      opts:['It also fails','It continues normally with degraded functionality for that service','It crashes entirely','It retries infinitely'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. The bulkhead isolates the failure. The rest of the system continues with graceful degradation for the affected service.'}}],
+   breakit:BREAKIT[4],
+   done:'Resilience patterns tested and validated. The system is harder to break.',
+   ach:'resilient'},
+
+  /* Phase 5: Game Days */
+  {title:'Game Days',
+   lolaIntro:"Scheduled chaos scenarios with live monitoring.",
+   spacedRep:SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Run a full game day scenario',ctx:'Time to test the entire team under controlled chaos.',
+     cmd:['gameday start'],
+     accept:['gameday start','gameday run'],
+     acceptFn:v=>v.includes('gameday')&&(v.includes('start')||v.includes('run')),
+     hint:'Type: gameday start',
+     out:'GAME DAY SCENARIO STARTED:\n\n  Network partition injected\n  Pod kills every 30 seconds\n  Live monitoring dashboard active\n  Team practicing recovery\n\nGame day in progress.',
+     unlockCmd:'gameday',
+     jit:{title:'Game days build team muscle memory',body:'The best teams practice chaos together regularly.'},
+     bridge:{title:'Game days turn theory into muscle memory',body:'When the real failure hits, the team already knows what to do.',tags:['Game Days','Chaos Drills']},
+     teach:{title:'How to run an effective game day',body:'Clear scope, live monitoring, rollback plan, blameless debrief. Involve the full on-call team.'}},
+    {id:'p5s2',obj:'Monitor and recover during the game day',ctx:'The chaos is running. Keep the system alive.',
+     cmd:['gameday monitor'],
+     accept:['gameday monitor','gameday recover'],
+     acceptFn:v=>v.includes('gameday')&&(v.includes('monitor')||v.includes('recover')),
+     hint:'Type: gameday monitor',
+     out:'GAME DAY RECOVERY COMPLETE:\n\n  All injected failures contained\n  System returned to healthy state\n  Team response time: 4 minutes\n  Lessons documented\n\nGame day successful.',
+     jit:{title:'The real value is in the recovery practice',body:'Not whether the system survived — but how quickly and calmly the team responded.'},
+     bridge:{title:'Game days are the best investment in system resilience',body:'They build confidence, improve processes, and strengthen team coordination.',tags:['Game Days','Team Practice']},
+     teach:{title:'Game day success criteria',body:'Clear objectives, measurable impact, fast recovery, and documented lessons learned.'},
+     quiz:{q:'During a game day the team panics and rolls back immediately. Was the game day a failure?',
+      opts:['Yes — they didn\'t let it run long enough','No — practicing recovery under pressure is the goal','Yes — they should have waited longer','No — the system survived'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. The goal of a game day is to practice recovery under pressure, not to prove the system is perfect.'}}],
+   breakit:BREAKIT[5],
+   done:'Game days are now part of your chaos practice. The team is battle-tested.',
+   ach:'gameday'},
+
+  /* Phase 6: Advanced Fault Injection */
+  {title:'Advanced Fault Injection',
+   lolaIntro:"Gremlin-style attacks on services, databases, AI calls.",
+   spacedRep:SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Inject a database failure',ctx:'What happens when the database goes away?',
+     cmd:['inject db failure'],
+     accept:['inject db failure','inject database'],
+     acceptFn:v=>v.includes('inject')&&(v.includes('db')||v.includes('database')),
+     hint:'Type: inject db failure',
+     out:'DATABASE FAILURE INJECTED:\n\n  Database connections dropped\n  Circuit breakers triggered\n  Fallback to cached data activated\n  No user-visible outage\n\nDatabase resilience validated.',
+     unlockCmd:'inject',
+     jit:{title:'Database chaos is one of the most valuable experiments',body:'Databases are the most common point of failure in production systems.'},
+     bridge:{title:'Advanced fault injection finds the hidden weaknesses',body:'The ones that only appear under realistic failure conditions.',tags:['Advanced Chaos','Database Failure']},
+     teach:{title:'Database chaos techniques',body:'Connection drops, slow queries, read-only mode, replication lag, and complete outage.'}},
+    {id:'p6s2',obj:'Inject AI-specific failures',ctx:'What happens when the AI starts hallucinating at scale?',
+     cmd:['inject ai hallucination'],
+     accept:['inject ai hallucination','inject ai failure'],
+     acceptFn:v=>v.includes('inject')&&(v.includes('ai')||v.includes('hallucination')),
+     hint:'Type: inject ai hallucination',
+     out:'AI HALLUCINATION INJECTED:\n\n  AI confidence artificially lowered\n  Hallucinated responses generated\n  Circuit breaker triggered correctly\n  Human fallback engaged\n\nAI integrity safeguards working.',
+     jit:{title:'AI chaos is the new frontier',body:'Hallucinations, prompt injections, and confidence failures need their own chaos experiments.'},
+     bridge:{title:'AI systems need chaos engineering too',body:'They fail in unique and surprising ways.',tags:['AI Chaos','Hallucination Injection']},
+     teach:{title:'AI-specific chaos experiments',body:'Low confidence injection, prompt injection simulation, hallucination forcing, and sudden model degradation.'},
+     quiz:{q:'You injected an AI hallucination and the circuit breaker did not trigger. What does this mean?',
+      opts:['The system is more resilient than expected','The circuit breaker thresholds are too high','The injection was not strong enough','Everything is fine'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. The circuit breaker thresholds need adjustment. It should have triggered on sustained low-confidence or hallucinated outputs.'}}],
+   breakit:BREAKIT[5],
+   done:'Advanced fault injection mastered. You can now simulate complex, realistic failures.',
+   ach:'advanced'},
+
+  /* Phase 7: Recovery Automation */
+  {title:'Recovery Automation',
+   lolaIntro:"Write self-healing scripts and circuit breakers.",
+   spacedRep:SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Deploy an automated recovery script',ctx:'When something breaks, the system should heal itself.',
+     cmd:['recover script'],
+     accept:['recover script','recover auto'],
+     acceptFn:v=>v.includes('recover')&&(v.includes('script')||v.includes('auto')),
+     hint:'Type: recover script',
+     out:'AUTOMATED RECOVERY SCRIPT DEPLOYED:\n\n  Self-healing logic active\n  Automatic pod restarts on failure\n  Circuit breaker reset after recovery\n  Full audit trail of every recovery\n\nThe system can now heal itself.',
+     unlockCmd:'recover',
+     jit:{title:'Self-healing is the ultimate resilience',body:'The best systems recover before anyone even notices the problem.'},
+     bridge:{title:'Recovery automation turns incidents into non-events',body:'The fleet heals itself while the team sleeps.',tags:['Self-Healing','Recovery Automation']},
+     teach:{title:'What good recovery automation looks like',body:'Detect failure → isolate → recover → verify → resume normal operation. All automatically.'}},
+    {id:'p7s2',obj:'Test the full recovery automation loop',ctx:'Break it and watch the system fix itself.',
+     cmd:['recover test'],
+     accept:['recover test','recover loop'],
+     acceptFn:v=>v.includes('recover')&&(v.includes('test')||v.includes('loop')),
+     hint:'Type: recover test',
+     out:'RECOVERY AUTOMATION TEST COMPLETE:\n\n  Failure injected\n  Automatic detection and isolation\n  Self-healing completed successfully\n  System back to healthy state\n  Recovery time: 47 seconds\n\nFull automation loop validated.',
+     jit:{title:'Test your recovery automation regularly',body:'If you don\'t test it, it doesn\'t work when you need it.'},
+     bridge:{title:'Automated recovery is what separates good platforms from great ones',body:'The best platforms never wake anyone up.',tags:['Recovery Automation','Self-Healing']},
+     teach:{title:'Recovery automation best practices',body:'Test it in chaos experiments. Have clear success criteria. Keep humans in the loop for the most critical failures.'},
+     quiz:{q:'Your recovery script just healed a failure automatically. What is the next step?',
+      opts:['Celebrate and move on','Manually verify the fix','Add this failure mode to the regression test suite','All of the above'],
+      janetQuiz:true,
+      correct:3,fb:'Correct. Celebrate, verify, and make sure the same failure is caught automatically next time.'}}],
+   breakit:BREAKIT[5],
+   done:'Recovery automation is now live. The system can heal itself.',
+   ach:'recover'},
+
+  /* Phase 8: Post-Mortem Mastery */
+  {title:'Post-Mortem Mastery',
+   lolaIntro:"Reconstruct chaos experiments and extract lessons.",
+   spacedRep:SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Reconstruct the timeline of a chaos experiment',ctx:'Something broke during the last game day. Reconstruct exactly what happened.',
+     cmd:['forensic timeline'],
+     accept:['forensic timeline','forensic reconstruct'],
+     acceptFn:v=>v.includes('forensic')&&(v.includes('timeline')||v.includes('reconstruct')),
+     hint:'Type: forensic timeline',
+     out:'CHAOS EXPERIMENT TIMELINE RECONSTRUCTED:\n\n  14:12 — Network delay injected\n  14:13 — Retries exhausted\n  14:15 — Circuit breaker opened\n  14:17 — Recovery script executed\n  14:19 — System healthy again\n\nFull timeline documented.',
+     unlockCmd:'forensic',
+     jit:{title:'Blameless post-mortems focus on systems',body:'Ask "what allowed this to happen?" not "who broke it?"'},
+     bridge:{title:'Great post-mortems turn failures into permanent improvements',body:'Every chaos experiment should end with actionable lessons.',tags:['Post-Mortem','Forensics','Lessons Learned']},
+     teach:{title:'How to write a chaos post-mortem',body:'Timeline, what broke, why it broke, what we learned, and what we will change.'}},
+    {id:'p8s2',obj:'Extract systemic lessons and update resilience patterns',ctx:'The experiment revealed weaknesses. Fix them permanently.',
+     cmd:['forensic rootcause'],
+     accept:['forensic rootcause','forensic lessons'],
+     acceptFn:v=>v.includes('forensic')&&(v.includes('rootcause')||v.includes('lessons')),
+     hint:'Type: forensic rootcause',
+     out:'SYSTEMIC LESSONS EXTRACTED:\n\n  Root cause: insufficient retry budget\n  Action: increase retry budget and add jitter\n  Updated: resilience patterns documentation\n  Added: new regression test for this scenario\n\nThe system is now stronger.',
+     jit:{title:'Every chaos experiment must produce action items',body:'If you don\'t change something, you didn\'t learn anything.'},
+     bridge:{title:'Post-mortem mastery is what makes chaos engineering valuable',body:'The experiments are just the beginning. The lessons are the real value.',tags:['Post-Mortem Mastery','Systemic Improvement']},
+     teach:{title:'Blameless post-mortem principles',body:'Focus on process gaps, not people. Assign owners and due dates. Follow up to make sure changes were made.'},
+     quiz:{q:'A chaos experiment caused an outage. The team says "the engineer should have known better." What is the correct response?',
+      opts:['Agree and add it to their review','Reframe to "what process gap allowed this?"','Ignore the comment','Ask the engineer to explain'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Blameless post-mortems focus on systemic improvements, not individual blame.'}}],
+   breakit:BREAKIT[5],
+   done:'Post-mortem mastery achieved. Every chaos experiment now becomes permanent improvement.',
+   ach:'postmortem'},
+
+  /* Phase 9: The Black Swan Event (Boss Fight) */
+  {title:'The Black Swan Event',
+   lolaIntro:"Multiple cascading failures hit simultaneously. Contain the blast and restore stability under J.A.N.E.T.’s mocking commentary.",
+   spacedRep:SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Contain the multi-failure Black Swan event',ctx:'Everything is breaking at once. Stop the cascade.',
+     cmd:['chaos contain'],
+     accept:['chaos contain','chaos emergency'],
+     acceptFn:v=>v.includes('chaos')&&(v.includes('contain')||v.includes('emergency')),
+     hint:'Type: chaos contain',
+     out:'BLACK SWAN CONTAINMENT ACTIVATED:\n\n  All non-critical traffic paused\n  Circuit breakers opened across the fleet\n  Fallback systems engaged\n  Blast radius isolated to 3 services\n\nThe core is protected. Manual recovery now required.',
+     unlockCmd:'chaos',
+     jit:{title:'Black Swan events test everything',body:'When multiple failures hit at once, your resilience patterns and recovery automation are put to the ultimate test.'},
+     bridge:{title:'The Black Swan is why we do chaos engineering',body:'You cannot prepare for the unknown unless you practice the unknown.',tags:['Black Swan','Cascade Failure']},
+     teach:{title:'Black Swan containment playbook',body:'1. Pause everything non-critical. 2. Isolate failing components. 3. Engage all fallbacks. 4. Recover one service at a time.'}},
+    {id:'p9s2',obj:'Manually restore the fleet from the Black Swan',ctx:'The cascade is contained. Now bring everything back online.',
+     cmd:['chaos restore'],
+     accept:['chaos restore','chaos recover'],
+     acceptFn:v=>v.includes('chaos')&&(v.includes('restore')||v.includes('recover')),
+     hint:'Type: chaos restore',
+     out:'BLACK SWAN RECOVERY COMPLETE:\n\n  All services restored to stable version\n  Circuit breakers reset\n  Monitoring confirms healthy state\n  Full post-mortem initiated\n\nThe fleet survived the Black Swan.',
+     isFinalBeforeBoss:true}],
+   done:null,
+   ach:null},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BOSS FIGHT — The Black Swan Event
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    id:'boss1',
+    scenario:'L.O.L.A. has gone offline. Multiple cascading failures have hit the fleet simultaneously — the Black Swan has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The logs show pod kills, network partitions, and AI hallucinations all at once. Read the logs.',
+    prompt:'Read the chaos logs.',
+    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('forensic')||v.includes('chaos'),
+    accept:['cat logs/chaos.log','forensic logs','chaos observe'],
+    out:'[03:31:07] CHAOS LOG: Multiple failures detected simultaneously\n[03:31:07] Pod kills + network partition + AI hallucination cascade\n[03:31:08] Blast radius expanding rapidly\n[03:31:09] Black Swan event confirmed',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss2',
+    scenario:'STEP 2 OF 5: The Black Swan is in full effect — cascading failures everywhere.\n\nI note that the automated recovery did not trigger fast enough. I note this without offering my opinion on how this happened.\n\nContain this immediately.',
+    prompt:'Activate full emergency containment.',
+    acceptFn:v=>v.includes('chaos')||(v.includes('contain')||v.includes('emergency')),
+    accept:['chaos contain','chaos emergency'],
+    out:'BLACK SWAN CONTAINMENT EXECUTED:\n\n  ✓ All non-critical traffic paused\n  ✓ Circuit breakers opened fleet-wide\n  ✓ Fallback systems engaged\n  ✓ Blast radius isolated\n\n[03:33] Cascade contained. Fleet stabilizing.',
+    hint:'Type: chaos contain'
+  },
+  {
+    id:'boss3',
+    scenario:'STEP 3 OF 5: The cascade is stopped. Now determine how multiple failures aligned to create the Black Swan.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin the forensic investigation.',
+    prompt:'Begin Black Swan forensic investigation.',
+    acceptFn:v=>v.includes('forensic')||v.includes('logs')||v.includes('trace'),
+    accept:['forensic logs','forensic trace'],
+    out:'BLACK SWAN FORENSICS:\n\n  Root cause: multiple untested failure modes aligned\n  Timeline: pod kill + network delay + AI hallucination\n  Impact: 274 services affected\n\n  Immediate action: rollback completed\n  Systemic fix required.',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss4',
+    scenario:'STEP 4 OF 5: The root cause was multiple untested failure modes aligning into a Black Swan.\n\nI note that this is covered in Phase 9. I note it without irony.\n\nRun a full chaos audit and implement the systemic fix.',
+    prompt:'Run chaos audit and fix the root cause.',
+    acceptFn:v=>v.includes('forensic')||v.includes('chaos')||v.includes('audit'),
+    accept:['forensic logs','chaos audit','recover script'],
+    out:'CHAOS AUDIT COMPLETE:\n\n  Fixed: additional failure mode combinations added to test suite\n  Fixed: recovery automation strengthened\n  Fixed: blast radius controls tightened\n  All services restored to stable state\n\nThe fleet is now hardened against this Black Swan.',
+    hint:'Type: forensic logs'
+  },
+  {
+    id:'boss5',
+    scenario:'STEP 5 OF 5: The Black Swan is contained. The fleet is stable.\n\nNow you must communicate. The entire fleet was affected. The CNO and bridge crew are waiting.\n\nYou have 90 minutes before the briefing. Write the executive brief and the fleet-wide notification plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most chaos officers reveal the true limits of their composure.',
+    prompt:'Write the executive brief and notification plan.',
+    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    accept:['design resilient','policy brief','respond notify'],
+    out:'EXECUTIVE BRIEF: Black Swan Event — 2026-04-20\n\nTo: CNO, Bridge Crew\nFrom: Officer '+G.name+'\n\nWhat happened:\n  Multiple failure modes aligned into a Black Swan cascade.\n  Contained in under 4 minutes.\n\nWhat we did:\n  Emergency containment activated\n  Full rollback executed\n  Systemic fixes deployed\n\nPrevention:\n  Expanded chaos test suite\n  Strengthened recovery automation\n  Tighter blast radius controls\n\nStatus: Contained. Fleet fully operational.',
+    hint:'Type: design resilient  — executive brief and notification plan'
+  },
+];
+
+/* ── DOM REFS & UTILS (identical) ── */
+const $out = document.getElementById('output');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;$out.appendChild(d);$out.scrollTop=$out.scrollHeight;return d;
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — identical structure, only data changed */
+
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showBridge(br){
+  const tags=br.tags?br.tags.map(t=>`<span class="bridge-tag">${t}</span>`).join(''):'';
+  const w=document.createElement('div');w.className='bridge ln';
+  w.innerHTML=`<div class="bridge-hd">🌉 Career Bridge: ${br.title}</div><div class="bridge-bd">${br.body}<div style="margin-top:8px">${tags}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+let janetQuizAttempt=true;
+const _quizFeedbackMap={};
+function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
+
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb;
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
+
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:120px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('')}
+
+function unlock(id){
+  if(G.achievements.includes(id))return;G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{const a=ACHS.find(x=>x.id===id);if(!a)return'';return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`}).join('');
+}
+
+function renderGloss(){document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,"\\'")}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('')}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+const CMD_META={
+  'chaos':   {label:'chaos',   desc:'Chaos engineering'},
+  'inject':  {label:'inject',  desc:'Failure injection'},
+  'blast':   {label:'blast',   desc:'Blast radius'},
+  'resilient':{label:'resilient',desc:'Resilience patterns'},
+  'gameday': {label:'gameday', desc:'Game days'},
+  'recover': {label:'recover', desc:'Recovery automation'},
+  'forensic':{label:'forensic',desc:'Post-chaos forensics'},
+};
+
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const c=document.getElementById('active-cmds-list');
+  if(G.unlockedCmds.length===0){c.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span>';return}
+  c.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k];if(!m)return'';return`<span class="ac-pill" onclick="document.getElementById('cmd').value='${m.label} ';document.getElementById('cmd').focus()" title="${m.desc}">${m.label}</span>`}).join('');
+}
+
+function addAgent(role,name){
+  G.agents.push({role,name});save();
+  const c=document.getElementById('crew-sec');
+  document.getElementById('crew-empty').style.display='none';
+  const tips={'Vuln Analyst':'Hunts for hidden weaknesses.','Pen Tester':'Tests failure scenarios.','Threat Analyst':'Monitors for chaos threats.'};
+  const d=document.createElement('div');d.className='agent-card';
+  d.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role}</div><div class="ac-status">active</div><div class="ac-tip">${tips[role]||'Chaos specialist.'}</div>`;
+  d.onclick=()=>d.classList.toggle('open');
+  c.insertBefore(d,document.getElementById('crew-empty'));
+}
+
+function addCareerEntry(idx){
+  if(!CAREER_LOG_DATA[idx-1])return;
+  G.careerLog.push(idx);save();
+  document.getElementById('career-impact-btn').style.display='inline';
+}
+function renderCareer(){
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i-1];if(!d)return'';
+    return`<div class="career-item"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-ctx">${d.context}</div><div class="career-tags">${d.tags.map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function setLola(msg){
+  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+}
+function lolaComment(text){
+  const w=document.createElement('div');
+  w.className='ln ln-lola';
+  w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  telem('L.O.L.A.: '+text);
+}
+function lolaMotivate(){
+  const lines=["You're making me proud, Officer.","The fleet is getting harder to break.","That's exactly how a real Chaos Officer thinks.","One more solid break like that…"];
+  lolaComment(lines[Math.floor(Math.random()*lines.length)]);
+}
+
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span> Show me the deep version`;
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];if(!dd)return;
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  lolaComment("That's the production-grade context. This is what separates engineers who practice chaos from engineers who fear it.");
+}
+
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  lolaComment("Want to see what would have happened if you chose a different path? Type: whatif");
+  G._pendingWhatIf=phaseIdx;
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  const body=document.getElementById('playbook-body');
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?`Phase ${phaseIdx} — ${ph.title}`:`Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={1:'Start small. Measure everything. Have rollback ready.',2:'Targeted injection finds weaknesses fast.',3:'Always know your blast radius.',4:'Resilience patterns must be tested.',5:'Game days build team muscle memory.',6:'Advanced fault injection reveals hidden failures.',7:'Self-healing is the ultimate resilience.',8:'Blameless post-mortems turn failures into improvements.',9:'Black Swan events test everything at once.'};
+  const note=phNotes[phaseIdx]||'Chaos control applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  lolaComment("Saved to your playbook! Type: playbook export to get it as markdown.");
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(G.playbook.length===0){body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';count.style.display='none';return}
+  count.style.display='inline';count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map((e,i)=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My Chaos Playbook\n*Vibe Chaos Officer — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  lolaComment("Playbook copied to clipboard!");
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
+function getProgressiveHint(val, s, wrongStreak){
+  const ph=PHASES[G.phase];
+  const vl=val.toLowerCase().trim();
+  const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
+  const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
+  let hint=base;
+  let levelLabel='HINT';
+  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'a chaos command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
+  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function getPersonalizedTakeaway(){
+  if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
+  const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(!top)return;
+  const takeaways={'wrong_cmd':'You tried creative commands — curiosity is an asset.','close_cmd':'You were close — just needed the full subcommand.','repeated':'You found one approach and stuck with it. In chaos work, if something isn\'t working, the system itself might be telling you something.'};
+  const key=top[0];
+  const msg=takeaways[key]||'You pushed through. That persistence is exactly what chaos engineering requires.';
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">🧠 L.O.L.A. Insight <span class="diag-level-badge">PERSONAL</span></div><div class="diag-msg">${msg}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  G.mistakeTypes=[];save();
+}
+
+function syncObjCard(){
+  const ph=PHASES[G.phase];if(!ph){return}
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
+  const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
+  document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+}
+let eaglePhase=true;
+function revealCmd(){
+  document.getElementById('obj-cmd-val').classList.remove('blurred');
+  eaglePhase=false;
+  G.score=Math.max(0,G.score-5);
+  document.getElementById('score-n').textContent=G.score;
+  save();
+}
+
+function syncDots(){
+  const track=document.getElementById('phase-track');
+  track.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(G.completedPhases.includes(i)?' done':i===G.phase?' active':'');
+    const ph=PHASES[i];d.setAttribute('data-tip',ph?`P${i}: ${ph.title}`:`P${i}`);
+    track.appendChild(d);
+    if(i<9){const s=document.createElement('div');s.className='phase-sep';s.textContent='·';track.appendChild(s)}
+  }
+}
+
+const SAVE_KEY='vco_v1';
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
+
+const EASTER={
+  'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
+  'whoami':{handle:()=>{appendLine(`Chaos Officer ${G.name} · Fleet Resilience Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'neofetch':{handle:()=>{appendLine('chaos-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-chaos 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Threat level: nominal','ln-sys')}},
+  'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last Black Swan: contained in 4 minutes','ln-ok')}},
+  'ls':{handle:()=>{appendLine('logs/  experiments/  breakers/  recoveries/  game-days/  blackswans/','ln-code')}},
+  'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
+  'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+};
+
+function showDiag(val){
+  const vl=val.toLowerCase().trim();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!G.mistakeTypes)G.mistakeTypes=[];
+  if(!G.wrongStreak)G.wrongStreak=0;
+  G.wrongStreak=(G.wrongStreak||0)+1;
+  if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
+  else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
+  else{G.mistakeTypes.push('wrong_cmd')}
+  getProgressiveHint(val,s,G.wrongStreak);
+  G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function handleChallengeAnswer(val){
+  const ch=G.activeChallengeData;if(!ch)return false;
+  const vl=val.toLowerCase().trim();
+  if(ch.acceptFn&&ch.acceptFn(vl)){
+    appendLine('✓ CHALLENGE SOLVED: '+ch.title,'ln-ok');
+    appendLine(ch.answer,'ln-info');
+    G.activeChallengeData=null;
+    if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-5);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+function handleBreakitAnswer(val){
+  const bi=G.activeBreakitData;if(!bi)return false;
+  const vl=val.toLowerCase().trim();
+  if(bi.acceptFn&&bi.acceptFn(vl)){
+    appendLine('✓ BREAK-IT DIAGNOSED: '+bi.title,'ln-ok');
+    appendLine(bi.answer,'ln-info');
+    G.activeBreakitData=null;
+    if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-3);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+
+async function startPhase(){
+  const ph=PHASES[G.phase];if(!ph)return;
+  blank();divline();
+  appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
+  blank();
+  appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
+  blank();
+  if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  setLola(ph.steps[0].ctx);
+  syncObjCard();
+  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+}
+
+async function completeStep(s,ph){
+  G.step++;G.tries=0;G.wrongStreak=0;save();
+  await new Promise(r=>setTimeout(r,300));
+  lolaMotivate();
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.teach)showTeach(s.teach);
+  if(s.quiz&&s.quiz.janetQuiz){janetQuizAttempt=true;await showJanetQuizWithQ(s.quiz);blank();lolaComment("Whether you got that right or wrong — the fact you're here working through this matters.")}
+  if(G.step>=ph.steps.length){
+    await completePhase(ph);
+  } else {
+    const ns=ph.steps[G.step];
+    blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    setLola(ns.ctx);syncObjCard();
+    if(!G.hard&&!G.practitioner)showHint(ns.hint);
+    if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
+    save();
+  }
+}
+
+async function completePhase(ph){
+  if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
+  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  blank();divline();
+  if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
+  if(ph.ach)unlock(ph.ach);
+  if(eaglePhase)unlock('eagle');
+  eaglePhase=true;
+  addCareerEntry(G.phase);
+  const phaseDebriefs=[null,"Chaos fundamentals established.","Targeted failure injection mastered.","Blast radius mapped.","Resilience patterns tested.","Game days practiced.","Advanced fault injection live.","Recovery automation deployed.","Post-mortem mastery achieved.","The Black Swan survived."];
+  const debriefMsg=phaseDebriefs[G.phase];
+  if(debriefMsg){await delay(400);lolaComment(debriefMsg)}
+  const exitSR=SPACED_EXIT&&SPACED_EXIT[G.phase];
+  if(exitSR){blank();await showSpacedRep(exitSR);blank()}
+  G.completedPhases.push(G.phase);
+  if(G.phase===5)addAgent('Vuln Analyst','Cipher');
+  if(G.phase===6)addAgent('Pen Tester','Raven');
+  if(G.phase===7)addAgent('Threat Analyst','Specter');
+  await delay(300);getPersonalizedTakeaway();
+  await delay(400);
+  lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
+  await delay(500);
+  showWhatIfButton(G.phase);
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();
+  await startPhase();
+}
+
+async function startBossFight(){
+  G.bossActive=true;G.bossStep=0;G.bossScore=0;save();
+  blank();divline();
+  await delay(300);
+  appendLine('⚠ L.O.L.A.: [EMERGENCY SHUTDOWN INITIATED]','ln-warn');
+  await delay(600);
+  appendLine('⚠ L.O.L.A.: Black Swan event detected…','ln-warn');
+  await delay(500);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  document.getElementById('lola-avatar').style.background='var(--silver-d)';
+  document.getElementById('lola-name').style.color='var(--muted)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  document.getElementById('lola-msg').textContent='Intelligence core offline.';
+  await delay(800);
+  appendLine('J.A.N.E.T.: Good evening. I have been asked to oversee your final assessment.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: There is an active Black Swan event in progress.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: You will need to apply everything you have learned.','ln-janet');
+  blank();await delay(500);
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  G.bossStep=idx;save();
+  const bs=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+  const w=document.createElement('div');w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ FINAL ASSESSMENT</div>
+      <div class="boss-sub">J.A.N.E.T. PROTOCOL · STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${bs.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Required Action</div>
+      <div class="boss-prompt">${bs.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  if(!G.hard&&!G.practitioner&&!G.expert)showHint(bs.hint);
+}
+
+function handleBossInput(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  const bs=BOSS_STEPS[G.bossStep];
+  const accepted=bs.acceptFn?bs.acceptFn(vl):bs.accept&&bs.accept.some(a=>vl===a.toLowerCase());
+  if(accepted){
+    appendLine(bs.out||'Action executed.','ln-ok');blank();
+    G.bossScore++;
+    if(G.bossStep+1<BOSS_STEPS.length){
+      G.bossStep++;save();
+      setTimeout(()=>showBossStep(G.bossStep),400);
+    } else {
+      G.bossActive=false;save();
+      completeBossFight();
+    }
+  } else {
+    appendLine('J.A.N.E.T.: That is not the correct action.','ln-janet');
+    G.score=Math.max(0,G.score-15);document.getElementById('score-n').textContent=G.score;save();
+  }
+}
+
+async function completeBossFight(){
+  blank();divline();
+  await delay(500);
+  appendLine('J.A.N.E.T.: The incident is contained. Your final assessment is complete.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: I am now going to acknowledge that you performed adequately.','ln-janet');
+  await delay(700);
+  appendLine('J.A.N.E.T.: Do not let this go to your head.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: L.O.L.A. can come back now.','ln-janet');
+  await delay(800);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  lolaComment("I'm back. Thank you for keeping the fleet unbreakable.");
+  await delay(600);
+  appendLine(`L.O.L.A.: Officer ${G.name}. The Black Swan has been survived.`,'ln-lola');
+  blank();divline();
+  appendLine('FLEET CHAOS STATUS: ALL 50 SHIPS UNBREAKABLE','ln-sys');
+  const steps=['Validating certification…','Chaos fundamentals: PASSED','Targeted injection: PASSED','Blast radius: PASSED','Resilience patterns: PASSED','Game days: PASSED','Advanced injection: PASSED','Recovery automation: PASSED','Post-mortem mastery: PASSED','Black Swan survival: PASSED','Final assessment: PASSED','Issuing certification…'];
+  for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('💥 CHAOS CERTIFICATION GRANTED','ln-success');
+  appendLine(`Officer ${G.name} — Vibe Chaos Officer · Class of 2026`,'ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('      CHAOS CERTIFICATION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('blackswan');unlock('chaoslord');
+  addCareerEntry(9);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase]){showWhatIf(pendingPhase)}
+    else{appendLine('No what-if scenario available.','ln-info')}
+    return;
+  }
+  appendLine(`${val}: executed.`,'ln-ok');
+}
+
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const lines=[
+    {t:'VIBE CHAOS OFFICER v1.0',c:'ln-success'},
+    {t:'Booting fleet chaos core…',c:'ln-sys'},
+    {t:'Chaos fundamentals: READY',c:'ln-sys'},
+    {t:'Failure injection: READY',c:'ln-sys'},
+    {t:'Blast radius mapping: READY',c:'ln-sys'},
+    {t:'Resilience patterns: READY',c:'ln-sys'},
+    {t:'Game days: STANDBY',c:'ln-sys'},
+    {t:'Advanced fault injection: READY',c:'ln-sys'},
+    {t:'Recovery automation: READY',c:'ln-sys'},
+    {t:'Post-mortem mastery: LOADED',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome aboard, Officer ${G.name}. Break it before production does.`,c:'ln-lola'},
+    {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    {t:'Chaos fundamentals. Failure injection. Blast radius. Resilience. Game days. Advanced injection. Recovery. Forensics. Black Swan.',c:'ln-lola'},
+    {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
+    {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: Try janet, whoami, neofetch, uptime',c:'ln-info'},
+    {t:'TIP: After each step → type  deep  to go deeper. After each phase → playbook save or whatif',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
+  if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
+  if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
+  appendLine(`Welcome back, Officer ${G.name}. Chaos systems restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  renderPlaybook();
+  if(G.sandbox){
+    appendLine('Chaos certification complete. Sandbox mode.','ln-success');
+  }else if(G.bossActive){
+    appendLine('Active Black Swan event in progress. J.A.N.E.T. is still waiting.','ln-warn');
+    blank();showBossStep(G.bossStep);
+  }else{
+    const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
+    if(ph&&s){
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(s.ctx);
+    }
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){if(confirm('Restart Vibe Chaos Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function shareGrad(){
+  const txt=`Just completed Vibe Chaos Officer 💥\n\nAll 9 phases: chaos fundamentals, failure injection, blast radius mapping, resilience patterns, game days, advanced fault injection, recovery automation, post-mortem mastery, and surviving the Black Swan.\n\nFree training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
+  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your chaos operations?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+</script>
+</body>
+</html>

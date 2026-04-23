@@ -1,0 +1,69 @@
+{
+  "redirects": [
+    {
+      "source": "/Vibe_Cadet.html",
+      "destination": "/vibe-cadet.html",
+      "permanent": true
+    },
+    {
+      "source": "/vibe-engineer-test.html",
+      "destination": "/vibe-engineer.html",
+      "permanent": true
+    },
+    {
+      "source": "/VibeLieutenant.html",
+      "destination": "/vibe-lieutenant.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Agent%20Architecht.html",
+      "destination": "/officer-track/vibe-agent-architect.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Chaos%20Officer.html",
+      "destination": "/officer-track/vibe-chaos-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/data-officer.html",
+      "destination": "/officer-track/vibe-data-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Deployment%20Officer.html",
+      "destination": "/officer-track/vibe-deployment-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/FinOps.html",
+      "destination": "/officer-track/vibe-finops-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Performance%20Officer.html",
+      "destination": "/officer-track/vibe-performance-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Vibe_commsOfficer.html",
+      "destination": "/officer-track/vibe-comms-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/vibe%20security%20officer.html",
+      "destination": "/officer-track/vibe-security-officer.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/systemsIntegrity.html",
+      "destination": "/officer-track/vibe-systems-integrity.html",
+      "permanent": true
+    },
+    {
+      "source": "/officer-track/Vibe_Captian.html",
+      "destination": "/officer-track/vibe-captain.html",
+      "permanent": true
+    }
+  ]
+}

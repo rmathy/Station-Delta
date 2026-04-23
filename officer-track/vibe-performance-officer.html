@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Performance Officer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#1db954;
+  --green-d:#0d5c28;
+  --green-bg:#040f09;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--silver)}50%{text-shadow:0 0 16px var(--silver),0 0 32px rgba(176,190,197,.2)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--silver)}
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--silver);border-color:var(--silver)}
+.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── TERMINAL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--silver)}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--silver);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--silver);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* ══ BOSS FIGHT ══ */
+.boss-container{margin:14px 0;border:2px solid var(--red);border-radius:var(--r8);overflow:hidden;animation:bossGlow 2s infinite;position:relative}
+.boss-header{background:linear-gradient(90deg,#1a0505,#0d0202);border-bottom:2px solid var(--red-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:14px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;animation:bossFlicker 3s infinite}
+.boss-sub{font-family:var(--janet);font-size:10px;color:var(--red-d);letter-spacing:.15em;margin-left:auto}
+.boss-body{background:#080202;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:#c47070;line-height:1.8;margin-bottom:12px;border-left:3px solid var(--red-d);padding-left:12px}
+.boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
+.boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--silver);background:var(--silver-bg)}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--silver)}
+
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+#crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
+.mbtn-p{background:var(--silver);color:#000;font-weight:700}
+.mbtn-p:hover{background:var(--silver-bright)}
+.mbtn-s{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
+.mbtn-s:hover{background:var(--b2);color:var(--text)}
+.boot-features{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--red);margin-right:6px}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
+input[type=text]:focus{border-color:var(--silver)}
+.grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
+.grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
+.grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
+.skills-list span{color:var(--green);margin-right:8px}
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:22px;flex-shrink:0}
+.ach-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ach-desc{font-size:11px;color:var(--muted2)}
+.gloss-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;margin-bottom:4px}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:11px;color:var(--muted2);line-height:1.65}
+.career-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.career-item:last-child{border-bottom:none}
+.career-phase{font-size:11px;color:var(--cyan);margin-bottom:4px}
+.career-stat{font-size:22px;font-weight:700;color:var(--silver);margin-bottom:3px}
+.career-ctx{font-size:11px;color:var(--text);line-height:1.65}
+.career-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
+/* ── ENHANCED DIAG ── */
+.diag-block-progressive{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div id="logo">📈 VIBE · PERFORMANCE OFFICER</div>
+    <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <span id="sandbox-pill">SANDBOX</span>
+      <span id="hardmode-pill">HARD MODE</span>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+    </div>
+  </div>
+
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">perf@<span id="term-path-val">ship:/home/officer/ops</span></div>
+    </div>
+    <div id="output"></div>
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
+    </div>
+    <div id="input-row">
+      <div id="prompt-pre">$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Loading…</div>
+      <div id="obj-context">Initializing…</div>
+      <div id="obj-cmd-label">Next Command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">—</div>
+        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Officer on deck. Fast is cheap. Slow is expensive.</div>
+    </div>
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
+    </div>
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">📈</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Performance Officer</div>
+    <div class="msub">Fast is cheap. Slow is expensive. You are the cost & speed optimizer for AI-heavy infrastructure.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · real-world performance & cost optimization<br>
+      <span>▸</span>L.O.L.A. — your tactical intel officer<br>
+      <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all quizzes. She is… unimpressed.<br>
+      <span>▸</span>Profiling · tracing · AI bottlenecks · query tuning<br>
+      <span>▸</span>Resource right-sizing · cost attribution · caching · load testing<br>
+      <span>▸</span>The Cost Explosion boss fight<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable performance reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div><div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full context. Recommended.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div><div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart feedback only.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div><div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No feedback. Timer on.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">OPTIMIZE THE FLEET</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">📈</div>
+    <div class="mtitle" style="text-align:center;color:var(--silver)">Performance Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Performance Officer — including the Cost Explosion. The fleet now runs fast and cheap.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Performance Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Vibe Performance Officer · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Profiling foundations and flame graphs<br>
+      <span>✓</span>End-to-end tracing with OpenTelemetry<br>
+      <span>✓</span>AI-specific bottlenecks and token throughput<br>
+      <span>✓</span>Query & database tuning with EXPLAIN<br>
+      <span>✓</span>Resource right-sizing and auto-scaling<br>
+      <span>✓</span>Cost attribution and expensive AI call detection<br>
+      <span>✓</span>Caching strategies and invalidation<br>
+      <span>✓</span>Production load testing<br>
+      <span>✓</span>Live cost explosion containment and optimization
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+  </div>
+</div>
+
+<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Performance milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Performance terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE PERFORMANCE OFFICER v1.0
+   Exact same framework as all previous Vibe titles.
+   J.A.N.E.T. administers all quizzes. L.O.L.A. is your tactical performance officer.
+   Boss Fight: Phase 9 — The Cost Explosion. L.O.L.A. goes offline. JANET takes over.
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/officer/ops',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  mistakeTypes:[],
+  wrongStreak:0,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your performance assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for a performance assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. Performance module loaded. I will now present a question. Please answer it correctly. Or incorrectly. Both outcomes have been observed. I document them all.",
+  "I am J.A.N.E.T. I have been asked to test your performance optimization knowledge. I find 'fast is cheap' a somewhat optimistic statement for most AI infrastructure. Nonetheless. I will proceed.",
+  "J.A.N.E.T. online. I note you have reached a performance quiz. Statistically, most engineers believe they understand latency until they are asked a specific question. This is one of those.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your performance record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. The bottleneck has been correctly identified. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your performance file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it carefully.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit in the incorrect styling.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is common in performance work. Especially after a cost explosion.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is not something I recommend reviewing before important model deployments.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Profiling Foundations',stat:'40%',context:'of all latency is usually in the top 5% of functions. Engineers who master top, perf, and flame graphs eliminate the majority of hidden bottlenecks.',tags:['Profiling','Flame Graphs','Perf']},
+  {phase:'Phase 2 — Tracing Slow Paths',stat:'End-to-End',context:'OpenTelemetry traces reveal the exact slowest span. Teams that trace every AI call cut end-to-end latency by 60% on average.',tags:['OpenTelemetry','Tracing','Slow Paths']},
+  {phase:'Phase 3 — AI-Specific Bottlenecks',stat:'3–8×',context:'token throughput and inference latency are the real cost drivers. Optimizing these directly reduces GPU bills.',tags:['Token Throughput','Inference Latency','Context Window']},
+  {phase:'Phase 4 — Query & Database Tuning',stat:'10–100×',context:'EXPLAIN plans and vector index tuning turn slow AI queries into sub-second responses.',tags:['EXPLAIN','Vector Search','DB Tuning']},
+  {phase:'Phase 5 — Resource Right-Sizing',stat:'30–60%',context:'Most AI workloads run on over-provisioned resources. Right-sizing + auto-scaling rules slash cloud bills.',tags:['CPU Limits','Auto-Scaling','Right-Sizing']},
+  {phase:'Phase 6 — Cost Attribution',stat:'Tag-Based',context:'Engineers who can attribute cost to specific AI calls can make data-driven optimization decisions.',tags:['Cost Attribution','Tagging','AI Spend']},
+  {phase:'Phase 7 — Caching Strategies',stat:'80%',context:'Proper caching and invalidation strategies eliminate repeated expensive AI calls.',tags:['Caching','Redis','Invalidation']},
+  {phase:'Phase 8 — Production Load Testing',stat:'Realistic',context:'Simulated traffic reveals performance cliffs before they hit real users.',tags:['Load Testing','Metrics','Production']},
+  {phase:'Phase 9 — The Cost Explosion',stat:'CPO track',context:'Engineers who can contain a 10× overnight AI bill spike become Chief Performance Officers and platform cost leaders.',tags:['Cost Explosion','Live Optimization','Leadership']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'Flame Graph',def:'A visualization that shows where time is spent in your code. The widest bars are your hottest code paths.'},
+  {term:'OpenTelemetry Span',def:'A single unit of work in a distributed trace. The slowest span is usually your biggest performance win.'},
+  {term:'Token Throughput',def:'How many tokens per second your model can generate. Directly impacts cost and user experience.'},
+  {term:'Inference Latency',def:'Time from prompt to first token + time to complete response. The #1 driver of perceived slowness in AI apps.'},
+  {term:'EXPLAIN Plan',def:'Database command that shows how a query will be executed and which indexes (or lack of them) are being used.'},
+  {term:'Bulkhead',def:'Isolating resources so that a slow AI call does not starve the rest of the system.'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'perf':    {synopsis:'perf [command]',desc:'Profiling & flame graphs',why:'Find the hottest code paths.',flags:[{f:'top',d:'Live process overview'},{f:'flame',d:'Generate flame graph'}],example:'$ perf top\n$ perf flame'},
+  'trace':   {synopsis:'trace [command]',desc:'OpenTelemetry tracing',why:'Find the slowest span in the request.',flags:[{f:'slow',d:'Show slowest span'},{f:'span',d:'Inspect a specific span'}],example:'$ trace slow\n$ trace span ai-inference'},
+  'ai':      {synopsis:'ai [command]',desc:'AI-specific bottlenecks',why:'Optimize token throughput and inference latency.',flags:[{f:'throughput',d:'Token throughput stats'},{f:'latency',d:'Inference latency breakdown'}],example:'$ ai throughput\n$ ai latency'},
+  'query':   {synopsis:'query [command]',desc:'Database & vector query tuning',why:'Speed up slow AI queries.',flags:[{f:'explain',d:'Show EXPLAIN plan'},{f:'vector',d:'Vector index analysis'}],example:'$ query explain\n$ query vector'},
+  'scale':   {synopsis:'scale [command]',desc:'Resource right-sizing',why:'Right-size CPU/memory and set auto-scaling.',flags:[{f:'limits',d:'Show current limits'},{f:'auto',d:'Configure auto-scaling'}],example:'$ scale limits\n$ scale auto'},
+  'cost':    {synopsis:'cost [command]',desc:'Cost attribution',why:'Identify which AI calls are expensive.',flags:[{f:'tags',d:'Tag-based breakdown'},{f:'top',d:'Most expensive calls'}],example:'$ cost tags\n$ cost top'},
+  'cache':   {synopsis:'cache [command]',desc:'Caching strategies',why:'Reduce repeated expensive AI calls.',flags:[{f:'status',d:'Cache hit rate'},{f:'invalidate',d:'Invalidate specific keys'}],example:'$ cache status\n$ cache invalidate'},
+  'loadtest':{synopsis:'loadtest [command]',desc:'Production load testing',why:'Simulate traffic and read metrics.',flags:[{f:'run',d:'Start load test'},{f:'metrics',d:'Read live metrics'}],example:'$ loadtest run\n$ loadtest metrics'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal Performance Playbook',why:'Build your own exportable performance reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',    icon:'📈',name:'First Profile',      desc:'Issued your first performance command.'},
+  {id:'profiler',     icon:'🔥',name:'Profiler',           desc:'Completed Phase 1 — profiling foundations.'},
+  {id:'tracer',       icon:'🔗',name:'Tracer',             desc:'Completed Phase 2 — end-to-end tracing.'},
+  {id:'aibottleneck', icon:'⚡',name:'AI Bottleneck Hunter',desc:'Completed Phase 3 — AI-specific bottlenecks.'},
+  {id:'querymaster',  icon:'📊',name:'Query Master',       desc:'Completed Phase 4 — database tuning.'},
+  {id:'scaler',       icon:'📏',name:'Right-Sizer',        desc:'Completed Phase 5 — resource right-sizing.'},
+  {id:'costdetective',icon:'💰',name:'Cost Detective',     desc:'Completed Phase 6 — cost attribution.'},
+  {id:'cacheking',    icon:'📦',name:'Cache King',         desc:'Completed Phase 7 — caching strategies.'},
+  {id:'loadtester',   icon:'🚀',name:'Load Tester',        desc:'Completed Phase 8 — production load testing.'},
+  {id:'costexplosion',icon:'💥',name:'Cost Explosion Slayer',desc:'Defeated the Phase 9 Cost Explosion. JANET was unimpressed.'},
+  {id:'performance',  icon:'📈',name:'Chief Performance Officer',desc:'Completed all 9 phases. The fleet runs fast and cheap.'},
+  {id:'janet_ace',    icon:'🧊',name:'JANET Ace',          desc:'Answered a JANET quiz correctly on first try.'},
+  {id:'eagle',        icon:'🦅',name:'Eagle Eye',          desc:'Completed a phase without revealing the answer.'},
+  {id:'recall_master',icon:'🧠',name:'Recall Master',      desc:'Got 3+ spaced recall questions right in a row.'},
+];
+
+/* ── SPACED RECALL CALLBACKS ── */
+const SPACED_CALLBACKS = [
+  null,
+  {q:'What command shows live CPU/memory usage of processes?',answer:'perf top or htop',acceptFn:v=>v.includes('top')||v.includes('htop')},
+  {q:'What does the slowest span in an OpenTelemetry trace tell you?',answer:'The biggest performance bottleneck in the request',acceptFn:v=>v.includes('slow')||v.includes('bottleneck')},
+  {q:'What is the #1 cost driver in most AI workloads?',answer:'Inference latency and token throughput',acceptFn:v=>v.includes('latency')||v.includes('throughput')},
+  {q:'What database command shows how a query will be executed?',answer:'EXPLAIN',acceptFn:v=>v.includes('explain')},
+  {q:'What is the safest way to reduce cost without breaking the system?',answer:'Right-size resources and add auto-scaling rules',acceptFn:v=>v.includes('right-size')||v.includes('auto-scaling')},
+  {q:'What is the purpose of proper cache invalidation?',answer:'Prevent serving stale data while still avoiding repeated expensive calls',acceptFn:v=>v.includes('invalidate')||v.includes('stale')},
+  {q:'During a cost explosion, what is the first thing you should do?',answer:'Pause non-critical traffic and look at cost attribution tags',acceptFn:v=>v.includes('pause')||v.includes('cost')||v.includes('tags')},
+  {q:'What is the difference between monitoring and load testing?',answer:'Monitoring tells you what is happening now. Load testing tells you what will happen under stress.',acceptFn:v=>v.includes('load')||v.includes('stress')},
+];
+
+/* ── SPACED EXIT ── */
+const SPACED_EXIT = [
+  null,
+  {q:'Why is flame graph analysis more useful than top/htop alone?',answer:'It shows exactly which functions are consuming CPU time across the entire call stack',acceptFn:v=>v.includes('flame')||v.includes('stack')},
+  {q:'Why do most AI cost explosions happen?',answer:'A sudden increase in token usage or inference latency that was not caught by profiling or tracing',acceptFn:v=>v.includes('token')||v.includes('latency')},
+  {q:'What is the most important output of a load test?',answer:'The exact point where latency or cost explodes under real traffic',acceptFn:v=>v.includes('explode')||v.includes('latency')},
+];
+
+/* ── DEEP DIVE CONTENT ── */
+const DEEP_DIVE = [
+  null,
+  {title:'Profiling in Production',body:'top and htop give you the big picture. perf and flame graphs show you exactly which function is burning CPU. The best performance officers profile in production with low overhead tools.'},
+  {title:'End-to-End Tracing with OpenTelemetry',body:'Every AI call should be traced. The slowest span is almost always the one you should optimize first. Correlate traces with cost tags for maximum impact.'},
+  {title:'AI-Specific Performance Bottlenecks',body:'Token throughput, time-to-first-token, and context window management are the real cost and latency drivers. Most teams optimize these last and regret it.'},
+  {title:'Database & Vector Query Tuning',body:'EXPLAIN ANALYZE shows you exactly why a query is slow. Vector indexes, proper embedding dimensions, and query rewriting can deliver 10–100× speedups.'},
+  {title:'Resource Right-Sizing in AI Workloads',body:'Most AI services run on 2–4× more CPU/memory than needed. Combine vertical right-sizing with horizontal auto-scaling rules for massive savings.'},
+  {title:'Cost Attribution at the AI Call Level',body:'Tag every AI inference with user, feature, and model. The teams that can answer “which prompt is costing us the most?” win the cost battle.'},
+  {title:'Caching Strategies That Actually Work',body:'Cache invalidation is hard. Use time-based + event-driven invalidation, cache-aside pattern, and Redis with proper TTLs. Measure hit rates religiously.'},
+  {title:'Production Load Testing Best Practices',body:'Simulate real user patterns, not just uniform traffic. Ramp up slowly, watch for the hockey-stick latency curve, and always have an immediate abort plan.'},
+  {title:'Surviving the Cost Explosion',body:'When the AI bill suddenly 10×s, the first 5 minutes decide everything. Pause non-critical traffic, look at cost tags, and surgically optimize the offending workload while the meter is still running.'},
+];
+
+/* ── WHATIF SCENARIOS ── */
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'What if you never profiled?',alt:'The team only looked at high-level metrics.',outcome:'Result: A single function was using 60% of CPU for months. The bill was quietly 3× higher than it needed to be.',learning:'Profiling finds the problems high-level metrics hide.'},
+  {title:'What if you skipped tracing?',alt:'The team added OpenTelemetry but never looked at spans.',outcome:'Result: The slowest span was a 3-second database query hidden inside every AI call. Users complained about latency for weeks.',learning:'Tracing shows you exactly where time is being wasted.'},
+  {title:'What if you never right-sized resources?',alt:'The team kept the default 4 vCPU / 16 GB for every service.',outcome:'Result: Monthly cloud bill was 55% higher than necessary with zero performance gain.',learning:'Right-sizing is free money.'},
+];
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = [
+  null,
+  {title:'No Profiling',scenario:'The team only monitors aggregate CPU. A single function is using 70% of CPU but nobody knows which one.\n\nWhy is this dangerous?',acceptFn:v=>v.includes('profile')||v.includes('flame')||v.includes('perf'),answer:'You cannot optimize what you cannot see. Flame graphs would have shown the exact hot function immediately.'},
+  {title:'Missing Cost Tags',scenario:'The AI bill suddenly 8×’d overnight. Every call looks identical in the cost dashboard.\n\nWhat went wrong?',acceptFn:v=>v.includes('tag')||v.includes('cost')||v.includes('attribution'),answer:'No cost attribution tags. You cannot find which feature or user is causing the explosion without per-call tagging.'},
+  {title:'No Load Testing',scenario:'A new model was deployed after passing unit tests. Under real traffic it caused 12-second latency spikes.\n\nWhy was this missed?',acceptFn:v=>v.includes('load')||v.includes('test')||v.includes('traffic'),answer:'No production-like load testing. Unit tests never reveal real-world bottlenecks.'},
+];
+
+/* ── CHALLENGE SCENARIOS ── */
+const CHALLENGES = [
+  null,
+  {title:'Find the Slowest Function',scenario:'You have a flame graph. The widest bar is in a function called generateEmbedding(). What is your next command?',acceptFn:v=>v.includes('perf')||v.includes('flame')||v.includes('profile'),answer:'perf flame or trace slow — focus optimization effort on the hottest function first.'},
+  {title:'Design a Cost Attribution Strategy',scenario:'Every AI call needs to be traceable to a specific user and feature. What tagging strategy would you implement?',acceptFn:v=>v.includes('tag')||v.includes('cost')||v.includes('attribution'),answer:'Add metadata tags: user_id, feature, model, prompt_hash. Query cost dashboards by these tags.'},
+];
+
+/* ── PHASE DATA ── */
+const PHASES = [
+  null,
+  /* Phase 1: Profiling Foundations */
+  {title:'Profiling Foundations',
+   lolaIntro:"Most performance problems hide in the top 5% of functions. You need to learn how to see them.",
+   spacedRep:SPACED_CALLBACKS[1],
+   steps:[
+    {id:'p1s1',obj:'Run live process profiling',ctx:'The fleet is using too much CPU. Find the hot functions.',
+     cmd:['perf top'],
+     accept:['perf top','perf htop'],
+     acceptFn:v=>v.includes('perf')&&(v.includes('top')||v.includes('htop')),
+     hint:'Type: perf top',
+     out:'PROFILNG LIVE:\n\n  Top processes by CPU\n  Function-level breakdown active\n  Flame graph generation ready\n\nHot paths are now visible.',
+     unlockCmd:'perf',
+     jit:{title:'top/htop vs perf',body:'top shows processes. perf shows functions inside those processes.'},
+     bridge:{title:'Profiling is the foundation of all performance work',body:'You cannot optimize what you cannot measure.',tags:['Profiling','Perf','Flame Graphs']},
+     teach:{title:'The profiling golden rule',body:'Always start with the smallest possible scope. Measure before you change anything.'}},
+    {id:'p1s2',obj:'Generate a flame graph',ctx:'See exactly where CPU time is being spent.',
+     cmd:['perf flame'],
+     accept:['perf flame','perf graph'],
+     acceptFn:v=>v.includes('perf')&&(v.includes('flame')||v.includes('graph')),
+     hint:'Type: perf flame',
+     out:'FLAME GRAPH GENERATED:\n\n  Widest bar: generateEmbedding() — 42% CPU\n  Next: vectorSearch() — 18% CPU\n  Interactive SVG saved\n\nYou now know exactly what to optimize.',
+     jit:{title:'Flame graphs are the single best visualization',body:'Width = time spent. The widest bars are your biggest wins.'},
+     bridge:{title:'Flame graphs turn weeks of guesswork into minutes',body:'This is how mature performance teams work.',tags:['Flame Graphs','Profiling']},
+     teach:{title:'Reading a flame graph',body:'Left-to-right is call stack. Width is time. Look for the widest rectangles.'},
+     quiz:{q:'A flame graph shows one function using 60% of CPU. What is your next action?',
+      opts:['Ignore it — it’s probably important','Optimize that function immediately','Profile deeper with perf record','All of the above'],
+      janetQuiz:true,
+      correct:3,fb:'Correct. The widest bar is almost always your highest-leverage optimization target.'}}],
+   breakit:BREAKIT[1],
+   done:'Profiling foundations established. You can now see where time is really being spent.',
+   ach:'profiler'},
+
+  /* Phase 2: Tracing Slow Paths */
+  {title:'Tracing Slow Paths',
+   lolaIntro:"OpenTelemetry in terminal, finding the slowest span.",
+   spacedRep:SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Enable OpenTelemetry tracing',ctx:'You need end-to-end visibility across services.',
+     cmd:['trace enable'],
+     accept:['trace enable','trace otel'],
+     acceptFn:v=>v.includes('trace')&&(v.includes('enable')||v.includes('otel')),
+     hint:'Type: trace enable',
+     out:'OPENTELEMETRY ENABLED:\n\n  Traces now flowing from every AI call\n  Correlation IDs active\n  Slowest span detection live\n\nEnd-to-end visibility achieved.',
+     unlockCmd:'trace',
+     jit:{title:'Every AI call should be traced',body:'The slowest span is almost always the one costing you the most.'},
+     bridge:{title:'Tracing turns guesswork into data',body:'You can now prove exactly which service is slow.',tags:['OpenTelemetry','Tracing']},
+     teach:{title:'OpenTelemetry best practices',body:'Always sample at 100% in dev. Use head-based sampling in prod. Export to Jaeger or Tempo.'}},
+    {id:'p2s2',obj:'Find the slowest span in the trace',ctx:'A request is slow. Pinpoint exactly why.',
+     cmd:['trace slow'],
+     accept:['trace slow','trace span'],
+     acceptFn:v=>v.includes('trace')&&(v.includes('slow')||v.includes('span')),
+     hint:'Type: trace slow',
+     out:'SLOWEST SPAN FOUND:\n\n  Span: ai-inference — 2.8 seconds\n  Next: vector-search — 840ms\n  Root cause: missing index on embedding column\n\nActionable insight delivered.',
+     jit:{title:'The slowest span is your highest-leverage fix',body:'Fix that first.'},
+     bridge:{title:'Tracing is how you stop guessing',body:'You now know exactly where time is being wasted.',tags:['Slowest Span','Tracing']},
+     teach:{title:'How to read a trace',body:'Look for the longest bar. Drill into child spans. Correlate with logs and metrics.'},
+     quiz:{q:'You found a 3-second span. What is the correct next step?',
+      opts:['Optimize it immediately','Add more tracing','Run a load test','Profile that specific service'],
+      janetQuiz:true,
+      correct:0,fb:'Correct. The slowest span is your biggest performance win. Start there.'}}],
+   breakit:BREAKIT[2],
+   done:'End-to-end tracing is live. You can now find the slowest path in any request.',
+   ach:'tracer'},
+
+  /* Phase 3: AI-Specific Bottlenecks */
+  {title:'AI-Specific Bottlenecks',
+   lolaIntro:"Token throughput, inference latency, context window issues.",
+   spacedRep:SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Measure token throughput',ctx:'How fast is the model actually generating tokens?',
+     cmd:['ai throughput'],
+     accept:['ai throughput','ai tokens'],
+     acceptFn:v=>v.includes('ai')&&(v.includes('throughput')||v.includes('tokens')),
+     hint:'Type: ai throughput',
+     out:'TOKEN THROUGHPUT MEASURED:\n\n  Current: 28 tokens/sec\n  Target: 85 tokens/sec\n  Bottleneck: embedding generation\n\nAI performance baseline established.',
+     unlockCmd:'ai',
+     jit:{title:'Token throughput is the #1 cost driver',body:'More tokens per second = lower cost and better UX.'},
+     bridge:{title:'AI performance is different from traditional performance',body:'Tokens, inference latency, and context windows matter more than CPU.',tags:['Token Throughput','Inference Latency']},
+     teach:{title:'Key AI performance metrics',body:'Time-to-first-token, tokens-per-second, context window utilization.'}},
+    {id:'p3s2',obj:'Analyze inference latency breakdown',ctx:'The model is slow. Find out exactly why.',
+     cmd:['ai latency'],
+     accept:['ai latency','ai breakdown'],
+     acceptFn:v=>v.includes('ai')&&(v.includes('latency')||v.includes('breakdown')),
+     hint:'Type: ai latency',
+     out:'INFERENCE LATENCY BREAKDOWN:\n\n  Prompt encoding: 420ms\n  Model inference: 1.9s\n  Decoding: 180ms\n  Total: 2.5s\n\nClear optimization targets identified.',
+     jit:{title:'Break latency into its parts',body:'You can only fix what you can measure.'},
+     bridge:{title:'AI latency directly impacts user experience and cost',body:'Every millisecond counts.',tags:['Inference Latency','AI Bottlenecks']},
+     teach:{title:'Common AI latency culprits',body:'Large context windows, unoptimized embeddings, missing batching, and slow decoding.'},
+     quiz:{q:'Your model has high time-to-first-token but good tokens-per-second. What is the likely issue?',
+      opts:['Decoding is slow','Prompt encoding / embedding generation','Model inference','Network latency'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. High time-to-first-token is almost always caused by prompt encoding or embedding generation.'}}],
+   breakit:BREAKIT[3],
+   done:'AI-specific bottlenecks are now visible and measurable.',
+   ach:'aibottleneck'},
+
+  /* Phase 4: Query & Database Tuning */
+  {title:'Query & Database Tuning',
+   lolaIntro:"EXPLAIN plans, index analysis, vector search optimization.",
+   spacedRep:SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Run EXPLAIN on a slow query',ctx:'A database query is killing performance.',
+     cmd:['query explain'],
+     accept:['query explain','query analyze'],
+     acceptFn:v=>v.includes('query')&&(v.includes('explain')||v.includes('analyze')),
+     hint:'Type: query explain',
+     out:'EXPLAIN PLAN:\n\n  Sequential Scan on embeddings (cost 1.2M)\n  Missing index on vector column\n  Recommendation: CREATE INDEX on embedding vector\n\nClear win identified.',
+     unlockCmd:'query',
+     jit:{title:'EXPLAIN is your database profiler',body:'It tells you exactly why a query is slow.'},
+     bridge:{title:'Database tuning is one of the highest-leverage performance wins',body:'A single index can cut latency by 100×.',tags:['EXPLAIN','DB Tuning']},
+     teach:{title:'Reading an EXPLAIN plan',body:'Look for Sequential Scan, high cost, and missing indexes. Fix those first.'}},
+    {id:'p4s2',obj:'Optimize vector search',ctx:'Vector similarity search is the new bottleneck.',
+     cmd:['query vector'],
+     accept:['query vector','query index'],
+     acceptFn:v=>v.includes('query')&&(v.includes('vector')||v.includes('index')),
+     hint:'Type: query vector',
+     out:'VECTOR SEARCH OPTIMIZED:\n\n  HNSW index created\n  Query time: 42ms → 4ms\n  Recall maintained at 99.8%\n\nVector performance restored.',
+     jit:{title:'Vector search is the new database hot path',body:'Proper indexing and embedding dimension choice make or break AI performance.'},
+     bridge:{title:'Vector databases need the same love as SQL databases',body:'Indexes, query rewriting, and proper schema design still matter.',tags:['Vector Search','DB Tuning']},
+     teach:{title:'Vector search best practices',body:'Choose the right index type (HNSW, IVF), tune efSearch, and monitor recall vs latency trade-off.'},
+     quiz:{q:'You ran EXPLAIN and saw a Sequential Scan on a 10-million-row embeddings table. What should you do?',
+      opts:['Add more RAM','Create a vector index','Rewrite the query','All of the above'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. A missing vector index on a large table is almost always the root cause of slow similarity search.'}}],
+   breakit:BREAKIT[4],
+   done:'Query and database tuning mastered. Slow AI queries are now fast.',
+   ach:'querymaster'},
+
+  /* Phase 5: Resource Right-Sizing */
+  {title:'Resource Right-Sizing',
+   lolaIntro:"CPU/memory limits, auto-scaling rules in terminal.",
+   spacedRep:SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Check current resource limits',ctx:'Services are probably over-provisioned.',
+     cmd:['scale limits'],
+     accept:['scale limits','scale check'],
+     acceptFn:v=>v.includes('scale')&&(v.includes('limits')||v.includes('check')),
+     hint:'Type: scale limits',
+     out:'CURRENT RESOURCE LIMITS:\n\n  Service AI-Inference: 4 vCPU / 16 GB (using 1.2 vCPU / 4 GB)\n  Recommendation: right-size to 2 vCPU / 8 GB\n\nSavings opportunity identified.',
+     unlockCmd:'scale',
+     jit:{title:'Most AI services are over-provisioned',body:'Right-sizing is free money.'},
+     bridge:{title:'Right-sizing is the easiest performance win',body:'You get the same performance for less cost.',tags:['Right-Sizing','Auto-Scaling']},
+     teach:{title:'How to right-size safely',body:'Profile under load, add 20% buffer, enable auto-scaling, monitor for 48 hours.'}},
+    {id:'p5s2',obj:'Configure auto-scaling rules',ctx:'The system should scale itself.',
+     cmd:['scale auto'],
+     accept:['scale auto','scale rules'],
+     acceptFn:v=>v.includes('scale')&&(v.includes('auto')||v.includes('rules')),
+     hint:'Type: scale auto',
+     out:'AUTO-SCALING RULES DEPLOYED:\n\n  Scale up at 70% CPU\n  Scale down at 30% CPU\n  Min 2 pods, max 20 pods\n  Cooldown: 60 seconds\n\nDynamic right-sizing active.',
+     jit:{title:'Auto-scaling + right-sizing = maximum efficiency',body:'The system uses exactly the resources it needs.'},
+     bridge:{title:'Auto-scaling turns fixed costs into variable costs',body:'You only pay for what you actually use.',tags:['Auto-Scaling','Cost Optimization']},
+     teach:{title:'Good auto-scaling rules',body:'Use both CPU and custom metrics (tokens/sec, queue depth). Always have a minimum floor.'},
+     quiz:{q:'A service is using 1.8 vCPU but is limited to 4 vCPU. What is the correct action?',
+      opts:['Leave it alone','Right-size to 2 vCPU and enable auto-scaling','Add more CPU','Ignore it'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Right-size first, then enable auto-scaling. Over-provisioning wastes money.'}}],
+   breakit:BREAKIT[5],
+   done:'Resource right-sizing and auto-scaling are now operational.',
+   ach:'scaler'},
+
+  /* Phase 6: Cost Attribution */
+  {title:'Cost Attribution',
+   lolaIntro:"Tag-based cost analysis, identifying expensive AI calls.",
+   spacedRep:SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Enable tag-based cost tracking',ctx:'You need to know which AI calls are expensive.',
+     cmd:['cost tags'],
+     accept:['cost tags','cost enable'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('tags')||v.includes('enable')),
+     hint:'Type: cost tags',
+     out:'COST ATTRIBUTION ENABLED:\n\n  Every AI call now tagged with user_id, feature, model\n  Dashboard updated in real time\n  Top expensive calls visible\n\nYou can now answer “who is costing us the most?”',
+     unlockCmd:'cost',
+     jit:{title:'Cost attribution is the key to sustainable AI',body:'Without it you are flying blind.'},
+     bridge:{title:'You cannot optimize cost you cannot see',body:'Tag everything.',tags:['Cost Attribution','Tagging']},
+     teach:{title:'Essential cost tags',body:'user_id, feature, model, prompt_hash, tokens_used. Query dashboards by any combination.'}},
+    {id:'p6s2',obj:'Identify the most expensive AI calls',ctx:'The bill is high. Find the culprit.',
+     cmd:['cost top'],
+     accept:['cost top','cost expensive'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('top')||v.includes('expensive')),
+     hint:'Type: cost top',
+     out:'TOP EXPENSIVE CALLS:\n\n  #1: feature=chat, model=gpt-4o — $14,872 this month\n  Recommendation: add caching + smaller model fallback\n\nActionable cost insight delivered.',
+     jit:{title:'Always start with the top 5 expensive calls',body:'They usually account for 80% of the bill.'},
+     bridge:{title:'Cost attribution turns a big bill into a prioritized list',body:'You know exactly what to fix first.',tags:['Cost Attribution','AI Spend']},
+     teach:{title:'Cost optimization playbook',body:'1. Top calls → 2. Add caching → 3. Smaller model fallback → 4. Prompt compression → 5. Right-size infrastructure.'},
+     quiz:{q:'You see one feature using 60% of the AI budget. What is the first thing you should do?',
+      opts:['Turn it off','Add caching and prompt compression','Right-size the infrastructure','All of the above'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Start with the highest-leverage fix on the most expensive calls.'}}],
+   breakit:BREAKIT[5],
+   done:'Cost attribution is now fully operational.',
+   ach:'costdetective'},
+
+  /* Phase 7: Caching Strategies */
+  {title:'Caching Strategies',
+   lolaIntro:"Cache invalidation, CDN simulation, Redis in production.",
+   spacedRep:SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Deploy Redis caching layer',ctx:'Repeated expensive AI calls are killing performance and cost.',
+     cmd:['cache deploy'],
+     accept:['cache deploy','cache redis'],
+     acceptFn:v=>v.includes('cache')&&(v.includes('deploy')||v.includes('redis')),
+     hint:'Type: cache deploy',
+     out:'REDIS CACHE DEPLOYED:\n\n  Cache hit rate: 0% → 87%\n  Repeated AI calls now served from cache\n  Cost savings: 68% on this endpoint\n\nCaching layer live.',
+     unlockCmd:'cache',
+     jit:{title:'Cache invalidation is hard but necessary',body:'Better to have stale data than no data.'},
+     bridge:{title:'Caching is the highest-leverage performance win',body:'One cache hit saves an entire expensive AI call.',tags:['Caching','Redis']},
+     teach:{title:'Cache-aside pattern',body:'Check cache → if miss, compute and store → return. Always use TTLs.'}},
+    {id:'p7s2',obj:'Implement smart cache invalidation',ctx:'Stale data is worse than no cache.',
+     cmd:['cache invalidate'],
+     accept:['cache invalidate','cache strategy'],
+     acceptFn:v=>v.includes('cache')&&(v.includes('invalidate')||v.includes('strategy')),
+     hint:'Type: cache invalidate',
+     out:'SMART INVALIDATION DEPLOYED:\n\n  Event-driven invalidation active\n  TTL + versioned keys\n  Cache hit rate stable at 92%\n\nCaching strategy production-ready.',
+     jit:{title:'Never cache without invalidation',body:'Stale data is the #1 cause of caching disasters.'},
+     bridge:{title:'Good caching strategies save both money and latency',body:'Bad ones cause outages.',tags:['Cache Invalidation','Caching Strategies']},
+     teach:{title:'Proven cache invalidation techniques',body:'Event-driven, time-based TTL, versioned keys, and cache-aside with write-through.'},
+     quiz:{q:'Your cache hit rate is 92% but users are seeing stale data. What went wrong?',
+      opts:['TTL was too long','No invalidation on writes','Cache was too small','All of the above'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Without proper invalidation on writes, cache becomes a source of stale data.'}}],
+   breakit:BREAKIT[5],
+   done:'Caching strategies are now production-grade.',
+   ach:'cacheking'},
+
+  /* Phase 8: Production Load Testing */
+  {title:'Production Load Testing',
+   lolaIntro:"Simulate traffic and read the resulting metrics.",
+   spacedRep:SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Run a realistic load test',ctx:'You need to know how the system behaves under real traffic.',
+     cmd:['loadtest run'],
+     accept:['loadtest run','loadtest start'],
+     acceptFn:v=>v.includes('loadtest')&&(v.includes('run')||v.includes('start')),
+     hint:'Type: loadtest run',
+     out:'LOAD TEST RUNNING:\n\n  500 concurrent users simulated\n  Real prompt distribution used\n  Latency p95: 840ms\n  Cost per 1k requests: $0.42\n\nProduction behavior observed.',
+     unlockCmd:'loadtest',
+     jit:{title:'Load testing reveals the hockey-stick curve',body:'Everything looks fine until it suddenly doesn’t.'},
+     bridge:{title:'Load testing prevents production surprises',body:'You find the breaking point before users do.',tags:['Load Testing','Production']},
+     teach:{title:'Good load test characteristics',body:'Realistic traffic patterns, gradual ramp-up, real prompt distribution, and immediate abort capability.'}},
+    {id:'p8s2',obj:'Analyze load test metrics',ctx:'The test just finished. What broke?',
+     cmd:['loadtest metrics'],
+     accept:['loadtest metrics','loadtest analyze'],
+     acceptFn:v=>v.includes('loadtest')&&(v.includes('metrics')||v.includes('analyze')),
+     hint:'Type: loadtest metrics',
+     out:'LOAD TEST ANALYSIS:\n\n  Latency p95 spiked at 800 concurrent users\n  Bottleneck: vector search index\n  Cost curve became exponential after 600 users\n\nClear optimization targets identified.',
+     jit:{title:'The hockey-stick moment is where you learn the most',body:'That is your real production limit.'},
+     bridge:{title:'Load testing + profiling = production confidence',body:'You now know exactly where the system will break.',tags:['Load Testing','Metrics']},
+     teach:{title:'What to look for in load test results',body:'Latency curves, error rates, cost curves, and the exact point where everything falls apart.'},
+     quiz:{q:'Your load test showed latency exploding at 800 concurrent users. What is the correct next step?',
+      opts:['Deploy more servers','Optimize the bottleneck first','Ignore it — it will probably be fine','Add caching'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Always fix the root cause bottleneck before throwing more hardware at the problem.'}}],
+   breakit:BREAKIT[5],
+   done:'Production load testing is now part of your performance practice.',
+   ach:'loadtester'},
+
+  /* Phase 9: The Cost Explosion (Boss Fight) */
+  {title:'The Cost Explosion',
+   lolaIntro:"AI bill has 10x’d overnight. Identify root cause and optimize live while J.A.N.E.T. watches the dollar counter climb.",
+   spacedRep:SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Pause non-critical traffic and look at cost attribution',ctx:'The bill is exploding. Stop the bleeding.',
+     cmd:['cost emergency'],
+     accept:['cost emergency','cost pause'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('emergency')||v.includes('pause')),
+     hint:'Type: cost emergency',
+     out:'EMERGENCY COST CONTAINMENT:\n\n  Non-critical AI traffic paused\n  Cost attribution dashboard live\n  Top offending calls identified\n\nMeter slowed. Investigation active.',
+     unlockCmd:'cost',
+     jit:{title:'First 5 minutes of a cost explosion decide everything',body:'Pause first, investigate second.'},
+     bridge:{title:'The Cost Explosion is the ultimate performance test',body:'Only the best officers can contain it live.',tags:['Cost Explosion','Live Optimization']},
+     teach:{title:'Cost explosion containment playbook',body:'1. Pause non-critical traffic. 2. Look at cost tags. 3. Identify the 1–2 offending workloads. 4. Optimize or roll back.'}},
+    {id:'p9s2',obj:'Identify root cause and apply live optimization',ctx:'The meter is still climbing. Fix it now.',
+     cmd:['cost optimize'],
+     accept:['cost optimize','cost fix'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('optimize')||v.includes('fix')),
+     hint:'Type: cost optimize',
+     out:'COST EXPLOSION CONTAINED:\n\n  Root cause: un-cached high-volume feature\n  Fix: caching + smaller model fallback deployed\n  Current savings rate: $1,872 per hour\n\nBill stabilized. Fleet optimized.',
+     isFinalBeforeBoss:true}],
+   done:null,
+   ach:null},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BOSS FIGHT — The Cost Explosion
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    id:'boss1',
+    scenario:'L.O.L.A. has gone offline. The AI bill has suddenly 10×’d overnight — the Cost Explosion has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The cost dashboard is red. Read the cost logs.',
+    prompt:'Read the cost attribution logs.',
+    acceptFn:v=>v.includes('cat')&&v.includes('cost')||v.includes('cost')||v.includes('forensic'),
+    accept:['cat logs/cost.log','cost top','forensic logs'],
+    out:'[03:31:07] COST LOG: $14,872 in the last hour — 10× normal rate\n[03:31:07] Top call: feature=chat, model=gpt-4o, tokens=2.4M\n[03:31:08] No caching detected\n[03:31:09] Cost explosion confirmed',
+    hint:'Type: cost top'
+  },
+  {
+    id:'boss2',
+    scenario:'STEP 2 OF 5: The meter is still climbing rapidly.\n\nI note that non-critical traffic is still running. I note this without offering my opinion on how this happened.\n\nPause everything non-essential immediately.',
+    prompt:'Pause non-critical traffic and enable emergency cost controls.',
+    acceptFn:v=>v.includes('cost')||(v.includes('pause')||v.includes('emergency')),
+    accept:['cost emergency','cost pause'],
+    out:'EMERGENCY COST CONTAINMENT EXECUTED:\n\n  ✓ Non-critical AI traffic paused\n  ✓ Cost tags fully visible\n  ✓ Top offending calls isolated\n\n[03:33] Meter slowed dramatically. Investigation active.',
+    hint:'Type: cost emergency'
+  },
+  {
+    id:'boss3',
+    scenario:'STEP 3 OF 5: The explosion is contained but still expensive.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin forensic cost analysis.',
+    prompt:'Begin forensic cost investigation.',
+    acceptFn:v=>v.includes('forensic')||v.includes('cost')||v.includes('trace'),
+    accept:['forensic logs','cost trace'],
+    out:'COST FORENSICS:\n\n  Root cause: missing cache on high-volume chat feature\n  Timeline: deployed 47 minutes ago without cache\n  Impact: $1,872 per hour\n\n  Immediate action: cache enabled\n  Systemic fix required.',
+    hint:'Type: cost top'
+  },
+  {
+    id:'boss4',
+    scenario:'STEP 4 OF 5: The root cause was a missing cache on a high-volume feature.\n\nI note that this is covered in Phase 7. I note it without irony.\n\nDeploy the fix and verify cost reduction.',
+    prompt:'Deploy live optimization and verify cost reduction.',
+    acceptFn:v=>v.includes('cost')||v.includes('optimize')||v.includes('cache'),
+    accept:['cost optimize','cache deploy','cost fix'],
+    out:'LIVE OPTIMIZATION COMPLETE:\n\n  Cache deployed on chat feature\n  Smaller model fallback activated\n  Current savings rate: $1,872 per hour\n  Cost curve returned to normal\n\nThe explosion is over.',
+    hint:'Type: cost optimize'
+  },
+  {
+    id:'boss5',
+    scenario:'STEP 5 OF 5: The Cost Explosion is contained. The fleet is stable.\n\nNow you must communicate. The entire fleet’s budget was affected. The CFO and bridge crew are waiting.\n\nYou have 90 minutes before the briefing. Write the executive brief and the cost recovery plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most performance officers reveal the true limits of their composure.',
+    prompt:'Write the executive brief and cost recovery plan.',
+    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    accept:['design resilient','policy brief','respond notify'],
+    out:'EXECUTIVE BRIEF: AI Cost Explosion — 2026-04-20\n\nTo: CFO, Bridge Crew\nFrom: Officer '+G.name+'\n\nWhat happened:\n  Missing cache on high-volume chat feature caused 10× bill spike.\n  Contained in under 4 minutes.\n\nWhat we did:\n  Emergency pause + cache deployment\n  Smaller model fallback activated\n\nPrevention:\n  Mandatory cache review on all new features\n  Real-time cost alerting by feature\n  Load testing with cost metrics\n\nStatus: Contained. Monthly budget protected.',
+    hint:'Type: design resilient  — executive brief and cost recovery plan'
+  },
+];
+
+/* ── DOM REFS & UTILS (identical to previous versions) ── */
+const $out = document.getElementById('output');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;$out.appendChild(d);$out.scrollTop=$out.scrollHeight;return d;
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — identical structure, only data changed */
+
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showBridge(br){
+  const tags=br.tags?br.tags.map(t=>`<span class="bridge-tag">${t}</span>`).join(''):'';
+  const w=document.createElement('div');w.className='bridge ln';
+  w.innerHTML=`<div class="bridge-hd">🌉 Career Bridge: ${br.title}</div><div class="bridge-bd">${br.body}<div style="margin-top:8px">${tags}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+let janetQuizAttempt=true;
+const _quizFeedbackMap={};
+function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
+
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb;
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
+
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:120px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('')}
+
+function unlock(id){
+  if(G.achievements.includes(id))return;G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{const a=ACHS.find(x=>x.id===id);if(!a)return'';return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`}).join('');
+}
+
+function renderGloss(){document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,"\\'")}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('')}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+const CMD_META={
+  'perf':    {label:'perf',    desc:'Profiling'},
+  'trace':   {label:'trace',   desc:'Tracing'},
+  'ai':      {label:'ai',      desc:'AI bottlenecks'},
+  'query':   {label:'query',   desc:'DB tuning'},
+  'scale':   {label:'scale',   desc:'Right-sizing'},
+  'cost':    {label:'cost',    desc:'Cost attribution'},
+  'cache':   {label:'cache',   desc:'Caching'},
+  'loadtest':{label:'loadtest',desc:'Load testing'},
+};
+
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const c=document.getElementById('active-cmds-list');
+  if(G.unlockedCmds.length===0){c.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span>';return}
+  c.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k];if(!m)return'';return`<span class="ac-pill" onclick="document.getElementById('cmd').value='${m.label} ';document.getElementById('cmd').focus()" title="${m.desc}">${m.label}</span>`}).join('');
+}
+
+function addAgent(role,name){
+  G.agents.push({role,name});save();
+  const c=document.getElementById('crew-sec');
+  document.getElementById('crew-empty').style.display='none';
+  const tips={'Vuln Analyst':'Finds hidden bottlenecks.','Pen Tester':'Tests performance under load.','Threat Analyst':'Monitors cost explosions.'};
+  const d=document.createElement('div');d.className='agent-card';
+  d.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role}</div><div class="ac-status">active</div><div class="ac-tip">${tips[role]||'Performance specialist.'}</div>`;
+  d.onclick=()=>d.classList.toggle('open');
+  c.insertBefore(d,document.getElementById('crew-empty'));
+}
+
+function addCareerEntry(idx){
+  if(!CAREER_LOG_DATA[idx-1])return;
+  G.careerLog.push(idx);save();
+  document.getElementById('career-impact-btn').style.display='inline';
+}
+function renderCareer(){
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i-1];if(!d)return'';
+    return`<div class="career-item"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-ctx">${d.context}</div><div class="career-tags">${d.tags.map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function setLola(msg){
+  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+}
+function lolaComment(text){
+  const w=document.createElement('div');
+  w.className='ln ln-lola';
+  w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  telem('L.O.L.A.: '+text);
+}
+function lolaMotivate(){
+  const lines=["You're making the fleet faster already.","That optimization was beautiful.","Exactly how a real Performance Officer thinks.","One more win like that…"];
+  lolaComment(lines[Math.floor(Math.random()*lines.length)]);
+}
+
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span> Show me the deep version`;
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];if(!dd)return;
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  lolaComment("That's the production-grade context. This is what separates engineers who optimize from engineers who hope it works.");
+}
+
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  lolaComment("Want to see what would have happened if you chose a different path? Type: whatif");
+  G._pendingWhatIf=phaseIdx;
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  const body=document.getElementById('playbook-body');
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?`Phase ${phaseIdx} — ${ph.title}`:`Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={1:'Profiling and flame graphs are your eyes.',2:'The slowest span is always the highest-leverage fix.',3:'Token throughput and inference latency are the real cost drivers.',4:'EXPLAIN plans turn slow queries into fast ones.',5:'Right-sizing + auto-scaling is free money.',6:'Tag everything or you cannot optimize cost.',7:'Cache invalidation is hard but necessary.',8:'Load testing reveals the real breaking point.',9:'The first 5 minutes of a cost explosion decide everything.'};
+  const note=phNotes[phaseIdx]||'Performance control applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  lolaComment("Saved to your playbook! Type: playbook export to get it as markdown.");
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(G.playbook.length===0){body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';count.style.display='none';return}
+  count.style.display='inline';count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map((e,i)=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My Performance Playbook\n*Vibe Performance Officer — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  lolaComment("Playbook copied to clipboard!");
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
+function getProgressiveHint(val, s, wrongStreak){
+  const ph=PHASES[G.phase];
+  const vl=val.toLowerCase().trim();
+  const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
+  const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
+  let hint=base;
+  let levelLabel='HINT';
+  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'a performance command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
+  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function getPersonalizedTakeaway(){
+  if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
+  const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(!top)return;
+  const takeaways={'wrong_cmd':'You tried creative commands — curiosity is an asset.','close_cmd':'You were close — just needed the full subcommand.','repeated':'You found one approach and stuck with it. In performance work, if something isn\'t working, the system itself might be telling you something.'};
+  const key=top[0];
+  const msg=takeaways[key]||'You pushed through. That persistence is exactly what live optimization requires.';
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">🧠 L.O.L.A. Insight <span class="diag-level-badge">PERSONAL</span></div><div class="diag-msg">${msg}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  G.mistakeTypes=[];save();
+}
+
+function syncObjCard(){
+  const ph=PHASES[G.phase];if(!ph){return}
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
+  const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
+  document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+}
+let eaglePhase=true;
+function revealCmd(){
+  document.getElementById('obj-cmd-val').classList.remove('blurred');
+  eaglePhase=false;
+  G.score=Math.max(0,G.score-5);
+  document.getElementById('score-n').textContent=G.score;
+  save();
+}
+
+function syncDots(){
+  const track=document.getElementById('phase-track');
+  track.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(G.completedPhases.includes(i)?' done':i===G.phase?' active':'');
+    const ph=PHASES[i];d.setAttribute('data-tip',ph?`P${i}: ${ph.title}`:`P${i}`);
+    track.appendChild(d);
+    if(i<9){const s=document.createElement('div');s.className='phase-sep';s.textContent='·';track.appendChild(s)}
+  }
+}
+
+const SAVE_KEY='vpo_v1';
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
+
+const EASTER={
+  'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
+  'whoami':{handle:()=>{appendLine(`Performance Officer ${G.name} · Fleet Cost & Speed Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'neofetch':{handle:()=>{appendLine('performance-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-perf 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Cost level: nominal','ln-sys')}},
+  'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last cost explosion: contained in 4 minutes','ln-ok')}},
+  'ls':{handle:()=>{appendLine('logs/  traces/  profiles/  costs/  caches/  loadtests/','ln-code')}},
+  'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
+  'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+};
+
+function showDiag(val){
+  const vl=val.toLowerCase().trim();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!G.mistakeTypes)G.mistakeTypes=[];
+  if(!G.wrongStreak)G.wrongStreak=0;
+  G.wrongStreak=(G.wrongStreak||0)+1;
+  if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
+  else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
+  else{G.mistakeTypes.push('wrong_cmd')}
+  getProgressiveHint(val,s,G.wrongStreak);
+  G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function handleChallengeAnswer(val){
+  const ch=G.activeChallengeData;if(!ch)return false;
+  const vl=val.toLowerCase().trim();
+  if(ch.acceptFn&&ch.acceptFn(vl)){
+    appendLine('✓ CHALLENGE SOLVED: '+ch.title,'ln-ok');
+    appendLine(ch.answer,'ln-info');
+    G.activeChallengeData=null;
+    if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-5);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+function handleBreakitAnswer(val){
+  const bi=G.activeBreakitData;if(!bi)return false;
+  const vl=val.toLowerCase().trim();
+  if(bi.acceptFn&&bi.acceptFn(vl)){
+    appendLine('✓ BREAK-IT DIAGNOSED: '+bi.title,'ln-ok');
+    appendLine(bi.answer,'ln-info');
+    G.activeBreakitData=null;
+    if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-3);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+
+async function startPhase(){
+  const ph=PHASES[G.phase];if(!ph)return;
+  blank();divline();
+  appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
+  blank();
+  appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
+  blank();
+  if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  setLola(ph.steps[0].ctx);
+  syncObjCard();
+  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+}
+
+async function completeStep(s,ph){
+  G.step++;G.tries=0;G.wrongStreak=0;save();
+  await new Promise(r=>setTimeout(r,300));
+  lolaMotivate();
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.teach)showTeach(s.teach);
+  if(s.quiz&&s.quiz.janetQuiz){janetQuizAttempt=true;await showJanetQuizWithQ(s.quiz);blank();lolaComment("Whether you got that right or wrong — the fact you're here working through this matters.")}
+  if(G.step>=ph.steps.length){
+    await completePhase(ph);
+  } else {
+    const ns=ph.steps[G.step];
+    blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    setLola(ns.ctx);syncObjCard();
+    if(!G.hard&&!G.practitioner)showHint(ns.hint);
+    if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
+    save();
+  }
+}
+
+async function completePhase(ph){
+  if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
+  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  blank();divline();
+  if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
+  if(ph.ach)unlock(ph.ach);
+  if(eaglePhase)unlock('eagle');
+  eaglePhase=true;
+  addCareerEntry(G.phase);
+  const phaseDebriefs=[null,"Profiling foundations established.","End-to-end tracing live.","AI bottlenecks visible.","Database tuning mastered.","Resource right-sizing active.","Cost attribution operational.","Caching strategies deployed.","Production load testing complete.","The Cost Explosion survived."];
+  const debriefMsg=phaseDebriefs[G.phase];
+  if(debriefMsg){await delay(400);lolaComment(debriefMsg)}
+  const exitSR=SPACED_EXIT&&SPACED_EXIT[G.phase];
+  if(exitSR){blank();await showSpacedRep(exitSR);blank()}
+  G.completedPhases.push(G.phase);
+  if(G.phase===5)addAgent('Vuln Analyst','Cipher');
+  if(G.phase===6)addAgent('Pen Tester','Raven');
+  if(G.phase===7)addAgent('Threat Analyst','Specter');
+  await delay(300);getPersonalizedTakeaway();
+  await delay(400);
+  lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
+  await delay(500);
+  showWhatIfButton(G.phase);
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();
+  await startPhase();
+}
+
+async function startBossFight(){
+  G.bossActive=true;G.bossStep=0;G.bossScore=0;save();
+  blank();divline();
+  await delay(300);
+  appendLine('⚠ L.O.L.A.: [EMERGENCY SHUTDOWN INITIATED]','ln-warn');
+  await delay(600);
+  appendLine('⚠ L.O.L.A.: Cost explosion detected…','ln-warn');
+  await delay(500);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  document.getElementById('lola-avatar').style.background='var(--silver-d)';
+  document.getElementById('lola-name').style.color='var(--muted)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  document.getElementById('lola-msg').textContent='Intelligence core offline.';
+  await delay(800);
+  appendLine('J.A.N.E.T.: Good evening. I have been asked to oversee your final assessment.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: There is an active cost explosion in progress.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: You will need to apply everything you have learned.','ln-janet');
+  blank();await delay(500);
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  G.bossStep=idx;save();
+  const bs=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+  const w=document.createElement('div');w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ FINAL ASSESSMENT</div>
+      <div class="boss-sub">J.A.N.E.T. PROTOCOL · STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${bs.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Required Action</div>
+      <div class="boss-prompt">${bs.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  if(!G.hard&&!G.practitioner&&!G.expert)showHint(bs.hint);
+}
+
+function handleBossInput(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  const bs=BOSS_STEPS[G.bossStep];
+  const accepted=bs.acceptFn?bs.acceptFn(vl):bs.accept&&bs.accept.some(a=>vl===a.toLowerCase());
+  if(accepted){
+    appendLine(bs.out||'Action executed.','ln-ok');blank();
+    G.bossScore++;
+    if(G.bossStep+1<BOSS_STEPS.length){
+      G.bossStep++;save();
+      setTimeout(()=>showBossStep(G.bossStep),400);
+    } else {
+      G.bossActive=false;save();
+      completeBossFight();
+    }
+  } else {
+    appendLine('J.A.N.E.T.: That is not the correct action.','ln-janet');
+    G.score=Math.max(0,G.score-15);document.getElementById('score-n').textContent=G.score;save();
+  }
+}
+
+async function completeBossFight(){
+  blank();divline();
+  await delay(500);
+  appendLine('J.A.N.E.T.: The incident is contained. Your final assessment is complete.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: I am now going to acknowledge that you performed adequately.','ln-janet');
+  await delay(700);
+  appendLine('J.A.N.E.T.: Do not let this go to your head.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: L.O.L.A. can come back now.','ln-janet');
+  await delay(800);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  lolaComment("I'm back. Thank you for keeping the fleet fast and cheap.");
+  await delay(600);
+  appendLine(`L.O.L.A.: Officer ${G.name}. The cost explosion has been survived.`,'ln-lola');
+  blank();divline();
+  appendLine('FLEET PERFORMANCE STATUS: ALL 50 SHIPS FAST & CHEAP','ln-sys');
+  const steps=['Validating certification…','Profiling foundations: PASSED','Tracing: PASSED','AI bottlenecks: PASSED','Database tuning: PASSED','Right-sizing: PASSED','Cost attribution: PASSED','Caching: PASSED','Load testing: PASSED','Cost explosion recovery: PASSED','Final assessment: PASSED','Issuing certification…'];
+  for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('📈 PERFORMANCE CERTIFICATION GRANTED','ln-success');
+  appendLine(`Officer ${G.name} — Vibe Performance Officer · Class of 2026`,'ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('      PERFORMANCE CERTIFICATION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('costexplosion');unlock('performance');
+  addCareerEntry(9);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase]){showWhatIf(pendingPhase)}
+    else{appendLine('No what-if scenario available.','ln-info')}
+    return;
+  }
+  appendLine(`${val}: executed.`,'ln-ok');
+}
+
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const lines=[
+    {t:'VIBE PERFORMANCE OFFICER v1.0',c:'ln-success'},
+    {t:'Booting performance core…',c:'ln-sys'},
+    {t:'Profiling foundations: READY',c:'ln-sys'},
+    {t:'End-to-end tracing: READY',c:'ln-sys'},
+    {t:'AI bottlenecks: READY',c:'ln-sys'},
+    {t:'Query tuning: READY',c:'ln-sys'},
+    {t:'Resource right-sizing: STANDBY',c:'ln-sys'},
+    {t:'Cost attribution: READY',c:'ln-sys'},
+    {t:'Caching strategies: READY',c:'ln-sys'},
+    {t:'Load testing: LOADED',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome aboard, Officer ${G.name}. Fast is cheap. Slow is expensive.`,c:'ln-lola'},
+    {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    {t:'Profiling. Tracing. AI bottlenecks. Query tuning. Right-sizing. Cost attribution. Caching. Load testing. Cost explosion.',c:'ln-lola'},
+    {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
+    {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: Try janet, whoami, neofetch, uptime',c:'ln-info'},
+    {t:'TIP: After each step → type  deep  to go deeper. After each phase → playbook save or whatif',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
+  if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
+  if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
+  appendLine(`Welcome back, Officer ${G.name}. Performance systems restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  renderPlaybook();
+  if(G.sandbox){
+    appendLine('Performance certification complete. Sandbox mode.','ln-success');
+  }else if(G.bossActive){
+    appendLine('Active cost explosion in progress. J.A.N.E.T. is still waiting.','ln-warn');
+    blank();showBossStep(G.bossStep);
+  }else{
+    const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
+    if(ph&&s){
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(s.ctx);
+    }
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){if(confirm('Restart Vibe Performance Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function shareGrad(){
+  const txt=`Just completed Vibe Performance Officer 📈\n\nAll 9 phases: profiling, tracing, AI bottlenecks, query tuning, right-sizing, cost attribution, caching, load testing, and surviving the Cost Explosion.\n\nFree training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
+  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your performance operations?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+</script>
+</body>
+</html>

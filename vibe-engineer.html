@@ -3794,7 +3794,7 @@ function resumeSession(){
 
 /* ── VIBE ENGINEER OVERRIDE LAYER ── */
 document.title='Vibe Engineer Academy';
-const _logo=document.getElementById('logo'); if(_logo) _logo.textContent='Vibe Engineer';
+const _logo=document.getElementById('logo'); if(_logo) _logo.textContent='Vibe Engineer ⚙';
 const _tag=document.getElementById('cadet-tag'); if(_tag) _tag.innerHTML='Engineer: <b id="cadet-name-display">—</b>';
 const _termPath=document.getElementById('term-path'); if(_termPath) _termPath.innerHTML='engineer@station-delta — <span id="path-display">~/distress-bay</span>';
 const _prompt=document.getElementById('prompt-pre'); if(_prompt) _prompt.innerHTML='engineer@station:~$&nbsp;';
@@ -3803,6 +3803,9 @@ const _bootSub=document.querySelector('#boot-modal .msub'); if(_bootSub) _bootSu
 const _gradTitle=document.querySelector('#grad-modal .mtitle'); if(_gradTitle) _gradTitle.textContent='Commission Complete';
 const _gradSub=document.querySelector('#grad-modal .msub'); if(_gradSub) _gradSub.textContent='You completed all 9 phases of Vibe Engineer Academy.';
 const _gradCapBtn=document.querySelector('#grad-modal .mbtn.mbtn-p'); if(_gradCapBtn) _gradCapBtn.textContent='ATTEMPT POST-COMMISSION DRILL';
+const _stripAvatar=document.getElementById('lola-strip-avatar'); if(_stripAvatar) _stripAvatar.textContent='⚙ L.O.L.A.';
+const _bootIcon=document.querySelector('#boot-modal .mbox > div'); if(_bootIcon) _bootIcon.textContent='🛠️';
+const _gradIcon=document.querySelector('#grad-modal .mbox > div'); if(_gradIcon) _gradIcon.textContent='🛡️';
 
 // Micro-polish: tighten hierarchy and preserve terminal readability on common laptop heights.
 const _engineerPolish=document.createElement('style');
@@ -3810,6 +3813,10 @@ _engineerPolish.textContent=`
 :root{
   --engineer-accent:#22d3ee;
   --engineer-accent-soft:#0f3f4b;
+  --engineer-ok:#67e8f9;
+  --engineer-primary:#38bdf8;
+  --engineer-primary-deep:#0c4a6e;
+  --engineer-track:#0f172a;
 }
 #logo{color:var(--engineer-accent)}
 #cadet-tag b{color:var(--engineer-accent)}
@@ -3819,6 +3826,18 @@ _engineerPolish.textContent=`
 #lola-strip-avatar{background:#0b2431;color:#67e8f9;border-right-color:#18495e}
 #prompt-pre{color:#67e8f9}
 #phase-track .pdot.active{border-color:var(--engineer-accent);box-shadow:0 0 10px rgba(34,211,238,.28)}
+#phase-track .pdot.done{background:var(--engineer-primary);border-color:var(--engineer-primary)}
+#obj-prog-fill{background:linear-gradient(90deg,var(--engineer-primary),var(--engineer-accent))}
+.ln-ok,.ln-success,.ln-code{color:var(--engineer-ok)}
+.mbtn-p{background:var(--engineer-primary);color:#001018}
+.mbtn-p:hover{background:#67d6ff}
+#boot-modal .mbox{border-color:var(--engineer-primary-deep)}
+#boot-modal .mbox input[type=text]:focus{border-color:var(--engineer-primary);box-shadow:0 0 0 2px rgba(56,189,248,.2)}
+#grad-modal .mbox{border-color:var(--engineer-primary-deep);box-shadow:0 0 50px rgba(56,189,248,.14)}
+.grad-cert{border-color:var(--engineer-primary-deep)}
+.grad-name{color:var(--engineer-accent)}
+#career-impact-btn{color:var(--engineer-accent);border-color:var(--engineer-primary-deep)}
+#career-impact-btn:hover{border-color:var(--engineer-primary)}
 #action-rail{grid-template-columns:minmax(380px,1.3fr) minmax(280px,.7fr)}
 #term-panel #lola-sec{max-height:236px}
 #output-static{max-height:146px}
