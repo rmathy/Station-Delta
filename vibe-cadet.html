@@ -609,9 +609,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="term-path">cadet@vibe-ship — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
-    <div id="output-static" onclick="focusCmd()"></div>
+    <div id="output-static" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
-    <div id="output" onclick="focusCmd()"></div>
+    <div id="output" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">cadet@vibe:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
@@ -2175,14 +2175,35 @@ const $outS=document.getElementById('output-static'); // static zone (learning c
 const $cmd=document.getElementById('cmd');
 const $tl=document.getElementById('telem-log');
  
-function focusCmd(){$cmd.focus()}
-document.addEventListener('click',focusCmd);
+function isInteractiveTarget(node){
+  return !!(node && node.closest('input, textarea, button, select, option, .qopt, .janet-opt, .path-card, .mbtn, .ac-pill'));
+}
+
+function focusCmd(evt){
+  if(document.getElementById('boot-modal')?.classList.contains('open')) return;
+  if(evt && isInteractiveTarget(evt.target)) return;
+  const active=document.activeElement;
+  if(active && active!==$cmd && active.matches && active.matches('input, textarea, select')) return;
+  $cmd.focus();
+}
+
+document.addEventListener('click',e=>{
+  if(document.getElementById('boot-modal')?.classList.contains('open')) return;
+  if(!e.target.closest('#term-panel')) return;
+  focusCmd(e);
+});
  
  
 function appendLine(text, cls='ln-sys'){
   const d=document.createElement('div');
   d.className='ln '+cls;
-  d.textContent=text;
+  if(cls.includes('ln-cmd')){
+    const now = new Date();
+    const ts = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] `;
+    d.textContent = ts + text;
+  } else {
+    d.textContent=text;
+  }
   $out.appendChild(d);
   $out.scrollTop=$out.scrollHeight;
   return d;
@@ -2193,6 +2214,15 @@ function appendLineS(text, cls='ln-sys'){
   const d=document.createElement('div');
   d.className='ln '+cls;
   d.textContent=text;
+  $outS.appendChild(d);
+  $outS.scrollTop=$outS.scrollHeight;
+  return d;
+}
+
+function appendHTMLS(html, cls='ln'){
+  const d=document.createElement('div');
+  d.className='ln '+cls;
+  d.innerHTML=html;
   $outS.appendChild(d);
   $outS.scrollTop=$outS.scrollHeight;
   return d;
@@ -2431,6 +2461,20 @@ const CMD_META = {
   'export': {label:'export',desc:'Set env variable'},
   'vibe':   {label:'vibe', desc:'AI orchestration'},
   'prompt': {label:'prompt',desc:'Send agent prompt'},
+  'ssh':    {label:'ssh',  desc:'Secure remote shell'},
+  'scp':    {label:'scp',  desc:'Copy files over SSH'},
+  'chmod':  {label:'chmod',desc:'Change file permissions'},
+  'curl':   {label:'curl', desc:'Make HTTP/API requests'},
+  'jq':     {label:'jq',   desc:'Process JSON from CLI'},
+  'docker': {label:'docker',desc:'Container runtime commands'},
+  'kill':   {label:'kill', desc:'Terminate process by PID'},
+  'tee':    {label:'tee',  desc:'Split output to file and stream'},
+  'ps':     {label:'ps',   desc:'Inspect running processes'},
+  'git stash': {label:'git stash', desc:'Store local changes temporarily'},
+  'git fetch': {label:'git fetch', desc:'Fetch remote refs safely'},
+  'git rebase': {label:'git rebase', desc:'Replay commits on new base'},
+  'git bisect': {label:'git bisect', desc:'Binary search breaking commit'},
+  'git cherry-pick': {label:'git cherry-pick', desc:'Apply one commit selectively'},
 };
  
 function unlockCmd(key){
@@ -2757,7 +2801,7 @@ async function handleCorrect(s, ph){
   } else {
     const next = ph.steps[G.step];
     blank();
-    appendLineS(`▸ Next: ${next.obj}`, 'ln-info');
+    appendHTMLS(`▸ Next: ${next.obj}`, 'ln-info');
     if (!G.hard && !G.practitioner) showHint(next.hint);
     showPreStepConcept(next.id);
     
@@ -2796,15 +2840,53 @@ function handleWrong(val, s){
   }
  
   if(G.tries===1){
-    if(!diagnosed) appendLine(`✗ Not quite. Objective: ${s.obj}`,'ln-warn');
+    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
   } else if(G.tries===2){
-    if(!diagnosed) appendLine('✗ Try again. Here\'s a clue:','ln-warn');
+    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
     if(!diagnosed) showHint(s.hint);
   } else if(G.tries>=3){
-    if(!diagnosed) appendLine(`✗ Attempt ${G.tries}. Click "show" to reveal the exact command.`,'ln-warn');
+    if(!diagnosed) appendLine(cadetRetryMsg(s, G.tries),'ln-warn');
     telem(`Struggling: phase ${G.phase} step ${G.step}, ${G.tries} attempts`);
   }
   save();
+}
+
+const CADET_RETRY_COACH = {
+  p1s1:[
+    'L.O.L.A.: You are learning the right rhythm. First objective: print your location with the shortest command.',
+    'L.O.L.A.: Close. Think “print working directory.” That phrase maps directly to one command.',
+    'L.O.L.A.: Use the "show" button in the objective card, run it once, then repeat from memory.'
+  ],
+  p1s2:[
+    'L.O.L.A.: Good attempt. This step is only about listing files in the current folder.',
+    'L.O.L.A.: You are close. Start with the base listing command first, then we add flags later.',
+    'L.O.L.A.: Use the "show" button in the objective card, then retype it without looking.'
+  ],
+  p1s3:[
+    'L.O.L.A.: Nice effort. We are changing directory into a specific folder.',
+    'L.O.L.A.: Keep the pattern: command + folder name. Destination is game_v1.',
+    'L.O.L.A.: Click the "show" button in the objective card, run it, then run it again from recall.'
+  ],
+  p2s1:[
+    'L.O.L.A.: Strong try. This step creates a blank file only.',
+    'L.O.L.A.: You are one token away. Use the file-creation command with manifest.txt.',
+    'L.O.L.A.: Use the objective-card "show" button, then run it once more from memory.'
+  ],
+  p2s2:[
+    'L.O.L.A.: Great attempt. Goal state is text written into the file, not just printed on screen.',
+    'L.O.L.A.: Keep this pattern: command + "string" + redirect + filename.',
+    'L.O.L.A.: Click "show" in the objective card, then retype the full command yourself.'
+  ]
+};
+
+function cadetRetryMsg(step, tries){
+  const lane = step?.id ? CADET_RETRY_COACH[step.id] : null;
+  if(lane && lane.length){
+    return lane[Math.min(Math.max(tries,1)-1, lane.length-1)];
+  }
+  if(tries===1) return `L.O.L.A.: Good effort. Anchor to the objective: ${step.obj}`;
+  if(tries===2) return 'L.O.L.A.: You are close. Make one adjustment and run it again.';
+  return `L.O.L.A.: Attempt ${tries}. Use the "show" button in the objective card if needed, then rerun from memory.`;
 }
  
 async function completePhase(){
@@ -2961,7 +3043,7 @@ function showPreStepConcept(stepId){
 function continuePhaseStart(ph){
   blankS();
   const s=ph.steps[0];
-  appendLineS(`▸ ${s.obj}`,'ln-info');
+  appendHTMLS(`▸ ${s.obj}`,'ln-info');
   if(!G.hard && !G.practitioner) showHint(s.hint);
   // Show JIT card for the first step so context is visible before the player answers
   if(s.jit && !G.hard) showJIT(s.jit);
@@ -3132,7 +3214,7 @@ $cmd.addEventListener('keydown',e=>{
     $cmd.value=G.histIdx>=0?G.cmdHistory[G.histIdx]:'';
   } else if(e.key==='Tab'){
     e.preventDefault();
-    if(G.sandbox||G.capstoneActive)return;
+    if(G.sandbox)return;
     const ph=PHASES[G.phase];if(!ph)return;
     const s=ph.steps[G.step];if(!s||!s.cmd)return;
     const partial=$cmd.value;
@@ -3207,7 +3289,8 @@ function doRestart(){
  
 function shareGrad(){
   const txt=`Just graduated Vibe Cadet Academy v4 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
-  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
+  const launchUrl = `${window.location.origin}/vibe-cadet.html`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
 }
  

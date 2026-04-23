@@ -670,7 +670,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       </div>
     </div>
     <div id="output-static" onclick="focusCmd(event)"></div>
-    <div id="output-divider">▶ Terminal — type commands below</div>
+    <div id="output-divider">▶ Live terminal — distress-bay session active</div>
     <div id="output" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">engineer@station:~$&nbsp;</span>
@@ -2096,7 +2096,7 @@ const BOSS_STEPS=[
     id:'boss3',
     scenario:'STEP 3 OF 5: Before the deployment resumes, you must review the diff.\n\nI have reviewed it myself. I found two issues. I will not tell you what they are. That would defeat the purpose of an assessment.\n\nReview the deployment diff.',
     prompt:'Review the deployment diff for issues.',
-    acceptFn:v=>v.includes('git diff')||v.includes('review')||v.includes('cat'),
+    acceptFn:v=>v.includes('git diff')||v==='review diff',
     accept:['git diff','git diff main','review diff'],
     out:'diff --git a/src/app.ts b/src/app.ts\n\n-  const API_URL = "https://api.prod.example.com";\n+  const API_URL = "https://api.staging.example.com";\n\n-  const TIMEOUT = 30000;\n+  const TIMEOUT = 30;\n\n⚠  Issue 1: API_URL changed to staging endpoint (will hit wrong server)\n⚠  Issue 2: TIMEOUT changed from 30000ms → 30ms (30 milliseconds is not a timeout — it is a guarantee of failure)',
     hint:'Type: git diff  — examine the proposed changes carefully'
@@ -2323,7 +2323,13 @@ document.addEventListener('click',e=>{
 function appendLine(text, cls='ln-sys'){
   const d=document.createElement('div');
   d.className='ln '+cls;
-  d.textContent=text;
+  if(cls.includes('ln-cmd')){
+    const now = new Date();
+    const ts = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] `;
+    d.textContent = ts + text;
+  } else {
+    d.textContent=text;
+  }
   $out.appendChild(d);
   $out.scrollTop=$out.scrollHeight;
   return d;
@@ -2586,6 +2592,20 @@ const CMD_META = {
   'export': {label:'export',desc:'Set env variable'},
   'vibe':   {label:'vibe', desc:'AI orchestration'},
   'prompt': {label:'prompt',desc:'Send agent prompt'},
+  'ssh':    {label:'ssh',  desc:'Secure remote shell'},
+  'scp':    {label:'scp',  desc:'Copy files over SSH'},
+  'chmod':  {label:'chmod',desc:'Change file permissions'},
+  'curl':   {label:'curl', desc:'Make HTTP/API requests'},
+  'jq':     {label:'jq',   desc:'Process JSON from CLI'},
+  'docker': {label:'docker',desc:'Container runtime commands'},
+  'kill':   {label:'kill', desc:'Terminate process by PID'},
+  'tee':    {label:'tee',  desc:'Split output to file and stream'},
+  'ps':     {label:'ps',   desc:'Inspect running processes'},
+  'git stash': {label:'git stash', desc:'Store local changes temporarily'},
+  'git fetch': {label:'git fetch', desc:'Fetch remote refs safely'},
+  'git rebase': {label:'git rebase', desc:'Replay commits on new base'},
+  'git bisect': {label:'git bisect', desc:'Binary search breaking commit'},
+  'git cherry-pick': {label:'git cherry-pick', desc:'Apply one commit selectively'},
 };
  
 function unlockCmd(key){
@@ -3603,7 +3623,7 @@ $cmd.addEventListener('keydown',e=>{
     $cmd.value=G.histIdx>=0?G.cmdHistory[G.histIdx]:'';
   } else if(e.key==='Tab'){
     e.preventDefault();
-    if(G.sandbox||G.capstoneActive)return;
+    if(G.sandbox)return;
     const ph=PHASES[G.phase];if(!ph)return;
     const s=ph.steps[G.step];if(!s||!s.cmd)return;
     const partial=$cmd.value;
@@ -3677,8 +3697,9 @@ function doRestart(){
 }
  
 function shareGrad(){
-  const txt=`Just graduated Vibe Cadet Academy v4 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
-  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
+  const txt=`Just graduated Vibe Engineer Academy ⚙️\n\nI now know: SSH workflows, shell scripting, API diagnostics, Docker operations, advanced Git recovery, and incident-response command flow.\n\nFree hands-on terminal training →`;
+  const launchUrl = `${window.location.origin}/vibe-engineer.html`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
 }
  
@@ -3832,6 +3853,10 @@ _engineerPolish.textContent=`
 .mbtn-p{background:var(--engineer-primary);color:#001018}
 .mbtn-p:hover{background:#67d6ff}
 #boot-modal .mbox{border-color:var(--engineer-primary-deep)}
+#boot-modal .mtitle{color:var(--engineer-accent)!important}
+#boot-modal .boot-features span{color:var(--engineer-primary)!important}
+#boot-modal .boot-features b{color:var(--engineer-accent)!important}
+#boot-modal .mbox input[type=text]{caret-color:var(--engineer-accent)}
 #boot-modal .mbox input[type=text]:focus{border-color:var(--engineer-primary);box-shadow:0 0 0 2px rgba(56,189,248,.2)}
 #grad-modal .mbox{border-color:var(--engineer-primary-deep);box-shadow:0 0 50px rgba(56,189,248,.14)}
 .grad-cert{border-color:var(--engineer-primary-deep)}
@@ -3912,18 +3937,146 @@ const ENGINEER_PRE_STEP_CONCEPTS={
 };
 
 const ENGINEER_LOLA_STRIP={
-  p1s1:[{tag:'tip',msg:'Cadet instincts first: orient, inspect, then act.'}],
-  p1s2:[{tag:'concept',msg:'Hidden files begin with <code>.</code>. Security and tooling config live there.'}],
-  p1s4:[{tag:'concept',msg:'Compact commit history scanning becomes critical in Lieutenant incident phases.'}],
-  p2s3:[{tag:'syntax',msg:'Bash variables do not allow spaces around <code>=</code>.'}],
-  p2s6:[{tag:'habit',msg:'After writing a script: make it executable, then run it immediately.'}],
-  p3s3:[{tag:'new!',msg:'Prompt changed: you are now on remote host context.'}],
-  p4s5:[{tag:'command',msg:'You are calling a real AI endpoint with curl. This is production-style API interaction.'}],
-  p5s3:[{tag:'concept',msg:'jq can reshape data, not just filter it.'}],
-  p6s2:[{tag:'shortcut',msg:'<code>docker logs NAME --tail 20</code> is your fastest first look under incident pressure.'}],
-  p7s4:[{tag:'concept',msg:'Rebase replays local commits on latest upstream history for cleaner timeline.'}],
-  p8s4:[{tag:'warning',msg:'Forgetting <code>.env</code> in <code>.gitignore</code> is a common and expensive failure mode.'}],
-  p9s5:[{tag:'warning',msg:'Battery critical. Read objective once, execute once with precision.'}]
+  p1s1:[
+    {tag:'tip',msg:'You are in <code>/home/engineer/distress-bay</code>. Incident order is always: orient, inspect, then change.'},
+    {tag:'command',msg:'Use <code>pwd</code> to anchor location before any destructive command.'}
+  ],
+  p1s2:[
+    {tag:'concept',msg:'Critical artifacts here are <code>distress.log</code>, <code>rescue.sh.template</code>, and <code>Dockerfile.template</code>.'},
+    {tag:'habit',msg:'Run <code>ls -la</code> (not plain <code>ls</code>) during incidents so hidden files like <code>.ssh</code> are visible.'}
+  ],
+  p1s3:[
+    {tag:'tip',msg:'The remote host you will target for this mission is <code>192.168.1.42</code>. You will reuse it often.'}
+  ],
+  p1s4:[
+    {tag:'concept',msg:'Recent commit IDs matter for rollback and cherry-pick workflows in real incident response.'}
+  ],
+  p2s1:[
+    {tag:'new!',msg:'Script target is <code>rescue.sh</code>. Keep this exact filename for later SSH and execution steps.'}
+  ],
+  p2s2:[
+    {tag:'syntax',msg:'Shebang must be first line: <code>#!/bin/bash</code> (or <code>#!/usr/bin/env bash</code>) redirected to <code>rescue.sh</code>.'}
+  ],
+  p2s3:[
+    {tag:'syntax',msg:'Use exact variable form <code>SERVER=\"192.168.1.42\"</code> with no spaces around <code>=</code>.'}
+  ],
+  p2s4:[
+    {tag:'warning',msg:'Guard clauses prevent brittle incidents: fail early if <code>$SERVER</code> is empty.'}
+  ],
+  p2s5:[
+    {tag:'command',msg:'<code>chmod +x rescue.sh</code> is required before <code>./rescue.sh</code> works cleanly.'}
+  ],
+  p2s6:[
+    {tag:'habit',msg:'Write, chmod, run. That 3-step cycle is standard script workflow in production teams.'}
+  ],
+  p3s1:[
+    {tag:'concept',msg:'Key comment should identify ownership: <code>engineer@station-delta</code>.'}
+  ],
+  p3s2:[
+    {tag:'command',msg:'Remote target is fixed for this sim: <code>engineer@192.168.1.42</code>.'}
+  ],
+  p3s3:[
+    {tag:'new!',msg:'After this command, prompt context is remote host. Verify with <code>pwd</code> or prompt label if unsure.'}
+  ],
+  p3s4:[
+    {tag:'concept',msg:'Use <code>&&</code> when second command should run only if first succeeds.'}
+  ],
+  p3s5:[
+    {tag:'warning',msg:'SCP format is <code>user@host:path</code>. Do not omit the colon before <code>~/</code>.'}
+  ],
+  p4s1:[
+    {tag:'command',msg:'Health endpoint for this phase: <code>http://192.168.1.42/health</code>.'}
+  ],
+  p4s2:[
+    {tag:'syntax',msg:'POST restart body must include service name: <code>{\"service\":\"pod-monitor\"}</code>.'}
+  ],
+  p4s3:[
+    {tag:'warning',msg:'Protected endpoint requires <code>Authorization: Bearer $API_KEY</code> header format exactly.'}
+  ],
+  p4s4:[
+    {tag:'shortcut',msg:'Extract one field quickly with <code>jq \".battery\"</code> after a curl pipe.'}
+  ],
+  p4s5:[
+    {tag:'command',msg:'This uses the real Anthropic messages endpoint shape: URL + auth headers + JSON payload.'}
+  ],
+  p5s1:[
+    {tag:'tip',msg:'Text logs (<code>events.log</code>) are grep-friendly; JSON logs (<code>events.json</code>) are jq-friendly.'}
+  ],
+  p5s2:[
+    {tag:'concept',msg:'Use <code>.[] | select(...)</code> to filter JSON arrays deterministically.'}
+  ],
+  p5s3:[
+    {tag:'concept',msg:'Reshaping with jq objects is how teams make machine-readable telemetry summaries.'}
+  ],
+  p5s4:[
+    {tag:'habit',msg:'<code>tee monitor.log</code> lets you archive stream output while still piping to jq.'}
+  ],
+  p6s1:[
+    {tag:'tip',msg:'Container name to watch in this phase: <code>pod-monitor</code>.'}
+  ],
+  p6s2:[
+    {tag:'shortcut',msg:'<code>docker logs pod-monitor --tail 20</code> is the fastest first evidence pull under pressure.'}
+  ],
+  p6s3:[
+    {tag:'concept',msg:'Dockerfile locks runtime assumptions; this reduces “works on my machine” drift.'}
+  ],
+  p6s4:[
+    {tag:'command',msg:'Image tag for this mission is <code>rescue-service:v1</code>.'}
+  ],
+  p6s5:[
+    {tag:'warning',msg:'Port mapping is host:container, so use <code>-p 3000:3000</code> exactly.'}
+  ],
+  p6s6:[
+    {tag:'tip',msg:'Container exec shell accepts <code>/bin/sh</code> or <code>/bin/bash</code> depending image base.'}
+  ],
+  p7s1:[
+    {tag:'habit',msg:'Before sync, always inspect state with <code>git status</code> to avoid hidden local drift.'}
+  ],
+  p7s2:[
+    {tag:'concept',msg:'<code>git stash</code> protects WIP before upstream integration.'}
+  ],
+  p7s3:[
+    {tag:'warning',msg:'Use <code>git fetch origin</code> first; avoid blind <code>git pull</code> during incidents.'}
+  ],
+  p7s4:[
+    {tag:'concept',msg:'Rebase replays local commits on updated origin/main for cleaner history.'}
+  ],
+  p7s5:[
+    {tag:'command',msg:'Bisect pattern is start → bad → good tag/commit.'}
+  ],
+  p7s6:[
+    {tag:'tip',msg:'Cherry-pick is ideal when you need one known-good fix without merging unrelated work.'}
+  ],
+  p8s1:[
+    {tag:'command',msg:'Locate noisy process by PID first. In this phase, <code>4242</code> is the rogue worker.'}
+  ],
+  p8s2:[
+    {tag:'warning',msg:'Prefer graceful signal first (<code>-15</code>), then force (<code>-9</code>) if needed.'}
+  ],
+  p8s3:[
+    {tag:'habit',msg:'Use <code>.env</code> for local secret storage, never hardcoded constants in source.'}
+  ],
+  p8s4:[
+    {tag:'warning',msg:'Both <code>.env</code> and <code>.env.local</code> must be ignored to prevent secret leaks.'}
+  ],
+  p8s5:[
+    {tag:'concept',msg:'Command substitution <code>$(...)</code> lets curl+jq output become your new exported key.'}
+  ],
+  p9s1:[
+    {tag:'concept',msg:'Inline remote execution pattern: <code>ssh engineer@192.168.1.42 \"...\"</code>.'}
+  ],
+  p9s2:[
+    {tag:'warning',msg:'Order matters: build first, push second. No push exists without a local image.'}
+  ],
+  p9s3:[
+    {tag:'tip',msg:'Mission control only needs two fields: <code>battery</code> and <code>status</code>.'}
+  ],
+  p9s4:[
+    {tag:'habit',msg:'Use conventional incident commit prefix <code>rescue:</code> for searchable history.'}
+  ],
+  p9s5:[
+    {tag:'warning',msg:'Final command must target host <code>192.168.1.42</code> and run <code>~/rescue.sh</code> remotely.'}
+  ]
 };
 
 const ENGINEER_PHASES=[
@@ -3943,7 +4096,7 @@ const ENGINEER_PHASES=[
    lolaIntro:'Now we automate the rescue path. A script is just repeatable judgment in file form.',
    steps:[
     {id:'p2s1',obj:'Create the rescue script file',ctx:'Start with a runnable script file.',cmd:['touch rescue.sh'],accept:['touch rescue.sh'],hint:'Type: touch rescue.sh',out:'',unlockCmd:'touch'},
-    {id:'p2s2',obj:'Write the shebang line',ctx:'Set interpreter explicitly.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('#!/bin/bash')&&v.includes('> rescue.sh'),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'',unlockCmd:'echo >'},
+    {id:'p2s2',obj:'Write the shebang line',ctx:'Set interpreter explicitly.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('>')&&v.includes('rescue.sh')&&(v.includes('#!/bin/bash')||v.includes('#!/usr/bin/env bash')),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'',unlockCmd:'echo >'},
     {id:'p2s3',obj:'Add the SERVER variable',ctx:'Store remote host once for reuse.',cmd:['echo \'SERVER="192.168.1.42"\' >> rescue.sh','echo "SERVER=\\"192.168.1.42\\"" >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('SERVER=')&&v.includes('>> rescue.sh'),accept:['echo server >> rescue.sh'],hint:'Append variable line with >>',out:'',unlockCmd:'>>'},
     {id:'p2s4',obj:'Add an empty-variable guard',ctx:'Fail safely if SERVER is missing.',cmd:['echo \'if [ -z "$SERVER" ]; then echo "No server set"; fi\' >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('-z "$SERVER"')&&v.includes('>> rescue.sh'),accept:['if guard append'],hint:'Append if [ -z "$SERVER" ] guard',out:'',teach:{title:'Guard clauses in scripts',body:'This check prevents expensive mistakes by validating required inputs first.'}},
     {id:'p2s5',obj:'Make the script executable',ctx:'Set execute permission bit.',cmd:['chmod +x rescue.sh'],accept:['chmod +x rescue.sh'],hint:'Type: chmod +x rescue.sh',out:'',unlockCmd:'chmod +x'},
@@ -3997,7 +4150,7 @@ const ENGINEER_PHASES=[
     {id:'p6s3',obj:'Write Dockerfile from template pattern',ctx:'Create deterministic runtime recipe.',cmd:['echo -e \'FROM node:20-alpine\\nWORKDIR /app\\nCOPY . .\\nRUN npm install\\nCMD ["node","server.js"]\' > Dockerfile'],acceptFn:v=>v.startsWith('echo -e')&&v.includes('FROM node:20-alpine')&&v.includes('> Dockerfile'),accept:['echo dockerfile > Dockerfile'],hint:'Echo multi-line Dockerfile into Dockerfile',out:'Dockerfile written.',unlockCmd:'Dockerfile'},
     {id:'p6s4',obj:'Build rescue image',ctx:'Compile image from Dockerfile.',cmd:['docker build -t rescue-service:v1 .'],accept:['docker build -t rescue-service:v1 .'],hint:'Type: docker build -t rescue-service:v1 .',out:'Successfully built rescue-service:v1',unlockCmd:'docker build'},
     {id:'p6s5',obj:'Run rescue container',ctx:'Start service in detached mode with port mapping.',cmd:['docker run -d -p 3000:3000 --name rescue rescue-service:v1'],accept:['docker run -d -p 3000:3000 --name rescue rescue-service:v1'],hint:'Type full docker run with -d -p --name',out:'Container rescue started.',unlockCmd:'docker run'},
-    {id:'p6s6',obj:'Open shell inside running container',ctx:'Interactively inspect container internals.',cmd:['docker exec -it rescue /bin/sh'],accept:['docker exec -it rescue /bin/sh'],hint:'Type: docker exec -it rescue /bin/sh',out:'/app #',unlockCmd:'docker exec',quiz:{q:'Container returns errors. Which sequence is strongest first-pass triage?',opts:['Reboot machine immediately','docker ps → docker logs → docker exec','Delete image and rebuild only','Kill every process and retry'],correct:1,fb:'Correct. State, evidence, then inspection. That sequence minimizes blind guesses.'}}
+    {id:'p6s6',obj:'Open shell inside running container',ctx:'Interactively inspect container internals.',cmd:['docker exec -it rescue /bin/sh'],acceptFn:v=>v.startsWith('docker exec -it ')&&(v.includes(' /bin/sh')||v.includes(' /bin/bash')),accept:['docker exec -it rescue /bin/sh'],hint:'Type: docker exec -it rescue /bin/sh',out:'/app #',unlockCmd:'docker exec',quiz:{q:'Container returns errors. Which sequence is strongest first-pass triage?',opts:['Reboot machine immediately','docker ps → docker logs → docker exec','Delete image and rebuild only','Kill every process and retry'],correct:1,fb:'Correct. State, evidence, then inspection. That sequence minimizes blind guesses.'}}
    ],
    breakit:ENGINEER_BREAKIT[6],
    done:'Phase 6 complete. You can build, run, and investigate containers.',
@@ -4123,19 +4276,169 @@ JANET_WRONG.splice(0,JANET_WRONG.length,
   'Unacceptable ordering. Try again with operational discipline.'
 );
 
+function applyEngineerReferenceContent(){
+  CAREER_LOG_DATA.splice(0,CAREER_LOG_DATA.length,
+    {phase:'Phase 1 — Recall & Reorient',stat:'< 60s',context:'High-performing responders anchor location and artifact inventory in under one minute. This avoids wrong-host and wrong-directory mistakes during incident pressure.',tags:['Incident response','Linux','Remote ops','Runbooks']},
+    {phase:'Phase 2 — Shell Scripting',stat:'Daily',context:'Shell scripts remain a core automation tool across SRE, platform, security, and data engineering teams. Basic scripting fluency compounds over an entire career.',tags:['Bash','Automation','Ops','Platform engineering']},
+    {phase:'Phase 3 — SSH & Remote Access',stat:'90%+',context:'Most production systems are diagnosed remotely. SSH key workflows and secure file transfer are baseline expectations for modern engineering roles.',tags:['SSH','SCP','Remote servers','Security hygiene']},
+    {phase:'Phase 4 — API Literacy',stat:'Every stack',context:'Whether REST, GraphQL, or internal service contracts, engineers constantly inspect and validate APIs from the terminal before touching app code.',tags:['curl','HTTP','JSON','Service debugging']},
+    {phase:'Phase 5 — jq & Pipes',stat:'On-call core',context:'Structured log parsing with jq is a force multiplier in incident triage. Teams that can shape telemetry quickly resolve incidents faster.',tags:['jq','Pipelines','Observability','On-call']},
+    {phase:'Phase 6 — Docker Fundamentals',stat:'Industry standard',context:'Containerized runtime parity is now the default in professional software delivery. Docker literacy is expected across backend and platform tracks.',tags:['Docker','Containers','CI/CD','Deployment readiness']},
+    {phase:'Phase 7 — Git Advanced',stat:'High leverage',context:'Safe sync patterns (stash/fetch/rebase) and targeted recovery (bisect/cherry-pick) distinguish experienced engineers from novice contributors.',tags:['Git','Recovery workflows','Code review','Release engineering']},
+    {phase:'Phase 8 — Process + Secrets',stat:'High risk area',context:'Process control and secret rotation are foundational reliability and security practices. Mistakes here have direct operational and financial impact.',tags:['Security','Secrets management','Runtime ops','Resilience']},
+    {phase:'Phase 9 — Full Stack Rescue',stat:'Mission complete',context:'You executed an end-to-end incident workflow: diagnose remotely, build/deploy safely, shape decision outputs, and commit clean operational history.',tags:['Incident command','Shipping','Production discipline','Career-ready']}
+  );
+
+  GLOSSARY.splice(0,GLOSSARY.length,
+    {term:'SSH',def:'Secure Shell protocol for encrypted remote terminal access. Typical form: <code>ssh user@host</code>.'},
+    {term:'SSH key pair',def:'Two-key auth model: private key stays on your machine, public key is installed on remote servers for passwordless login.'},
+    {term:'SCP',def:'Secure Copy over SSH for file transfer. Syntax: <code>scp localfile user@host:remote/path</code>.'},
+    {term:'Shebang',def:'Interpreter directive at top of script file, e.g. <code>#!/bin/bash</code>. It tells OS how to execute the script.'},
+    {term:'Guard clause',def:'Early validation check that exits when required values are missing, preventing deeper unsafe behavior.'},
+    {term:'HTTP method',def:'Operation type for API requests: <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>.'},
+    {term:'Authorization header',def:'Request header carrying credentials, often in bearer form: <code>Authorization: Bearer TOKEN</code>.'},
+    {term:'jq',def:'Command-line JSON processor for filtering, selecting, and reshaping structured data.'},
+    {term:'tee',def:'Writes output to a file and passes the same stream onward in a pipeline.'},
+    {term:'Container',def:'Packaged application runtime with dependencies included, reducing environment drift across machines.'},
+    {term:'Docker image',def:'Immutable template used to create containers. Built with <code>docker build</code> and tagged for versions.'},
+    {term:'Port mapping',def:'Bridge between host and container ports, format <code>host:container</code>, e.g. <code>-p 3000:3000</code>.'},
+    {term:'Rebase',def:'Replays your commits on top of a newer base commit, producing linear history.'},
+    {term:'Cherry-pick',def:'Applies a single commit from another branch without merging all branch changes.'},
+    {term:'Bisect',def:'Git binary search for finding the exact commit that introduced a regression.'},
+    {term:'Process ID (PID)',def:'Numeric identifier for a running process, used with commands like <code>kill</code>.'},
+    {term:'Signal',def:'Control message sent to a process; e.g. <code>-15</code> (graceful terminate), <code>-9</code> (force kill).'},
+    {term:'.env file',def:'Local key-value file for environment variables and secrets. Must be excluded from Git history.'},
+    {term:'Command substitution',def:'Shell pattern <code>$(...)</code> that runs a command and injects its output inline.'},
+    {term:'Incident triage',def:'Rapid sequence of state check, evidence collection, and scoped remediation before broad changes.'}
+  );
+
+  Object.assign(MAN,{
+    pwd:{synopsis:'pwd',desc:'Print working directory',why:'Confirms exact path before you operate. First command in unfamiliar environments.',flags:[],example:'$ pwd\n/home/engineer/distress-bay'},
+    ls:{synopsis:'ls [flags] [path]',desc:'List directory contents',why:'Quick inventory of artifacts before execution.',flags:[{f:'-a',d:'Include hidden dotfiles'},{f:'-l',d:'Long listing with permissions and size'},{f:'-la',d:'Most-used incident listing form'}],example:'$ ls -la\n.ssh  distress.log  rescue.sh.template  Dockerfile.template'},
+    cat:{synopsis:'cat [file]',desc:'Print file contents',why:'Fast evidence reading for logs and config snapshots.',flags:[{f:'-n',d:'Show line numbers'}],example:'$ cat distress.log\nHost: 192.168.1.42\nService: pod-monitor DOWN'},
+    ssh:{synopsis:'ssh [user@host] [command]',desc:'Remote shell over encrypted channel',why:'Primary way to inspect and operate production hosts safely.',flags:[{f:'-i',d:'Specify identity key file'},{f:'-p',d:'Connect to non-default SSH port'}],example:'$ ssh engineer@192.168.1.42\n$ ssh engineer@192.168.1.42 "tail -5 /var/log/monitor.log"'},
+    scp:{synopsis:'scp [source] [user@host:path]',desc:'Secure file copy over SSH',why:'Move scripts and artifacts to remote hosts with the same trust model as SSH.',flags:[{f:'-r',d:'Recursive copy for directories'}],example:'$ scp rescue.sh engineer@192.168.1.42:~/'},
+    curl:{synopsis:'curl [url] [flags]',desc:'Transfer data from/to endpoints',why:'Terminal-level API testing and diagnostics.',flags:[{f:'-X',d:'Set HTTP method'},{f:'-H',d:'Add request header'},{f:'-d',d:'Send body payload'},{f:'-s',d:'Silent mode for clean pipelines'}],example:'$ curl -s http://192.168.1.42/status | jq ".battery"'},
+    jq:{synopsis:'jq [filter]',desc:'JSON query and transform',why:'Extract signal from structured logs and API responses.',flags:[{f:'-r',d:'Raw output without JSON quotes'}],example:'$ cat events.json | jq ".[] | select(.level == \"ERROR\")"'},
+    docker:{synopsis:'docker [subcommand]',desc:'Container runtime CLI',why:'Build, run, inspect, and exec workloads with consistent runtime behavior.',flags:[],example:'$ docker ps\n$ docker logs pod-monitor --tail 20\n$ docker exec -it rescue /bin/sh'},
+    ps:{synopsis:'ps aux',desc:'Process table snapshot',why:'Identify runaway processes during incidents.',flags:[{f:'aux',d:'All users, detailed view'}],example:'$ ps aux\nengineer 4242 ... rogue-worker'},
+    kill:{synopsis:'kill [signal] [PID]',desc:'Send signal to process',why:'Stop unstable workloads cleanly or forcefully when required.',flags:[{f:'-15',d:'Graceful terminate (SIGTERM)'},{f:'-9',d:'Force kill (SIGKILL)'}],example:'$ kill -15 4242'},
+    git:{synopsis:'git [subcommand]',desc:'Version control + recovery toolkit',why:'Beyond commits, Git supports safe sync and incident recovery operations.',flags:[],example:'$ git stash\n$ git fetch origin\n$ git rebase origin/main\n$ git cherry-pick a1b2c3d'}
+  });
+
+  const achById=Object.fromEntries(ACHS.map(a=>[a.id,a]));
+  if(achById.first_cmd){achById.first_cmd.name='Commission Online';achById.first_cmd.desc='Executed your first Engineer command.';}
+  if(achById.navigator){achById.navigator.name='Incident Navigator';achById.navigator.desc='Completed Phase 1 with clean orientation discipline.';}
+  if(achById.file_master){achById.file_master.name='Script Operator';achById.file_master.desc='Built and executed rescue automation script flow.';}
+  if(achById.git_mind){achById.git_mind.name='Remote Operator';achById.git_mind.desc='Established secure SSH-based server control.';}
+  if(achById.packager){achById.packager.name='API Operator';achById.packager.desc='Diagnosed live endpoints and shaped responses.';}
+  if(achById.pipe_dream){achById.pipe_dream.name='Data Shaper';achById.pipe_dream.desc='Transformed structured telemetry with jq pipelines.';}
+  if(achById.orchestrator){achById.orchestrator.name='Container Technician';achById.orchestrator.desc='Built and triaged containerized service workflows.';}
+  if(achById.crew_leader){achById.crew_leader.name='Version Responder';achById.crew_leader.desc='Used advanced Git recovery patterns under pressure.';}
+  if(achById.prompter){achById.prompter.name='Runtime Stabilizer';achById.prompter.desc='Controlled process and secret lifecycle correctly.';}
+  if(achById.shipper){achById.shipper.name='Rescue Shipper';achById.shipper.desc='Stabilized and shipped a live rescue service.';}
+  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed all 9 phases of Vibe Engineer Academy.';}
+}
+
+function ensureEngineerScaffold(){
+  const commandBridgeMap=[
+    {test:(cmd)=>cmd.startsWith('ssh')||cmd.startsWith('scp'),title:'Remote operations transfer directly to production',body:'Secure host access and artifact transfer are standard in cloud fleets, self-hosted infra, and incident-response workflows.',tags:['SRE','Cloud ops','Incident response']},
+    {test:(cmd)=>cmd.startsWith('curl'),title:'API-first debugging is industry standard',body:'Top teams validate service contracts in terminal before opening UI tools. It is faster, scriptable, and reproducible.',tags:['Backend','API testing','Reliability']},
+    {test:(cmd)=>cmd.includes('jq'),title:'Structured logs demand structured parsing',body:'JSON pipelines with jq outperform ad-hoc eyeballing and reduce incident resolution time.',tags:['Observability','On-call','Data workflows']},
+    {test:(cmd)=>cmd.startsWith('docker'),title:'Container parity reduces deployment drift',body:'Container workflows keep local, CI, and production behavior aligned across teams and environments.',tags:['DevOps','Platform','CI/CD']},
+    {test:(cmd)=>cmd.startsWith('git'),title:'History management is operational safety',body:'Advanced Git operations protect in-flight work while enabling low-drama recovery and release fixes.',tags:['Version control','Release engineering','Team workflow']},
+    {test:(cmd)=>cmd.startsWith('ps')||cmd.startsWith('kill'),title:'Process control is core reliability practice',body:'Runtime process inspection and signal handling are core competencies for production support engineers.',tags:['Linux ops','Incident triage','Performance']},
+  ];
+
+  ENGINEER_PHASES.forEach((phase)=>{
+    phase.steps.forEach((step)=>{
+      const sample=Array.isArray(step.cmd)&&step.cmd.length?step.cmd[0]:'';
+      if(!step.pre_step_concept){
+        const pre=ENGINEER_PRE_STEP_CONCEPTS[step.id];
+        if(pre) step.pre_step_concept=pre;
+      }
+      if(!step.jit){
+        step.jit={
+          title:'Why this command matters now',
+          body:`${step.ctx} Mission command: ${sample ? `<code>${sample}</code>` : 'this operation'}.`
+        };
+      }
+      if(!step.bridge){
+        const matched=commandBridgeMap.find((entry)=>entry.test(sample));
+        step.bridge=matched
+          ? {title:matched.title,body:matched.body,tags:matched.tags}
+          : {title:'Transfer to real engineering work',body:'This pattern appears in live team workflows where speed and correctness both matter.',tags:['Professional workflow']};
+      }
+    });
+  });
+}
+
+const ENGINEER_CTX_BY_STEP={
+  p2s1:'Create <code>rescue.sh</code> in <code>/home/engineer/distress-bay</code>. We will execute this file later against host <code>192.168.1.42</code>.',
+  p2s3:'Use the exact host value <code>192.168.1.42</code>. Store it once in <code>SERVER</code> so every later command stays consistent.',
+  p3s2:'Authorize key-based access for user <code>engineer</code> on host <code>192.168.1.42</code>.',
+  p4s3:'This endpoint expects bearer format exactly: <code>Authorization: Bearer $API_KEY</code>.',
+  p5s4:'Stream source is <code>http://192.168.1.42/stream</code>; write a persistent copy to <code>monitor.log</code> while parsing battery values.',
+  p6s5:'Container name must be <code>rescue</code> with explicit mapping <code>-p 3000:3000</code> for later exec and diagnostics.',
+  p8s3:'Secret file for this phase is <code>.env</code> with key name <code>API_KEY</code>.',
+  p9s1:'Run one inline command against host <code>192.168.1.42</code> and inspect <code>/var/log/monitor.log</code> without opening an interactive session.',
+  p9s5:'Final handoff command must run <code>bash ~/rescue.sh</code> remotely on <code>192.168.1.42</code>.'
+};
+
+function applyEngineerContextUpgrades(){
+  ENGINEER_PHASES.forEach((phase)=>{
+    phase.steps.forEach((step)=>{
+      if(ENGINEER_CTX_BY_STEP[step.id]) step.ctx=ENGINEER_CTX_BY_STEP[step.id];
+    });
+  });
+}
+
+applyEngineerReferenceContent();
+applyEngineerContextUpgrades();
+ensureEngineerScaffold();
+
+ENGINEER_PHASES.forEach((phase)=>{
+  phase.steps.forEach((step)=>{ delete DIAGNOSE[step.id]; });
+});
+
 Object.assign(DIAGNOSE,{
   p1s1:(v)=>{ if(v.includes('ls')) return {msg:'Inventory is step two. First anchor location.',next:'Try: pwd'}; if(v.includes('cd')) return {msg:'Movement is not needed yet. Confirm location first.',next:'Try: pwd'}; return null; },
-  p2s2:(v)=>{ if(v.includes('>>')) return {msg:'Use overwrite for first line so the script starts clean.',next:'Try: echo \'#!/bin/bash\' > rescue.sh'}; if(v.includes('bash')) return {msg:'You are writing the interpreter hint, not running bash yet.',next:'Write the shebang into rescue.sh'}; return null; },
+  p1s2:(v)=>{ if(v==='ls') return {msg:'Use full listing with hidden files so you do not miss .ssh or dotfiles.',next:'Try: ls -la'}; return null; },
+  p2s1:(v)=>{ if(v.startsWith('touch')&&!v.includes('rescue.sh')) return {msg:'Use the mission script filename exactly so later steps match.',next:'Try: touch rescue.sh'}; return null; },
+  p2s2:(v)=>{ if(v.includes('>>')) return {msg:'Use overwrite for first line so the script starts clean.',next:'Try: echo \'#!/bin/bash\' > rescue.sh'}; if(v.includes('bash')&&!v.includes('echo')) return {msg:'You are writing the interpreter hint, not running bash yet.',next:'Write the shebang into rescue.sh'}; return null; },
+  p2s3:(v)=>{ if(v.includes('SERVER')&&!v.includes('192.168.1.42')) return {msg:'Use the host from distress.log: 192.168.1.42.',next:'Try: echo \'SERVER=\"192.168.1.42\"\' >> rescue.sh'}; return null; },
+  p3s2:(v)=>{ if(v.startsWith('ssh-copy-id')&&!v.includes('192.168.1.42')) return {msg:'Wrong host. Use the distress server address.',next:'Try: ssh-copy-id engineer@192.168.1.42'}; return null; },
   p3s5:(v)=>{ if(v.includes('192.168.1.42~')) return {msg:'scp remote destination needs a colon separator before the path.',next:'Try: scp rescue.sh engineer@192.168.1.42:~/'}; return null; },
   p4s3:(v)=>{ if(v.includes('Authorization')&&!v.includes('Bearer')) return {msg:'Bearer token format is required for this endpoint.',next:'Use: -H \"Authorization: Bearer $API_KEY\"'}; return null; },
-  p5s2:(v)=>{ if(v.includes('grep')) return {msg:'For JSON use jq select instead of grep text matching.',next:'Try jq .[] | select(.level == \"ERROR\")'}; return null; },
-  p6s5:(v)=>{ if(v.includes('-p 3000')&&!v.includes(':3000')) return {msg:'Port mapping needs host:container format.',next:'Use -p 3000:3000'}; return null; },
+  p4s4:(v)=>{ if(v.includes('grep')) return {msg:'This endpoint returns JSON. Parse it with jq, not grep.',next:'Try: curl http://192.168.1.42/status | jq \'.battery\''}; return null; },
+  p5s2:(v)=>{ if(v.includes('grep')) return {msg:'For JSON use jq select instead of grep text matching.',next:'Try: cat events.json | jq \'.[] | select(.level == \"ERROR\")\''}; return null; },
+  p6s5:(v)=>{ if(v.includes('-p 3000')&&!v.includes(':3000')) return {msg:'Port mapping needs host:container format.',next:'Use -p 3000:3000'}; if(v.startsWith('docker run')&&!v.includes('--name rescue')) return {msg:'Name this container rescue so later exec/log commands stay consistent.',next:'Add --name rescue'}; return null; },
+  p6s6:(v)=>{ if(v.startsWith('docker exec')&&!v.includes('-it')) return {msg:'Interactive shell access needs -it flags.',next:'Try: docker exec -it rescue /bin/sh'}; return null; },
   p7s3:(v)=>{ if(v.includes('git pull')) return {msg:'Fetch first to inspect safely before integration.',next:'Try: git fetch origin'}; return null; },
   p8s2:(v)=>{ if(v==='kill 4242') return {msg:'Valid, but include explicit signal for incident clarity.',next:'Try: kill -15 4242 or kill -9 4242'}; return null; },
-  p9s2:(v)=>{ if(v.includes('docker push')&&!v.includes('docker build')) return {msg:'Push requires an image built locally first.',next:'Build then push with && chaining'}; return null; }
+  p8s4:(v)=>{ if(v.includes('.env')&&!v.includes('.env.local')) return {msg:'Protect both local secret files, not just one.',next:'Append both .env and .env.local to .gitignore'}; return null; },
+  p8s5:(v)=>{ if(v.startsWith('export API_KEY=')&&!v.includes('$(')) return {msg:'Use command substitution so rotated key is captured automatically.',next:'Try: export API_KEY=$(curl -s ... | jq -r \'.new_key\')'}; return null; },
+  p9s2:(v)=>{ if(v.includes('docker push')&&!v.includes('docker build')) return {msg:'Push requires an image built locally first.',next:'Build then push with && chaining'}; return null; },
+  p9s4:(v)=>{ if(v.includes('git commit')&&!v.includes('rescue:')) return {msg:'Use rescue: prefix so incident commits remain searchable and consistent.',next:'Try: git add -A && git commit -m \"rescue: ...\"'}; return null; },
+  p9s5:(v)=>{ if(v.startsWith('ssh')&&!v.includes('bash ~/rescue.sh')) return {msg:'Final command must execute rescue.sh remotely, not just connect.',next:'Try: ssh engineer@192.168.1.42 \'bash ~/rescue.sh\''}; return null; }
 });
 
 const ENGINEER_RETRY_COACH={
+  p1s1:[
+    'Strong start. In live incidents, orient before action: confirm where you are first.',
+    'You are close. Keep the first step deterministic: print location, then continue.',
+    'Use the objective-card show button if needed, then run it again from recall.'
+  ],
+  p1s2:[
+    'Good effort. Inventory is step two in every unknown environment.',
+    'Close. Use the listing command exactly, then move to evidence review.',
+    'Use show in the objective card, then rerun from memory.'
+  ],
+  p1s3:[
+    'Nice pressure handling. Read the distress evidence before changing anything.',
+    'You are close. Open the distress log directly and inspect signal first.',
+    'Use the objective-card show button, then rerun once from memory.'
+  ],
   p2s2:[
     'Good first pass. Focus on writing, not appending: use a single > into rescue.sh for the shebang line.',
     'You are close. Keep the interpreter line exact: #!/bin/bash and route it to rescue.sh.',
@@ -4171,7 +4474,7 @@ function lolaRetryMsg(step, tries){
   }
   if(tries===1) return `L.O.L.A.: Good effort. Anchor to the objective: ${step.obj}`;
   if(tries===2) return 'L.O.L.A.: You are close. Make one adjustment, then run it again.';
-  return `L.O.L.A.: Attempt ${tries}. Use "show" for exact syntax if needed, then run it once from memory.`;
+  return `L.O.L.A.: Attempt ${tries}. Use the "show" button in the objective card for exact syntax, then rerun from memory.`;
 }
 
 // Persistence is defined in the shared save/load block above.
@@ -4450,7 +4753,8 @@ function resumeSession(){
 
 function shareGrad(){
   const txt='Completed Vibe Engineer Academy: SSH, scripting, APIs, Docker, advanced Git, and incident-response command flow.';
-  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
+  const launchUrl = `${window.location.origin}/vibe-engineer.html`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
 }
 
