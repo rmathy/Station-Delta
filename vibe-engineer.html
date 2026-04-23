@@ -1358,7 +1358,7 @@ const PHASES = [null,
    jit:{title:'What is a filesystem path?',body:'Your computer stores files in a tree of folders. A <b>path</b> is the address of any file or folder, written with slashes: <code>/home/cadet/projects</code>. The leading <code>/</code> is the <b>root</b> — the very top of the tree. Everything lives inside root.'},
    bridge:{title:'This first COMMAND is used every day',body:'Developers type <code>pwd</code> dozens of times a day — especially after <code>cd</code>-ing (changing directory) around a complex project. You\'ll also see paths in error messages like <code>Error: cannot find /home/cadet/projects/src/app.ts</code>. Knowing how to read paths means you can find the problem instantly.',tags:['Linux','macOS','WSL','Docker containers']},
    teach:{title:'What pwd does',body:'<b>pwd</b> = <b>P</b>rint <b>W</b>orking <b>D</b>irectory. It shows your exact location in the filesystem as an <b>absolute path</b> — starting from root <code>/</code>. Run it whenever you feel lost.'}},
-  {id:'p1s2', obj:'List, <code>ls</code> the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
+  {id:'p1s2', obj:'List, ls the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
    cmd:['ls','eza','ls -la','ls -l','ls -a','ls -lah'],
    accept:['ls','eza','ls -la','ls -l','ls -a','ls -lah','ls --all'],
    hint:'Type: ls (or try ls -la for full details)',
@@ -1411,7 +1411,7 @@ const PHASES = [null,
    teach:{title:'echo and output redirection',body:'<code>echo</code> prints text to the terminal. The <code>></code> redirects that output into a file instead — overwriting it. Use <code>>></code> to append. This is I/O redirection — one of the most powerful Unix concepts.'},
    concept:{icon:'↔️',title:'I/O Redirection',body:'Every command has output (stdout). You can redirect it with special symbols.',
     examples:[{l:'Overwrite file',c:'echo "hi" > file.txt'},{l:'Append to file',c:'echo "more" >> file.txt'},{l:'Print file',c:'cat file.txt'},{l:'Filter output',c:'ls | grep .txt'}]}},
-  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly. This COMMAND actually means concentrate',
+  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly.',
    cmd:['cat manifest.txt'], accept:['cat manifest.txt'],
    hint:'Type: cat manifest.txt',
    out:'Mission: Escape Pod',
@@ -2085,7 +2085,10 @@ const BOSS_STEPS=[
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A memory fault in her intelligence core.\n\nThe escape pod deployment is paused. Your production server is unreachable and the logs are the only clue.\n\nSTEP 1 OF 5: Read the deployment error log.',
     prompt:'Read the deployment error logs.',
-    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('cat logs')||v.includes('cat deploy'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('cat ')&&(t.includes('logs/deploy.log')||t.includes('logs.txt')||t.includes('deploy.log'));
+    },
     accept:['cat logs/deploy.log','cat logs.txt','cat deploy.log'],
     out:'[04:12:31] DEPLOY: escape-pod-v2.1 → vercel\n[04:12:33] ERROR: Build failed — missing environment variable\n[04:12:33] DEPLOY PAUSED. Previous version still active.\n[04:12:33] Cause: API_KEY is undefined in production environment\n[04:12:33] The escape pod cannot launch without it.',
     hint:'Type: cat logs/deploy.log  — or cat logs.txt'
@@ -2094,7 +2097,10 @@ const BOSS_STEPS=[
     id:'boss2',
     scenario:'STEP 2 OF 5: The error is a missing environment variable.\n\nYou learned how to set one in Phase 9. Demonstrate that knowledge now.\n\nI am watching. I have always been watching.',
     prompt:'Set the missing API_KEY environment variable and verify it.',
-    acceptFn:v=>(v.includes('export')&&v.toUpperCase().includes('API_KEY'))||(v.includes('echo')&&v.toUpperCase().includes('API_KEY')),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('export api_key=');
+    },
     accept:['export API_KEY','echo $API_KEY'],
     out:'API_KEY set in environment.\n✓ Verified: echo $API_KEY → sk-prod-abc123\n\nBuild can now proceed.',
     hint:'Type: export API_KEY="sk-prod-abc123"  then verify with echo $API_KEY'
@@ -2112,7 +2118,10 @@ const BOSS_STEPS=[
     id:'boss4',
     scenario:'STEP 4 OF 5: You identified both issues. A staging URL and a broken timeout — introduced by the same commit.\n\nI note that a .gitignore would not have prevented this. But a proper code review would have.\n\nStage only the fixed files and commit with a clear message.',
     prompt:'Stage the fixed files and commit.',
-    acceptFn:v=>(v.includes('git add')&&v.includes('commit'))||(v.includes('git add'))||(v.includes('git commit')),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.includes('git add')&&t.includes('git commit')&&t.includes('-m');
+    },
     accept:['git add src/app.ts','git commit -m','git add . && git commit'],
     out:'✓ git add src/app.ts\n✓ git commit -m "fix: restore prod API URL and correct timeout value"\n[main 7a3f1c2] fix: restore prod API URL and correct timeout value\n 1 file changed, 2 insertions(+), 2 deletions(-)',
     hint:'Type: git add src/app.ts  then: git commit -m "fix: restore prod endpoint"'
@@ -2121,7 +2130,10 @@ const BOSS_STEPS=[
     id:'boss5',
     scenario:'STEP 5 OF 5: The fix is committed. The environment is set. The diff is clean.\n\nL.O.L.A. is still offline. The escape pod cannot wait.\n\nYou have learned every skill required for this moment.\n\nDeploy it.',
     prompt:'Deploy the escape pod to production.',
-    acceptFn:v=>v.includes('vibe deploy')||v.includes('vercel')||v.includes('deploy'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('vibe deploy')||t==='vercel deploy'||t==='vercel';
+    },
     accept:['vibe deploy','vercel','vercel deploy','vibe deploy --platform vercel'],
     out:'Deploying escape-pod-v2.1 to Vercel…\n  ✓ API_KEY: verified\n  ✓ Build: passing\n  ✓ Diff: reviewed and fixed\n  ✓ Commit: clean history\n  ✓ 52 modules bundled in 0.9s\n  ✓ CDN: 18 regions\n  ✓ SSL: valid\n\n🚀 LIVE: https://escape-pod-final.vercel.app',
     hint:'Type: vibe deploy --platform vercel'
@@ -2211,7 +2223,8 @@ async function handleBossStep(val){
   // Easter eggs still work
   for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
 
-  const matched=step.acceptFn(vl)||step.accept.some(a=>vl.includes(a.toLowerCase().split(' ')[0])&&vl.length>2);
+  const acceptedByList=step.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()+' '));
+  const matched=step.acceptFn(vl)||acceptedByList;
   if(matched){
     appendLine(val,'ln-cmd');blank();
     if(step.out)step.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));

@@ -759,6 +759,24 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
+<!-- PHASE CHECKPOINT -->
+<div id="checkpoint-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:28px;margin-bottom:8px">🛰️</div>
+    <div class="mtitle" style="color:var(--gold);font-size:19px">Phase Checkpoint</div>
+    <div class="msub" id="checkpoint-summary">Phase complete. Safe stopping point reached.</div>
+    <div class="boot-features" style="margin-top:8px">
+      <span>▸</span><b id="checkpoint-complete">Completed:</b><br>
+      <span>▸</span><b id="checkpoint-next">Next:</b><br>
+      <span>▸</span>Your progress is saved. Resume later from this exact boundary.
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="startNextPhaseFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="takeBreakAtCheckpoint()">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════════════════
    VIBE LIEUTENANT v1.0
@@ -785,7 +803,13 @@ let G = {
   bossActive:false,
   bossStep:0,
   bossScore:0,
+  pendingPhaseStart:false,
+  checkpointFromPhase:null,
+  analytics:null,
 };
+
+const COURSE_ID='vibe_lieutenant';
+const SAVE_KEY='vbl_v1';
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
 const JANET_INTROS = [
@@ -892,8 +916,16 @@ function setLolaStrip(phase){
   const msgs = LOLA_STRIP[phase]||LOLA_STRIP[0];
   const inner = document.getElementById('lola-strip-inner');
   if(!inner)return;
+  const normalizeStripTag=(tag)=>{
+    const t=String(tag||'tip').toLowerCase();
+    if(['tip','concept','new!','warning','habit','syntax','shortcut','command'].includes(t))return t;
+    if(t.includes('phase')||t.includes('welcome'))return 'new!';
+    if(t.includes('remember'))return 'habit';
+    if(t.includes('lola'))return 'concept';
+    return 'tip';
+  };
   const doubled = [...msgs,...msgs]; // double for seamless loop
-  inner.innerHTML = doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span>${m.msg}</span><span class="lola-strip-sep">◆</span>`).join('');
+  inner.innerHTML = doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${normalizeStripTag(m.tag)}</span>${m.msg}</span><span class="lola-strip-sep">◆</span>`).join('');
   // decide if we need to scroll
   const scrollWidth = inner.scrollWidth;
   const containerWidth = document.getElementById('lola-strip-scroll').offsetWidth;
@@ -1090,7 +1122,12 @@ const CHALLENGES = {
   1:{
     title:'Codebase Orientation Challenge',
     scenario:'You\'ve just joined a team and cloned their repo. You have 5 minutes before standup. What\'s your sequence of commands to understand: (1) what this project does, (2) what language/framework it uses, and (3) how to run it?',
-    acceptFn:(v)=>(v.includes('cat')&&v.includes('package.json'))||(v.includes('cat')&&v.includes('readme'))||(v.includes('ls')&&v.includes('cat')),
+    acceptFn:(v)=>{
+      const hasCat=v.includes('cat');
+      const hasReadme=v.includes('readme');
+      const hasManifest=v.includes('package.json');
+      return hasCat&&hasReadme&&hasManifest;
+    },
     successMsg:'Right approach: cat README.md for purpose, cat package.json for tech stack and scripts, ls -la for structure. Three commands, full orientation.',
     unlockMsg:'Challenge complete: you can orient yourself on any codebase before your first standup.'
   },
@@ -1415,7 +1452,18 @@ const PHASES = [null,
   {id:'p8s2', obj:'Identify and fix the hallucination', ctx:'You spotted the bug. Now articulate what\'s wrong and how to fix it.',
    cmd:['fix findUnique','fix prisma','fix hallucination'],
    accept:['fix findUnique','fix prisma','fix hallucination','fix api'],
-   acceptFn: v=>v.startsWith('fix'),
+   acceptFn: v=>{
+     const t=v.toLowerCase();
+     return t.startsWith('fix')&&(
+       t.includes('findunique')||
+       t.includes('findone')||
+       t.includes('prisma')||
+       t.includes('null check')||
+       t.includes('pod not found')||
+       t.includes('404')||
+       t.includes('hallucination')
+     );
+   },
    hint:'Type: fix findUnique  — correct the hallucinated API call',
    out:'═══ FIX APPLIED ═══\n\n- const pod = await prisma.pods.findOne({ where: { id: podId } });\n+ const pod = await prisma.pods.findUnique({ where: { id: podId } });\n+ if (!pod) return c.json({ error: "Pod not found" }, 404);\n\n✓ Hallucination corrected: findOne → findUnique\n✓ Null check added: handles pod not found\n✓ TypeScript types: now satisfied\n\n⚡ Two fixes from one review pass. This is why you read diffs.',
    jit:{title:'findOne vs findUnique — why AI gets this wrong',body:'Mongoose (MongoDB\'s ORM) uses <code>findOne()</code>. Prisma uses <code>findUnique()</code>. Sequelize uses <code>findOne()</code>. The AI was trained on all of them and sometimes crosses the wires. This exact error — calling a method that doesn\'t exist — is one of the most common AI code generation bugs. The fix is always the same: verify against the official docs.'},
@@ -1447,8 +1495,8 @@ const PHASES = [null,
    teach:{title:'git checkout -b — create and switch',body:'<code>git checkout -b branchname</code> creates a new branch from wherever you currently are and switches to it. <code>git switch -c branchname</code> is the modern equivalent. To list all branches: <code>git branch -a</code>. To switch back to main: <code>git checkout main</code>. To delete a branch: <code>git branch -d branchname</code>.'}},
   {id:'p9s2', obj:'Stage and commit your fix', ctx:'Good commit messages are documentation. Future you — and your teammates — will read them.',
    cmd:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"'],
-   accept:['git add','git commit'],
-   acceptFn: v=>(v.includes('git add')&&v.includes('git commit'))||(v.includes('git add'))||(v.includes('git commit')&&v.includes('-m')),
+   accept:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"','git add src/routes/pods.ts; git commit -m "fix: correct findUnique call and add null guard"'],
+   acceptFn: v=>v.includes('git add')&&v.includes('git commit')&&v.includes('-m'),
    hint:'Type: git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"',
    out:'[fix/escape-pod-timeout a3b4c5d] fix: correct findUnique call and add null guard\n 1 file changed, 3 insertions(+), 1 deletion(-)\n\n✓ Commit message follows conventional commits format\n✓ Scope is specific: 1 file, 1 concern\n✓ Message explains WHAT changed (not just "fixed bug")',
    jit:{title:'Conventional Commits — the professional standard',body:'The <code>type: description</code> format is called Conventional Commits. Types: <b>fix</b> (bug fix, bumps patch version), <b>feat</b> (new feature, bumps minor version), <b>chore</b> (maintenance), <b>refactor</b> (no behavior change), <b>docs</b> (documentation), <b>test</b> (adding tests). Tools like semantic-release use these to automatically generate changelogs and version bumps.'},
@@ -1479,8 +1527,8 @@ const BOSS_STEPS = [
     scenario:'Production alert. The escape-pod-api is returning 500 errors on GET /api/pods. You have 90 seconds before users notice. Your first action is to find the entry point and trace the request path.',
     prompt:'Navigate to the main server file to understand request routing.',
     hint:'Read the entry point — the main server file.',
-    accept:['read src/index.ts','cat src/index.ts','ls src'],
-    acceptFn:v=>(v.includes('read')||v.includes('cat'))&&(v.includes('index')||v.includes('src'))||v.startsWith('ls'),
+    accept:['read src/index.ts','cat src/index.ts'],
+    acceptFn:v=>(v.includes('read')||v.includes('cat'))&&v.includes('src/index.ts'),
     out:'// src/index.ts\nimport { Hono } from "hono"\nimport { podsRouter } from "./routes/pods"\nimport { authMiddleware } from "./middleware/auth"\n\nconst app = new Hono()\napp.use("*", authMiddleware)\napp.route("/api/pods", podsRouter)\n\nexport default app\n\n→ Request path: authMiddleware → podsRouter → handler\n→ Next: read the pods router to find the failing handler.',
   },
   {
@@ -1503,16 +1551,16 @@ const BOSS_STEPS = [
     scenario:'Service is restored. Now you\'re reviewing the PR that caused the outage. The engineer used an AI assistant to write the deployment config. The AI generated this Dockerfile line:\n\n  ENV DATABASE_URL="postgresql://localhost:5432/mydb"\n\nThis is in the committed Dockerfile. Identify the exact problem.',
     prompt:'Flag the AI-generated security and operational anti-pattern.',
     hint:'Review the Dockerfile line — what is wrong with it specifically?',
-    accept:['review','hardcoded','hardcode','localhost','credentials','secret','env','plain','plaintext'],
-    acceptFn:v=>v.includes('hardcod')||v.includes('localhost')||v.includes('secret')||v.includes('credential')||v.includes('review')||v.includes('plain')||v.includes('env'),
+    accept:['review dockerfile hardcoded database_url localhost','hardcoded database_url localhost in dockerfile'],
+    acceptFn:v=>(v.includes('hardcod')&&v.includes('localhost'))||(v.includes('hardcod')&&v.includes('secret'))||(v.includes('dockerfile')&&v.includes('database_url')&&v.includes('localhost')),
     out:'AI Code Review: ISSUES FOUND\n\n1. Hardcoded credentials in Dockerfile\n   → Never commit database URLs to source control.\n   → Secrets in a Docker image are readable by anyone with image access.\n\n2. Localhost in production config\n   → "localhost" only works inside the container itself.\n   → A real production DB runs on a separate host.\n\n3. Correct approach:\n   → Use Docker secrets or inject DATABASE_URL at runtime:\n      docker run -e DATABASE_URL="$DB_URL" escape-pod-api\n   → Or use a secrets manager: AWS Secrets Manager, Vault, Doppler.',
   },
   {
     scenario:'Incident resolved. Review passed. Now close the loop properly — open a PR with the fix (adding DATABASE_URL to the CI secrets config) and document what happened so the team learns from it.',
     prompt:'Push the fix branch and open a PR with a clear description of the change.',
     hint:'Use git push to push your fix branch.',
-    accept:['git push','git push origin','git commit','git add'],
-    acceptFn:v=>v.includes('git push')||v.includes('git commit')||(v.includes('git add')&&v.length>8),
+    accept:['git push','git push origin','git push origin fix/add-database-url-secret'],
+    acceptFn:v=>v.includes('git push'),
     out:'Branch fix/add-database-url-secret pushed.\n\nPR #1044 auto-created:\n  Title: fix: add DATABASE_URL to production secrets config\n  Body: Fixes the outage from 2026-04-20.\n        Root cause: DATABASE_URL not set in prod environment.\n        Fix: Added to Doppler production environment.\n        Post-mortem: docs/postmortems/2026-04-20-db-url.md\n\n✓ CI: passing\n✓ 1 reviewer assigned\n✓ Linked to incident #INC-2204\n\nAll 5 steps complete.',
   },
 ];
@@ -1611,7 +1659,8 @@ async function handleBossStep(val){
   // Easter eggs still work during boss fight
   for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
 
-  if(step.acceptFn(vl)||step.accept.some(a=>vl.includes(a.toLowerCase().split(' ')[0])&&vl.length>2)){
+  const acceptedByList=step.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()+' '));
+  if(step.acceptFn(vl)||acceptedByList){
     appendLine(val,'ln-cmd');blank();
     if(step.out)step.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
     blank();
@@ -1847,10 +1896,24 @@ function showConcept(cc){
 function showHint(text){
   if(!text)return;
   const w=document.createElement('div');w.className='hint-wrap';
+  w.dataset.hintOpened='0';
   w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
-function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+function toggleHint(btn){
+  btn.classList.toggle('open');
+  const body=btn.nextElementSibling;
+  const opening=!body.classList.contains('open');
+  body.classList.toggle('open');
+  if(opening){
+    const wrap=btn.parentElement;
+    if(wrap&&wrap.dataset.hintOpened!=='1'){
+      wrap.dataset.hintOpened='1';
+      markHintUsed();
+      analyticsEvent('hint_used',{phaseNum:G.phase,stepIndex:G.step});
+    }
+  }
+}
 
 /* ── JIT ── */
 function showJIT(jit){
@@ -2087,8 +2150,145 @@ function renderCareerModal(){
 }
 
 /* ── SAVE / LOAD ── */
-function save(){localStorage.setItem('vbl_v1',JSON.stringify(G))}
-function loadSave(){const raw=localStorage.getItem('vbl_v1');if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}}
+function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+function loadSave(){const raw=localStorage.getItem(SAVE_KEY);if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}}
+
+/* ── ANALYTICS ── */
+function newSessionId(){return 'lt_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function ensureAnalytics(){
+  if(!G.analytics||typeof G.analytics!=='object'){
+    G.analytics={
+      version:'1.0',
+      courseId:COURSE_ID,
+      sessionId:newSessionId(),
+      sessionStartedAt:new Date().toISOString(),
+      lastEventAt:null,
+      events:[],
+      phases:{},
+      steps:{}
+    };
+  }
+  if(!G.analytics.events)G.analytics.events=[];
+  if(!G.analytics.phases)G.analytics.phases={};
+  if(!G.analytics.steps)G.analytics.steps={};
+}
+function analyticsEvent(type,payload={}){
+  ensureAnalytics();
+  const at=new Date().toISOString();
+  G.analytics.lastEventAt=at;
+  G.analytics.events.push({type,at,phase:G.phase,step:G.step,...payload});
+  if(G.analytics.events.length>2500){
+    G.analytics.events=G.analytics.events.slice(-2000);
+  }
+}
+function phaseKey(phaseNum){return 'p'+phaseNum}
+function stepKey(phaseNum,stepId){return phaseNum+':'+stepId}
+function markPhaseStarted(phaseNum,title){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  if(!G.analytics.phases[key])G.analytics.phases[key]={phase:phaseNum,title:title||'',startedAt:null,completedAt:null,durationMs:null};
+  if(!G.analytics.phases[key].startedAt){
+    G.analytics.phases[key].startedAt=new Date().toISOString();
+    analyticsEvent('phase_started',{phaseNum,title});
+  }
+}
+function markPhaseCompleted(phaseNum,title){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  if(!G.analytics.phases[key])G.analytics.phases[key]={phase:phaseNum,title:title||'',startedAt:null,completedAt:null,durationMs:null};
+  const now=new Date().toISOString();
+  G.analytics.phases[key].completedAt=now;
+  if(G.analytics.phases[key].startedAt){
+    G.analytics.phases[key].durationMs=new Date(now)-new Date(G.analytics.phases[key].startedAt);
+  }
+  analyticsEvent('phase_completed',{phaseNum,title,durationMs:G.analytics.phases[key].durationMs||0});
+}
+function markStepStarted(phaseNum,stepObj,stepIdx){
+  if(!stepObj)return;
+  ensureAnalytics();
+  const key=stepKey(phaseNum,stepObj.id||('s'+stepIdx));
+  if(!G.analytics.steps[key]){
+    G.analytics.steps[key]={
+      phase:phaseNum,
+      stepId:stepObj.id||('s'+stepIdx),
+      objective:stepObj.obj||'',
+      startedAt:new Date().toISOString(),
+      completedAt:null,
+      ttrMs:null,
+      attempts:0,
+      hintUsed:0
+    };
+    analyticsEvent('step_started',{phaseNum,stepId:G.analytics.steps[key].stepId,stepIndex:stepIdx,objective:stepObj.obj||''});
+  }
+}
+function markStepAttempt(phaseNum,stepObj,isCorrect){
+  if(!stepObj)return;
+  ensureAnalytics();
+  const key=stepKey(phaseNum,stepObj.id||('s'+G.step));
+  if(!G.analytics.steps[key])markStepStarted(phaseNum,stepObj,G.step);
+  G.analytics.steps[key].attempts=(G.analytics.steps[key].attempts||0)+1;
+  analyticsEvent('step_attempt',{phaseNum,stepId:G.analytics.steps[key].stepId,correct:!!isCorrect,attempt:G.analytics.steps[key].attempts});
+}
+function markStepCompleted(phaseNum,stepObj){
+  if(!stepObj)return;
+  ensureAnalytics();
+  const key=stepKey(phaseNum,stepObj.id||('s'+G.step));
+  if(!G.analytics.steps[key])markStepStarted(phaseNum,stepObj,G.step);
+  const now=new Date().toISOString();
+  G.analytics.steps[key].completedAt=now;
+  if(G.analytics.steps[key].startedAt){
+    G.analytics.steps[key].ttrMs=new Date(now)-new Date(G.analytics.steps[key].startedAt);
+  }
+  analyticsEvent('step_completed',{phaseNum,stepId:G.analytics.steps[key].stepId,ttrMs:G.analytics.steps[key].ttrMs||0,attempts:G.analytics.steps[key].attempts||0});
+}
+function markHintUsed(){
+  ensureAnalytics();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps?ph.steps[G.step]:null;
+  if(!s)return;
+  const key=stepKey(G.phase,s.id||('s'+G.step));
+  if(!G.analytics.steps[key])markStepStarted(G.phase,s,G.step);
+  G.analytics.steps[key].hintUsed=(G.analytics.steps[key].hintUsed||0)+1;
+}
+window.vibeAnalytics={
+  getRaw:()=>JSON.parse(JSON.stringify(G.analytics||{})),
+  getTTRReport:()=>{
+    ensureAnalytics();
+    const rows=Object.values(G.analytics.steps).map(s=>({phase:s.phase,stepId:s.stepId,objective:s.objective,ttrMs:s.ttrMs||null,attempts:s.attempts||0}));
+    return rows.sort((a,b)=>a.phase-b.phase);
+  },
+  getHeatmapReport:()=>{
+    ensureAnalytics();
+    return Object.values(G.analytics.steps).map(s=>({
+      phase:s.phase,
+      stepId:s.stepId,
+      masteryScore:Math.max(0,100-((s.attempts||0)-1)*18-((s.ttrMs||0)/10000)),
+      attempts:s.attempts||0,
+      ttrMs:s.ttrMs||0,
+      hintUsed:s.hintUsed||0
+    }));
+  },
+  getGanttReport:()=>{
+    ensureAnalytics();
+    return {
+      phases:Object.values(G.analytics.phases).sort((a,b)=>a.phase-b.phase),
+      steps:Object.values(G.analytics.steps).sort((a,b)=>(a.phase-b.phase)||String(a.stepId).localeCompare(String(b.stepId)))
+    };
+  },
+  getSnapshot:()=>{
+    ensureAnalytics();
+    return {
+      courseId:G.analytics.courseId,
+      sessionId:G.analytics.sessionId,
+      currentPhase:G.phase,
+      currentStep:G.step,
+      pendingPhaseStart:!!G.pendingPhaseStart,
+      score:G.score,
+      completedPhases:[...G.completedPhases]
+    };
+  },
+  exportJSON:()=>JSON.stringify(G.analytics||{},null,2)
+};
 
 /* ── EASTER HELPERS ── */
 function trackEaster(id){
@@ -2147,6 +2347,13 @@ function syncDots(){
   const sep2=document.createElement('span');sep2.className='phase-sep';sep2.textContent='SHIP';track.appendChild(sep2);
 }
 function setLola(msg){document.getElementById('lola-msg').textContent=msg}
+function lolaMessageForStep(step,phaseNum){
+  if(!step)return 'Operational guidance unavailable.';
+  const phaseTitle=(PHASES[phaseNum]&&PHASES[phaseNum].title)?PHASES[phaseNum].title:'Current phase';
+  const objective=(step.obj||'').replace(/<[^>]+>/g,'');
+  const missionToken=(step.cmd&&step.cmd[0])?`Mission command shape: ${step.cmd[0]}.`:'';
+  return `${phaseTitle}: ${objective}. ${step.ctx||''} ${missionToken}`.trim();
+}
 function revealCmd(){document.getElementById('obj-cmd-val').classList.remove('blurred');document.getElementById('obj-reveal').textContent='✓';telem('Hint revealed');G.phaseReveal=true;}
 function focusCmd(){$cmd.focus()}
 
@@ -2171,6 +2378,7 @@ async function processCmd(raw){
   if(!G.achievements.includes('first_cmd'))unlock('first_cmd');
   appendLine(val,'ln-cmd');blank();
   telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
+  analyticsEvent('command_entered',{command:val});
   const vl=val.toLowerCase().trim();
 
   // man pages
@@ -2227,12 +2435,13 @@ async function processCmd(raw){
 
   // objective matching
   const ph=PHASES[G.phase];const s=ph.steps[G.step];
-  if(matchesStep(val,s)){await handleCorrect(s,ph);syncObjCard();return}
+  if(matchesStep(val,s)){markStepAttempt(G.phase,s,true);await handleCorrect(s,ph);syncObjCard();return}
 
   // persistent unlocked cmds
   if(G.unlockedCmds.length>0){const handled=handlePersistentCmd(vl,val);if(handled){syncObjCard();return}}
 
   // wrong
+  markStepAttempt(G.phase,s,false);
   handleWrong(val,s);syncObjCard();
 }
 
@@ -2275,6 +2484,7 @@ function handlePersistentCmd(vl,val){
 
 async function handleCorrect(s,ph){
   G.tries=0;G.score=Math.max(G.score,0);
+  markStepCompleted(G.phase,s);
   if(s.out)s.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
   blank();
   if(s.teach)showTeach(s.teach);
@@ -2300,7 +2510,9 @@ async function handleCorrect(s,ph){
     appendLine(`▸ Next: ${next.obj}`,'ln-info');
     if(!G.hard&&!G.practitioner)showHint(next.hint);
     if(next.jit&&!G.hard)showJIT(next.jit);
-    setLola(next.ctx);syncObjCard();save();
+    setLola(lolaMessageForStep(next,G.phase));
+    markStepStarted(G.phase,next,G.step);
+    syncObjCard();save();
   }
   syncDots();syncObjCard();
 }
@@ -2322,11 +2534,44 @@ const LOLA_HINT_PROMPT = [
   "Tap the hint — it's designed to give you just enough without giving it away.",
   "The hint below will unlock the syntax. One more try after reading it.",
 ];
+const LOLA_RETRY_COACH = {
+  p1s1:[
+    "You are aiming for the full directory listing with hidden files and permissions.",
+    "Think: list files + hidden files. That's the version engineers run when orienting in a new repo.",
+    "Use the list command with both long and all flags together."
+  ],
+  p1s2:[
+    "You are reading project metadata, not executing it.",
+    "Print the manifest file directly to terminal output.",
+    "Use the file-read command against package.json."
+  ],
+  p1s3:[
+    "You need recursive search, not current-folder listing.",
+    "Search from the current directory and filter by TypeScript filename pattern.",
+    "Use find with -name and the *.ts pattern."
+  ],
+  p2s1:[
+    "This is diff analysis, not commit history.",
+    "Compare the latest commit against the one right before it.",
+    "Use git diff with the previous HEAD reference."
+  ],
+  p2s2:[
+    "Open the full patch for a commit, not just the summary line.",
+    "Use the command that shows a commit's content directly.",
+    "Show the current HEAD commit details."
+  ]
+};
 
 function lolaEncourage(n){
   if(n===1) return LOLA_ENCOURAGE[Math.floor(Math.random()*LOLA_ENCOURAGE.length)];
   if(n===2) return LOLA_ENCOURAGE_2[Math.floor(Math.random()*LOLA_ENCOURAGE_2.length)];
   return LOLA_HINT_PROMPT[Math.floor(Math.random()*LOLA_HINT_PROMPT.length)];
+}
+function lolaRetryMsg(stepId,attempt){
+  const lines=LOLA_RETRY_COACH[stepId];
+  if(!lines||!lines.length)return '';
+  const idx=Math.max(0,Math.min(lines.length-1,attempt-1));
+  return lines[idx];
 }
 
 function handleWrong(val,s){
@@ -2338,21 +2583,34 @@ function handleWrong(val,s){
   if(G.hard){if(!diagnosed)appendLine('✗ Incorrect.','ln-err');return}
   if(G.tries===1){
     appendLine('✗ Not quite.','ln-err');
-    if(!diagnosed)appendLine(`L.O.L.A.: ${lolaEncourage(1)}`,'ln-lola');
+    if(!diagnosed){
+      const coach=lolaRetryMsg(s.id,1);
+      appendLine(`L.O.L.A.: ${coach||lolaEncourage(1)}`,'ln-lola');
+    }
   }
   else if(G.tries===2){
     appendLine('✗ Try again.','ln-err');
-    if(!diagnosed){appendLine(`L.O.L.A.: ${lolaEncourage(2)}`,'ln-lola');showHint(s.hint)}
+    if(!diagnosed){
+      const coach=lolaRetryMsg(s.id,2);
+      appendLine(`L.O.L.A.: ${coach||lolaEncourage(2)}`,'ln-lola');
+      showHint(s.hint);
+    }
   }
   else if(G.tries>=3){
     appendLine(`✗ Attempt ${G.tries}.`,'ln-err');
-    if(!diagnosed)appendLine(`L.O.L.A.: ${lolaEncourage(3)} Click "show" to reveal the exact command.`,'ln-lola');
+    if(!diagnosed){
+      const coach=lolaRetryMsg(s.id,3);
+      const msg=coach?`${coach} Use the show button if you want the exact command.`:`${lolaEncourage(3)} Click "show" to reveal the exact command.`;
+      appendLine(`L.O.L.A.: ${msg}`,'ln-lola');
+    }
   }
   save();
 }
 
 async function completePhase(){
+  const completedPhase=G.phase;
   const ph=PHASES[G.phase];
+  markPhaseCompleted(completedPhase,ph.title);
   G.completedPhases.push(G.phase);addCareerEntry(G.phase-1);
   if(!G.phaseReveal)unlock('eagle');if(G.tries===0)unlock('speed_run');G.phaseReveal=false;
   if(ph.ach)unlock(ph.ach);
@@ -2364,14 +2622,44 @@ async function completePhase(){
   if(ph.breakit&&!G.expert){blank();await showBreakIt(ph.breakit);blank()}
   G.phase++;G.step=0;G.tries=0;
   if(G.expert)stopExpertTimer();
-  if(G.phase<=PHASES.length-1){setTimeout(startPhase,900)}
+  if(G.phase<=PHASES.length-1){
+    G.pendingPhaseStart=true;
+    G.checkpointFromPhase=completedPhase;
+    save();
+    setTimeout(()=>showPhaseCheckpoint(completedPhase,G.phase),400);
+  }
   syncDots();save();
+}
+
+function showPhaseCheckpoint(fromPhase,toPhase){
+  const from=PHASES[fromPhase];
+  const to=PHASES[toPhase];
+  if(!to)return;
+  document.getElementById('checkpoint-summary').textContent=`Phase ${fromPhase} complete. This is a safe stopping point.`;
+  document.getElementById('checkpoint-complete').textContent=`Completed: Phase ${fromPhase} — ${from?from.title:''}`;
+  document.getElementById('checkpoint-next').textContent=`Next: Phase ${toPhase} — ${to.title}`;
+  openModal('checkpoint-modal');
+}
+function startNextPhaseFromCheckpoint(){
+  closeModal('checkpoint-modal');
+  G.pendingPhaseStart=false;
+  G.checkpointFromPhase=null;
+  save();
+  startPhase();
+}
+function takeBreakAtCheckpoint(){
+  closeModal('checkpoint-modal');
+  appendLine('Checkpoint saved. Take your break — resume when ready.','ln-lola');
+  telem(`Checkpoint pause at Phase ${G.phase}`);
+  analyticsEvent('phase_checkpoint_paused',{nextPhase:G.phase});
+  save();
 }
 
 function startPhase(){
   const ph=PHASES[G.phase];divline();
   appendLine(`┌── PHASE ${G.phase} OF ${PHASES.length-1}: ${ph.title.toUpperCase()} ──`,'ln-info');blank();
   setLolaStrip(G.phase);
+  markPhaseStarted(G.phase,ph.title);
   if(G.expert)startExpertTimer();
   const sr=ph.spacedRep;
   if(sr&&!G.expert){
@@ -2386,9 +2674,9 @@ function continuePhaseStart(ph){
   setStaticContext(s,ph);
   appendLine(`▸ ${s.obj}`,'ln-info');
   if(!G.hard&&!G.practitioner)showHint(s.hint);
-  if(s.jit&&!G.hard)showJIT(s.jit);
-  if(s.bridge&&!G.hard)showBridge(s.bridge);
-  setLola(s.ctx);syncObjCard();syncDots();
+  setLola(lolaMessageForStep(s,G.phase));
+  markStepStarted(G.phase,s,0);
+  syncObjCard();syncDots();
   telem(`Phase ${G.phase} started: ${ph.title}`);
 }
 
@@ -2518,17 +2806,25 @@ function resumeSession(){
     showBossStep(G.bossStep);
   }else{
     const ph=PHASES[G.phase];const s=ph.steps[G.step];
-    appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
-    appendLine(`Current objective: ${s.obj}`,'ln-info');
-    if(!G.hard&&!G.practitioner)showHint(s.hint);
-    setLola(s.ctx);
-    setLolaStrip(G.phase);
-    if(G.expert)startExpertTimer();
+    if(G.pendingPhaseStart&&G.step===0){
+      appendLine(`Resuming at checkpoint before Phase ${G.phase}.`,'ln-info');
+      setLola('Checkpoint restored. Start next phase when you are ready.');
+      setLolaStrip(G.phase);
+      setTimeout(()=>showPhaseCheckpoint(G.checkpointFromPhase||Math.max(1,G.phase-1),G.phase),200);
+    }else{
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(lolaMessageForStep(s,G.phase));
+      setLolaStrip(G.phase);
+      markStepStarted(G.phase,s,G.step);
+      if(G.expert)startExpertTimer();
+    }
   }
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Lieutenant from scratch?')){localStorage.removeItem('vbl_v1');location.reload()}}
+function doRestart(){if(confirm('Restart Vibe Lieutenant from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
 function shareGrad(){
   const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
@@ -2536,7 +2832,8 @@ function shareGrad(){
 
 /* ── STARTUP ── */
 loadSave();
-if(G.name!=='Lieutenant'&&(G.phase>1||G.completedPhases.length>0)){
+ensureAnalytics();
+if(G.phase>1||G.completedPhases.length>0||G.pendingPhaseStart||G.bossActive||G.sandbox){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
   bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue?`;
@@ -2547,4 +2844,4 @@ if(G.name!=='Lieutenant'&&(G.phase>1||G.completedPhases.length>0)){
 }
 </script>
 </body>
-</html>vdo_v1
+</html>

@@ -1283,7 +1283,12 @@ const CHALLENGES = {
   2: {
     title:'File Operations Challenge',
     scenario:'The mission log file was corrupted. Create a new one called mission-log.txt and write "STATUS: OPERATIONAL" into it — using terminal commands only.',
-    acceptFn:(v)=>(v.startsWith('touch')&&v.includes('mission-log'))||(v.startsWith('echo')&&v.includes('mission-log')&&v.includes('>')),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      const touchesLog=t.startsWith('touch')&&t.includes('mission-log');
+      const writesLog=t.startsWith('echo')&&t.includes('mission-log')&&t.includes('>')&&t.includes('status: operational');
+      return touchesLog||writesLog;
+    },
     retryHint:'Focus on the goal state: file exists and contains text. One command can do both if you use redirection.',
     successMsg:'Mission log created! Note: echo "..." > file.txt does both steps at once — it creates the file AND writes to it.',
     unlockMsg:'Challenge complete: you can create and populate files without ever opening an editor.'
@@ -1291,7 +1296,10 @@ const CHALLENGES = {
   3: {
     title:'Git Challenge',
     scenario:'You\'ve edited three files but only want to commit changes to README.md. The others are work-in-progress. What\'s your exact sequence of commands?',
-    acceptFn:(v)=>(v.includes('git add readme')||v.includes('git add README'))&&v.includes('commit'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return (t.includes('git add readme')||t.includes('git add readme.md'))&&t.includes('git commit');
+    },
     retryHint:'Think precision over speed: stage only one file, then snapshot.',
     successMsg:'Exactly right! git add README.md (specific file) then git commit -m "message". This is the precision that makes Git history clean and professional.',
     unlockMsg:'Challenge complete: you understand selective staging — the mark of a professional Git workflow.'
@@ -1299,7 +1307,10 @@ const CHALLENGES = {
   5: {
     title:'Log Analysis Challenge',
     scenario:'Someone reported three CRITICAL errors happened on this ship yesterday afternoon. Prove the count. The log file is logs.txt.',
-    acceptFn:(v)=>v.includes('cat logs.txt')&&v.includes('grep')&&(v.toLowerCase().includes('critical'))&&v.includes('wc'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('logs.txt')&&t.includes('grep')&&t.includes('critical')&&(t.includes('wc -l')||t.includes('grep -c'));
+    },
     retryHint:'Use the pipeline pattern exactly: read, filter, then count.',
     successMsg:'Pipeline correct! cat → grep → wc -l is the exact pattern used in real ops work to count incidents.',
     unlockMsg:'Challenge complete: you can build data pipelines from scratch without step-by-step guidance.'
@@ -1409,7 +1420,7 @@ const PHASES = [null,
    teach:{title:'echo and output redirection',body:'<code>echo</code> prints text to the terminal. The <code>></code> redirects that output into a file instead — overwriting it. Use <code>>></code> to append. This is I/O redirection — one of the most powerful Unix concepts.'},
    concept:{icon:'↔️',title:'I/O Redirection',body:'Every command has output (stdout). You can redirect it with special symbols.',
     examples:[{l:'Overwrite file',c:'echo "hi" > file.txt'},{l:'Append to file',c:'echo "more" >> file.txt'},{l:'Print file',c:'cat file.txt'},{l:'Filter output',c:'ls | grep .txt'}]}},
-  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly. This COMMAND actually means concentrate',
+  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly.',
    cmd:['cat manifest.txt'], accept:['cat manifest.txt'],
    hint:'Type: cat manifest.txt',
    out:'Mission: Escape Pod',
@@ -2045,7 +2056,10 @@ const BOSS_STEPS=[
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A memory fault in her intelligence core.\n\nThe escape pod deployment is paused. Your production server is unreachable and the logs are the only clue.\n\nSTEP 1 OF 5: Read the deployment error log.',
     prompt:'Read the deployment error logs.',
-    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('cat logs')||v.includes('cat deploy'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('cat ')&&(t.includes('logs/deploy.log')||t.includes('logs.txt')||t.includes('deploy.log'));
+    },
     accept:['cat logs/deploy.log','cat logs.txt','cat deploy.log'],
     out:'[04:12:31] DEPLOY: escape-pod-v2.1 → vercel\n[04:12:33] ERROR: Build failed — missing environment variable\n[04:12:33] DEPLOY PAUSED. Previous version still active.\n[04:12:33] Cause: API_KEY is undefined in production environment\n[04:12:33] The escape pod cannot launch without it.',
     hint:'Type: cat logs/deploy.log  — or cat logs.txt'
@@ -2054,7 +2068,10 @@ const BOSS_STEPS=[
     id:'boss2',
     scenario:'STEP 2 OF 5: The error is a missing environment variable.\n\nYou learned how to set one in Phase 9. Demonstrate that knowledge now.\n\nI am watching. I have always been watching.',
     prompt:'Set the missing API_KEY environment variable and verify it.',
-    acceptFn:v=>(v.includes('export')&&v.toUpperCase().includes('API_KEY'))||(v.includes('echo')&&v.toUpperCase().includes('API_KEY')),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('export api_key=');
+    },
     accept:['export API_KEY','echo $API_KEY'],
     out:'API_KEY set in environment.\n✓ Verified: echo $API_KEY → sk-prod-abc123\n\nBuild can now proceed.',
     hint:'Type: export API_KEY="sk-prod-abc123"  then verify with echo $API_KEY'
@@ -2063,7 +2080,10 @@ const BOSS_STEPS=[
     id:'boss3',
     scenario:'STEP 3 OF 5: Before the deployment resumes, you must review the diff.\n\nI have reviewed it myself. I found two issues. I will not tell you what they are. That would defeat the purpose of an assessment.\n\nReview the deployment diff.',
     prompt:'Review the deployment diff for issues.',
-    acceptFn:v=>v.includes('git diff')||v.includes('review')||v.includes('cat'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.includes('git diff')||t==='review diff';
+    },
     accept:['git diff','git diff main','review diff'],
     out:'diff --git a/src/app.ts b/src/app.ts\n\n-  const API_URL = "https://api.prod.example.com";\n+  const API_URL = "https://api.staging.example.com";\n\n-  const TIMEOUT = 30000;\n+  const TIMEOUT = 30;\n\n⚠  Issue 1: API_URL changed to staging endpoint (will hit wrong server)\n⚠  Issue 2: TIMEOUT changed from 30000ms → 30ms (30 milliseconds is not a timeout — it is a guarantee of failure)',
     hint:'Type: git diff  — examine the proposed changes carefully'
@@ -2072,7 +2092,10 @@ const BOSS_STEPS=[
     id:'boss4',
     scenario:'STEP 4 OF 5: You identified both issues. A staging URL and a broken timeout — introduced by the same commit.\n\nI note that a .gitignore would not have prevented this. But a proper code review would have.\n\nStage only the fixed files and commit with a clear message.',
     prompt:'Stage the fixed files and commit.',
-    acceptFn:v=>(v.includes('git add')&&v.includes('commit'))||(v.includes('git add'))||(v.includes('git commit')),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.includes('git add')&&t.includes('git commit')&&t.includes('-m');
+    },
     accept:['git add src/app.ts','git commit -m','git add . && git commit'],
     out:'✓ git add src/app.ts\n✓ git commit -m "fix: restore prod API URL and correct timeout value"\n[main 7a3f1c2] fix: restore prod API URL and correct timeout value\n 1 file changed, 2 insertions(+), 2 deletions(-)',
     hint:'Type: git add src/app.ts  then: git commit -m "fix: restore prod endpoint"'
@@ -2081,7 +2104,10 @@ const BOSS_STEPS=[
     id:'boss5',
     scenario:'STEP 5 OF 5: The fix is committed. The environment is set. The diff is clean.\n\nL.O.L.A. is still offline. The escape pod cannot wait.\n\nYou have learned every skill required for this moment.\n\nDeploy it.',
     prompt:'Deploy the escape pod to production.',
-    acceptFn:v=>v.includes('vibe deploy')||v.includes('vercel')||v.includes('deploy'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.startsWith('vibe deploy')||t==='vercel deploy'||t==='vercel';
+    },
     accept:['vibe deploy','vercel','vercel deploy','vibe deploy --platform vercel'],
     out:'Deploying escape-pod-v2.1 to Vercel…\n  ✓ API_KEY: verified\n  ✓ Build: passing\n  ✓ Diff: reviewed and fixed\n  ✓ Commit: clean history\n  ✓ 52 modules bundled in 0.9s\n  ✓ CDN: 18 regions\n  ✓ SSL: valid\n\n🚀 LIVE: https://escape-pod-final.vercel.app',
     hint:'Type: vibe deploy --platform vercel'
@@ -2171,7 +2197,8 @@ async function handleBossStep(val){
   // Easter eggs still work
   for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
 
-  const matched=step.acceptFn(vl)||step.accept.some(a=>vl.includes(a.toLowerCase().split(' ')[0])&&vl.length>2);
+  const acceptedByList=step.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()+' '));
+  const matched=step.acceptFn(vl)||acceptedByList;
   if(matched){
     appendLine(val,'ln-cmd');blank();
     if(step.out)step.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
@@ -3432,27 +3459,42 @@ async function runGraduation(){
 const CAPSTONE_STEPS = [
   {
     scenario:'A new junior dev joined your team. Their terminal shows: "npm: command not found". They have no package manager. What\'s the first thing they should check?',
-    acceptFn:(v)=>v.includes('bun')||v.includes('node')||v.includes('npm install')||v.includes('which npm')||v.includes('path'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('install bun')||t==='brew install bun'||t==='curl -fsSL https://bun.sh/install | bash'||t.includes('which npm')||t.includes('path');
+    },
     fb:'Correct — check their PATH, or install Node/Bun first. The PATH environment variable tells the shell where to find commands.'
   },
   {
     scenario:'Their .env file is missing. Running the app gives "API_KEY is undefined". They need to create one. Show the command.',
-    acceptFn:(v)=>v.includes('touch .env')||v.includes('echo')||v.includes('.env'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('touch .env')||(t.startsWith('echo')&&t.includes('api_key=')&&t.includes('.env'));
+    },
     fb:'Correct — touch .env creates the file. They\'d then populate it with echo "API_KEY=..." >> .env'
   },
   {
     scenario:'They made 3 files of changes but only want to commit src/app.ts. Show the exact git command sequence.',
-    acceptFn:(v)=>(v.includes('git add src')||v.includes('git add app'))&&v.includes('commit'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return (t.includes('git add src/app.ts')||t.includes('git add src/app'))&&t.includes('git commit')&&t.includes('-m');
+    },
     fb:'Correct — git add src/app.ts (specific file) then git commit -m "message". Selective staging is the mark of a professional Git workflow.'
   },
   {
     scenario:'The app logs show 127 ERROR lines. They need to know the count without manually counting. Build the pipeline.',
-    acceptFn:(v)=>v.includes('cat')&&v.includes('grep')&&v.includes('wc'),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('cat')&&t.includes('grep')&&t.includes('error')&&t.includes('wc -l');
+    },
     fb:'Correct — cat file | grep ERROR | wc -l is the exact production pattern for counting log events.'
   },
   {
     scenario:'They need to set the production API key before deploying. How do they do it safely (not hardcoded in code)?',
-    acceptFn:(v)=>v.includes('export')||v.includes('.env')||(v.includes('vercel')&&v.includes('env')),
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.startsWith('export api_key=')||(t.includes('.env')&&t.includes('api_key='))||t.includes('vercel env add');
+    },
     fb:'Correct — export API_KEY="..." for the current session, or add it to .env (gitignored), or set it in Vercel\'s environment settings for production.'
   },
 ];
