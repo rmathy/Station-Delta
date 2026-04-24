@@ -140,6 +140,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   0%{transform:translateX(0)}
   100%{transform:translateX(-50%)}
 }
+@media(prefers-reduced-motion:reduce){
+  #lola-strip-inner.scrolling{animation:none;padding-left:14px;}
+}
 .lola-strip-msg{
   font-size:11px;color:var(--cyan);
   padding:0 28px 0 0;
@@ -702,7 +705,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
       </div>
     </div>
-    <div id="output-static" onclick="focusCmd(event)"></div>
+    <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">

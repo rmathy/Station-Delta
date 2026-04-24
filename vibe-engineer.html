@@ -140,6 +140,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   0%{transform:translateX(0)}
   100%{transform:translateX(-50%)}
 }
+@media(prefers-reduced-motion:reduce){
+  #lola-strip-inner.scrolling{animation:none;padding-left:14px;}
+}
 .lola-strip-msg{
   font-size:11px;color:var(--cyan);
   padding:0 28px 0 0;
@@ -703,7 +706,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
       </div>
     </div>
-    <div id="output-static" onclick="focusCmd(event)"></div>
+    <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Live terminal — distress-bay session active</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
@@ -1388,7 +1391,7 @@ const PHASES = [null,
  
 /* ── P1: Terminal Navigation ── */
 {title:'Terminal Navigation',
- lolaIntro:"Hello Cadet, I'm your Logistical Organization & Learning Assistant, but you can call me L.O.L.A. I am your teacher in the box to the right. Before each objective, look for two things: what the terminal word means, and what you are about to do with it. A <b>command</b> is an instruction you type. Sometimes commands also take an <b>argument</b> like a file or folder name. Later you will also see <b>flags</b> like <code>-la</code> and <b>subcommands</b> like <code>git init</code>. First, let's learn how to orient yourself.",
+ lolaIntro:"Welcome back, Engineer. I'm L.O.L.A. — you know how this works. Phase 1 is a rapid warm-up: same commands, higher stakes. Station Delta's systems are degraded and we're starting from a cold terminal. Orient fast.",
  steps:[
   {id:'p1s1', obj:'Find out where you are', ctx:'Every terminal session starts somewhere in the filesystem. Your first job is to ask: where am I? Type a <b>command</b> into the prompt at the bottom. If you want help, type <code>man</code> to see a list of commands.',
    cmd:['pwd'], accept:['pwd'],
@@ -3839,7 +3842,7 @@ function selectPath(p){
 /* ── BOOT / RESUME ── */
 function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();
-  G.name=n||'Cadet';
+  G.name=n||'Engineer';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
   closeModal('boot-modal');
@@ -3866,7 +3869,7 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 function bootTerminal(){
   const pathLabel = {explorer:'GUIDED MODE', practitioner:'PRACTITIONER MODE', expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE CADET ACADEMY v4.0 — ENHANCED EDITION',c:'ln-success'},
+    {t:'VIBE ENGINEER ACADEMY v1.0 — DISTRESS-BAY EDITION',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'GNU coreutils: OK',c:'ln-sys'},
     {t:'Git subsystem: OK',c:'ln-sys'},
