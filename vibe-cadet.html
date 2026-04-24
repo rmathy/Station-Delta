@@ -114,6 +114,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   padding:0 10px;height:100%;display:flex;align-items:center;
   border-right:1px solid var(--green-d);white-space:nowrap;
 }
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1;
+}
+.strip-btn:hover{color:var(--text);border-color:var(--green-d)}
+.strip-btn[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
 #lola-strip-scroll{
   flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;
 }
@@ -434,6 +441,26 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── RIGHT PANEL ── */
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
 #right #active-cmds{border-top:none}
+#right-header{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);
+}
+#right-collapse-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em;
+}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--b3)}
+
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right{border-left:1px solid var(--border)}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{
+  writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px;
+}
+
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{display:none}
  
 /* ── OBJECTIVE CARD (NOW SCROLLABLE) ── */
 #obj-card{
@@ -600,9 +627,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 /* ── responsive ── */
 @media(max-width:820px){
-  #shell{grid-template-columns:1fr;grid-template-rows:48px 28 px 1fr 260px}
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 260px}
   #right{border-top:1px solid var(--border)}
   #lola-sec,#crew-sec,#telem-sec{display:none}
+  #lola-strip-ctrls .strip-btn,
+  #right-collapse-btn{min-height:32px;min-width:44px}
 }
 </style>
 </head>
@@ -634,6 +663,10 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="lola-strip-inner">
         <span class="lola-strip-msg"><span class="ls-tag">tip</span> The <code>$</code> prompt means the terminal is waiting. Click the input at the bottom and start typing.</span>
       </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" onclick="toggleStripPause()">Pause</button>
+      <button class="strip-btn" id="strip-dismiss-btn" aria-pressed="false" onclick="toggleStripDismiss()">Hide</button>
     </div>
   </div>
 
@@ -671,7 +704,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <div id="output-static" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
-    <div id="output" onclick="focusCmd(event)"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">cadet@vibe:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
@@ -681,6 +714,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
   <!-- RIGHT PANEL -->
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Learn your first command to unlock it here</span></div>
@@ -863,6 +899,9 @@ let G = {
   bossStep:0,
   bossScore:0,
   pendingPhaseStart:false,
+  stripPaused:false,
+  stripHidden:false,
+  rightCollapsed:false,
   analytics:null,
 };
 
@@ -1114,6 +1153,7 @@ function setLolaStrip(stepOrId){
     void inner.offsetWidth;
     inner.className = 'scrolling';
   }
+  applyUIPreferences();
 }
  
 /* ── ACHIEVEMENTS ── */
@@ -2947,6 +2987,51 @@ function syncDots(){
 }
  
 function setLola(msg){document.getElementById('lola-msg').innerHTML=msg}
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  const inner=document.getElementById('lola-strip-inner');
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  const hideBtn=document.getElementById('strip-dismiss-btn');
+  const rightBtn=document.getElementById('right-collapse-btn');
+  if(!shell) return;
+
+  shell.classList.toggle('strip-hidden', !!G.stripHidden);
+  shell.classList.toggle('right-collapsed', !!G.rightCollapsed);
+
+  if(inner){
+    inner.style.animationPlayState = G.stripPaused ? 'paused' : 'running';
+  }
+  if(pauseBtn){
+    pauseBtn.textContent = G.stripPaused ? 'Resume' : 'Pause';
+    pauseBtn.setAttribute('aria-pressed', G.stripPaused ? 'true' : 'false');
+  }
+  if(hideBtn){
+    hideBtn.textContent = G.stripHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', G.stripHidden ? 'true' : 'false');
+  }
+  if(rightBtn){
+    rightBtn.textContent = G.rightCollapsed ? 'Expand' : 'Collapse';
+    rightBtn.setAttribute('aria-pressed', G.rightCollapsed ? 'true' : 'false');
+  }
+}
+
+function toggleStripPause(){
+  G.stripPaused = !G.stripPaused;
+  applyUIPreferences();
+  save();
+}
+
+function toggleStripDismiss(){
+  G.stripHidden = !G.stripHidden;
+  applyUIPreferences();
+  save();
+}
+
+function toggleRightPanel(){
+  G.rightCollapsed = !G.rightCollapsed;
+  applyUIPreferences();
+  save();
+}
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
   document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
@@ -3684,6 +3769,7 @@ function startAcademy(){
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
   closeModal('boot-modal');
+  applyUIPreferences();
   save();
   telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
@@ -3749,6 +3835,7 @@ function resumeSession(){
  
   if(G.completedPhases.includes(6)) addAgent('Manager','Captain');
   if(G.completedPhases.includes(6) && G.agents.length>1) addAgent('Specialist','Engineer');
+  applyUIPreferences();
  
   $outS.innerHTML='';
   appendLineS(`Welcome back, ${G.name}. Progress restored.`,'ln-lola');
@@ -3797,6 +3884,7 @@ if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
     document.getElementById('boot-name').focus();
   }, 300);
 }
+applyUIPreferences();
 </script>
 <script src="analytics-client.js"></script>
 </body>
