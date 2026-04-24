@@ -10,6 +10,11 @@ function asArray(v) {
   return Array.isArray(v) ? v : [];
 }
 
+function truncateString(v, max = 800) {
+  const s = typeof v === "string" ? v : String(v ?? "");
+  return s.length > max ? s.slice(0, max) + "…(truncated)" : s;
+}
+
 function normalizeBody(body) {
   const b = body && typeof body === "object" ? body : {};
   const events = asArray(b.events)
@@ -37,17 +42,105 @@ function normalizeBody(body) {
   };
 }
 
+function compactForWebhook(packet) {
+  const events = asArray(packet.events).slice(0, 120).map((e) => {
+    const out = {};
+    for (const [k, v] of Object.entries(e || {})) {
+      if (v == null) out[k] = v;
+      else if (typeof v === "string") out[k] = truncateString(v, 600);
+      else if (typeof v === "number" || typeof v === "boolean") out[k] = v;
+      else out[k] = truncateString(JSON.stringify(v), 600);
+    }
+    return out;
+  });
+
+  const snapshot = packet.snapshot
+    ? {
+        courseId: packet.snapshot.courseId || packet.courseId,
+        sessionId: packet.snapshot.sessionId || packet.sessionId,
+        totals: packet.snapshot.totals || null,
+        phases: asArray(packet.snapshot.phases).slice(0, 30),
+        steps: asArray(packet.snapshot.steps).slice(0, 250),
+      }
+    : null;
+
+  return {
+    ...packet,
+    events,
+    eventOverflow: Math.max(0, asArray(packet.events).length - events.length),
+    snapshot,
+  };
+}
+
+async function postJson(url, payload) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort("Webhook timeout"), 10000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+    });
+    const text = await res.text().catch(() => "");
+    return { ok: res.ok, status: res.status, body: truncateString(text, 500) };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+async function postForm(url, payload) {
+  const form = new URLSearchParams();
+  form.set("payload", JSON.stringify(payload));
+  form.set("courseId", String(payload.courseId || "unknown"));
+  form.set("sessionId", String(payload.sessionId || "unknown"));
+  form.set("receivedAt", String(payload.receivedAt || ""));
+  form.set("eventCount", String(asArray(payload.events).length));
+
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort("Webhook timeout"), 10000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: form.toString(),
+      signal: ctrl.signal,
+    });
+    const text = await res.text().catch(() => "");
+    return { ok: res.ok, status: res.status, body: truncateString(text, 500) };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 async function forwardToWebhook(packet) {
   const webhookUrl = process.env.ANALYTICS_WEBHOOK_URL;
   if (!webhookUrl) return { used: false, ok: false };
 
+  const compact = compactForWebhook(packet);
+  const isGoogleScript = /script\.google(?:usercontent)?\.com/i.test(webhookUrl);
+
   try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(packet),
-    });
-    return { used: true, ok: res.ok, status: res.status };
+    if (isGoogleScript) {
+      // Apps Script webhooks are sometimes configured to read either JSON body
+      // or e.parameter payload; support both by trying JSON then form fallback.
+      const first = await postJson(webhookUrl, compact);
+      if (first.ok) return { used: true, ok: true, status: first.status, mode: "json" };
+
+      const second = await postForm(webhookUrl, compact);
+      return {
+        used: true,
+        ok: second.ok,
+        status: second.status,
+        mode: "form-fallback",
+        firstStatus: first.status,
+        firstBody: first.body,
+        secondBody: second.body,
+      };
+    }
+
+    const res = await postJson(webhookUrl, compact);
+    return { used: true, ok: res.ok, status: res.status, mode: "json", body: res.body };
   } catch (err) {
     return { used: true, ok: false, error: String(err?.message || err) };
   }
@@ -83,12 +176,19 @@ module.exports = async function handler(req, res) {
   const webhook = await forwardToWebhook(packet);
   const tmpLogged = await appendTmpLog(packet);
 
-  return res.status(200).json({
-    ok: true,
+  const webhookRequired = Boolean(process.env.ANALYTICS_WEBHOOK_URL);
+  const deliveryOk = !webhookRequired || webhook.ok;
+  const statusCode = deliveryOk ? 200 : 502;
+
+  return res.status(statusCode).json({
+    ok: deliveryOk,
     acceptedEvents: packet.events.length,
     sink: webhook.used ? "webhook" : "local-buffer",
     webhookOk: webhook.used ? webhook.ok : null,
+    webhookStatus: webhook.status || null,
+    webhookMode: webhook.mode || null,
+    webhookError: webhook.error || null,
+    webhookFirstStatus: webhook.firstStatus || null,
     tmpLogged,
   });
 };
-

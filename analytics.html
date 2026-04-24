@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Station Delta Analytics</title>
+  <style>
+    :root{
+      --bg:#060b11;
+      --surface:#0d1622;
+      --surface2:#121d2a;
+      --border:#1f3144;
+      --text:#d8e6f5;
+      --muted:#8ea3bb;
+      --green:#00d17a;
+      --blue:#4db8ff;
+      --amber:#ffb700;
+      --red:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 10% -5%,rgba(77,184,255,.08),transparent 65%),
+        radial-gradient(900px 500px at 95% 0%,rgba(0,209,122,.08),transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:22px}
+    .top{
+      display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .title{font-size:22px;font-weight:700;letter-spacing:.04em}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .controls{
+      display:grid;grid-template-columns:1fr 240px 130px 130px;gap:8px;
+      width:min(820px,100%);
+    }
+    .card{
+      background:linear-gradient(180deg,var(--surface),var(--surface2));
+      border:1px solid var(--border);
+      border-radius:8px;
+    }
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px;margin-bottom:10px}
+    .kpi{padding:12px}
+    .kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    .kpi .val{font-size:24px;font-weight:700;margin-top:6px}
+    .kpi .hint{font-size:11px;color:var(--muted)}
+    .panes{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
+    .pane{padding:12px}
+    .pane h3{margin:0 0 10px 0;font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+    th{color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+    .mono{font-family:inherit}
+    input,button,select{
+      width:100%;
+      background:#08111b;color:var(--text);
+      border:1px solid var(--border);border-radius:6px;
+      padding:10px;font:12px inherit;
+    }
+    input:focus,button:focus,select:focus{outline:none;border-color:var(--blue)}
+    button{
+      cursor:pointer;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      background:linear-gradient(180deg,#12314f,#0e253a);
+    }
+    button:hover{filter:brightness(1.1)}
+    .status{
+      margin:8px 0 14px 0;padding:8px 10px;border-radius:6px;border:1px solid var(--border);
+      background:rgba(0,0,0,.2);font-size:12px;color:var(--muted);
+    }
+    .ok{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)}
+    .course-chip{
+      display:inline-block;padding:3px 8px;border:1px solid var(--border);border-radius:99px;
+      font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)
+    }
+    @media (max-width: 980px){
+      .controls{grid-template-columns:1fr 1fr}
+      .kpi-grid{grid-template-columns:repeat(3,minmax(120px,1fr))}
+      .panes{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">Station Delta Analytics Console</div>
+        <div class="sub">Live session telemetry from Cadet · Engineer · Lieutenant</div>
+      </div>
+      <div class="controls">
+        <input id="key" type="password" placeholder="ANALYTICS_DASHBOARD_KEY" />
+        <select id="limit">
+          <option value="100">Last 100 packets</option>
+          <option value="200">Last 200 packets</option>
+          <option value="500" selected>Last 500 packets</option>
+        </select>
+        <button id="loadBtn">Load</button>
+        <button id="autoBtn">Auto: Off</button>
+      </div>
+    </div>
+
+    <div id="status" class="status">Enter dashboard key, then click Load.</div>
+
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="label">Packets</div><div id="kPackets" class="val">0</div><div class="hint">ingest payloads</div></div>
+      <div class="card kpi"><div class="label">Events</div><div id="kEvents" class="val">0</div><div class="hint">total events</div></div>
+      <div class="card kpi"><div class="label">Sessions</div><div id="kSessions" class="val">0</div><div class="hint">distinct session IDs</div></div>
+      <div class="card kpi"><div class="label">Retries</div><div id="kRetries" class="val">0</div><div class="hint">incorrect attempts</div></div>
+      <div class="card kpi"><div class="label">Hints Used</div><div id="kHints" class="val">0</div><div class="hint">hint expansions</div></div>
+      <div class="card kpi"><div class="label">Avg TTR</div><div id="kTTR" class="val">0s</div><div class="hint">step_completed</div></div>
+    </div>
+
+    <div class="panes">
+      <div class="card pane">
+        <h3>Course Summary</h3>
+        <table id="courseTable">
+          <thead><tr><th>Course</th><th>Sessions</th><th>Events</th><th>Retries</th><th>Hints</th><th>Avg TTR</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card pane">
+        <h3>Event Mix</h3>
+        <table id="typeTable">
+          <thead><tr><th>Event Type</th><th>Count</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card pane" style="margin-top:10px">
+      <h3>Recent Packets</h3>
+      <table id="packetTable">
+        <thead><tr><th>Received</th><th>Course</th><th>Session</th><th>Reason</th><th>Events</th><th>Page</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const keyEl = document.getElementById("key");
+    const limitEl = document.getElementById("limit");
+    const loadBtn = document.getElementById("loadBtn");
+    const autoBtn = document.getElementById("autoBtn");
+    const storeKey = "sd_analytics_dash_key";
+    const storeAuto = "sd_analytics_dash_auto";
+    let autoTimer = null;
+
+    keyEl.value = localStorage.getItem(storeKey) || "";
+
+    function fmtTime(iso) {
+      if (!iso) return "-";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return String(iso);
+      return d.toLocaleString();
+    }
+    function fmtSec(ms) {
+      if (!Number.isFinite(ms) || ms <= 0) return "0s";
+      return (ms / 1000).toFixed(1) + "s";
+    }
+    function setStatus(msg, cls) {
+      statusEl.className = "status " + (cls || "");
+      statusEl.textContent = msg;
+    }
+
+    function emptyBody(id) {
+      const tb = document.querySelector(id + " tbody");
+      tb.innerHTML = "";
+      return tb;
+    }
+    function td(v) {
+      const x = document.createElement("td");
+      x.textContent = v;
+      return x;
+    }
+
+    function render(data) {
+      const packets = Array.isArray(data?.events) ? data.events : [];
+      const allEvents = packets.flatMap((p) => Array.isArray(p.events) ? p.events : []);
+
+      const sessions = new Set();
+      let retries = 0;
+      let hints = 0;
+      let ttrSum = 0;
+      let ttrCount = 0;
+      const byCourse = new Map();
+      const byType = new Map();
+
+      for (const p of packets) {
+        const c = p.courseId || "unknown";
+        const sid = p.sessionId || "unknown";
+        sessions.add(sid);
+        if (!byCourse.has(c)) byCourse.set(c, { sessions: new Set(), events: 0, retries: 0, hints: 0, ttrSum: 0, ttrCount: 0 });
+        const row = byCourse.get(c);
+        row.sessions.add(sid);
+        const pe = Array.isArray(p.events) ? p.events : [];
+        row.events += pe.length;
+
+        for (const e of pe) {
+          const t = String(e.type || "unknown");
+          byType.set(t, (byType.get(t) || 0) + 1);
+          if (t === "step_attempt" && e.correct === false) { retries++; row.retries++; }
+          if (t === "hint_used") { hints++; row.hints++; }
+          if (t === "step_completed" && Number.isFinite(e.ttrMs)) {
+            ttrSum += e.ttrMs; ttrCount++;
+            row.ttrSum += e.ttrMs; row.ttrCount++;
+          }
+        }
+      }
+
+      document.getElementById("kPackets").textContent = packets.length;
+      document.getElementById("kEvents").textContent = allEvents.length;
+      document.getElementById("kSessions").textContent = sessions.size;
+      document.getElementById("kRetries").textContent = retries;
+      document.getElementById("kHints").textContent = hints;
+      document.getElementById("kTTR").textContent = fmtSec(ttrCount ? ttrSum / ttrCount : 0);
+
+      const courseBody = emptyBody("#courseTable");
+      [...byCourse.entries()]
+        .sort((a, b) => b[1].events - a[1].events)
+        .forEach(([course, r]) => {
+          const tr = document.createElement("tr");
+          const c = document.createElement("td");
+          c.innerHTML = `<span class="course-chip">${course}</span>`;
+          tr.appendChild(c);
+          tr.appendChild(td(r.sessions.size));
+          tr.appendChild(td(r.events));
+          tr.appendChild(td(r.retries));
+          tr.appendChild(td(r.hints));
+          tr.appendChild(td(fmtSec(r.ttrCount ? r.ttrSum / r.ttrCount : 0)));
+          courseBody.appendChild(tr);
+        });
+
+      const typeBody = emptyBody("#typeTable");
+      [...byType.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([type, count]) => {
+          const tr = document.createElement("tr");
+          tr.appendChild(td(type));
+          tr.appendChild(td(count));
+          typeBody.appendChild(tr);
+        });
+
+      const packetBody = emptyBody("#packetTable");
+      packets.slice().reverse().slice(0, 60).forEach((p) => {
+        const tr = document.createElement("tr");
+        tr.appendChild(td(fmtTime(p.receivedAt)));
+        tr.appendChild(td(p.courseId || "unknown"));
+        tr.appendChild(td(String(p.sessionId || "unknown").slice(0, 14)));
+        tr.appendChild(td(p.reason || "-"));
+        tr.appendChild(td(Array.isArray(p.events) ? p.events.length : 0));
+        tr.appendChild(td((p.page || "").slice(0, 36)));
+        packetBody.appendChild(tr);
+      });
+    }
+
+    async function loadData() {
+      const key = keyEl.value.trim();
+      if (!key) {
+        setStatus("Please enter ANALYTICS_DASHBOARD_KEY first.", "warn");
+        return;
+      }
+      localStorage.setItem(storeKey, key);
+      setStatus("Loading analytics...", "warn");
+      try {
+        const limit = Number(limitEl.value || 500);
+        const res = await fetch(`/api/analytics-recent?limit=${limit}&key=${encodeURIComponent(key)}`);
+        if (!res.ok) {
+          if (res.status === 401) setStatus("Unauthorized. Check ANALYTICS_DASHBOARD_KEY.", "bad");
+          else setStatus(`Load failed (${res.status}).`, "bad");
+          return;
+        }
+        const data = await res.json();
+        render(data);
+        setStatus(`Loaded ${data.count || 0} packets at ${new Date().toLocaleTimeString()}.`, "ok");
+      } catch (err) {
+        setStatus(`Load error: ${String(err.message || err)}`, "bad");
+      }
+    }
+
+    function setAuto(on) {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+      if (on) {
+        autoTimer = setInterval(loadData, 15000);
+      }
+      autoBtn.textContent = `Auto: ${on ? "On" : "Off"}`;
+      localStorage.setItem(storeAuto, on ? "1" : "0");
+    }
+
+    loadBtn.addEventListener("click", loadData);
+    autoBtn.addEventListener("click", () => {
+      const next = autoBtn.textContent.includes("Off");
+      setAuto(next);
+      if (next) loadData();
+    });
+    keyEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loadData();
+    });
+
+    setAuto(localStorage.getItem(storeAuto) === "1");
+  </script>
+</body>
+</html>
+

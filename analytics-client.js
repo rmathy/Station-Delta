@@ -3,6 +3,7 @@
   const MAX_EVENTS_PER_FLUSH = 200;
   const FLUSH_INTERVAL_MS = 15000;
   const HEARTBEAT_INTERVAL_MS = 60000;
+  const ALLOW_BEACON = false; // Keep strict delivery semantics (ack-driven cursor advancement).
 
   let inFlight = false;
   let lastHeartbeat = 0;
@@ -76,7 +77,13 @@
       body: JSON.stringify(payload),
       keepalive: true,
     });
-    return res.ok;
+    let body = null;
+    try { body = await res.json(); } catch {}
+    if (!res.ok) {
+      const reason = body && body.webhookError ? ` (${body.webhookError})` : "";
+      throw new Error(`Analytics ingest failed: ${res.status}${reason}`);
+    }
+    return true;
   }
 
   async function flush(reason, preferBeacon) {
@@ -98,7 +105,7 @@
     inFlight = true;
     try {
       let ok = false;
-      if (preferBeacon) ok = sendWithBeacon(payload);
+      if (preferBeacon && ALLOW_BEACON) ok = sendWithBeacon(payload);
       if (!ok) ok = await sendWithFetch(payload);
       if (ok) {
         setCursor(raw, payload.eventCursorEnd);
@@ -137,4 +144,3 @@
     }
   }, 500);
 })();
-

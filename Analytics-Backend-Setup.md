@@ -23,6 +23,10 @@ Set these in Vercel Project Environment Variables:
 - `ANALYTICS_WEBHOOK_URL` = your durable sink endpoint (recommended)
 - `ANALYTICS_DASHBOARD_KEY` = a random secret used to protect `/api/analytics-recent`
 
+Important:
+- For Google Apps Script, use the deployed web app **`/exec` URL** (not `/dev`).
+- If webhook delivery fails, ingest now returns a non-200 response so clients retry automatically (prevents silent data loss).
+
 ## View incoming data
 
 - Quick recent stream:
@@ -44,3 +48,51 @@ Set these in Vercel Project Environment Variables:
   - CC/BCC to `richard@fccbrewery.com`
   - Optional Slack/Discord notification
 
+## Google Apps Script starter (recommended)
+
+Use this as your Apps Script `Code.gs`, then deploy as **Web app** with access set to **Anyone**:
+
+```javascript
+function doPost(e) {
+  try {
+    const SHEET_NAME = 'RawEvents';
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+    if (sh.getLastRow() === 0) {
+      sh.appendRow([
+        'receivedAt','courseId','sessionId','reason','eventCount','eventTypes','page','rawPayload'
+      ]);
+    }
+
+    let payload = {};
+    if (e && e.postData && e.postData.contents) {
+      try { payload = JSON.parse(e.postData.contents); } catch (_) {}
+    }
+    if ((!payload || !payload.courseId) && e && e.parameter && e.parameter.payload) {
+      try { payload = JSON.parse(e.parameter.payload); } catch (_) {}
+    }
+
+    const events = Array.isArray(payload.events) ? payload.events : [];
+    const typeSet = [...new Set(events.map(x => (x && x.type) ? String(x.type) : 'unknown'))];
+
+    sh.appendRow([
+      payload.receivedAt || new Date().toISOString(),
+      payload.courseId || 'unknown',
+      payload.sessionId || 'unknown',
+      payload.reason || '',
+      events.length,
+      typeSet.join(','),
+      payload.page || '',
+      JSON.stringify(payload),
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+```
