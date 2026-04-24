@@ -246,7 +246,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="logo">STATION DELTA</div>
   <span class="logo-sep">·</span>
   <div class="logo-sub">Master Timeline — Beta Edition</div>
-  <div class="telem">Updated: <span>April 2026</span></div>
+  <div class="telem">Updated: <span>April 24, 2026</span></div>
 </div>
 
 <div class="wrap">
@@ -254,15 +254,15 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <!-- STAT BAR -->
   <div class="stat-bar">
     <div class="stat-cell">
-      <div class="stat-val c-green">6</div>
+      <div class="stat-val c-green">8</div>
       <div class="stat-label">Milestones done</div>
     </div>
     <div class="stat-cell">
-      <div class="stat-val c-amber">2</div>
+      <div class="stat-val c-amber">4</div>
       <div class="stat-label">Active now</div>
     </div>
     <div class="stat-cell">
-      <div class="stat-val c-blue">~14</div>
+      <div class="stat-val c-blue">~9</div>
       <div class="stat-label">Weeks to beta</div>
     </div>
     <div class="stat-cell">
@@ -286,22 +286,79 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="focus-item">
         <div class="focus-num fn-1">1</div>
         <div>
-          <div class="focus-text-title">Ship the Cadet feedback fixes</div>
-          <div class="focus-text-body">Sort student notes into fix / clarify / add. Fix the broken things first. Everything downstream depends on having a clean Cadet. Share notes here and fixes are written immediately.</div>
+          <div class="focus-text-title">Run one full QA cycle on Cadet + Engineer</div>
+          <div class="focus-text-body">Do guided + expert playthroughs, then ship only high-signal fixes (reproduced by 2+ learners) before adding new feature work.</div>
         </div>
       </div>
       <div class="focus-item">
         <div class="focus-num fn-2">2</div>
         <div>
-          <div class="focus-text-title">Build Vibe Engineer — one phase per session</div>
-          <div class="focus-text-body">The outline is done. Say "build Phase 1 of Vibe Engineer" and it gets built. Don't try all 9 phases at once. Phase 1 + 2 first, test, then continue.</div>
+          <div class="focus-text-title">Prepare Lieutenant as the next progression jump</div>
+          <div class="focus-text-body">Use a move-map from Engineer to Lieutenant so each phase clearly shifts from review to deeper operational complexity.</div>
         </div>
       </div>
       <div class="focus-item">
         <div class="focus-num fn-3">3</div>
         <div>
-          <div class="focus-text-title">Get Lieutenant in front of real engineers this week</div>
-          <div class="focus-text-body">Lieutenant is live on Vercel. Every day it's not in front of experienced engineers is feedback you're not collecting. Share the URL today — imperfect is fine.</div>
+          <div class="focus-text-title">Parallel-track productization for July 1 beta</div>
+          <div class="focus-text-body">Start auth + paywall + secure AI proxy now, in parallel with curriculum polish, so beta is a product and not only a content demo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-kicker">// External Momentum — Apr 24 Update <span class="sk-badge skb-now">Live</span> <span class="sk-badge skb-next">Actioned</span></div>
+  <div class="timeline">
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">BAE</div>
+      <div class="tl-content">
+        <div class="tl-period">Defense opportunity track · no subscription cost</div>
+        <div class="tl-title">BAE Small Business Industry Day pipeline is now on the beta critical path</div>
+        <div class="tl-desc"><strong>Event:</strong> Wednesday, <strong>May 20, 2026</strong> (8:00 AM–3:00 PM) at Innovare Advancement Center. This creates a forcing function for stronger security/air-gapped narrative and analytics credibility before July 1 beta.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>By May 6, 2026:</strong> submit pitch abstract (250 words max) aligned to BAE priorities</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>By May 11, 2026:</strong> prep pitch deck + 3-minute product demo if selected</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text"><strong>By May 20, 2026:</strong> run live Cadet→Engineer walkthrough + analytics proof points</div></div>
+        </div>
+        <div class="tl-note blue">Leverage existing relationship channel with Ryan Orilio for fit-check language before final submission.</div>
+      </div>
+    </div>
+
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">QA</div>
+      <div class="tl-content">
+        <div class="tl-period">Early expert feedback integrated</div>
+        <div class="tl-title">Thiago desktop/mobile feedback + Playwright suite converted into near-term execution work</div>
+        <div class="tl-desc">Positive expert signal confirms core concept quality. Immediate gaps are now explicit: mobile layout stability ("no floating windows"), resizable/minimizable panels, reduced ticker distraction, and accessibility/state persistence hardening.</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add mobile layout guardrails so terminal and guidance panes do not float or overlap on phones</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add panel controls: collapse/minimize optional right-side rail and preserve user preference</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add ticker control: pause/dismiss option for reduced distraction mode</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Integrate Playwright spec in QA ritual (<code>station-delta.spec.ts</code>) as a regression gate</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Patch a11y/state persistence checks: <code>aria-live</code> or <code>role="log"</code> on terminal output + refresh continuity behavior</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-kicker">// Next 10 Moves — Apr 23 to Beta <span class="sk-badge skb-now">Now</span> <span class="sk-badge skb-next">Look ahead</span></div>
+  <div class="timeline">
+    <div class="tl-item tl-active">
+      <div class="tl-node nd-active">10</div>
+      <div class="tl-content">
+        <div class="tl-period">Priority stack · Updated after Cadet + Engineer commit</div>
+        <div class="tl-title">What to do next (in order)</div>
+        <div class="checklist">
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Run a structured playtest on Cadet + Engineer (3 learners each) and log friction as fix / clarify / add</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Add Cadet → Engineer and Engineer → Lieutenant graduation CTAs with one-click progression</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Finish and lock the Track Placement Quiz on index so learners self-route into Security/Deployment/Data/AI tracks</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Normalize naming + links across all sims (<code>vibe-coursename.html</code>) and remove legacy alias drift</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fix remaining officer save-key collisions and run one restart/resume test per sim</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Apply Cadet/Engineer pedagogy contract to Lieutenant: LOLA strip taxonomy, pre-step concepts, phase checkpoints, JANET tone</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Create Lieutenant move-map from Engineer and mark what shifts from “review” to “new depth”</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Implement baseline analytics events everywhere: step start/complete, retries, hints, checkpoint pauses, phase TTR</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Stand up weekly QA ritual: one guided playthrough + one expert playthrough for each active core sim</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Start app-shell parallel track (auth + paywall + secure AI proxy) so July 1 beta is productized, not just content-complete</div></div>
         </div>
       </div>
     </div>
@@ -444,16 +501,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="tl-node nd-active">→</div>
       <div class="tl-content">
         <div class="tl-period">Now — Week 1–2</div>
-        <div class="tl-title">Process Cadet feedback + ship fixes</div>
-        <div class="tl-desc">Turn student feedback into three buckets: <strong>fix</strong> (broken), <strong>clarify</strong> (confusing), <strong>add</strong> (missing). Fix broken first, clarify second, add goes to backlog. Every fix goes to GitHub — Vercel auto-deploys in seconds.</div>
+        <div class="tl-title">Cadet gold pass stabilized + shipped</div>
+        <div class="tl-desc">Cadet has gone through multiple feedback loops and is now running with stronger phase transitions, improved scaffolding, and production commits pushed. Keep this as a continuous quality lane: triage notes quickly, fix breakage first, then clarity improvements.</div>
         <div class="checklist">
-          <div class="cl-item cl-partial"><div class="cl-box">→</div><div class="cl-text">Collect and sort all student feedback notes into fix / clarify / add</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Use a feedback-synthesis agent to turn messy notes into a ranked fix list + GitHub Issues</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Identify top 3 confusion points — these become priority fixes</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Fix broken commands or incorrect accept patterns</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Clarify LOLA hint language anywhere students got stuck for >2 minutes</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Log all "nice to have" suggestions as GitHub Issues for later</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Re-test with 2–3 students before moving on</div></div>
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text">Cadet fixes committed + pushed (focus behavior, Phase 1 guidance flow, JIT sequencing, clearer scaffolding)</div></div>
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text">Feedback-driven copy and pedagogy pass applied to core learner friction points</div></div>
+          <div class="cl-item cl-partial"><div class="cl-box">~</div><div class="cl-text">Fix / clarify / add loop active but not yet systematized into weekly synthesis report</div></div>
+          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Run next 3-student playtest and only prioritize issues reproduced by 2+ learners</div></div>
         </div>
         <div class="tl-note">Share feedback notes here. They'll be sorted immediately and fixes written to paste into GitHub.</div>
       </div>
@@ -463,20 +517,17 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="tl-node nd-active">→</div>
       <div class="tl-content">
         <div class="tl-period">Now — Weeks 1–3</div>
-        <div class="tl-title">Build Vibe Engineer — one phase per session</div>
-        <div class="tl-desc">The outline is complete. Build phase by phase modeled on Cadet's code structure. The live AI integration in Phase 4 comes last. Don't build all 9 at once — each phase gets tested before the next is built.</div>
+        <div class="tl-title">Vibe Engineer built + tuning pass underway</div>
+        <div class="tl-desc">Engineer is now live, committed, and structurally aligned to Cadet. Current work is quality tuning: less copy-paste learning leakage, stronger Phase 1 recall bridge, consistency cleanup, and playthrough QA under real learner behavior.</div>
         <div class="checklist">
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Copy Vibe Cadet HTML as template — change title, save key to <code>vbe_v1</code>, color accents to amber/gold</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">For each phase, ask AI for the build bundle in one shot: code, acceptance tests, hint copy, and regression checklist</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 1 (Recall + Reorient) + Phase 2 (Shell Scripting) — test with a student</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 3 (SSH + Remote Access) + Phase 4 (curl + API Literacy) — test curl commands work</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 5 (jq + Advanced Pipes) + Phase 6 (Docker) — Docker is heaviest, test more carefully</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 7 (Advanced Git) + Phase 8 (.env + Process Management)</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 9 (Full Stack Rescue) + Boss Fight (The Dead Server Protocol)</div></div>
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text">Engineer core build complete across phases with JANET/LOLA contract integrated</div></div>
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text">UI identity and progression flow tuned to feel distinct from Cadet</div></div>
+          <div class="cl-item cl-partial"><div class="cl-box">~</div><div class="cl-text">Phase 1 redesigned as Cadet recall + new twist; validate with learner timing data</div></div>
+          <div class="cl-item cl-partial"><div class="cl-box">~</div><div class="cl-text">Hint/reveal behavior shifted toward coaching-first; verify reduced copy-paste behavior in playtests</div></div>
           <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Phase 4 Step 5: live AI call — add Anthropic API key to Vercel env vars, implement proxy</div></div>
-          <div class="cl-item cl-todo"><div class="cl-box"></div><div class="cl-text">Upload to GitHub → auto-deploys to Vercel</div></div>
+          <div class="cl-item cl-done"><div class="cl-box">✓</div><div class="cl-text">GitHub + Vercel deployment loop verified; latest Cadet/Engineer updates pushed</div></div>
         </div>
-        <div class="tl-note blue">Say "build Phase 1 of Vibe Engineer" at any time. One phase at a time, modeled on Cadet.</div>
+        <div class="tl-note blue">Current command: "run playthrough QA pass on Engineer and log false negatives" — this is the highest-leverage next move before Lieutenant expansion.</div>
       </div>
     </div>
 
