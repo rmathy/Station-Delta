@@ -38,7 +38,7 @@
   --pink:#f472b6;
   --orange:#fb923c;
   --gold:#fbbf24;
-  --gold-bg:#16100;
+  --gold-bg:#161000;
   --silver:#b0bec5;
   --silver-d:#455a64;
   --silver-bg:#0a0e10;
@@ -116,6 +116,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   padding:0 10px;height:100%;display:flex;align-items:center;
   border-right:1px solid var(--amber-d);white-space:nowrap;
 }
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1;
+}
+.strip-btn:hover{color:var(--text);border-color:var(--amber-d)}
+.strip-btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 #lola-strip-scroll{
   flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;
 }
@@ -134,6 +141,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes lolaScroll{
   0%{transform:translateX(0)}
   100%{transform:translateX(-50%)}
+}
+@media(prefers-reduced-motion:reduce){
+  #lola-strip-inner.scrolling{animation:none;padding-left:14px;}
 }
 .lola-strip-msg{
   font-size:11px;color:var(--cyan);
@@ -419,6 +429,24 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* right panel */
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#right-header{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);
+}
+#right-collapse-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em;
+}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--b3)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right{border-left:1px solid var(--border)}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{
+  writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px;
+}
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{display:none}
 
 /* obj card */
 #obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
@@ -542,9 +570,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .glitch{animation:shake .2s ease}
 
 @media(max-width:820px){
-  #shell{grid-template-columns:1fr;grid-template-rows:48px 1fr 260px}
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 260px}
   #right{border-top:1px solid var(--border)}
   #lola-sec,#crew-sec,#telem-sec{display:none}
+  #lola-strip-ctrls .strip-btn,
+  #right-collapse-btn{min-height:32px;min-width:44px}
 }
 </style>
 </head>
@@ -577,6 +607,10 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Vibe Cadet. Now you operate. Same terminal, higher stakes.</span>
       </div>
     </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" onclick="toggleStripPause()">Pause</button>
+      <button class="strip-btn" id="strip-dismiss-btn" aria-pressed="false" onclick="toggleStripDismiss()">Hide</button>
+    </div>
   </div>
 
   <!-- TERMINAL -->
@@ -586,9 +620,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="term-path">lt@vibe-ship — <span id="path-display">~/ops/escape-pod</span></div>
       <div style="width:50px"></div>
     </div>
-    <div id="output-static"></div>
-    <div id="output-divider">Terminal</div>
-    <div id="output" onclick="focusCmd()"></div>
+    <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
+    <div id="output-divider">Live Terminal — Ops Session</div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">lt@vibe:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
@@ -598,6 +632,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
   <!-- RIGHT PANEL -->
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Read the codebase</div>
@@ -779,7 +816,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE LIEUTENANT v1.0
+   VIBE LIEUTENANT v2.0
    Sequel to Vibe Cadet Academy
    Phases: Codebase reading · Diff review · Stack traces ·
    TypeScript errors · API literacy · Testing · Incidents ·
@@ -805,6 +842,9 @@ let G = {
   bossScore:0,
   pendingPhaseStart:false,
   checkpointFromPhase:null,
+  stripPaused:false,
+  stripHidden:false,
+  rightCollapsed:false,
   analytics:null,
 };
 
@@ -852,7 +892,7 @@ const LOLA_STRIP = {
     {tag:'PHASE 1',msg:"Codebase navigation. The first thing a senior dev does when joining a new team: read before you write."},
     {tag:'TIP',msg:"<code>find . -name \"*.ts\"</code> counts all TypeScript files. Use it to understand scope before touching anything."},
     {tag:'REMEMBER',msg:"<code>ls -la</code> — the <code>-a</code> flag shows hidden files like <code>.env</code> and <code>.gitignore</code>. They matter."},
-    {tag:'LOLA',msg:"Don't worry if the output looks complex. Focus on what changed. I'll walk you through every step."},
+    {tag:'LOLA',msg:"Don't worry if the repo looks dense. Focus on where things live first. I'll walk you through every step."},
     {tag:'TIP',msg:"<code>package.json</code> → <code>scripts</code> section tells you how to run, test, and build the project. Always read this first."},
   ],
   2: [
@@ -934,6 +974,7 @@ function setLolaStrip(phase){
   } else {
     inner.className='lola-strip-inner no-scroll';
   }
+  applyUIPreferences();
 }
 
 /* ── EXPERT TIMER ── */
@@ -1068,11 +1109,13 @@ const DIAGNOSE = {
   'p3s1':(v)=>{
     if(v.includes('console.log')) return {msg:'<code>console.log</code> is useful at runtime, but to read a stack trace you need to read the error message itself, not add more logs. Look at what <code>trace</code> shows you.',next:'Try: trace'};
     if(v.includes('grep')&&v.includes('error')) return {msg:'Grepping for errors works in logs, but for stack trace analysis, use the <code>trace</code> command to step through the call chain.',next:'Try: trace'};
+    if(v.startsWith('read ')||v.startsWith('cat ')) return {msg:'You will open files in the next step. First inspect the stack trace so you know exactly which file to open and why.',next:'Try: trace'};
     return null;
   },
   'p3s2':(v)=>{
-    if(v.includes('delete')||v.includes('remove')) return {msg:'Don\'t delete the error — diagnose it. The stack trace tells you exactly which file and line caused the crash. Use <code>read</code> to open that file.',next:'Try: read src/auth/login.ts'};
-    if(v.startsWith('read')&&!v.includes('src/auth')) return {msg:'Close — but you need to read the specific file mentioned in the stack trace. Which file was it?',next:'Try: read src/auth/login.ts'};
+    if(v.includes('delete')||v.includes('remove')) return {msg:'Don\'t delete the error — diagnose it. The stack trace tells you exactly which file and line caused the crash. Use <code>read</code> to open that file.',next:'Try: read src/middleware/auth.ts'};
+    if(v.startsWith('read')&&!v.includes('src/middleware/auth.ts')) return {msg:'Close — but you need to read the specific file mentioned in the stack trace. Which file was it?',next:'Try: read src/middleware/auth.ts'};
+    if(v.startsWith('trace')) return {msg:'You already traced the failure. Now open the file where the crash occurred so you can inspect the null-check gap directly.',next:'Try: read src/middleware/auth.ts'};
     return null;
   },
   'p4s1':(v)=>{
@@ -1092,6 +1135,7 @@ const DIAGNOSE = {
   'p7s1':(v)=>{
     if(v.includes('restart')||v.includes('reboot')) return {msg:'Restarting without understanding the cause is a valid mitigation but not a fix. First step is always to check what\'s actually failing. Look at the logs.',next:'Try: cat logs/error.log'};
     if(v.includes('grep')&&!v.includes('log')) return {msg:'Good instinct, but you need to grep the log file specifically. The error log is at <code>logs/error.log</code>.',next:'Try: cat logs/error.log'};
+    if(v.includes('revert')||v.includes('rollback')) return {msg:'Rollback comes after diagnosis. First confirm the failure and timeline from logs, then mitigate with rollback.',next:'Try: cat logs/error.log'};
     return null;
   },
   'p8s1':(v)=>{
@@ -1141,7 +1185,7 @@ const CHALLENGES = {
   3:{
     title:'Stack Trace Challenge',
     scenario:'Production is throwing this error:\n\nTypeError: Cannot read properties of undefined (reading \'id\')\n  at formatUser (src/utils/user.ts:34)\n  at getUserById (src/api/users.ts:18)\n  at handler (src/routes/profile.ts:9)\n\nWhere is the bug, and what\'s the most likely cause?',
-    acceptFn:(v)=>(v.toLowerCase().includes('user.ts')||v.toLowerCase().includes('line 34')||v.toLowerCase().includes('formateur'))||(v.toLowerCase().includes('undefined')&&v.toLowerCase().includes('user'))||(v.toLowerCase().includes('null')&&v.toLowerCase().includes('user')),
+    acceptFn:(v)=>(v.toLowerCase().includes('user.ts')||v.toLowerCase().includes('line 34')||v.toLowerCase().includes('formatuser'))||(v.toLowerCase().includes('undefined')&&v.toLowerCase().includes('user'))||(v.toLowerCase().includes('null')&&v.toLowerCase().includes('user')),
     successMsg:'Correct: the bug is in src/utils/user.ts line 34. The user object is undefined — most likely getUserById returned undefined when no user was found, and formatUser didn\'t handle that case.',
     unlockMsg:'Challenge complete: you can triage production errors from a stack trace without running anything.'
   },
@@ -1347,7 +1391,10 @@ const PHASES = [null,
   {id:'p5s1', obj:'Test the API health endpoint', ctx:'Before integrating an API, always verify it\'s reachable and responding correctly.',
    cmd:['curl /api/health'],
    accept:['curl /api/health','curl /api/health -v'],
-   acceptFn: v=>v.startsWith('curl'),
+   acceptFn: v=>{
+     const t=v.toLowerCase();
+     return t.startsWith('curl')&&t.includes('/api/health');
+   },
    hint:'Type: curl /api/health  — make a GET request to the health endpoint',
    out:'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"ok","version":"2.4.1","uptime":847293,"db":"connected"}',
    unlockCmd:'curl',
@@ -1420,7 +1467,10 @@ const PHASES = [null,
   {id:'p7s2', obj:'Rollback the bad deploy', ctx:'You\'ve confirmed the error started with the last deploy. Fastest mitigation: rollback first, fix later.',
    cmd:['fix rollback','git revert HEAD'],
    accept:['fix rollback','git revert head','git revert HEAD'],
-   acceptFn: v=>v.includes('rollback')||( v.includes('git')&&v.includes('revert')),
+   acceptFn: v=>{
+     const t=v.toLowerCase().trim();
+     return t==='fix rollback'||(t.includes('git')&&t.includes('revert')&&t.includes('head'));
+   },
    hint:'Type: fix rollback  — revert to the last known good deploy',
    out:'Rolling back to commit 9f8e7d6 (previous stable)…\nDeploy: 9f8e7d6 → LIVE\n\n✓ Error rate: 847/min → 0/min (took 8 seconds)\n✓ Successful requests resuming\n✓ Service restored at 02:16:44\n\nIncident duration: 3m 11s\n\n⚡ Now: investigate the root cause on a branch, fix it, test it, and redeploy.',
    jit:{title:'Rollback first, investigate second',body:'The order matters: (1) <b>Mitigate</b> — restore service as fast as possible, even if it means reverting working code. Users are waiting. (2) <b>Investigate</b> — once users are unblocked, understand the root cause properly. (3) <b>Fix</b> — implement the actual fix on a branch with tests. (4) <b>Deploy</b> — ship the fix. (5) <b>Post-mortem</b> — write down what happened and how to prevent it. This sequence is the professional standard.'},
@@ -1442,7 +1492,10 @@ const PHASES = [null,
   {id:'p8s1', obj:'Review the AI-generated diff before merging', ctx:'Never merge AI-generated code without reading it. LGTM without reading is how bugs ship.',
    cmd:['review diff'],
    accept:['review diff','review pr','git diff'],
-   acceptFn: v=>v.includes('review')||v.includes('git diff'),
+   acceptFn: v=>{
+     const t=v.toLowerCase();
+     return (t.includes('review')&&(t.includes('diff')||t.includes('pr')))||t.includes('git diff');
+   },
    hint:'Type: review diff  — read the proposed AI-generated changes',
    out:'═══ AI-GENERATED PR: "feat: add pod capacity validation" ═══\n\n--- a/src/routes/pods.ts\n+++ b/src/routes/pods.ts\n@@ -15,6 +15,14 @@\n \n app.post("/pods/reserve", async (c) => {\n   const { podId, partySize } = await c.req.json();\n+\n+  // Validate capacity\n+  const pod = await prisma.pods.findOne({ where: { id: podId } });\n+  if (pod.capacity < partySize) {\n+    return c.json({ error: "Pod too small" }, 400);\n+  }\n+\n   const reserved = await reservePod(podId);\n   return c.json({ reserved });\n });',
    unlockCmd:'review',
@@ -2347,6 +2400,38 @@ function syncDots(){
   const sep2=document.createElement('span');sep2.className='phase-sep';sep2.textContent='SHIP';track.appendChild(sep2);
 }
 function setLola(msg){document.getElementById('lola-msg').textContent=msg}
+function isInteractiveTarget(node){
+  return !!(node && node.closest('input, textarea, button, select, option, .qopt, .janet-opt, .path-card, .mbtn, .ac-pill, .hint-toggle'));
+}
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  const inner=document.getElementById('lola-strip-inner');
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  const hideBtn=document.getElementById('strip-dismiss-btn');
+  const rightBtn=document.getElementById('right-collapse-btn');
+  if(!shell) return;
+
+  shell.classList.toggle('strip-hidden', !!G.stripHidden);
+  shell.classList.toggle('right-collapsed', !!G.rightCollapsed);
+  if(inner){
+    inner.style.animationPlayState = G.stripPaused ? 'paused' : 'running';
+  }
+  if(pauseBtn){
+    pauseBtn.textContent = G.stripPaused ? 'Resume' : 'Pause';
+    pauseBtn.setAttribute('aria-pressed', G.stripPaused ? 'true' : 'false');
+  }
+  if(hideBtn){
+    hideBtn.textContent = G.stripHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', G.stripHidden ? 'true' : 'false');
+  }
+  if(rightBtn){
+    rightBtn.textContent = G.rightCollapsed ? 'Expand' : 'Collapse';
+    rightBtn.setAttribute('aria-pressed', G.rightCollapsed ? 'true' : 'false');
+  }
+}
+function toggleStripPause(){ G.stripPaused=!G.stripPaused; applyUIPreferences(); save(); }
+function toggleStripDismiss(){ G.stripHidden=!G.stripHidden; applyUIPreferences(); save(); }
+function toggleRightPanel(){ G.rightCollapsed=!G.rightCollapsed; applyUIPreferences(); save(); }
 function lolaMessageForStep(step,phaseNum){
   if(!step)return 'Operational guidance unavailable.';
   const phaseTitle=(PHASES[phaseNum]&&PHASES[phaseNum].title)?PHASES[phaseNum].title:'Current phase';
@@ -2355,7 +2440,7 @@ function lolaMessageForStep(step,phaseNum){
   return `${phaseTitle}: ${objective}. ${step.ctx||''} ${missionToken}`.trim();
 }
 function revealCmd(){document.getElementById('obj-cmd-val').classList.remove('blurred');document.getElementById('obj-reveal').textContent='✓';telem('Hint revealed');G.phaseReveal=true;}
-function focusCmd(){$cmd.focus()}
+function focusCmd(evt){if(evt&&isInteractiveTarget(evt.target))return;$cmd.focus()}
 
 /* ── KEYBOARD HANDLER ── */
 $cmd.addEventListener('keydown',e=>{
@@ -2559,6 +2644,36 @@ const LOLA_RETRY_COACH = {
     "Open the full patch for a commit, not just the summary line.",
     "Use the command that shows a commit's content directly.",
     "Show the current HEAD commit details."
+  ],
+  p3s1:[
+    "Start by inspecting the stack trace itself before opening files.",
+    "Use the trace command to identify the first src/ frame.",
+    "Run the stack-trace inspection command now."
+  ],
+  p4s1:[
+    "This step is about static type validation across the project.",
+    "Run the TypeScript compiler in check mode only.",
+    "Use tsc with the no-emit flag to type-check."
+  ],
+  p5s2:[
+    "You need the pod-listing endpoint, not health.",
+    "Fetch the pods route and inspect the JSON shape.",
+    "Use curl against /api/pods."
+  ],
+  p7s1:[
+    "In incidents, logs come before fixes.",
+    "Read the error log to establish timeline and cause.",
+    "Open logs/error.log before doing anything else."
+  ],
+  p8s2:[
+    "Name the hallucinated method and the correct one.",
+    "Focus on Prisma API correctness and missing null handling.",
+    "State that findOne is wrong here and should be findUnique."
+  ],
+  p9s2:[
+    "This step requires both staging and committing.",
+    "First add the changed file, then commit with a message.",
+    "Use git add + git commit -m in sequence."
   ]
 };
 
@@ -2635,6 +2750,7 @@ function showPhaseCheckpoint(fromPhase,toPhase){
   const from=PHASES[fromPhase];
   const to=PHASES[toPhase];
   if(!to)return;
+  analyticsEvent('phase_checkpoint_opened',{fromPhase,toPhase});
   document.getElementById('checkpoint-summary').textContent=`Phase ${fromPhase} complete. This is a safe stopping point.`;
   document.getElementById('checkpoint-complete').textContent=`Completed: Phase ${fromPhase} — ${from?from.title:''}`;
   document.getElementById('checkpoint-next').textContent=`Next: Phase ${toPhase} — ${to.title}`;
@@ -2642,6 +2758,8 @@ function showPhaseCheckpoint(fromPhase,toPhase){
 }
 function startNextPhaseFromCheckpoint(){
   closeModal('checkpoint-modal');
+  analyticsEvent('phase_checkpoint_resumed',{nextPhase:G.phase});
+  telem(`Checkpoint resume into Phase ${G.phase}`);
   G.pendingPhaseStart=false;
   G.checkpointFromPhase=null;
   save();
@@ -2720,7 +2838,7 @@ function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Lieutenant';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
-  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  closeModal('boot-modal');applyUIPreferences();save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
@@ -2784,6 +2902,8 @@ function resumeSession(){
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
   if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  applyUIPreferences();
+  analyticsEvent('session_resumed',{phase:G.phase,step:G.step,pendingPhaseStart:!!G.pendingPhaseStart,bossActive:!!G.bossActive,sandbox:!!G.sandbox});
   if(G.completedPhases.includes(5))addAgent('Analyst','Sigma');
   if(G.completedPhases.includes(8))addAgent('Reviewer','Atlas');
   appendLine(`Welcome back, ${G.name}. Progress restored.`,'ln-lola');blank();
@@ -2827,7 +2947,7 @@ function resumeSession(){
 function doRestart(){if(confirm('Restart Vibe Lieutenant from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
 function shareGrad(){
   const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
-  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');closeModal('grad-modal');
 }
 
 /* ── STARTUP ── */
@@ -2842,6 +2962,7 @@ if(G.phase>1||G.completedPhases.length>0||G.pendingPhaseStart||G.bossActive||G.s
 }else{
   setTimeout(()=>document.getElementById('boot-name').focus(),300);
 }
+applyUIPreferences();
 </script>
 <script src="analytics-client.js"></script>
 </body>
