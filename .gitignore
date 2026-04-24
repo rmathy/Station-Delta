@@ -2,3 +2,6 @@
 Thumbs.db
 *.swp
 *.swo
+Playtesting/node_modules/
+Playtesting/playwright-report/
+Playtesting/test-results/

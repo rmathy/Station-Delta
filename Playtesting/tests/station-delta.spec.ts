@@ -17,6 +17,7 @@ import { test, expect } from '@playwright/test';
 
 const SHORT = 5000;
 const LONG  = 15000;
+const REQUIRE_ANALYTICS_POST = process.env.REQUIRE_ANALYTICS_POST === '1';
 
 // ─── SIM CONFIGS ────────────────────────────────────────────────
 const SIMS = [
@@ -61,6 +62,29 @@ async function bootSim(page, sim) {
   await terminalInput.waitFor({ state: 'attached', timeout: LONG });
 
   return terminalInput;
+}
+
+function watchConsole(page, sim) {
+  const issues: string[] = [];
+
+  page.on('console', msg => {
+    if (msg.type() === 'error' || msg.type() === 'warning') {
+      issues.push(`[console.${msg.type()}] ${msg.text()}`);
+    }
+  });
+
+  page.on('pageerror', err => {
+    issues.push(`[pageerror] ${err.message}`);
+  });
+
+  return {
+    assertClean() {
+      expect(
+        issues,
+        `[${sim.name}] unexpected console/page errors:\n${issues.join('\n')}`
+      ).toEqual([]);
+    },
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -158,6 +182,23 @@ for (const sim of SIMS) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// BLOCK 3.5 — CONSOLE HYGIENE
+// ═══════════════════════════════════════════════════════════════════
+
+for (const sim of SIMS) {
+  test(`[${sim.name}] Console hygiene — no uncaught warnings or errors during boot flow`, async ({ page }) => {
+    const consoleWatch = watchConsole(page, sim);
+    const terminalInput = await bootSim(page, sim);
+
+    await terminalInput.fill('pwd');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#output')).toContainText(/pwd|projects|home|distress/i, { timeout: LONG });
+
+    consoleWatch.assertClean();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BLOCK 4 — UI CONTROLS (Pass B.5)
 // Panel collapse, strip pause/hide
 // ═══════════════════════════════════════════════════════════════════
@@ -237,17 +278,19 @@ for (const sim of SIMS) {
     // Reload and check behavior
     await page.reload({ waitUntil: 'networkidle' });
 
-    const isBackAtLanding = await page.isVisible('.nav-cta');
-    const bootModalVisible = await page.isVisible('#boot-modal');
+    const bootModalVisible = await page.locator('#boot-modal').isVisible().catch(() => false);
+    const terminalVisible = await page.locator('#cmd').isVisible().catch(() => false);
 
     if (bootModalVisible) {
       console.log(`[${sim.name}] State persistence: returns to boot screen on refresh (expected until cloud saves live)`);
-    } else {
+    } else if (terminalVisible) {
       console.log(`[${sim.name}] State persistence: progress retained on refresh`);
+    } else {
+      console.warn(`[${sim.name}] State persistence: neither boot modal nor terminal was visible after refresh`);
     }
 
-    // Either state is acceptable — just document it
-    expect(bootModalVisible || !isBackAtLanding).toBeTruthy();
+    // Either state is acceptable — the page just must not dead-end.
+    expect(bootModalVisible || terminalVisible).toBeTruthy();
   });
 }
 
@@ -287,9 +330,11 @@ for (const sim of SIMS) {
       console.warn(`[${sim.name}] ⚠️ No POST requests detected. Verify analytics-client.js is deployed and env var is set in Vercel.`);
     }
 
-    // Soft assertion — warn don't fail (webhook may be env-gated in CI)
-    // Change to expect(postRequests.length).toBeGreaterThan(0) once confirmed working
-    expect(postRequests.length).toBeGreaterThanOrEqual(0);
+    if (REQUIRE_ANALYTICS_POST) {
+      expect(postRequests.length).toBeGreaterThan(0);
+    } else {
+      expect(postRequests.length).toBeGreaterThanOrEqual(0);
+    }
   });
 }
 

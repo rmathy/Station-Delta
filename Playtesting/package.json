@@ -1,0 +1,15 @@
+{
+  "name": "station-delta-playtesting",
+  "private": true,
+  "version": "1.0.0",
+  "description": "QA harness for Station Delta production sims",
+  "scripts": {
+    "qa:static": "node ./scripts/offline-evidence.mjs",
+    "qa:playwright": "playwright test",
+    "qa:chromium": "playwright test --project=chromium --project=mobile-chrome",
+    "qa:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

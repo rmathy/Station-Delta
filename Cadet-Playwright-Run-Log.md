@@ -12,17 +12,23 @@ Spec: `station-delta.spec.ts`
   - refresh persistence behavior note
 
 ## Current status
-- Script available and reviewed.
-- Selector corrections required before CI use:
-  - replace `hashtag#boot-name` with `#boot-name`
-  - replace `hashtag#cmd` with `#cmd`
-  - replace `hashtag#output` with `#output`
+- Playtesting project now includes:
+  - `Playtesting/package.json`
+  - `Playtesting/README.md`
+  - `Playtesting/scripts/offline-evidence.mjs`
+- Cadet passes the offline evidence preflight for:
+  - terminal live-region attributes
+  - analytics client wiring
+  - checkpoint/resume markers
+  - mobile hardening markers
 - Cadet close patch applied for required accessibility attributes on terminal output:
   - `role="log"`
   - `aria-live="polite"`
+- Full production Playwright run is still blocked on the current network:
+  - Chrome to `https://station-delta-one.vercel.app/` returns `ERR_CONNECTION_CLOSED`
+  - npm install for Playwright may also fail behind the school firewall
 
 ## Next execution step
-1. Update selectors in `station-delta.spec.ts`.
-2. Run against production URL.
+1. Move to an open network.
+2. Run `cd Playtesting && npm install && npm run qa:playwright`.
 3. Save pass/fail output and screenshot artifacts in this log.
-
