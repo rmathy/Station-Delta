@@ -92,6 +92,23 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#mobile-tools-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  background:var(--s2);
+  border:1px solid var(--b2);
+  color:var(--text);
+  padding:3px 10px;
+  border-radius:var(--r4);
+  font-family:var(--mono);
+  font-size:10px;
+  cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.04em;
+}
+#mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
@@ -631,10 +648,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── responsive ── */
 @media(max-width:820px){
   #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
-  #topbar{padding:0 10px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.12em}
+  #cadet-tag{font-size:10px}
   #phase-track{display:none}
-  #tb-right .tbbtn{padding:3px 8px;font-size:10px}
-  #tb-right .tbbtn:nth-child(n+3){display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #career-impact-btn{padding:3px 8px;font-size:10px}
+  #mobile-tools-btn{display:inline-flex}
   #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
   #term-panel #lola-sec{max-height:118px}
@@ -668,6 +689,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="hardmode-pill">HARD MODE</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
+      <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
@@ -851,6 +873,20 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
+<div id="mobile-tools-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">Mobile Tools</div>
+    <div class="msub">The phone layout condenses the top bar. Open support surfaces here without leaving the sim.</div>
+    <div style="display:grid;gap:10px">
+      <button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MAN PAGES</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('gloss-modal')">OPEN GLOSSARY</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('ach-modal')">OPEN ACHIEVEMENTS</button>
+      <button class="mbtn mbtn-p" onclick="restartFromMobileTools()">RESTART TRAINING</button>
+    </div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" style="margin-left:0" onclick="closeModal('mobile-tools-modal')">Close</button></div>
+  </div>
+</div>
+
 <!-- ACHIEVEMENTS -->
 <div id="ach-modal" class="modal">
   <div class="mbox">
@@ -922,6 +958,7 @@ let G = {
   stripHidden:false,
   rightCollapsed:false,
   mobilePresetApplied:false,
+  mobileUiVersion:2,
   analytics:null,
 };
 
@@ -3046,8 +3083,16 @@ function applyMobileLayoutDefaults(){
   if(G.mobilePresetApplied) return;
   // Mobile should prioritize the terminal first.
   G.rightCollapsed = true;
-  G.stripHidden = true;
+  G.stripHidden = false;
   G.mobilePresetApplied = true;
+}
+
+function migrateMobileUiDefaults(){
+  if(!window.matchMedia || !window.matchMedia('(max-width:820px)').matches) return;
+  if((G.mobileUiVersion || 0) >= 2) return;
+  G.stripHidden = false;
+  G.mobileUiVersion = 2;
+  save();
 }
 
 function toggleStripPause(){
@@ -3066,6 +3111,14 @@ function toggleRightPanel(){
   G.rightCollapsed = !G.rightCollapsed;
   applyUIPreferences();
   save();
+}
+function openSupportModal(id){
+  closeModal('mobile-tools-modal');
+  openModal(id);
+}
+function restartFromMobileTools(){
+  closeModal('mobile-tools-modal');
+  doRestart();
 }
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
@@ -3879,6 +3932,7 @@ function resumeSession(){
  
   if(G.completedPhases.includes(6)) addAgent('Manager','Captain');
   if(G.completedPhases.includes(6) && G.agents.length>1) addAgent('Specialist','Engineer');
+  migrateMobileUiDefaults();
   applyMobileLayoutDefaults();
   applyUIPreferences();
  
@@ -3911,11 +3965,13 @@ function resumeSession(){
  
 /* ── STARTUP DECISION ── */
 loadSave();
+migrateMobileUiDefaults();
 applyMobileLayoutDefaults();
 if(window.matchMedia){
   const mobileMq = window.matchMedia('(max-width:820px)');
   const syncMobilePreset = (evt)=>{
     if(!evt.matches || G.mobilePresetApplied) return;
+    migrateMobileUiDefaults();
     applyMobileLayoutDefaults();
     applyUIPreferences();
     save();
