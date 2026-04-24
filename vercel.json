@@ -2,27 +2,27 @@
   "redirects": [
     {
       "source": "/Vibe_Cadet.html",
-      "destination": "/vibe-cadet.html",
+      "destination": "/base/vibe-cadet.html",
       "permanent": true
     },
     {
       "source": "/vibe-engineer-test.html",
-      "destination": "/vibe-engineer.html",
+      "destination": "/base/vibe-engineer.html",
       "permanent": true
     },
     {
       "source": "/Vibe-Engineer-sim.html",
-      "destination": "/vibe-engineer.html",
+      "destination": "/base/vibe-engineer.html",
       "permanent": true
     },
     {
       "source": "/VibeLieutenant.html",
-      "destination": "/vibe-lieutenant.html",
+      "destination": "/base/vibe-lieutenant.html",
       "permanent": true
     },
     {
       "source": "/vibe-lieotenantv2.html",
-      "destination": "/vibe-lieutenant.html",
+      "destination": "/base/vibe-lieutenant.html",
       "permanent": true
     },
     {
