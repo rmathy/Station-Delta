@@ -604,7 +604,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="lola-strip-avatar">L.O.L.A. ▸</div>
     <div id="lola-strip-scroll">
       <div id="lola-strip-inner" class="no-scroll">
-        <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Vibe Cadet. Now you operate. Same terminal, higher stakes.</span>
+        <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Vibe Cadet. Same terminal, but now your judgment affects the whole crew.</span>
       </div>
     </div>
     <div id="lola-strip-ctrls">
@@ -657,7 +657,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         <div id="lola-name">L.O.L.A.</div>
         <div id="lola-online">ready</div>
       </div>
-      <div id="lola-msg">Same terminal as Cadet. Same commands. The scenarios are real now.</div>
+      <div id="lola-msg">Same terminal as Cadet. Faster calls, less hand-holding, more responsibility.</div>
     </div>
 
     <div id="active-cmds">
@@ -685,7 +685,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🎖️</div>
     <div class="mtitle" style="color:var(--gold);font-size:19px">Vibe Lieutenant</div>
-    <div class="msub">The second trainer in the series. You graduated Vibe Cadet — you know the terminal, Git, and how to ship. Now learn to <i>operate</i>: read codebases cold, catch AI errors, review diffs, debug stack traces, and lead a crew through a production incident.</div>
+    <div class="msub">The senior-dev bridge in the series. You already know the terminal, Git, and how to ship. Now learn to <i>operate safely under pressure</i>: orient fast, make review calls, choose validation scope, govern AI-generated changes, and coordinate a crew through a production incident.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · AI-augmented development workflows<br>
       <span>▸</span><b style="color:var(--gold)">Codebase navigation</b> — reading real project structure cold<br>
@@ -730,7 +730,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🌟</div>
     <div class="mtitle" style="text-align:center;color:var(--gold)">Commission Complete</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You don't just ship — you operate.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
     <div class="grad-cert">
       <div class="grad-ct">Field Certification</div>
       <div class="grad-name" id="grad-name">—</div>
@@ -1164,22 +1164,25 @@ const SPACED_CALLBACKS = {
 /* ── CHALLENGES ── */
 const CHALLENGES = {
   1:{
-    title:'Codebase Orientation Challenge',
-    scenario:'You\'ve just joined a team and cloned their repo. You have 5 minutes before standup. What\'s your sequence of commands to understand: (1) what this project does, (2) what language/framework it uses, and (3) how to run it?',
+    title:'Recall Under Load Challenge',
+    scenario:'You\'ve just joined a team and cloned their repo. You have 5 minutes before standup and 1 minute to brief the tech lead. What\'s your sequence of commands to understand: (1) what this project does, (2) what language/framework it uses, (3) how to run it, and (4) what looks operationally risky first?',
     acceptFn:(v)=>{
-      const hasCat=v.includes('cat');
-      const hasReadme=v.includes('readme');
-      const hasManifest=v.includes('package.json');
-      return hasCat&&hasReadme&&hasManifest;
+      const t=v.toLowerCase();
+      const hasLs=t.includes('ls');
+      const hasCat=t.includes('cat');
+      const hasReadme=t.includes('readme');
+      const hasManifest=t.includes('package.json');
+      const hasRiskSignal=t.includes('.env')||t.includes('hidden')||t.includes('config')||t.includes('risk')||t.includes('secret');
+      return hasLs&&hasCat&&hasReadme&&hasManifest&&hasRiskSignal;
     },
-    successMsg:'Right approach: cat README.md for purpose, cat package.json for tech stack and scripts, ls -la for structure. Three commands, full orientation.',
+    successMsg:'Right approach: ls -la for surface area, cat README.md for purpose, cat package.json for stack and scripts. That gives you enough to brief the lead on run path, likely owner, and immediate risk surface without wandering.',
     unlockMsg:'Challenge complete: you can orient yourself on any codebase before your first standup.'
   },
   2:{
-    title:'Diff Review Challenge',
+    title:'Diff Review Decision Challenge',
     scenario:'A teammate opened a PR that changes how user sessions expire. The diff shows:\n\n- const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour\n+ const SESSION_TIMEOUT = 60 * 1000; // 1 hour\n\nThe comment says "1 hour" but is that what the code does now? Type your diagnosis.',
-    acceptFn:(v)=>v.toLowerCase().includes('minute')||v.toLowerCase().includes('60 second')||v.toLowerCase().includes('wrong')||v.toLowerCase().includes('1 min')||v.toLowerCase().includes('bug'),
-    successMsg:'Correct! 60 * 1000 = 60,000 milliseconds = 60 seconds = 1 minute, NOT 1 hour. The comment is wrong and the change is a security regression. This is exactly what diff review catches.',
+    acceptFn:(v)=>{const t=v.toLowerCase();return (t.includes('minute')||t.includes('60 second')||t.includes('1 min'))&&(t.includes('block')||t.includes('request changes')||t.includes('do not approve')||t.includes('wrong')||t.includes('bug'));},
+    successMsg:'Correct! 60 * 1000 = 60,000 milliseconds = 60 seconds = 1 minute, not 1 hour. This is a block-or-request-changes review call, because the behavior and comment disagree and the change creates a session security regression.',
     unlockMsg:'Challenge complete: you caught a real-world off-by-one bug that ships in production every single week somewhere.'
   },
   3:{
@@ -1197,10 +1200,17 @@ const CHALLENGES = {
     unlockMsg:'Challenge complete: you can read a JSON shape and write the access path without trial and error.'
   },
   7:{
-    title:'Incident Response Challenge',
-    scenario:'3:47am. You get paged. The escape pod booking API is returning 500 errors. You have: the error logs, shell access, and the ability to rollback the last deploy. What\'s your sequence?',
-    acceptFn:(v)=>(v.toLowerCase().includes('log')||v.toLowerCase().includes('check'))&&(v.toLowerCase().includes('rollback')||v.toLowerCase().includes('deploy')||v.toLowerCase().includes('revert')),
-    successMsg:'Right sequence: check logs to understand the error → determine if last deploy caused it → rollback if yes → verify service restored → then fix properly. Speed of mitigation matters more than perfect fixes at 3am.',
+    title:'Incident Coordination Challenge',
+    scenario:'3:47am. You get paged. The escape pod booking API is returning 500 errors. You have: the error logs, shell access, and the ability to rollback the last deploy. What\'s your sequence, and what do you tell the rest of the team while mitigation is happening?',
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      const hasDiagnosis=t.includes('log')||t.includes('check');
+      const hasMitigation=t.includes('rollback')||t.includes('deploy')||t.includes('revert');
+      const hasRecovery=t.includes('verify')||t.includes('restore')||t.includes('mitigate');
+      const hasComms=(t.includes('team')||t.includes('stakeholder')||t.includes('status')||t.includes('update')||t.includes('notify'))&&(t.includes('impact')||t.includes('restored')||t.includes('next')||t.includes('investigate'));
+      return hasDiagnosis&&hasMitigation&&hasRecovery&&hasComms;
+    },
+    successMsg:'Right sequence: check logs to understand the error -> determine if last deploy caused it -> rollback if yes -> verify service restored -> communicate status and next actions -> then fix properly. Lieutenant-level work is not just the command order; it is keeping the room aligned while you mitigate.',
     unlockMsg:'Challenge complete: you know the incident response loop. Identify → Isolate → Mitigate → Fix → Post-mortem.'
   },
 };
@@ -1244,11 +1254,11 @@ const BREAKIT = {
    ═══════════════════════════════════════════════════════════════ */
 const PHASES = [null,
 
-/* ── P1: Codebase Navigation ── */
-{title:'Codebase Navigation',
- lolaIntro:"In Cadet you learned ls, cat, and find. You used them on a simple project. Now you're using them on a real production codebase you've never seen. Same commands — but now the goal is orientation, not just practice. Before you change a single line, you need to understand what you're looking at.",
+/* ── P1: Recall Under Load ── */
+{title:'Recall Under Load',
+ lolaIntro:"This phase is not a re-teach. You already know these commands. Lieutenant-level work is using them under time pressure to answer higher-order questions: what system am I in, what looks risky first, and who probably owns the next move. Same terminal. Faster judgment.",
  steps:[
-  {id:'p1s1', obj:'Get the full file listing including hidden files', ctx:'Start every codebase investigation the same way — see everything, including hidden config files.',
+  {id:'p1s1', obj:'Start the 90-second triage scan with a full file listing', ctx:'Start every unfamiliar codebase the same way: surface the config, secrets, and runtime clues before you speculate.',
    cmd:['ls -la','ls -la .'],
    accept:['ls -la','ls -la .','ls -lah'],
    acceptFn: v=>v.startsWith('ls')&&v.includes('l')&&v.includes('a'),
@@ -1256,18 +1266,18 @@ const PHASES = [null,
    out:'total 72\ndrwxr-xr-x  lt  ./\ndrwxr-xr-x  lt  ../\n-rw-r--r--  lt  .env           ← secrets file\n-rw-r--r--  lt  .gitignore\n-rw-r--r--  lt  package.json   ← project manifest\n-rw-r--r--  lt  README.md\ndrwxr-xr-x  lt  src/           ← source code\ndrwxr-xr-x  lt  tests/\n-rw-r--r--  lt  tsconfig.json  ← TypeScript config',
    unlockCmd:'ls',
    jit:{title:'What to look for in a new codebase listing',body:'Five things immediately tell you about a project: <b>package.json</b> (what tech, what scripts), <b>tsconfig.json</b> (TypeScript — good), <b>README.md</b> (purpose and setup), <b>.env</b> (what secrets it needs), and the <b>src/ structure</b> (how the code is organized). Hidden files (starting with <code>.</code>) are configuration — they matter.'},
-   bridge:{title:'Codebase orientation is a daily senior dev skill',body:'When you join a team, get paged for an incident, or review a PR in an unfamiliar part of the codebase — this orientation sequence is what you do first. Every minute spent understanding context saves ten minutes of confused changes.',tags:['Onboarding','Code review','Incidents','Senior engineering']},
+   bridge:{title:'This is where senior engineers buy time',body:'When you join a team, get paged for an incident, or review a PR in an unfamiliar part of the codebase, these first 30 seconds tell you where the risk surface lives. Every minute spent understanding context saves ten minutes of confused changes and bad leadership calls.',tags:['Onboarding','Code review','Incidents','Senior engineering']},
    teach:{title:'ls -la — the full picture',body:'<code>ls -l</code> gives long format (permissions, sizes, dates). <code>ls -a</code> shows hidden files (starting with <code>.</code>). Combined: <code>ls -la</code> shows everything. In any new codebase, this is your first command.'}},
-  {id:'p1s2', obj:'Read the project manifest', ctx:'package.json tells you everything: what this project is, what it depends on, and how to run it.',
+  {id:'p1s2', obj:'Read the manifest to identify stack, run path, and likely owner', ctx:'package.json is not trivia. It tells you what runtime you are in, which scripts are safe, and which teammate probably owns this service.',
    cmd:['cat package.json'],
    accept:['cat package.json'],
    hint:'Type: cat package.json',
    out:'{\n  "name": "escape-pod-api",\n  "version": "2.4.1",\n  "scripts": {\n    "dev":   "bun run src/index.ts",\n    "build": "bun build src/index.ts --outdir dist",\n    "test":  "vitest run",\n    "lint":  "eslint src/"\n  },\n  "dependencies": {\n    "hono": "^3.12.0",\n    "prisma": "^5.8.0"\n  },\n  "devDependencies": {\n    "vitest": "^1.2.0",\n    "typescript": "^5.3.0"\n  }\n}',
    unlockCmd:'cat',
    jit:{title:'Reading package.json like a senior dev',body:'Four things jump out: <b>scripts</b> — <code>bun run dev</code> starts it, <code>bun run test</code> runs tests. <b>dependencies</b> — Hono is a web framework, Prisma is a database ORM. <b>devDependencies</b> — Vitest for testing, TypeScript for types. <b>version</b> — 2.4.1 means this has been in production a while. 30 seconds and you know the whole stack.'},
-   bridge:{title:'package.json is the first file senior devs open',body:'In technical interviews, pairing sessions, and incident response — reading package.json cold and narrating what you see is a direct signal of experience level. It\'s the fastest way to orient on any JavaScript project.',tags:['JavaScript','TypeScript','Node.js','Technical interviews','Onboarding']},
+   bridge:{title:'Manifest reading is operational triage',body:'In technical interviews, pairing sessions, and incidents, reading package.json cold and narrating what you see is a direct signal of experience level. At Lieutenant level, you are not just identifying the stack, you are deciding which run path is safest and who should be looped in.',tags:['JavaScript','TypeScript','Node.js','Technical interviews','Onboarding']},
    teach:{title:'What package.json tells you',body:'<b>name</b>: what this project is. <b>scripts</b>: how to run, build, test, and lint it — always check these before guessing commands. <b>dependencies</b>: what it needs at runtime. <b>devDependencies</b>: what it only needs during development. Version numbers with <code>^</code> allow minor updates.'}},
-  {id:'p1s3', obj:'Find all TypeScript files in the project', ctx:'Map the codebase. Know how many files you\'re dealing with and where they live.',
+  {id:'p1s3', obj:'Map the TypeScript surface before you touch production code', ctx:'Estimate blast radius before you change anything. File count and file placement tell you whether this is a quick fix or a wider coordination problem.',
    cmd:['find . -name "*.ts"'],
    accept:['find . -name "*.ts"','find . -name "*.ts" -type f'],
    acceptFn: v=>v.includes('find')&&v.includes('.ts'),
@@ -1275,22 +1285,22 @@ const PHASES = [null,
    out:'./src/index.ts\n./src/routes/pods.ts\n./src/routes/auth.ts\n./src/middleware/logger.ts\n./src/middleware/auth.ts\n./src/db/client.ts\n./src/utils/formatDate.ts\n./tests/pods.test.ts\n./tests/auth.test.ts',
    unlockCmd:'find',
    jit:{title:'find vs grep — searching files vs searching content',body:'<code>find</code> searches by <b>filename and location</b>: <code>find . -name "*.ts"</code> — all TypeScript files. <code>grep -r</code> searches by <b>content inside files</b>: <code>grep -rn "handleLogin" src/</code> — find where a function is used. Both together let you navigate any codebase.'},
-   bridge:{title:'Mapping a codebase before changing it',body:'Before touching any production code, senior developers do a mental map: how many files, how are they organized, what calls what. <code>find . -name "*.ts" | wc -l</code> gives you the file count instantly.',tags:['Codebase analysis','Refactoring','Code review','Architecture']},
+   bridge:{title:'This is where execution turns into judgment',body:'Before touching production code, strong engineers build a mental map. Lieutenant-level work adds one more question: is this a one-file correction, or are you about to wake up three owners and widen the blast radius?',tags:['Codebase analysis','Refactoring','Code review','Architecture']},
    teach:{title:'find — your codebase map',body:'<code>find [directory] -name [pattern]</code>. The <code>.</code> means start from current directory. The pattern uses wildcards: <code>*.ts</code> matches any TypeScript file. Use <code>-type f</code> for files only, <code>-type d</code> for directories only.'},
    quiz:{q:'You want to find all files containing the word "TODO" across the entire project. Which command is correct?',
     opts:['find . -name "TODO"','grep -rn "TODO" .','ls -la | grep TODO','find . -type TODO'],
     correct:1,fb:'Correct! <code>grep -rn "TODO" .</code> — <code>-r</code> searches recursively, <code>-n</code> shows line numbers, <code>.</code> starts from current directory. find searches filenames; grep searches file contents.'}}
  ],
  challenge:CHALLENGES[1],
- done:'Codebase orientation unlocked. ls -la, cat package.json, find — three commands that orient you in any project cold.',
+ done:'Recall under load unlocked. ls -la, cat package.json, find — not as drills, but as the fastest path to a reliable first call.',
  ach:'navigator'},
 
-/* ── P2: Diff Review ── */
-{title:'Reading Diffs & Git History',
- lolaIntro:"You used git add, commit, and push in Cadet. Now you're on the other side — reading what someone else committed. Diffs are how you see exactly what changed, line by line. This is the most important quality gate in software development. Every bug that ships past this point was in a diff that someone didn't read carefully enough.",
+/* ── P2: Diff Review Decision Gate ── */
+{title:'Diff Review Decision Gate',
+ lolaIntro:"Engineer-level work reads the patch. Lieutenant-level work decides what happens next. Does this ship, does it wait, or does it get blocked right now? Diffs are not just how you understand code changes. They are where you make release-safety calls.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1', obj:'See what changed in the last commit', ctx:'Before touching anything, understand what the last engineer changed.',
+  {id:'p2s1', obj:'Inspect the last change before making a go/no-go call', ctx:'Before you approve anything, understand exactly what changed and what user-facing behavior moved with it.',
    cmd:['git diff HEAD~1'],
    accept:['git diff HEAD~1','git diff HEAD~1 --stat'],
    acceptFn: v=>v.includes('git')&&v.includes('diff')&&(v.includes('HEAD')||v.includes('head')),
@@ -1298,16 +1308,16 @@ const PHASES = [null,
    out:'diff --git a/src/routes/pods.ts b/src/routes/pods.ts\nindex a1b2c3..d4e5f6 100644\n--- a/src/routes/pods.ts\n+++ b/src/routes/pods.ts\n@@ -42,7 +42,7 @@\n \n   const timeout = req.query.timeout;\n-  const LIMIT = parseInt(timeout) || 30000;\n+  const LIMIT = parseInt(timeout) || 5000;\n \n   return pod.reserve(LIMIT);\n',
    unlockCmd:'git',
    jit:{title:'How to read a diff',body:'Every diff has the same anatomy: <b>--- a/file</b> is the old version. <b>+++ b/file</b> is the new version. <b>@@ -42,7 +42,7 @@</b> is the hunk header — line numbers of context. Lines starting with <code>-</code> were removed (red). Lines starting with <code>+</code> were added (green). Lines with neither are unchanged context. Read the <code>-</code> and <code>+</code> lines together to understand the change.'},
-   bridge:{title:'Diff reading is the foundation of code review',body:'Every PR on GitHub, GitLab, or Bitbucket shows diffs. Every engineer reviews them. The ability to read a diff fluently — spotting the intent AND catching the bugs — is what makes code reviews valuable instead of rubber stamps.',tags:['Code review','GitHub','GitLab','Pull requests','Quality']},
+   bridge:{title:'This is where review turns into leadership',body:'Every PR on GitHub, GitLab, or Bitbucket shows diffs. Engineers read them. Senior engineers decide what level of risk is acceptable. If you cannot explain why a change is safe, the answer is not approval.',tags:['Code review','GitHub','GitLab','Pull requests','Quality']},
    teach:{title:'git diff — your change lens',body:'<code>git diff</code> — unstaged changes. <code>git diff HEAD~1</code> — last commit. <code>git diff main..feature</code> — between branches. <code>git diff --stat</code> — summary view. The <code>HEAD~1</code> syntax means "one commit before HEAD". <code>HEAD~3</code> means three commits back.'}},
-  {id:'p2s2', obj:'Inspect the full detail of the latest commit', ctx:'See the commit message, author, and full changes together.',
+  {id:'p2s2', obj:'Read the full commit context before you decide', ctx:'The code matters, but so do intent, timing, and authorship. Good review decisions use all three.',
    cmd:['git show HEAD','git show'],
    accept:['git show head','git show','git show head --stat'],
    acceptFn: v=>v.startsWith('git show'),
    hint:'Type: git show HEAD  — shows the commit metadata and its complete diff',
    out:'commit d4e5f6a (HEAD -> main)\nAuthor: Cadet Maverick <maverick@vibe-ship.io>\nDate:   Thu Apr 17 02:14:33 2026 +0000\n\n    fix: reduce pod reservation timeout\n\n    Pod bookings were timing out after 30s causing user-facing errors.\n    Reduced default timeout to 5s. Refs #1042.\n\ndiff --git a/src/routes/pods.ts b/src/routes/pods.ts\n...(same diff as above)',
    jit:{title:'Commit messages tell the story the code can\'t',body:'A good commit message has: a <b>type</b> (fix, feat, chore, refactor), a <b>subject</b> (what changed, imperative mood), and an optional <b>body</b> (why, refs to tickets). <code>fix: reduce pod reservation timeout</code> tells you this was a bug fix and exactly what was changed. <code>stuff</code> or <code>wip</code> tells you nothing.'},
-   bridge:{title:'git show is your first move in an incident',body:'When production breaks after a deploy, the first thing you run is <code>git show HEAD</code> — what changed last? 80% of production incidents are caused by the most recent deploy. Reading the last commit fast is a survival skill.',tags:['Incident response','Production','Debugging','Git']},
+   bridge:{title:'Commit context changes the review call',body:'When production breaks after a deploy, the first thing you run is <code>git show HEAD</code>. Lieutenant-level review is not only "what changed?" but also "how risky is this, who touched it, and what evidence do I still need before it moves?".',tags:['Incident response','Production','Debugging','Git']},
    teach:{title:'git show — commit forensics',body:'<code>git show</code> combines <code>git log -1</code> (metadata) and <code>git diff HEAD~1</code> (changes) in one command. Useful shortcuts: <code>git show HEAD~2</code> (two commits back), <code>git show abc1234</code> (specific commit hash), <code>git show --stat</code> (summary only).'},
    quiz:{q:'In a diff, a line starting with + means:',
     opts:['This line was present in the old version','This line was added in the new version','This line is a comment','This line contains an error'],
@@ -1315,15 +1325,15 @@ const PHASES = [null,
  ],
  challenge:CHALLENGES[2],
  breakit:BREAKIT[3],
- done:'Diff fluency unlocked. git diff, git show — you can now audit any change before it ships.',
+ done:'Diff review unlocked. git diff and git show now feed a harder skill: approve, request changes, or block with a clear reason.',
  ach:'diff_reader'},
 
-/* ── P3: Stack Trace Debugging ── */
-{title:'Stack Trace Debugging',
- lolaIntro:"In Cadet you ran commands and watched them succeed. In Lieutenant, commands fail — and you have to figure out why. A stack trace is a breadcrumb trail from the crash back to the bug. The key insight: library code shows up first because it caught the error, but YOUR code caused it. Learn to skip past the noise and find your src/ line.",
+/* ── P3: Trace Triage & Failure Strategy ── */
+{title:'Trace Triage & Failure Strategy',
+ lolaIntro:"At this tier, reading the trace is only half the job. The other half is deciding whether you are looking at a local fix, a rollback-now situation, or a wider data or auth problem. A stack trace is not just debugging output. It is evidence for your next call.",
  spacedRep:SPACED_CALLBACKS[3],
  steps:[
-  {id:'p3s1', obj:'Analyze the production error', ctx:'Don\'t guess — read the stack trace. It tells you exactly what happened and where.',
+  {id:'p3s1', obj:'Read the trace before choosing fix versus mitigation', ctx:'Do not guess. Read the trace, locate the failure, and figure out whether this is a contained coding bug or a wider operational problem.',
    cmd:['trace','trace TypeError'],
    accept:['trace','trace typeerror','trace error'],
    acceptFn: v=>v.startsWith('trace'),
@@ -1331,16 +1341,16 @@ const PHASES = [null,
    out:'═══ STACK TRACE ANALYSIS ═══\n\nTypeError: Cannot read properties of undefined (reading \'userId\')\n\nCall stack (most recent first):\n  → [1] validateSession    src/middleware/auth.ts:23\n  → [2] checkPermissions   src/middleware/auth.ts:41\n  → [3] routeHandler       src/routes/pods.ts:15\n  → [4] Router.handle      node_modules/hono/dist/router.js:84\n  → [5] app.fetch          node_modules/hono/dist/hono.js:122\n\n⚡ Tip: Frames 4-5 are library code. Frames 1-3 are YOUR code.',
    unlockCmd:'trace',
    jit:{title:'Reading a stack trace: the method',body:'Step 1: read the <b>error message</b> — <code>Cannot read properties of undefined (reading \'userId\')</code> means something is <code>undefined</code> when you expected an object. Step 2: find the <b>first frame from your own code</b> — <code>src/middleware/auth.ts:23</code>. That\'s where the crash happened. Step 3: read the frames <b>below it</b> to understand what called it. Library frames (node_modules) are noise — skip past them.'},
-   bridge:{title:'Stack trace reading is the #1 gap between junior and mid',body:'Engineering managers consistently report this as the clearest signal of experience level. Juniors see a wall of text and start Googling. Mid-levels read the first src/ frame, open the file, and fix it in minutes. The skill is simply knowing which lines to read.',tags:['Debugging','Node.js','Production','On-call','Career growth']},
+   bridge:{title:'The trace tells you what kind of problem you own',body:'Engineering managers consistently report stack-trace reading as a signal of experience. Lieutenant-level work adds one more layer: you use the trace to decide whether the safest next step is local debugging, rollback, or escalation to another owner.',tags:['Debugging','Node.js','Production','On-call','Career growth']},
    teach:{title:'Stack trace anatomy',body:'Stack traces are read <b>top-down</b> for where the crash is, <b>bottom-up</b> for where it started. Frame 1 is the crash site. The bottom frames are usually the entry point. Library code (node_modules/) is not your problem — your <code>src/</code> frames are. The error message at the top tells you what type of failure occurred.'}},
-  {id:'p3s2', obj:'Open the file where the crash occurred', ctx:'The stack trace told you the file and line. Go read the actual code.',
+  {id:'p3s2', obj:'Open the crash site and name the unsafe assumption', ctx:'The stack trace gave you the location. Now read the code and identify the exact assumption that failed under real traffic.',
    cmd:['read src/middleware/auth.ts'],
    accept:['read src/middleware/auth.ts','cat src/middleware/auth.ts'],
    acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('auth.ts'),
    hint:'Type: read src/middleware/auth.ts  — open the file from the stack trace',
    out:'// src/middleware/auth.ts\n\n 20 | export async function validateSession(req, res, next) {\n 21 |   const token = req.headers[\'authorization\'];\n 22 |   const session = await db.sessions.findUnique({ where: { token } });\n 23 |   const userId = session.userId;  // ← CRASH HERE\n 24 |   req.user = await db.users.findUnique({ where: { id: userId } });\n 25 |   next();\n 26 | }\n\n⚡ Line 23: session could be null if the token is invalid or expired.',
    jit:{title:'The null check pattern — the most common bug in the world',body:'Line 23 assumes <code>session</code> is always a valid object. But <code>findUnique</code> returns <code>null</code> when no record is found. If someone sends an expired or invalid token, <code>session</code> is <code>null</code> and <code>session.userId</code> crashes. The fix: <code>if (!session) return res.status(401).json({ error: "Invalid session" });</code> before line 23.'},
-   bridge:{title:'Null checks prevent the majority of production crashes',body:'The most common runtime error in JavaScript is "Cannot read properties of null/undefined." It almost always means a database query returned nothing and the code assumed it would always return something. A single <code>if (!result) return</code> before accessing properties prevents it.',tags:['Defensive programming','Node.js','TypeScript','Production hardening']},
+   bridge:{title:'This is where you choose the smallest safe fix',body:'The most common runtime error in JavaScript is "Cannot read properties of null/undefined." At Lieutenant level, you are also deciding whether a null guard is enough, whether auth semantics are wrong, and whether the blast radius justifies a hotfix versus rollback.',tags:['Defensive programming','Node.js','TypeScript','Production hardening']},
    teach:{title:'The null handling pattern',body:'Whenever you get data from: a database, an API, user input, or environment variables — assume it might not exist. Check before accessing: <code>if (!session) { handle the error } else { use session.userId }</code>. TypeScript with strict mode will actually catch this at compile time — another reason strict mode matters.'},
    quiz:{q:'The stack trace shows Frame 1 is in node_modules/express and Frame 2 is in src/app.ts. Where is the bug?',
     opts:['In node_modules/express — that\'s the crash site','In src/app.ts — that\'s your code causing the crash','Impossible to tell from a stack trace','In node_modules because it\'s listed first'],
@@ -1348,15 +1358,15 @@ const PHASES = [null,
  ],
  challenge:CHALLENGES[3],
  breakit:BREAKIT[3],
- done:'Stack trace debugging unlocked. Read the error, find the first src/ frame, check for nulls. That\'s 80% of production debugging.',
+ done:'Trace triage unlocked. Read the error, find the first src/ frame, identify the failed assumption, and choose the smallest safe next move.',
  ach:'bug_hunter'},
 
-/* ── P4: TypeScript & Build Errors ── */
-{title:'TypeScript & Build Errors',
- lolaIntro:"You've seen TypeScript files in Cadet — tsconfig.json was in the file listing. Now you're working with the compiler directly. TypeScript errors aren't failures — they're the compiler telling you something would break at runtime. Learning to read them is the difference between junior and mid-level.",
+/* ── P4: Type Risk & Validation Scope ── */
+{title:'Type Risk & Validation Scope',
+ lolaIntro:"The compiler is not just finding bugs for you. It is helping you decide whether a change is safe to release. Lieutenant-level work means reading type errors as release risk, then deciding what validation is required before code moves forward.",
  spacedRep:SPACED_CALLBACKS[4],
  steps:[
-  {id:'p4s1', obj:'Run the TypeScript type checker', ctx:'Before deploying, always check types. Find the errors before your users do.',
+  {id:'p4s1', obj:'Run the compiler to expose release-blocking type risk', ctx:'Before deploying, check types and treat the output like pre-production evidence. The question is not just "is there an error?" but "does this block release?"',
    cmd:['tsc --noEmit','bun run tsc --noEmit'],
    accept:['tsc --noemit','tsc --noEmit','bun run tsc','npx tsc --noemit'],
    acceptFn: v=>v.includes('tsc'),
@@ -1364,31 +1374,31 @@ const PHASES = [null,
    out:'src/routes/pods.ts(67,24): error TS2345:\n  Argument of type \'string | undefined\' is not assignable\n  to parameter of type \'string\'.\n\nsrc/db/client.ts(12,5): error TS2304:\n  Cannot find name \'PrismaClient\'.\n\nFound 2 errors.',
    unlockCmd:'tsc',
    jit:{title:'How to read a TypeScript error',body:'TypeScript errors have a precise format: <code>file(line,col): error TSxxxx: message</code>. The error code (TS2345, TS2304) tells you the category. The message tells you exactly what\'s wrong. TS2345 = type mismatch. TS2304 = undefined variable. TS2322 = wrong type assignment. Don\'t suppress errors with <code>// @ts-ignore</code> — fix them.'},
-   bridge:{title:'TypeScript errors are runtime crashes caught early',body:'Every TypeScript error the compiler catches is a production crash that won\'t happen. TS2345 "string | undefined not assignable to string" means somewhere in your code you\'re passing a value that might not exist into a function that requires it to exist. Fix the type, fix the crash.',tags:['TypeScript','type safety','Production hardening','CI/CD']},
+   bridge:{title:'Compiler output is part of your go/no-go evidence',body:'Every TypeScript error the compiler catches is a production crash that will not happen. Lieutenant-level work is deciding whether the type error is local and quick to fix, whether it reveals missing validation, and whether the branch should move at all until it is clean.',tags:['TypeScript','type safety','Production hardening','CI/CD']},
    teach:{title:'tsc --noEmit — the type check command',body:'<code>tsc --noEmit</code> runs the TypeScript compiler purely to check types — it doesn\'t write any JavaScript files. This is the right command for CI pipelines and pre-deploy checks. If it returns exit code 0, your types are clean. If it returns errors, fix them before deploying.'}},
-  {id:'p4s2', obj:'Diagnose the type error in pods.ts', ctx:'Read the error. Understand what TypeScript is actually telling you.',
+  {id:'p4s2', obj:'Read the route and name the missing guardrail', ctx:'Read the error closely. TypeScript is telling you where the contract is weak and what runtime safeguard is missing.',
    cmd:['read src/routes/pods.ts'],
    accept:['read src/routes/pods.ts','cat src/routes/pods.ts'],
    acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('pods'),
    hint:'Type: read src/routes/pods.ts  — look at line 67 where the error is',
    out:'// src/routes/pods.ts\n\n 64 | app.get("/pods/reserve", async (req) => {\n 65 |   const podId = req.query.podId;   // type: string | undefined\n 66 |   const timeout = req.query.timeout; // type: string | undefined\n 67 |   const reserved = await reservePod(podId, timeout); // ← TS2345 here\n 68 |   return c.json({ reserved });\n 69 | });\n\n// reservePod signature:\n// async function reservePod(podId: string, timeout: string): Promise<Pod>',
    jit:{title:'string | undefined — the most common TypeScript error pattern',body:'<code>req.query.podId</code> is <code>string | undefined</code> because the query parameter might not be in the URL. The function <code>reservePod</code> requires a definite <code>string</code>. TypeScript is protecting you from calling a function with a missing parameter. The fix: check for undefined first — <code>if (!podId) return c.json({ error: "Missing podId" }, 400);</code>'},
-   bridge:{title:'Query parameter validation is a real security concern',body:'Passing undefined query params into database queries or business logic functions causes crashes and can create security vulnerabilities. TypeScript\'s type system forces you to handle the undefined case — this is exactly the kind of bug that reaches production in dynamically-typed languages.',tags:['TypeScript','Input validation','Security','API design']},
+   bridge:{title:'Type safety becomes release safety here',body:'Passing undefined query params into business logic creates crashes and can create security issues. At Lieutenant level, the lesson is not merely "fix the type." It is "add the guardrail, then decide the minimum validation needed before anyone merges this."',tags:['TypeScript','Input validation','Security','API design']},
    teach:{title:'Handling string | undefined',body:'Three patterns: (1) Early return: <code>if (!podId) return error response</code>. (2) Default value: <code>const podId = req.query.podId ?? "default"</code>. (3) Type assertion (only when you\'re certain): <code>const podId = req.query.podId as string</code>. Pattern 1 is safest — it communicates the error to the caller.'},
    quiz:{q:'TypeScript shows error TS2304: "Cannot find name \'PrismaClient\'". What does this most likely mean?',
     opts:['PrismaClient has a bug','The import statement for PrismaClient is missing','The TypeScript version is too old','The file needs to be renamed'],
     janetQuiz:true,
     correct:1,fb:'Correct! TS2304 means a name is being used that TypeScript can\'t find. Almost always this means a missing import. Add <code>import { PrismaClient } from "@prisma/client"</code> at the top of the file.'}}
  ],
- done:'TypeScript fluency unlocked. tsc --noEmit, reading error codes, handling undefined. The compiler is your most honest colleague.',
+ done:'Type risk unlocked. tsc --noEmit, error interpretation, and guardrail thinking now feed a stronger skill: deciding whether code is actually ready to move.',
  ach:'type_safe'},
 
-/* ── P5: API & Data Literacy ── */
-{title:'API & Data Literacy',
- lolaIntro:"You used curl in Cadet's sandbox. Now you're using it for real diagnosis — hitting live endpoints, reading HTTP status codes, tracing JSON responses. Every feature that talks to the outside world involves this. Developers who can read an API response cold and write the access path in their head are significantly faster than those who have to guess-and-run.",
+/* ── P5: API Impact & Response Reading ── */
+{title:'API Impact & Response Reading',
+ lolaIntro:"At Engineer level, API literacy means you can read the response. At Lieutenant level, it also means you can judge impact. Is the service healthy, degraded, unauthenticated, or broken? Can the client retry, or do you need to contain something now? The response shape helps you make that call.",
  spacedRep:SPACED_CALLBACKS[5],
  steps:[
-  {id:'p5s1', obj:'Test the API health endpoint', ctx:'Before integrating an API, always verify it\'s reachable and responding correctly.',
+  {id:'p5s1', obj:'Probe the health endpoint before deciding whether service is degraded or down', ctx:'Before you speculate, confirm whether the service is reachable and how healthy it really is.',
    cmd:['curl /api/health'],
    accept:['curl /api/health','curl /api/health -v'],
    acceptFn: v=>{
@@ -1399,40 +1409,40 @@ const PHASES = [null,
    out:'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"ok","version":"2.4.1","uptime":847293,"db":"connected"}',
    unlockCmd:'curl',
    jit:{title:'HTTP status codes — the universal language of APIs',body:'Every HTTP response has a status code. Know these cold: <b>200</b> OK. <b>201</b> Created. <b>400</b> Bad Request (your fault). <b>401</b> Unauthorized (missing/invalid auth). <b>403</b> Forbidden (auth valid, permission denied). <b>404</b> Not Found. <b>422</b> Unprocessable Entity (validation failed). <b>500</b> Internal Server Error (their fault). <b>503</b> Service Unavailable. 2xx = success. 4xx = client error. 5xx = server error.'},
-   bridge:{title:'curl is the fastest API debugger in existence',body:'In production debugging, API integration work, and CI/CD pipeline health checks — <code>curl</code> is the universal tool. No SDK, no browser, no Postman needed. Every backend developer uses it daily.',tags:['API development','Debugging','DevOps','Integration testing','Backend']},
+   bridge:{title:'Health checks support operational judgment',body:'In production debugging, API integration work, and CI/CD health checks, <code>curl</code> is the universal tool. Lieutenant-level work adds one more question: is this healthy enough to continue service, or are you seeing degraded behavior that needs a coordination call?',tags:['API development','Debugging','DevOps','Integration testing','Backend']},
    teach:{title:'curl — making HTTP requests from the terminal',body:'<code>curl [url]</code> makes a GET request. Add <code>-X POST</code> for POST. Add <code>-H "Content-Type: application/json"</code> for headers. Add <code>-d \'{"key":"value"}\'</code> for a request body. Add <code>-v</code> for verbose output including headers. These four flags cover 90% of API testing scenarios.'}},
-  {id:'p5s2', obj:'Fetch a pod listing and read the data shape', ctx:'APIs return JSON. Understanding the shape of the response tells you exactly what you can do with the data.',
+  {id:'p5s2', obj:'Read the response shape so you can reason about client impact', ctx:'APIs return JSON, but the structure also tells you what downstream clients will break on if a field moves, disappears, or becomes null.',
    cmd:['curl /api/pods'],
    accept:['curl /api/pods','curl /api/pods | jq .'],
    acceptFn: v=>v.includes('curl')&&v.includes('pods'),
    hint:'Type: curl /api/pods  — fetch the pods listing endpoint',
    out:'{\n  "status": "ok",\n  "data": {\n    "pods": [\n      {\n        "id": "pod-001",\n        "status": "available",\n        "capacity": 4,\n        "location": { "deck": 7, "bay": "A" },\n        "reservedUntil": null\n      },\n      {\n        "id": "pod-002",\n        "status": "reserved",\n        "capacity": 2,\n        "location": { "deck": 7, "bay": "B" },\n        "reservedUntil": "2026-04-17T06:00:00Z"\n      }\n    ],\n    "total": 12,\n    "available": 8\n  }\n}',
    jit:{title:'Tracing a JSON response to a JavaScript access path',body:'Given the shape above, to get the first pod\'s deck number: <code>response.data.pods[0].location.deck</code>. Practice this mentally: start at the root, follow each key, index into arrays with <code>[n]</code>. If you can trace the access path without running the code, you can write integrations confidently. This is the skill that separates developers who can work with any API from those who need to guess-and-run.'},
-   bridge:{title:'JSON shape literacy powers every API integration',body:'REST, GraphQL, webhooks, AI model responses — they\'re all JSON. Every time you integrate with an external service, a payment processor, a maps API, or an AI model, you\'re reading and traversing JSON shapes. This mental model never goes away.',tags:['REST','JSON','GraphQL','Webhooks','AI APIs','Integration']},
+   bridge:{title:'Shape literacy is how you estimate blast radius',body:'REST, GraphQL, webhooks, and AI model responses are all JSON. At this tier, you are not just traversing the shape. You are deciding which clients, dashboards, or jobs will break if that shape changes under real traffic.',tags:['REST','JSON','GraphQL','Webhooks','AI APIs','Integration']},
    teach:{title:'Reading JSON shapes',body:'JSON has six types: string, number, boolean, null, object <code>{}</code>, array <code>[]</code>. Nested objects use dot notation: <code>data.pods</code>. Arrays use index notation: <code>pods[0]</code>. Nullable fields (<code>"reservedUntil": null</code>) must be handled — always check for null before accessing nested properties.'},
    quiz:{q:'An API returns 401. What should your code do?',
     opts:['Retry the request immediately','Show the user a "not found" message','Redirect to login or refresh the auth token','Log the error and continue anyway'],
     correct:2,fb:'Correct! 401 Unauthorized means the request lacks valid authentication credentials. The right response is to prompt the user to log in again or attempt a token refresh. It\'s a recoverable auth error, not a "not found" or a crash.'}}
  ],
  challenge:CHALLENGES[5],
- done:'API literacy unlocked. curl, HTTP status codes, JSON shape traversal — you can integrate any API and trace any response.',
+ done:'API impact reading unlocked. curl, status codes, and JSON traversal now support the harder question: what breaks, and how urgent is it?',
  ach:'api_fluent'},
 
-/* ── P6: Testing Fundamentals ── */
-{title:'Testing Fundamentals',
- lolaIntro:"Here's the reality of AI-augmented development: the AI writes code, and sometimes that code is wrong in ways that look right. Tests are your verification layer. You don't need to be a TDD expert — you need to be able to write one test that says: does this function do what it claims? That's it. That's the skill.",
+/* ── P6: Test Scope & Confidence ── */
+{title:'Test Scope & Confidence',
+ lolaIntro:"Senior engineers do not just run tests. They decide what level of evidence is enough for this moment. Hotfix, full regression, targeted smoke, or block entirely. This phase is about using test results to justify confidence instead of treating green output like magic.",
  spacedRep:SPACED_CALLBACKS[6],
  steps:[
-  {id:'p6s1', obj:'Read an existing test file', ctx:'Before writing tests, understand the pattern. Read how existing tests are structured.',
+  {id:'p6s1', obj:'Read an existing test file to understand the confidence boundary', ctx:'Before you add or trust a test, understand what behavior it actually proves and what it still leaves uncovered.',
    cmd:['read tests/auth.test.ts','cat tests/auth.test.ts'],
    accept:['read tests/auth.test.ts','cat tests/auth.test.ts'],
    acceptFn: v=>(v.includes('read')||v.includes('cat'))&&v.includes('test'),
    hint:'Type: read tests/auth.test.ts  — study the test structure before writing your own',
    out:'// tests/auth.test.ts\nimport { describe, it, expect } from "vitest";\nimport { validateToken } from "../src/utils/auth";\n\ndescribe("validateToken", () => {\n\n  it("returns true for a valid token", () => {\n    const result = validateToken("valid-token-abc123");\n    expect(result).toBe(true);\n  });\n\n  it("returns false for an expired token", () => {\n    const result = validateToken("expired-token-xyz");\n    expect(result).toBe(false);\n  });\n\n  it("returns false for an empty string", () => {\n    const result = validateToken("");\n    expect(result).toBe(false);\n  });\n\n});',
    jit:{title:'The anatomy of a test',body:'Every test has three parts: <b>Arrange</b> — set up the input (<code>const result = validateToken("valid-token-abc123")</code>). <b>Act</b> — call the function. <b>Assert</b> — check the output (<code>expect(result).toBe(true)</code>). The <code>describe</code> block groups related tests. Each <code>it</code> block tests one specific behavior. One assertion per test makes failures obvious.'},
-   bridge:{title:'Tests are the contract for AI-generated code',body:'When you ask Claude or Cursor to implement a function, the tests are the specification. Write the tests first (what should this function do?) and the AI implements against them. This is the most effective way to use AI coding assistants — tests as specs, AI as implementer.',tags:['AI-assisted development','TDD','Vitest','Jest','Code quality']},
+   bridge:{title:'Tests are evidence, not ceremony',body:'When you ask Claude or Cursor to implement a function, the tests are the specification. Lieutenant-level work adds one more responsibility: decide whether the tests you have are strong enough to support a merge or whether you still lack the evidence to ship safely.',tags:['AI-assisted development','TDD','Vitest','Jest','Code quality']},
    teach:{title:'Test structure: describe, it, expect',body:'<code>describe("name", () => {})</code> groups related tests. <code>it("should do X", () => {})</code> is one test case — name it in plain English, the behavior it tests. <code>expect(actual).toBe(expected)</code> is the assertion — the check that makes the test pass or fail. <code>toBe</code> for primitives, <code>toEqual</code> for objects/arrays.'}},
-  {id:'p6s2', obj:'Run the test suite', ctx:'Check the current state of the tests — what\'s passing, what\'s failing.',
+  {id:'p6s2', obj:'Run the suite and decide how much confidence it earns', ctx:'Run the tests, but do not stop at pass or fail. Decide what the result means for release confidence and next validation scope.',
    cmd:['bun run test','bun test'],
    accept:['bun run test','bun test','bun run test --run'],
    acceptFn: v=>(v.includes('bun')&&v.includes('test'))||(v.includes('vitest')),
@@ -1440,31 +1450,31 @@ const PHASES = [null,
    out:'✓ tests/auth.test.ts (3 tests)\n  ✓ returns true for a valid token\n  ✓ returns false for an expired token\n  ✓ returns false for an empty string\n\n✗ tests/pods.test.ts (2 tests)\n  ✓ reserves an available pod\n  ✗ rejects reservation when pod is full\n      AssertionError: expected 200 to be 400\n      at tests/pods.test.ts:24\n\nTest Files:  1 passed, 1 failed\nTests:       4 passed, 1 failed',
    unlockCmd:'test',
    jit:{title:'Reading test output',body:'A test failure gives you: the test name (what behavior is broken), the assertion error (expected 200, got 400), and the file and line. This is more useful than a production stack trace because it tells you the exact behavioral contract that was violated. The fix is: understand what the test expected, read the implementation, find where those diverge.'},
-   bridge:{title:'Green test suite = deployable code',body:'In professional teams, CI/CD pipelines run tests on every push. If tests fail, the deploy is blocked automatically. This is the gate that keeps broken code out of production. A failing test is not a problem — it\'s a signal. Fix the code or fix the test (if the test is wrong), then deploy.',tags:['CI/CD','GitHub Actions','Continuous integration','Quality gates']},
+   bridge:{title:'Test output informs the release call',body:'In professional teams, CI/CD pipelines run tests on every push. If tests fail, the deploy is blocked automatically. Lieutenant-level work means deciding whether a targeted fix plus focused tests is enough for a hotfix, or whether the risk demands broader validation before anything moves.',tags:['CI/CD','GitHub Actions','Continuous integration','Quality gates']},
    teach:{title:'What to do with a failing test',body:'Step 1: read the test name — "rejects reservation when pod is full" — that\'s the expected behavior. Step 2: read the assertion — expected 400, got 200. The API is returning 200 (success) when it should return 400 (bad request). Step 3: find the route handler and check the validation logic. The test is correct; the implementation is wrong.'},
    quiz:{q:'A test says: expect(result).toBeDefined(). When will this test FAIL?',
     opts:['When result is the wrong value','When result is undefined or null','When result is 0 or false','When result is an empty string'],
     correct:1,fb:'Correct! toBeDefined() only checks that the value is not undefined. It passes for wrong values, empty strings, false, 0. This is why specific assertions like toBe("exact value") are almost always better. toBeDefined() gives false confidence.'}}
  ],
  breakit:BREAKIT[6],
- done:'Testing fundamentals unlocked. Read tests, run tests, interpret failures. You can now verify that code does what it claims.',
+ done:'Test scope unlocked. Read tests, run them, and decide what level of confidence they actually buy you.',
  ach:'tester'},
 
-/* ── P7: Production Incident Response ── */
-{title:'Production Incident Response',
- lolaIntro:"This is the scenario every on-call engineer faces. Something is broken in production. Users are affected. You have the logs, the terminal, and a git history. The sequence you're about to learn — check logs, identify cause, mitigate first, investigate second — is standard at every engineering team in the world. Slow down. Read the logs. The answer is there.",
+/* ── P7: Incident Coordination ── */
+{title:'Incident Coordination',
+ lolaIntro:"This is where Lieutenant should feel different from Engineer. Yes, you still read the logs and execute the rollback. But now you are also responsible for the room: what is the impact, what is the first containment call, and what happens immediately after service is restored. The commands matter. The sequencing and coordination matter more.",
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
-  {id:'p7s1', obj:'Check the error logs first', ctx:'Before touching anything — find out what\'s actually failing. Never guess.',
+  {id:'p7s1', obj:'Read the logs and form the first incident call', ctx:'Before touching anything, find out what is failing, how broad it is, and whether the last deploy is your leading suspect.',
    cmd:['cat logs/error.log'],
    accept:['cat logs/error.log','cat logs/error.log | tail','tail logs/error.log'],
    acceptFn: v=>(v.includes('cat')||v.includes('tail'))&&v.includes('log'),
    hint:'Type: cat logs/error.log  — read what\'s actually happening before changing anything',
    out:'[02:14:33] ERROR  PrismaClientKnownRequestError\n  code: P2002\n  message: Unique constraint failed on field: `session_token`\n  model: Session\n  target: [session_token]\n\n[02:14:33] ERROR  (repeated 847 times in last 60s)\n\n[02:14:01] INFO   Deploy: d4e5f6a shipped at 02:13:47\n\nLast successful request: 02:13:46',
    jit:{title:'The incident timeline is always in the logs',body:'Three critical pieces of information: (1) the error — <code>P2002 Unique constraint failed</code> — something is trying to insert a duplicate value. (2) the frequency — 847 times in 60 seconds — this is systemic, not a one-off. (3) the correlation — errors started at 02:14:01, deploy shipped at 02:13:47. That 14-second gap is almost certainly causation. The logs told you everything before you changed a single line.'},
-   bridge:{title:'Log reading is the first responder skill of engineering',body:'Every production incident starts here: read the logs, find the error, check the deploy timeline. 80% of incidents are caused by the most recent deploy. If you can correlate an error spike to a deployment timestamp in under 2 minutes, you\'re ahead of most engineers.',tags:['SRE','Incident management','On-call','Observability','Production']},
+   bridge:{title:'First response quality shapes the whole incident',body:'Every production incident starts here: read the logs, find the error, check the deploy timeline. Lieutenant-level work means turning that evidence into a calm first call for the team: what changed, how urgent it is, and what you are doing first.',tags:['SRE','Incident management','On-call','Observability','Production']},
    teach:{title:'The incident log reading checklist',body:'Four things to extract from error logs: (1) <b>What</b> is the error message and code? (2) <b>When</b> did it start? (3) <b>How often</b> is it happening? (4) <b>What changed</b> right before? If errors started within seconds of a deploy — rollback is likely the fastest mitigation.'}},
-  {id:'p7s2', obj:'Rollback the bad deploy', ctx:'You\'ve confirmed the error started with the last deploy. Fastest mitigation: rollback first, fix later.',
+  {id:'p7s2', obj:'Mitigate fast and set the next workstream', ctx:'You confirmed the deploy correlation. Restore service first, then split the follow-up into investigation, validation, and postmortem work.',
    cmd:['fix rollback','git revert HEAD'],
    accept:['fix rollback','git revert head','git revert HEAD'],
    acceptFn: v=>{
@@ -1474,22 +1484,22 @@ const PHASES = [null,
    hint:'Type: fix rollback  — revert to the last known good deploy',
    out:'Rolling back to commit 9f8e7d6 (previous stable)…\nDeploy: 9f8e7d6 → LIVE\n\n✓ Error rate: 847/min → 0/min (took 8 seconds)\n✓ Successful requests resuming\n✓ Service restored at 02:16:44\n\nIncident duration: 3m 11s\n\n⚡ Now: investigate the root cause on a branch, fix it, test it, and redeploy.',
    jit:{title:'Rollback first, investigate second',body:'The order matters: (1) <b>Mitigate</b> — restore service as fast as possible, even if it means reverting working code. Users are waiting. (2) <b>Investigate</b> — once users are unblocked, understand the root cause properly. (3) <b>Fix</b> — implement the actual fix on a branch with tests. (4) <b>Deploy</b> — ship the fix. (5) <b>Post-mortem</b> — write down what happened and how to prevent it. This sequence is the professional standard.'},
-   bridge:{title:'The fastest mitigation is almost always a rollback',body:'Feature flags and blue-green deployments exist specifically for this reason — they make rollbacks instant. Even without them, <code>git revert HEAD</code> and a redeploy is faster than debugging under pressure. Never try to "patch forward" during an active incident unless a rollback would cause worse problems.',tags:['SRE','Deployment','Rollback','Feature flags','Blue-green deployment']},
+   bridge:{title:'Containment beats heroics',body:'Feature flags and blue-green deployments exist specifically for this reason — they make rollbacks instant. Lieutenant-level work means choosing mitigation over ego, then making sure the team knows the next workstreams: verify recovery, investigate root cause, and harden against repeat.',tags:['SRE','Deployment','Rollback','Feature flags','Blue-green deployment']},
    teach:{title:'git revert vs git reset',body:'<code>git revert HEAD</code> creates a new commit that undoes the last commit — safe for shared branches. <code>git reset HEAD~1</code> moves the branch pointer back and rewrites history — dangerous on shared branches. For production rollbacks, always use <code>git revert</code> (or your deploy platform\'s rollback button).'},
    quiz:{q:'The incident is over. What should happen NEXT?',
     opts:['Immediately redeploy the same code','Write a post-mortem documenting what happened and how to prevent it','Blame the developer who wrote the bad code','Wait a week before making any changes'],
     correct:1,fb:'Correct! A blameless post-mortem is the professional standard. Document: timeline, root cause, contributing factors, action items to prevent recurrence. The goal is improving the system, not assigning blame. Teams that do post-mortems well have dramatically fewer repeated incidents.'}}
  ],
  challenge:CHALLENGES[7],
- done:'Incident response unlocked. Logs first, rollback fast, investigate properly, post-mortem always. You can handle a 2am page.',
+ done:'Incident coordination unlocked. Logs first, rollback fast, restore service, then lead the follow-through instead of improvising after the fire is out.',
  ach:'incident_cmd'},
 
-/* ── P8: AI Code Review ── */
-{title:'AI Code Review',
- lolaIntro:"You've been using AI throughout this series. Now you're going to look under the hood at what AI gets wrong — and why. The hallucination patterns are consistent and learnable: wrong method names, missing null guards, outdated API usage. Once you know the patterns, you can review AI code in 60 seconds and catch the bugs before they ship.",
+/* ── P8: AI Merge Governance ── */
+{title:'AI Merge Governance',
+ lolaIntro:"You have already used AI. This phase is about governing it. Lieutenant-level work is not merely spotting hallucinations. It is deciding whether AI-generated code is safe enough to merge, what evidence is missing, and when the answer is an immediate block.",
  spacedRep:SPACED_CALLBACKS[8],
  steps:[
-  {id:'p8s1', obj:'Review the AI-generated diff before merging', ctx:'Never merge AI-generated code without reading it. LGTM without reading is how bugs ship.',
+  {id:'p8s1', obj:'Review the AI-generated diff before making a merge call', ctx:'Never merge AI-generated code without reading it. LGTM without reading is how bugs ship and how trust in AI disappears.',
    cmd:['review diff'],
    accept:['review diff','review pr','git diff'],
    acceptFn: v=>{
@@ -1500,9 +1510,9 @@ const PHASES = [null,
    out:'═══ AI-GENERATED PR: "feat: add pod capacity validation" ═══\n\n--- a/src/routes/pods.ts\n+++ b/src/routes/pods.ts\n@@ -15,6 +15,14 @@\n \n app.post("/pods/reserve", async (c) => {\n   const { podId, partySize } = await c.req.json();\n+\n+  // Validate capacity\n+  const pod = await prisma.pods.findOne({ where: { id: podId } });\n+  if (pod.capacity < partySize) {\n+    return c.json({ error: "Pod too small" }, 400);\n+  }\n+\n   const reserved = await reservePod(podId);\n   return c.json({ reserved });\n });',
    unlockCmd:'review',
    jit:{title:'Three things to check in every AI diff',body:'(1) <b>Does it use real APIs?</b> — <code>prisma.pods.findOne</code> doesn\'t exist in Prisma. The correct method is <code>findUnique</code>. AI mixes up library APIs constantly. (2) <b>Are there null checks?</b> — <code>pod.capacity</code> will crash if <code>pod</code> is null (pod not found). (3) <b>Is the logic correct?</b> — the capacity check looks right, but the missing null check means a request for a non-existent pod will crash instead of returning 404.'},
-   bridge:{title:'AI hallucinations have a pattern',body:'AI code review is rapidly becoming a core engineering skill. The hallucination patterns are consistent: wrong method names from similar libraries, missing null checks on database queries, incorrect error handling, subtle off-by-one errors in loops, and hardcoded values that should be configurable.',tags:['Claude Code','Cursor','Copilot','AI safety','Code review']},
+   bridge:{title:'This is AI governance at the PR layer',body:'AI code review is rapidly becoming a core engineering skill. The hallucination patterns are consistent: wrong method names, missing null checks, incorrect error handling, subtle off-by-one errors, and hardcoded values. Lieutenant-level work is deciding whether the diff gets blocked until real verification exists.',tags:['Claude Code','Cursor','Copilot','AI safety','Code review']},
    teach:{title:'The AI code review checklist',body:'Before approving any AI-generated code: (1) verify every library API call against actual documentation, (2) check that database queries handle the null/not-found case, (3) trace any user input through to where it\'s used — is it validated?, (4) run the tests — do they still pass?, (5) for security-sensitive code (auth, payments) — extra scrutiny always.'}},
-  {id:'p8s2', obj:'Identify and fix the hallucination', ctx:'You spotted the bug. Now articulate what\'s wrong and how to fix it.',
+  {id:'p8s2', obj:'Block the unsafe parts and state the required fix', ctx:'You spotted the bug. Now articulate what is unsafe, what the correct fix is, and why this should not merge yet.',
    cmd:['fix findUnique','fix prisma','fix hallucination'],
    accept:['fix findUnique','fix prisma','fix hallucination','fix api'],
    acceptFn: v=>{
@@ -1520,7 +1530,7 @@ const PHASES = [null,
    hint:'Type: fix findUnique  — correct the hallucinated API call',
    out:'═══ FIX APPLIED ═══\n\n- const pod = await prisma.pods.findOne({ where: { id: podId } });\n+ const pod = await prisma.pods.findUnique({ where: { id: podId } });\n+ if (!pod) return c.json({ error: "Pod not found" }, 404);\n\n✓ Hallucination corrected: findOne → findUnique\n✓ Null check added: handles pod not found\n✓ TypeScript types: now satisfied\n\n⚡ Two fixes from one review pass. This is why you read diffs.',
    jit:{title:'findOne vs findUnique — why AI gets this wrong',body:'Mongoose (MongoDB\'s ORM) uses <code>findOne()</code>. Prisma uses <code>findUnique()</code>. Sequelize uses <code>findOne()</code>. The AI was trained on all of them and sometimes crosses the wires. This exact error — calling a method that doesn\'t exist — is one of the most common AI code generation bugs. The fix is always the same: verify against the official docs.'},
-   bridge:{title:'Catching AI hallucinations is a competitive advantage',body:'As AI coding assistants become standard, the developers who ship faster aren\'t those who trust AI blindly — they\'re those who can review AI output quickly and correctly. Catching a hallucination in review takes 30 seconds. Catching it in production takes hours.',tags:['AI-assisted development','Code review','Prisma','TypeScript','Production safety']},
+   bridge:{title:'The win is not speed alone. It is safe speed.',body:'As AI coding assistants become standard, the developers who ship faster are not those who trust AI blindly. They are the ones who can review AI output quickly, explain the risk clearly, and require the right fix before it reaches production.',tags:['AI-assisted development','Code review','Prisma','TypeScript','Production safety']},
    teach:{title:'Hallucination patterns to watch for',body:'Common AI code hallucinations: (1) <b>Wrong library method names</b> — especially across similar ORMs/frameworks. (2) <b>Missing null guards</b> on database queries. (3) <b>Outdated API usage</b> — calling APIs that changed in a major version. (4) <b>Wrong error codes</b> — returning 500 instead of 400 for validation errors. (5) <b>Off-by-one in loops</b> — <code>< length</code> vs <code><= length</code>.'},
    quiz:{q:'An AI generates code using React.createClass(). It runs without errors. Should you ship it?',
     opts:['Yes — if it works it\'s fine','No — createClass was removed in React 16. The AI used outdated API knowledge','Yes — older APIs are more stable','No — AI code should never be shipped'],
@@ -1528,15 +1538,15 @@ const PHASES = [null,
     correct:1,fb:'Correct! React.createClass() was removed in React 16 and is over 7 years old. If it "works," you\'re probably running an ancient React version or a compatibility shim. The AI was trained on old examples. Always verify that APIs it uses still exist in the version you\'re running.'}}
  ],
  breakit:BREAKIT[8],
- done:'AI code review unlocked. Verify APIs, check for nulls, trace user input. Trust but verify — then ship faster than everyone who doesn\'t.',
+ done:'AI merge governance unlocked. Verify APIs, check for nulls, and make the right merge call instead of outsourcing judgment to the model.',
  ach:'ai_auditor'},
 
-/* ── P9: Team Workflow ── */
-{title:'Team Workflow & Deployment',
- lolaIntro:"Final phase. In Cadet you learned to ship: git add, commit, push, deploy. Now you're doing it in a team context — branches, PRs, review gates, deployment pipelines. These structures exist because multiple engineers touching the same codebase without coordination is chaos. This is the last thing between you and J.A.N.E.T.",
+/* ── P9: Release Gate & Team Workflow ── */
+{title:'Release Gate & Team Workflow',
+ lolaIntro:"Final phase before J.A.N.E.T. In Cadet you learned to ship. In Lieutenant you are making the release-safe version of those same moves: branch hygiene, reviewer-ready commits, and evidence that helps someone else decide yes or no. This is not process theater. This is how teams keep incidents from happening twice.",
  spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1', obj:'Create a feature branch for your fix', ctx:'Never commit directly to main. Branch first — it\'s how teams work in parallel without collisions.',
+  {id:'p9s1', obj:'Open a fix branch so the hotfix has a safe review path', ctx:'Never commit directly to main. Branch first so the fix can be reviewed, validated, and reverted cleanly if needed.',
    cmd:['git checkout -b fix/escape-pod-timeout'],
    accept:['git checkout -b fix/escape-pod-timeout','git checkout -b fix/pod','git checkout -b feature/'],
    acceptFn: v=>v.includes('git checkout -b')||v.includes('git switch -c'),
@@ -1544,29 +1554,35 @@ const PHASES = [null,
    out:'Switched to a new branch \'fix/escape-pod-timeout\'\n\n💡 Branch naming conventions matter:\n  fix/    → bug fixes\n  feat/   → new features\n  chore/  → maintenance, deps\n  refactor/ → code improvements\n  docs/   → documentation',
    unlockCmd:'git',
    jit:{title:'Why branches exist',body:'Without branches, two engineers editing the same file create merge conflicts constantly. Branches let you work in isolation: your changes don\'t affect main until you merge them. This also enables code review (PRs), CI testing, and easy rollback — the infrastructure of professional software development.'},
-   bridge:{title:'Branch conventions are team communication',body:'A branch named <code>fix/escape-pod-timeout</code> tells your team exactly what you\'re doing without opening the code. Branch naming conventions are a lightweight coordination mechanism — they make CI rules, auto-labeling, and CHANGELOG generation possible.',tags:['Git workflow','GitHub flow','Team coordination','CI/CD','Semantic commits']},
+   bridge:{title:'Branch names are part of incident clarity',body:'A branch named <code>fix/escape-pod-timeout</code> tells your team exactly what you are doing without opening the code. During a live issue, that clarity matters because people are scanning branches, CI runs, and PRs quickly.',tags:['Git workflow','GitHub flow','Team coordination','CI/CD','Semantic commits']},
    teach:{title:'git checkout -b — create and switch',body:'<code>git checkout -b branchname</code> creates a new branch from wherever you currently are and switches to it. <code>git switch -c branchname</code> is the modern equivalent. To list all branches: <code>git branch -a</code>. To switch back to main: <code>git checkout main</code>. To delete a branch: <code>git branch -d branchname</code>.'}},
-  {id:'p9s2', obj:'Stage and commit your fix', ctx:'Good commit messages are documentation. Future you — and your teammates — will read them.',
+  {id:'p9s2', obj:'Stage and commit the hotfix with a reviewer-ready message', ctx:'Good commit messages are documentation and triage support. Future you, your reviewer, and incident responders will read them.',
    cmd:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"'],
    accept:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"','git add src/routes/pods.ts; git commit -m "fix: correct findUnique call and add null guard"'],
-   acceptFn: v=>v.includes('git add')&&v.includes('git commit')&&v.includes('-m'),
+   acceptFn: v=>{
+     const t=v.toLowerCase();
+     return t.includes('git add')&&t.includes('pods.ts')&&t.includes('git commit')&&t.includes('-m')&&t.includes('fix:')&&t.includes('findunique')&&t.includes('null guard');
+   },
    hint:'Type: git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"',
    out:'[fix/escape-pod-timeout a3b4c5d] fix: correct findUnique call and add null guard\n 1 file changed, 3 insertions(+), 1 deletion(-)\n\n✓ Commit message follows conventional commits format\n✓ Scope is specific: 1 file, 1 concern\n✓ Message explains WHAT changed (not just "fixed bug")',
    jit:{title:'Conventional Commits — the professional standard',body:'The <code>type: description</code> format is called Conventional Commits. Types: <b>fix</b> (bug fix, bumps patch version), <b>feat</b> (new feature, bumps minor version), <b>chore</b> (maintenance), <b>refactor</b> (no behavior change), <b>docs</b> (documentation), <b>test</b> (adding tests). Tools like semantic-release use these to automatically generate changelogs and version bumps.'},
-   bridge:{title:'Good commit history is a career asset',body:'In technical interviews, senior roles, and code reviews — your commit history is read by your peers. Clear, focused commits with informative messages signal professional practice. "fixed stuff" or single monolithic commits of 40 files signal the opposite.',tags:['Conventional commits','Git','Code review','Technical interviews','Team culture']},
+   bridge:{title:'Commit history is operational context',body:'In technical interviews, senior roles, and code reviews, your commit history is read by your peers. Under incident pressure, it is also part of recovery. Clear, focused commits with informative messages help the next person decide whether the change is safe, reversible, and reviewable.',tags:['Conventional commits','Git','Code review','Technical interviews','Team culture']},
    teach:{title:'What makes a good commit message',body:'(1) Use imperative mood: "fix bug" not "fixed bug". (2) Explain WHAT, not HOW: "add null guard" not "added if statement". (3) One concern per commit. (4) Reference tickets when relevant: "Refs #1042". (5) Keep subject under 72 chars. If you need to explain WHY, add a commit body separated by a blank line.'}},
-  {id:'p9s3', obj:'Push the branch and open a PR', ctx:'Your fix is ready. Share it for review — the last gate before production.',
+  {id:'p9s3', obj:'Push the hotfix branch and move it into review', ctx:'Your fix is ready. Push it with enough clarity that CI, reviewers, and release owners can decide quickly.',
    cmd:['git push origin fix/escape-pod-timeout'],
    accept:['git push origin fix/escape-pod-timeout','git push','git push origin'],
-   acceptFn: v=>v.includes('git push'),
+   acceptFn: v=>{
+     const t=v.toLowerCase();
+     return t.includes('git push')&&t.includes('origin')&&t.includes('fix/escape-pod-timeout');
+   },
    hint:'Type: git push origin fix/escape-pod-timeout',
    out:'Enumerating objects: 5, done.\nCounting objects: 100%\nWriting objects: 100%\n\nTo github.com:vibe-ship/escape-pod-api.git\n * [new branch]  fix/escape-pod-timeout → fix/escape-pod-timeout\n\n╔══════════════════════════════════════════╗\n║  ✓ Branch pushed to GitHub               ║\n║  ✓ PR auto-created: #1043                ║\n║  ✓ CI running: tests + type check        ║\n║  ✓ 1 reviewer assigned (auto)            ║\n╚══════════════════════════════════════════╝\n\n⚡ CI must pass and 1 approval required before merge.',
    jit:{title:'What happens when you push a branch',body:'Modern repos are configured so that pushing a branch automatically: creates a PR draft, triggers CI (runs tests, type check, lint), notifies reviewers, and starts the deploy preview. The PR is the integration point — it\'s where your work enters the team\'s awareness. Write a clear PR description: what changed, why, how to test it.'},
-   bridge:{title:'The PR lifecycle is how professional teams ship',body:'feature branch → PR → CI green → 1+ approvals → merge to main → auto-deploy to staging → manual approval → production. This pipeline is standard at every company from 5 engineers to 5,000. Understanding each gate and why it exists makes you effective at any team scale.',tags:['GitHub','GitLab','CI/CD','Code review','Deployment pipeline','Team workflow']},
+   bridge:{title:'The pipeline is a decision system, not just a conveyor belt',body:'feature branch -> PR -> CI green -> approvals -> merge to main -> staging -> production. This pipeline exists so risk gets evaluated in the right order. Lieutenant-level work means feeding that system with clear commits, reviewable diffs, and enough evidence to support a release call.',tags:['GitHub','GitLab','CI/CD','Code review','Deployment pipeline','Team workflow']},
    teach:{title:'git push origin branchname',body:'<code>git push</code> alone pushes to the tracked remote. <code>git push origin branchname</code> is explicit — always safe. First push of a new branch needs <code>origin branchname</code>. After that, <code>git push</code> is enough. <code>git push --force</code> rewrites remote history — dangerous on shared branches, sometimes necessary on your own feature branch.'},
    isFinalBeforeBoss:true}
  ],
- done:null,
+ done:'Release gate unlocked. You can move a fix through branch, commit, and review flow in a way that supports a safe go/no-go decision.',
  ach:'team_player'},
 ];
 
@@ -1577,23 +1593,23 @@ const PHASES = [null,
    ════════════════════════════════════════════════════════════════ */
 const BOSS_STEPS = [
   {
-    scenario:'Production alert. The escape-pod-api is returning 500 errors on GET /api/pods. You have 90 seconds before users notice. Your first action is to find the entry point and trace the request path.',
-    prompt:'Navigate to the main server file to understand request routing.',
+    scenario:'Production alert. The escape-pod-api is returning 500 errors on GET /api/pods. You have 90 seconds before users notice. Your first action is to find the entry point, map the blast path, and avoid chasing the wrong file under pressure.',
+    prompt:'Navigate to the main server file to map request routing and likely blast radius.',
     hint:'Read the entry point — the main server file.',
     accept:['read src/index.ts','cat src/index.ts'],
     acceptFn:v=>(v.includes('read')||v.includes('cat'))&&v.includes('src/index.ts'),
     out:'// src/index.ts\nimport { Hono } from "hono"\nimport { podsRouter } from "./routes/pods"\nimport { authMiddleware } from "./middleware/auth"\n\nconst app = new Hono()\napp.use("*", authMiddleware)\napp.route("/api/pods", podsRouter)\n\nexport default app\n\n→ Request path: authMiddleware → podsRouter → handler\n→ Next: read the pods router to find the failing handler.',
   },
   {
-    scenario:'You read the pods router. The GET /api/pods handler is calling db.pod.findMany() but the Prisma client is throwing. The stack trace shows:\n\nError: PrismaClientInitializationError\n  at /src/db/client.ts:8:3\n  at Object.<anonymous> (/src/routes/pods.ts:14:28)\n\nDiagnose the likely cause.',
-    prompt:'Read the database client file to find the initialization error.',
+    scenario:'You read the pods router. The GET /api/pods handler is calling db.pod.findMany() but the Prisma client is throwing. The stack trace shows:\n\nError: PrismaClientInitializationError\n  at /src/db/client.ts:8:3\n  at Object.<anonymous> (/src/routes/pods.ts:14:28)\n\nDiagnose the likely cause and decide whether this is rollback-now or patch-forward-now territory.',
+    prompt:'Read the database client file and confirm the operational cause of failure.',
     hint:'Read the db client — where Prisma is initialized.',
     accept:['read src/db/client.ts','cat src/db/client.ts','trace src/db/client.ts'],
     acceptFn:v=>(v.includes('read')||v.includes('cat')||v.includes('trace'))&&v.includes('client'),
     out:'// src/db/client.ts\nimport { PrismaClient } from "@prisma/client"\n\nconst db = new PrismaClient({\n  datasources: { db: { url: process.env.DATABASE_URL } }\n})\n\nexport { db }\n\n⚠ DATABASE_URL is undefined in this environment.\n→ The Prisma client cannot initialize without a connection string.\n→ Root cause: missing environment variable in production deployment.',
   },
   {
-    scenario:'Root cause identified: DATABASE_URL is missing from the production environment. The deployment 22 minutes ago did not include the secrets. Classic. You need to initiate the incident response playbook — first action is to roll back the deployment to restore service.',
+    scenario:'Root cause identified: DATABASE_URL is missing from the production environment. The deployment 22 minutes ago did not include the secrets. Classic. You need to initiate the incident response playbook and make the containment call now, not after a long debug session.',
     prompt:'Execute a deployment rollback to restore the last known-good version.',
     hint:'Use git to revert to the previous commit and redeploy.',
     accept:['git revert','git rollback','fix rollback','fix deploy rollback','git revert head'],
@@ -1601,7 +1617,7 @@ const BOSS_STEPS = [
     out:'Reverting to commit d4e5f6a (previous deployment)…\n\nRunning health checks on reverted build…\n  GET /api/health → 200 OK\n  GET /api/pods   → 200 OK (47 pods returned)\n  DB connection   → ✓ connected\n\n✓ Service restored. Incident duration: 4 minutes.\n✓ Zero data loss. Users impacted: ~140.\n\n→ Next: write the post-mortem and fix the root cause.',
   },
   {
-    scenario:'Service is restored. Now you\'re reviewing the PR that caused the outage. The engineer used an AI assistant to write the deployment config. The AI generated this Dockerfile line:\n\n  ENV DATABASE_URL="postgresql://localhost:5432/mydb"\n\nThis is in the committed Dockerfile. Identify the exact problem.',
+    scenario:'Service is restored. Now you\'re reviewing the PR that caused the outage. The engineer used an AI assistant to write the deployment config. The AI generated this Dockerfile line:\n\n  ENV DATABASE_URL="postgresql://localhost:5432/mydb"\n\nThis is in the committed Dockerfile. Identify the exact problem and why this should block the change.',
     prompt:'Flag the AI-generated security and operational anti-pattern.',
     hint:'Review the Dockerfile line — what is wrong with it specifically?',
     accept:['review dockerfile hardcoded database_url localhost','hardcoded database_url localhost in dockerfile'],
@@ -1609,11 +1625,14 @@ const BOSS_STEPS = [
     out:'AI Code Review: ISSUES FOUND\n\n1. Hardcoded credentials in Dockerfile\n   → Never commit database URLs to source control.\n   → Secrets in a Docker image are readable by anyone with image access.\n\n2. Localhost in production config\n   → "localhost" only works inside the container itself.\n   → A real production DB runs on a separate host.\n\n3. Correct approach:\n   → Use Docker secrets or inject DATABASE_URL at runtime:\n      docker run -e DATABASE_URL="$DB_URL" escape-pod-api\n   → Or use a secrets manager: AWS Secrets Manager, Vault, Doppler.',
   },
   {
-    scenario:'Incident resolved. Review passed. Now close the loop properly — open a PR with the fix (adding DATABASE_URL to the CI secrets config) and document what happened so the team learns from it.',
+    scenario:'Incident resolved. Review passed. Now close the loop properly. Push the fix branch, open the PR, and leave behind enough context that the next engineer understands both the fix and the incident trail.',
     prompt:'Push the fix branch and open a PR with a clear description of the change.',
     hint:'Use git push to push your fix branch.',
     accept:['git push','git push origin','git push origin fix/add-database-url-secret'],
-    acceptFn:v=>v.includes('git push'),
+    acceptFn:v=>{
+      const t=v.toLowerCase();
+      return t.includes('git push')&&(t.includes('origin')||t.includes('fix/add-database-url-secret'));
+    },
     out:'Branch fix/add-database-url-secret pushed.\n\nPR #1044 auto-created:\n  Title: fix: add DATABASE_URL to production secrets config\n  Body: Fixes the outage from 2026-04-20.\n        Root cause: DATABASE_URL not set in prod environment.\n        Fix: Added to Doppler production environment.\n        Post-mortem: docs/postmortems/2026-04-20-db-url.md\n\n✓ CI: passing\n✓ 1 reviewer assigned\n✓ Linked to incident #INC-2204\n\nAll 5 steps complete.',
   },
 ];
