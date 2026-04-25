@@ -255,53 +255,66 @@
       for (const [key, aliases] of Object.entries(COL)) {
         ci[key] = findCol(headers, aliases);
       }
+      const ciPayload = findCol(headers, ["payload"]);
  
       const limit = Number(document.getElementById("limit").value || 500);
       const sliced = rows.slice(-limit);
  
       const sessions = new Set();
-      let retries = 0, hints = 0, ttrSum = 0, ttrCount = 0;
+      let totalEvents = 0, retries = 0, hints = 0, ttrSum = 0, ttrCount = 0;
       const byCourse = new Map();
       const byType   = new Map();
  
       for (const row of sliced) {
-        const course   = g(row, ci.courseId)  || "unknown";
-        const sid      = g(row, ci.sessionId) || "unknown";
-        const etype    = g(row, ci.eventType) || "unknown";
-        const correct  = g(row, ci.correct);
-        const ttrRaw   = g(row, ci.ttrMs);
-        const hintRaw  = g(row, ci.hint);
- 
+        const course = g(row, ci.courseId) || "unknown";
+        const sid    = g(row, ci.sessionId) || "unknown";
         sessions.add(sid);
  
         if (!byCourse.has(course)) byCourse.set(course, {sessions:new Set(),events:0,retries:0,hints:0,ttrSum:0,ttrCount:0});
         const cr = byCourse.get(course);
         cr.sessions.add(sid);
-        cr.events++;
  
-        byType.set(etype, (byType.get(etype)||0) + 1);
+        // Parse the payload JSON to get real events array
+        let events = [];
+        const payloadRaw = g(row, ciPayload);
+        if (payloadRaw) {
+          try {
+            const p = JSON.parse(payloadRaw);
+            if (Array.isArray(p.events)) events = p.events;
+          } catch(e) {}
+        }
  
-        // Retries: event type contains "attempt" and correct is false/no/0
-        const isIncorrect = correct !== undefined && /^(false|no|0|f|n)$/i.test(correct.trim());
-        const isAttempt   = /attempt/i.test(etype);
-        if (isAttempt && isIncorrect) { retries++; cr.retries++; }
+        // If no payload events, fall back to row-level event type column
+        if (events.length === 0) {
+          const etype = g(row, ci.eventType);
+          if (etype) events = [{ type: etype, correct: g(row, ci.correct), ttrMs: parseFloat(g(row, ci.ttrMs)) }];
+        }
  
-        // Hints: event type or hint column
-        const isHint = /hint/i.test(etype) || (hintRaw && /^(true|yes|1|t|y)$/i.test(hintRaw.trim()));
-        if (isHint) { hints++; cr.hints++; }
+        cr.events += events.length;
+        totalEvents += events.length;
  
-        // TTR
-        const ttrVal = parseFloat(ttrRaw);
-        if (Number.isFinite(ttrVal) && ttrVal > 0) {
-          // auto-detect if stored as seconds vs ms (assume >1000 = ms)
-          const ms = ttrVal > 1000 ? ttrVal : ttrVal * 1000;
-          ttrSum += ms; ttrCount++;
-          cr.ttrSum += ms; cr.ttrCount++;
+        for (const e of events) {
+          const etype = String(e.type || "unknown");
+          byType.set(etype, (byType.get(etype)||0) + 1);
+ 
+          // Retries: step_attempt where correct === false
+          if (/attempt/i.test(etype) && e.correct === false) { retries++; cr.retries++; }
+ 
+          // Hints
+          if (/hint/i.test(etype)) { hints++; cr.hints++; }
+ 
+          // TTR
+          const ttrVal = Number(e.ttrMs);
+          if (Number.isFinite(ttrVal) && ttrVal > 0) {
+            const ms = ttrVal > 1000 ? ttrVal : ttrVal * 1000;
+            ttrSum += ms; ttrCount++;
+            cr.ttrSum += ms; cr.ttrCount++;
+          }
         }
       }
  
       document.getElementById("kPackets").textContent  = sliced.length;
-      document.getElementById("kEvents").textContent   = sliced.length;
+      document.getElementById("kEvents").textContent   = totalEvents;
       document.getElementById("kSessions").textContent = sessions.size;
       document.getElementById("kRetries").textContent  = retries;
       document.getElementById("kHints").textContent    = hints;
@@ -335,14 +348,22 @@
  
       const packetBody = emptyBody("#packetTable");
       [...sliced].reverse().slice(0,60).forEach(row => {
+        // Parse payload for event list
+        let rowEvents = [];
+        const payloadRaw2 = g(row, ciPayload);
+        if (payloadRaw2) {
+          try { const p = JSON.parse(payloadRaw2); if (Array.isArray(p.events)) rowEvents = p.events; } catch(e) {}
+        }
+        const etypes = rowEvents.length ? rowEvents.map(e=>e.type||"?").join(", ") : (g(row, ci.eventType)||"—");
+        const correctVals = rowEvents.length ? rowEvents.map(e=>e.correct===true?"✓":e.correct===false?"✗":"—").join(" ") : (g(row,ci.correct)||"—");
+ 
         const tr = document.createElement("tr");
-        const recv = g(row, ci.receivedAt);
-        tr.appendChild(td(recv || "—"));
-        tr.appendChild(td(g(row, ci.courseId)  || "unknown"));
-        tr.appendChild(td(String(g(row, ci.sessionId) || "unknown").slice(0,14)));
-        tr.appendChild(td(g(row, ci.eventType) || "—"));
-        tr.appendChild(td(g(row, ci.correct)   || "—"));
-        tr.appendChild(td(String(g(row, ci.page) || "").slice(0,40)));
+        tr.appendChild(td(g(row, ci.receivedAt) || "—"));
+        tr.appendChild(td(g(row, ci.courseId)   || "unknown"));
+        tr.appendChild(td(String(g(row, ci.sessionId)||"unknown").slice(0,14)));
+        tr.appendChild(td(etypes.slice(0,60)));
+        tr.appendChild(td(correctVals));
+        tr.appendChild(td(String(g(row, ci.page)||"").slice(0,40)));
         packetBody.appendChild(tr);
       });
     }
@@ -387,3 +408,4 @@
   </script>
 </body>
 </html>
+ 
