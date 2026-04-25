@@ -294,7 +294,8 @@
         totalEvents += events.length;
  
         for (const e of events) {
-          const etype = String(e.type || "unknown");
+          const etype = String(e.type || "").trim();
+          if (!etype || etype === "0") continue;
           byType.set(etype, (byType.get(etype)||0) + 1);
  
           // Retries: step_attempt where correct === false
