@@ -2479,8 +2479,9 @@ function showHint(text){
 function toggleHint(btn){
   btn.classList.toggle('open');
   btn.nextElementSibling.classList.toggle('open');
+  if(btn.classList.contains('open')) analyticsEvent('hint_used', {});
 }
-
+ 
 function renderStaticStep(step){
   $outS.innerHTML='';
   appendLineS(`▸ ${step.obj}`,'ln-info');
