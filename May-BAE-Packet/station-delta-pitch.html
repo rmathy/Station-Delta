@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Station Delta — BAE Systems Pitch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
+
+  :root {
+    --navy:    #0a1628;
+    --navy2:   #0f2040;
+    --steel:   #1a3a5c;
+    --ice:     #cde4f5;
+    --ice2:    #e8f4fd;
+    --green:   #00c87a;
+    --amber:   #f5a623;
+    --red:     #e74c3c;
+    --white:   #ffffff;
+    --muted:   #7a9ab8;
+    --mono:    'IBM Plex Mono', monospace;
+    --sans:    'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: #000;
+    color: var(--white);
+  }
+
+  /* ── SLIDE ENGINE ── */
+  .deck { width: 100%; }
+
+  .slide {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    display: none;
+    page-break-after: always;
+  }
+  .slide.active { display: flex; }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 12px; align-items: center; z-index: 100;
+    background: rgba(10,22,40,0.85); border: 1px solid rgba(205,228,245,0.15);
+    border-radius: 40px; padding: 10px 20px; backdrop-filter: blur(12px);
+  }
+  .nav button {
+    background: none; border: none; color: var(--ice); cursor: pointer;
+    font-family: var(--mono); font-size: 13px; padding: 4px 12px;
+    border-radius: 20px; transition: background .2s;
+  }
+  .nav button:hover { background: rgba(205,228,245,0.1); }
+  .nav button:disabled { opacity: 0.3; cursor: default; }
+  #slideCounter { font-family: var(--mono); font-size: 11px; color: var(--muted); min-width: 50px; text-align: center; }
+
+  /* keyboard hint */
+  .keyhint {
+    position: fixed; bottom: 24px; right: 28px;
+    font-family: var(--mono); font-size: 10px; color: rgba(122,154,184,0.5);
+    z-index: 100;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 1 — TITLE
+  ══════════════════════════════════════ */
+  .s1 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 7% 10%;
+  }
+  .s1::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 90% 50%, rgba(0,200,122,0.07), transparent 60%),
+      radial-gradient(ellipse 60% 80% at 10% 80%, rgba(26,58,92,0.8), transparent 50%);
+  }
+  .s1 .tag {
+    font-family: var(--mono); font-size: 1.1vw; letter-spacing: .2em;
+    color: var(--green); text-transform: uppercase; margin-bottom: 2.5%;
+    position: relative;
+  }
+  .s1 h1 {
+    font-size: 5.5vw; font-weight: 700; line-height: 1.05;
+    color: var(--white); position: relative; margin-bottom: 1.5%;
+  }
+  .s1 h1 span { color: var(--green); }
+  .s1 .tagline {
+    font-size: 1.6vw; font-weight: 300; color: var(--ice);
+    position: relative; max-width: 55%; line-height: 1.5;
+    margin-bottom: 5%;
+  }
+  .s1 .byline {
+    font-family: var(--mono); font-size: .9vw; color: var(--muted);
+    position: relative;
+  }
+  .s1 .grid-accent {
+    position: absolute; right: 5%; top: 15%;
+    width: 38%; height: 70%;
+    display: grid; grid-template-columns: repeat(6,1fr); gap: 2px;
+    opacity: 0.06;
+  }
+  .s1 .grid-accent div { background: var(--ice); border-radius: 1px; }
+
+  /* terminal mock on title slide */
+  .s1 .terminal {
+    position: absolute; right: 6%; top: 50%; transform: translateY(-50%);
+    width: 36%; background: #050d18;
+    border: 1px solid rgba(205,228,245,0.12);
+    border-radius: 8px; overflow: hidden;
+    font-family: var(--mono); font-size: .85vw;
+  }
+  .s1 .terminal .tbar {
+    background: #0a1628; padding: 1% 3%;
+    display: flex; gap: 6px; align-items: center;
+    border-bottom: 1px solid rgba(205,228,245,0.08);
+  }
+  .s1 .terminal .tbar span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .s1 .terminal .tbar .r { background: #e74c3c; }
+  .s1 .terminal .tbar .y { background: #f5a623; }
+  .s1 .terminal .tbar .g { background: #00c87a; }
+  .s1 .terminal .tbody { padding: 4% 5%; line-height: 1.8; }
+  .s1 .terminal .prompt { color: var(--green); }
+  .s1 .terminal .cmd { color: var(--ice); }
+  .s1 .terminal .out { color: var(--muted); }
+  .s1 .terminal .err { color: var(--red); }
+  .s1 .terminal .ok  { color: var(--green); }
+
+  /* ══════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+  ══════════════════════════════════════ */
+  .s2 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    padding: 6% 9%;
+  }
+  .slide-label {
+    font-family: var(--mono); font-size: .85vw; letter-spacing: .18em;
+    color: var(--green); text-transform: uppercase; margin-bottom: 3%;
+  }
+  .slide-title {
+    font-size: 3.2vw; font-weight: 700; color: var(--white);
+    margin-bottom: 5%; line-height: 1.1;
+  }
+  .slide-title em { color: var(--green); font-style: normal; }
+
+  .problem-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2%;
+  }
+  .problem-card {
+    background: rgba(26,58,92,0.4);
+    border: 1px solid rgba(205,228,245,0.1);
+    border-radius: 6px; padding: 5% 6%;
+    border-top: 3px solid var(--red);
+  }
+  .problem-card .num {
+    font-family: var(--mono); font-size: 2.8vw; font-weight: 700;
+    color: var(--red); margin-bottom: 4%;
+  }
+  .problem-card h3 {
+    font-size: 1.05vw; font-weight: 600; color: var(--white);
+    margin-bottom: 3%; line-height: 1.3;
+  }
+  .problem-card p {
+    font-size: .85vw; color: var(--muted); line-height: 1.5;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 3 — THE SOLUTION
+  ══════════════════════════════════════ */
+  .s3 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    padding: 6% 9%;
+  }
+  .solution-wrap {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 5%; align-items: center;
+  }
+  .solution-left {}
+  .big-quote {
+    font-size: 1.9vw; font-weight: 300; line-height: 1.5;
+    color: var(--ice); margin-bottom: 6%;
+    border-left: 3px solid var(--green); padding-left: 4%;
+  }
+  .big-quote strong { color: var(--white); font-weight: 700; }
+  .solution-points { display: flex; flex-direction: column; gap: 3%; }
+  .sol-point {
+    display: flex; gap: 3%; align-items: flex-start;
+  }
+  .sol-dot {
+    width: .7vw; height: .7vw; border-radius: 50%;
+    background: var(--green); flex-shrink: 0; margin-top: .5%;
+  }
+  .sol-point p { font-size: .95vw; color: var(--ice); line-height: 1.4; }
+  .sol-point p strong { color: var(--white); }
+
+  .solution-right {
+    background: rgba(0,200,122,0.05);
+    border: 1px solid rgba(0,200,122,0.15);
+    border-radius: 8px; padding: 6%;
+  }
+  .sim-stat { margin-bottom: 6%; }
+  .sim-stat:last-child { margin-bottom: 0; }
+  .sim-stat .sval {
+    font-family: var(--mono); font-size: 2.5vw; font-weight: 700;
+    color: var(--green);
+  }
+  .sim-stat .slabel {
+    font-size: .8vw; color: var(--muted); margin-top: 1%;
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+  .sim-divider { height: 1px; background: rgba(205,228,245,0.08); margin: 4% 0; }
+
+  /* ══════════════════════════════════════
+     SLIDE 4 — HOW IT WORKS
+  ══════════════════════════════════════ */
+  .s4 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    padding: 6% 9%;
+  }
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 2%;
+  }
+  .step-card {
+    background: rgba(15,32,64,0.8);
+    border: 1px solid rgba(205,228,245,0.08);
+    border-radius: 6px; padding: 5% 5% 6%;
+    position: relative;
+  }
+  .step-num {
+    font-family: var(--mono); font-size: 2vw; font-weight: 700;
+    color: rgba(0,200,122,0.25); margin-bottom: 4%;
+  }
+  .step-icon { font-size: 1.8vw; margin-bottom: 3%; }
+  .step-card h3 { font-size: .95vw; font-weight: 600; color: var(--white); margin-bottom: 3%; }
+  .step-card p  { font-size: .78vw; color: var(--muted); line-height: 1.5; }
+  .step-arrow {
+    position: absolute; right: -5%; top: 50%; transform: translateY(-50%);
+    color: var(--steel); font-size: 1.2vw; z-index: 2;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 5 — THE DASHBOARD / DATA
+  ══════════════════════════════════════ */
+  .s5 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    padding: 6% 9%;
+  }
+  .dashboard-mock {
+    background: #050d18;
+    border: 1px solid rgba(205,228,245,0.1);
+    border-radius: 8px; padding: 3% 4%;
+    font-family: var(--mono);
+  }
+  .dash-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 3%; font-size: .8vw; color: var(--muted);
+  }
+  .dash-header .live { color: var(--green); }
+  .dash-kpis {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 2%;
+    margin-bottom: 3%;
+  }
+  .dash-kpi {
+    background: rgba(26,58,92,0.4);
+    border: 1px solid rgba(205,228,245,0.08);
+    border-radius: 4px; padding: 3% 4%;
+  }
+  .dash-kpi .dval { font-size: 1.8vw; font-weight: 700; color: var(--white); }
+  .dash-kpi .dlabel { font-size: .65vw; color: var(--muted); margin-top: 2%; text-transform: uppercase; letter-spacing: .1em; }
+  .dash-kpi.good .dval { color: var(--green); }
+  .dash-kpi.warn .dval { color: var(--amber); }
+  .dash-kpi.bad  .dval { color: var(--red); }
+  .dash-table { font-size: .72vw; }
+  .dash-table .dth {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1.5fr;
+    padding: 1.5% 2%; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .1em; border-bottom: 1px solid rgba(205,228,245,0.08);
+  }
+  .dash-table .dtr {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1.5fr;
+    padding: 1.8% 2%; border-bottom: 1px solid rgba(205,228,245,0.05);
+    color: var(--ice); align-items: center;
+  }
+  .dash-table .dtr:last-child { border-bottom: none; }
+  .chip {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 99px; font-size: .65vw;
+    font-family: var(--mono);
+  }
+  .chip.green { background: rgba(0,200,122,0.15); color: var(--green); border: 1px solid rgba(0,200,122,0.3); }
+  .chip.amber { background: rgba(245,166,35,0.15); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); }
+  .chip.red   { background: rgba(231,76,60,0.15);  color: var(--red);   border: 1px solid rgba(231,76,60,0.3); }
+  .bar-wrap { background: rgba(26,58,92,0.4); border-radius: 99px; height: 6px; width: 80%; }
+  .bar-fill { height: 6px; border-radius: 99px; background: var(--green); }
+  .bar-fill.amber { background: var(--amber); }
+  .bar-fill.red   { background: var(--red); }
+
+  /* ══════════════════════════════════════
+     SLIDE 6 — WHO BUYS THIS
+  ══════════════════════════════════════ */
+  .s6 {
+    background: var(--navy);
+    flex-direction: column;
+    justify-content: center;
+    padding: 6% 9%;
+  }
+  .buyers-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2.5%;
+  }
+  .buyer-card {
+    border-radius: 8px; padding: 6% 6% 7%;
+    border: 1px solid rgba(205,228,245,0.1);
+  }
+  .buyer-card.junior  { background: rgba(0,200,122,0.06);  border-top: 3px solid var(--green); }
+  .buyer-card.senior  { background: rgba(26,58,92,0.4);    border-top: 3px solid var(--ice); }
+  .buyer-card.manager { background: rgba(245,166,35,0.06); border-top: 3px solid var(--amber); }
+  .buyer-icon { font-size: 2.2vw; margin-bottom: 4%; }
+  .buyer-card h3 { font-size: 1.1vw; font-weight: 700; color: var(--white); margin-bottom: 2%; }
+  .buyer-card .role { font-family: var(--mono); font-size: .72vw; color: var(--muted); margin-bottom: 4%; text-transform: uppercase; letter-spacing: .1em; }
+  .buyer-card p { font-size: .82vw; color: var(--ice); line-height: 1.5; }
+  .buyer-card .wants { margin-top: 4%; font-size: .78vw; color: var(--muted); font-style: italic; }
+
+  /* ══════════════════════════════════════
+     SLIDE 7 — THE ASK
+  ══════════════════════════════════════ */
+  .s7 {
+    background: var(--navy2);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6% 9%;
+    text-align: center;
+  }
+  .s7::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(0,200,122,0.06), transparent 65%);
+  }
+  .s7 .slide-label { text-align: center; position: relative; }
+  .s7 .ask-title {
+    font-size: 3.5vw; font-weight: 700; color: var(--white);
+    margin-bottom: 2%; position: relative; line-height: 1.15;
+  }
+  .s7 .ask-title span { color: var(--green); }
+  .s7 .ask-sub {
+    font-size: 1.3vw; font-weight: 300; color: var(--ice);
+    margin-bottom: 6%; position: relative; max-width: 65%;
+  }
+  .ask-cards {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2%;
+    width: 100%; position: relative;
+  }
+  .ask-card {
+    background: rgba(15,32,64,0.8);
+    border: 1px solid rgba(205,228,245,0.1);
+    border-radius: 8px; padding: 5% 5%;
+  }
+  .ask-card .anum {
+    font-family: var(--mono); font-size: 1.8vw; font-weight: 700;
+    color: var(--green); margin-bottom: 3%;
+  }
+  .ask-card h3 { font-size: .95vw; font-weight: 600; color: var(--white); margin-bottom: 3%; }
+  .ask-card p  { font-size: .8vw; color: var(--muted); line-height: 1.5; }
+
+  .s7 .contact {
+    position: relative; margin-top: 5%;
+    font-family: var(--mono); font-size: .8vw; color: var(--muted);
+  }
+  .s7 .contact a { color: var(--green); text-decoration: none; }
+
+  /* ══════════════════════════════════════
+     PRINT / PDF
+  ══════════════════════════════════════ */
+  @media print {
+    .nav, .keyhint { display: none; }
+    .slide { display: flex !important; page-break-after: always; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ══ SLIDE 1: TITLE ══ -->
+  <div class="slide s1 active">
+    <div class="s1 grid-accent">
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+    <div class="tag">BAE Systems · Small Business Industry Day · May 2026</div>
+    <h1>STATION<br/><span>DELTA</span></h1>
+    <p class="tagline">Simulation-based workforce readiness for the engineers who operate AI-augmented defense systems.</p>
+    <p class="byline">station-delta-one.vercel.app</p>
+
+    <div class="terminal">
+      <div class="tbar">
+        <span class="r"></span><span class="y"></span><span class="g"></span>
+      </div>
+      <div class="tbody">
+        <div><span class="prompt">cadet@vibe-ship:~$</span> <span class="cmd">git status</span></div>
+        <div class="out">On branch main · 3 files staged</div>
+        <div><span class="prompt">cadet@vibe-ship:~$</span> <span class="cmd">git commit -m "Deploy escape pod"</span></div>
+        <div class="ok">✓ [main 4a2f1e3] Deploy escape pod</div>
+        <div><span class="prompt">cadet@vibe-ship:~$</span> <span class="cmd">vibe deploy --prod</span></div>
+        <div class="out">Deploying to production...</div>
+        <div class="ok">✓ Live at https://pod.station-delta.dev</div>
+        <div><span class="prompt">J.A.N.E.T.:</span> <span class="err">Assessment begins now.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 2: THE PROBLEM ══ -->
+  <div class="slide s2">
+    <div class="slide-label">// The Problem</div>
+    <h2 class="slide-title">You know who's <em>brilliant.</em><br/>You don't always know who's <em>ready.</em></h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="num">01</div>
+        <h3>The Readiness Gap</h3>
+        <p>Junior engineers look strong on paper but freeze when something breaks in production. Traditional certifications don't test under real pressure.</p>
+      </div>
+      <div class="problem-card">
+        <div class="num">02</div>
+        <h3>No Objective Data</h3>
+        <p>Managers make on-call and deployment decisions based on gut feel. In defense environments, that's not just inefficient — it's a liability.</p>
+      </div>
+      <div class="problem-card">
+        <div class="num">03</div>
+        <h3>The AI Skills Cliff</h3>
+        <p>AI-augmented systems are now standard. Most training programs haven't caught up. Engineers are being handed tools they weren't trained to operate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 3: THE SOLUTION ══ -->
+  <div class="slide s3">
+    <div class="slide-label">// The Solution</div>
+    <h2 class="slide-title" style="margin-bottom:4%">Simulation-based training with<br/><em>real performance telemetry.</em></h2>
+    <div class="solution-wrap">
+      <div class="solution-left">
+        <div class="big-quote">
+          Station Delta puts engineers in <strong>narrative-driven terminal simulations</strong> — real commands, real consequences, no passive videos.
+        </div>
+        <div class="solution-points">
+          <div class="sol-point"><div class="sol-dot"></div><p><strong>Smart wrong-answer diagnosis</strong> — the sim understands what you attempted and explains why it didn't work</p></div>
+          <div class="sol-point"><div class="sol-dot"></div><p><strong>AI & CLI skills in context</strong> — from first command to multi-agent orchestration and incident response</p></div>
+          <div class="sol-point"><div class="sol-dot"></div><p><strong>Boss fight graduation</strong> — J.A.N.E.T. administers a cold adversarial assessment at the end of every simulation</p></div>
+          <div class="sol-point"><div class="sol-dot"></div><p><strong>Full telemetry pipeline</strong> — every step attempt, retry, and time-to-respond is logged and surfaced to managers</p></div>
+        </div>
+      </div>
+      <div class="solution-right">
+        <div class="sim-stat">
+          <div class="sval">13</div>
+          <div class="slabel">Simulations across 4 career tracks</div>
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-stat">
+          <div class="sval">9</div>
+          <div class="slabel">Phases per simulation</div>
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-stat">
+          <div class="sval">100%</div>
+          <div class="slabel">Command-line · No passive content</div>
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-stat">
+          <div class="sval">Live</div>
+          <div class="slabel">Analytics dashboard · real session data</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 4: HOW IT WORKS ══ -->
+  <div class="slide s4">
+    <div class="slide-label">// How It Works</div>
+    <h2 class="slide-title" style="margin-bottom:5%">From first command to <em>mission-ready.</em></h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-icon">🎯</div>
+        <h3>Pick Your Track</h3>
+        <p>Security & Reliability, Platform & Delivery, AI Systems, or Data & Intelligence. Career-matched paths, not a menu of random courses.</p>
+        <div class="step-arrow">›</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-icon">⌨️</div>
+        <h3>Execute Real Commands</h3>
+        <p>Narrative scenarios with actual terminal input. Type the wrong thing and get a specific diagnosis — not just "incorrect."</p>
+        <div class="step-arrow">›</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-icon">⚡</div>
+        <h3>Face J.A.N.E.T.</h3>
+        <p>Every simulation ends with a cold adversarial assessment. L.O.L.A. goes offline. No hints. No guidance. Just knowledge under pressure.</p>
+        <div class="step-arrow">›</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-icon">📊</div>
+        <h3>Manager Gets the Data</h3>
+        <p>Time-to-respond per step, retry rates, skill heat maps by track. Objective readiness data — not a completion certificate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 5: THE DASHBOARD ══ -->
+  <div class="slide s5">
+    <div class="slide-label">// Readiness Intelligence</div>
+    <h2 class="slide-title" style="margin-bottom:3%">The data managers actually need<br/>before <em>someone goes on call.</em></h2>
+    <div class="dashboard-mock">
+      <div class="dash-header">
+        <span>STATION DELTA · TEAM READINESS OVERVIEW · FLEET TIER</span>
+        <span class="live">● LIVE</span>
+      </div>
+      <div class="dash-kpis">
+        <div class="dash-kpi good"><div class="dval">8</div><div class="dlabel">Active Sessions</div></div>
+        <div class="dash-kpi"><div class="dval">278</div><div class="dlabel">Total Events</div></div>
+        <div class="dash-kpi warn"><div class="dval">51.5s</div><div class="dlabel">Avg Time-to-Respond</div></div>
+        <div class="dash-kpi bad"><div class="dval">6</div><div class="dlabel">Retry Events</div></div>
+      </div>
+      <div class="dash-table">
+        <div class="dth"><span>Engineer</span><span>Track</span><span>Sim</span><span>Retries</span><span>Avg TTR</span><span>Readiness</span></div>
+        <div class="dtr">
+          <span>A. Chen</span><span>Security</span><span>Phase 7/9</span><span>1</span><span>28s</span>
+          <span><div class="bar-wrap"><div class="bar-fill" style="width:92%"></div></div></span>
+        </div>
+        <div class="dtr">
+          <span>M. Torres</span><span>Platform</span><span>Phase 5/9</span><span>4</span><span>61s</span>
+          <span><div class="bar-wrap"><div class="bar-fill amber" style="width:72%"></div></div></span>
+        </div>
+        <div class="dtr">
+          <span>R. Patel</span><span>AI Systems</span><span>Phase 8/9</span><span>2</span><span>44s</span>
+          <span><div class="bar-wrap"><div class="bar-fill" style="width:85%"></div></div></span>
+        </div>
+        <div class="dtr">
+          <span>S. Wright</span><span>Data</span><span>Phase 3/9</span><span>9</span><span>88s</span>
+          <span><div class="bar-wrap"><div class="bar-fill red" style="width:41%"></div></div></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 6: WHO BUYS THIS ══ -->
+  <div class="slide s6">
+    <div class="slide-label">// Who This Serves</div>
+    <h2 class="slide-title" style="margin-bottom:5%">Three buyers. <em>One platform.</em></h2>
+    <div class="buyers-grid">
+      <div class="buyer-card junior">
+        <div class="buyer-icon">🚀</div>
+        <h3>The Junior Engineer</h3>
+        <div class="role">Onboarding · Early career</div>
+        <p>New to the team but not to motivation. They want to prove themselves fast and close the gap between classroom and production systems.</p>
+        <p class="wants">"I need to get up to speed before I touch anything critical."</p>
+      </div>
+      <div class="buyer-card senior">
+        <div class="buyer-icon">🛡️</div>
+        <h3>The Senior Engineer</h3>
+        <div class="role">Mid-level · Promotion track</div>
+        <p>Competent but the landscape keeps shifting. AI-augmented workflows, new CLI tooling, evolving security practices — wants structured upskilling with a credential.</p>
+        <p class="wants">"I want to stay sharp and have something to show for it."</p>
+      </div>
+      <div class="buyer-card manager">
+        <div class="buyer-icon">📋</div>
+        <h3>The Engineering Manager</h3>
+        <div class="role">Team lead · On-call decisions</div>
+        <p>Responsible for who handles what when things break. Needs objective data — not self-reported confidence — before assigning someone to a critical system or incident.</p>
+        <p class="wants">"I need to know who's actually ready before it matters."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 7: THE ASK ══ -->
+  <div class="slide s7">
+    <div class="slide-label">// The Ask</div>
+    <h2 class="ask-title">A pilot. Not a contract.<br/><span>90 days. 5–10 engineers.</span></h2>
+    <p class="ask-sub">We measure readiness before and after. You get real data on your team. We get real-world validation in a defense environment.</p>
+    <div class="ask-cards">
+      <div class="ask-card">
+        <div class="anum">5–10</div>
+        <h3>Engineers on one team</h3>
+        <p>Matched to the track most relevant to their role — Security, Platform, AI Systems, or Data.</p>
+      </div>
+      <div class="ask-card">
+        <div class="anum">90</div>
+        <h3>Days, fully instrumented</h3>
+        <p>Every session logged. Manager dashboard live from day one. Full telemetry, no black box.</p>
+      </div>
+      <div class="ask-card">
+        <div class="anum">$0</div>
+        <h3>Cost to BAE for the pilot</h3>
+        <p>We want a reference customer and a real environment. You get measurable team readiness data in return.</p>
+      </div>
+    </div>
+    <p class="contact">station-delta-one.vercel.app &nbsp;·&nbsp; <a href="mailto:hello@stationdelta.dev">hello@stationdelta.dev</a></p>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<div class="nav">
+  <button id="prev" onclick="go(-1)" disabled>← Prev</button>
+  <span id="slideCounter">1 / 7</span>
+  <button id="next" onclick="go(1)">Next →</button>
+</div>
+<div class="keyhint">← → keys to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+
+  function go(dir) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+    slides[cur].classList.add('active');
+    document.getElementById('slideCounter').textContent = `${cur+1} / ${slides.length}`;
+    document.getElementById('prev').disabled = cur === 0;
+    document.getElementById('next').disabled = cur === slides.length - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+  });
+</script>
+</body>
+</html>
