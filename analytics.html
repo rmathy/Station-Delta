@@ -36,8 +36,7 @@
     .title{font-size:22px;font-weight:700;letter-spacing:.04em}
     .sub{font-size:12px;color:var(--muted);margin-top:4px}
     .controls{
-      display:grid;grid-template-columns:1fr 240px 130px 130px;gap:8px;
-      width:min(820px,100%);
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
     }
     .card{
       background:linear-gradient(180deg,var(--surface),var(--surface2));
@@ -56,13 +55,12 @@
     th,td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
     th{color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
     .mono{font-family:inherit}
-    input,button,select{
-      width:100%;
+    button,select{
       background:#08111b;color:var(--text);
       border:1px solid var(--border);border-radius:6px;
-      padding:10px;font:12px inherit;
+      padding:10px 16px;font:12px inherit;
     }
-    input:focus,button:focus,select:focus{outline:none;border-color:var(--blue)}
+    button:focus,select:focus{outline:none;border-color:var(--blue)}
     button{
       cursor:pointer;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
       background:linear-gradient(180deg,#12314f,#0e253a);
@@ -77,8 +75,16 @@
       display:inline-block;padding:3px 8px;border:1px solid var(--border);border-radius:99px;
       font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)
     }
+    /* Raw columns debug panel */
+    #debugPanel{
+      margin-bottom:10px;display:none;
+    }
+    #debugPanel pre{
+      background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:6px;
+      padding:12px;font-size:11px;color:var(--amber);overflow-x:auto;white-space:pre-wrap;
+      word-break:break-all;margin:0;
+    }
     @media (max-width: 980px){
-      .controls{grid-template-columns:1fr 1fr}
       .kpi-grid{grid-template-columns:repeat(3,minmax(120px,1fr))}
       .panes{grid-template-columns:1fr}
     }
@@ -89,31 +95,37 @@
     <div class="top">
       <div>
         <div class="title">Station Delta Analytics Console</div>
-        <div class="sub">Live session telemetry from Cadet · Engineer · Lieutenant</div>
+        <div class="sub">Live session telemetry · pulled from Google Sheets</div>
       </div>
       <div class="controls">
-        <input id="key" type="password" placeholder="ANALYTICS_DASHBOARD_KEY" />
         <select id="limit">
-          <option value="100">Last 100 packets</option>
-          <option value="200">Last 200 packets</option>
-          <option value="500" selected>Last 500 packets</option>
+          <option value="100">Last 100 rows</option>
+          <option value="200">Last 200 rows</option>
+          <option value="500" selected>Last 500 rows</option>
+          <option value="99999">All rows</option>
         </select>
-        <button id="loadBtn">Load</button>
+        <button id="loadBtn">↺ Refresh</button>
         <button id="autoBtn">Auto: Off</button>
       </div>
     </div>
-
-    <div id="status" class="status">Enter dashboard key, then click Load.</div>
-
+ 
+    <div id="status" class="status">Loading data from Google Sheets…</div>
+ 
+    <!-- Debug panel: shown only on first load so you can confirm column names -->
+    <div id="debugPanel" class="card pane">
+      <h3>📋 Column Headers Detected — confirm these match your sheet, then this panel hides itself</h3>
+      <pre id="debugPre"></pre>
+    </div>
+ 
     <div class="kpi-grid">
-      <div class="card kpi"><div class="label">Packets</div><div id="kPackets" class="val">0</div><div class="hint">ingest payloads</div></div>
+      <div class="card kpi"><div class="label">Rows</div><div id="kPackets" class="val">0</div><div class="hint">total sheet rows</div></div>
       <div class="card kpi"><div class="label">Events</div><div id="kEvents" class="val">0</div><div class="hint">total events</div></div>
       <div class="card kpi"><div class="label">Sessions</div><div id="kSessions" class="val">0</div><div class="hint">distinct session IDs</div></div>
       <div class="card kpi"><div class="label">Retries</div><div id="kRetries" class="val">0</div><div class="hint">incorrect attempts</div></div>
       <div class="card kpi"><div class="label">Hints Used</div><div id="kHints" class="val">0</div><div class="hint">hint expansions</div></div>
-      <div class="card kpi"><div class="label">Avg TTR</div><div id="kTTR" class="val">0s</div><div class="hint">step_completed</div></div>
+      <div class="card kpi"><div class="label">Avg TTR</div><div id="kTTR" class="val">0s</div><div class="hint">time-to-respond</div></div>
     </div>
-
+ 
     <div class="panes">
       <div class="card pane">
         <h3>Course Summary</h3>
@@ -122,7 +134,7 @@
           <tbody></tbody>
         </table>
       </div>
-
+ 
       <div class="card pane">
         <h3>Event Mix</h3>
         <table id="typeTable">
@@ -131,43 +143,49 @@
         </table>
       </div>
     </div>
-
+ 
     <div class="card pane" style="margin-top:10px">
-      <h3>Recent Packets</h3>
+      <h3>Recent Rows</h3>
       <table id="packetTable">
-        <thead><tr><th>Received</th><th>Course</th><th>Session</th><th>Reason</th><th>Events</th><th>Page</th></tr></thead>
+        <thead><tr><th>Received</th><th>Course</th><th>Session</th><th>Event Type</th><th>Correct?</th><th>Page / Step</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
-
+ 
   <script>
-    const statusEl = document.getElementById("status");
-    const keyEl = document.getElementById("key");
-    const limitEl = document.getElementById("limit");
-    const loadBtn = document.getElementById("loadBtn");
-    const autoBtn = document.getElementById("autoBtn");
-    const storeKey = "sd_analytics_dash_key";
-    const storeAuto = "sd_analytics_dash_auto";
-    let autoTimer = null;
-
-    keyEl.value = localStorage.getItem(storeKey) || "";
-
-    function fmtTime(iso) {
-      if (!iso) return "-";
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return String(iso);
-      return d.toLocaleString();
-    }
-    function fmtSec(ms) {
-      if (!Number.isFinite(ms) || ms <= 0) return "0s";
-      return (ms / 1000).toFixed(1) + "s";
-    }
+    // ─── CONFIG ──────────────────────────────────────────────────────────────
+    const SHEET_ID  = "1IjJhdUguxOjC6NwyKIZlLxH0k--4UYvULWEf8yhz_H4";
+    const GID       = "0";   // the sheet tab id from your URL  (#gid=0)
+    const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+ 
+    // ─── COLUMN NAME MAPPING ─────────────────────────────────────────────────
+    // These are the column headers we look for (case-insensitive, partial match).
+    // Edit them here if your sheet uses different names.
+    const COL = {
+      receivedAt : ["receivedat","received_at","timestamp","time","date","created"],
+      courseId   : ["courseid","course_id","course"],
+      sessionId  : ["sessionid","session_id","session"],
+      eventType  : ["eventtype","event_type","type","event"],
+      correct    : ["correct","iscorrect","is_correct","result"],
+      ttrMs      : ["ttrms","ttr_ms","ttr","time_to_respond","responsetime","response_time"],
+      hint       : ["hint_used","hintused","hint"],
+      page       : ["page","pageid","page_id","step","stepid","step_id","url"],
+    };
+    // ─────────────────────────────────────────────────────────────────────────
+ 
+    const statusEl   = document.getElementById("status");
+    const loadBtn    = document.getElementById("loadBtn");
+    const autoBtn    = document.getElementById("autoBtn");
+    const debugPanel = document.getElementById("debugPanel");
+    const debugPre   = document.getElementById("debugPre");
+    let autoTimer    = null;
+    let firstLoad    = true;
+ 
     function setStatus(msg, cls) {
       statusEl.className = "status " + (cls || "");
       statusEl.textContent = msg;
     }
-
     function emptyBody(id) {
       const tb = document.querySelector(id + " tbody");
       tb.innerHTML = "";
@@ -175,54 +193,124 @@
     }
     function td(v) {
       const x = document.createElement("td");
-      x.textContent = v;
+      x.textContent = v ?? "";
       return x;
     }
-
-    function render(data) {
-      const packets = Array.isArray(data?.events) ? data.events : [];
-      const allEvents = packets.flatMap((p) => Array.isArray(p.events) ? p.events : []);
-
+    function fmtSec(ms) {
+      if (!Number.isFinite(ms) || ms <= 0) return "—";
+      return (ms / 1000).toFixed(1) + "s";
+    }
+ 
+    // ── CSV parser (handles quoted fields with commas) ──
+    function parseCSV(text) {
+      const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+      function splitLine(line) {
+        const out = [];
+        let cur = "", inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+            else inQ = !inQ;
+          } else if (ch === ',' && !inQ) {
+            out.push(cur); cur = "";
+          } else cur += ch;
+        }
+        out.push(cur);
+        return out;
+      }
+      return lines.filter(l => l.trim()).map(splitLine);
+    }
+ 
+    // ── Find column index by matching COL aliases ──
+    function findCol(headers, aliases) {
+      const h = headers.map(s => String(s).toLowerCase().replace(/[^a-z0-9]/g,""));
+      for (const alias of aliases) {
+        const idx = h.indexOf(alias.toLowerCase().replace(/[^a-z0-9]/g,""));
+        if (idx !== -1) return idx;
+      }
+      // fuzzy: check if any header contains alias
+      for (const alias of aliases) {
+        const a = alias.toLowerCase().replace(/[^a-z0-9]/g,"");
+        const idx = h.findIndex(hh => hh.includes(a) || a.includes(hh));
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    }
+ 
+    function g(row, idx) { return idx === -1 ? undefined : (row[idx] ?? "").trim(); }
+ 
+    function render(rows, headers) {
+      // Show debug panel on first load
+      if (firstLoad) {
+        debugPre.textContent = "Columns found:\n" + headers.map((h,i) => `  [${i}] "${h}"`).join("\n") +
+          "\n\nFirst data row (sample):\n" + (rows[0] ? rows[0].map((v,i) => `  [${i}] "${v}"`).join("\n") : "  (no data rows)");
+        debugPanel.style.display = "block";
+        firstLoad = false;
+        // Auto-hide debug after 30 s
+        setTimeout(() => { debugPanel.style.display = "none"; }, 30000);
+      }
+ 
+      // Map columns
+      const ci = {};
+      for (const [key, aliases] of Object.entries(COL)) {
+        ci[key] = findCol(headers, aliases);
+      }
+ 
+      const limit = Number(document.getElementById("limit").value || 500);
+      const sliced = rows.slice(-limit);
+ 
       const sessions = new Set();
-      let retries = 0;
-      let hints = 0;
-      let ttrSum = 0;
-      let ttrCount = 0;
+      let retries = 0, hints = 0, ttrSum = 0, ttrCount = 0;
       const byCourse = new Map();
-      const byType = new Map();
-
-      for (const p of packets) {
-        const c = p.courseId || "unknown";
-        const sid = p.sessionId || "unknown";
+      const byType   = new Map();
+ 
+      for (const row of sliced) {
+        const course   = g(row, ci.courseId)  || "unknown";
+        const sid      = g(row, ci.sessionId) || "unknown";
+        const etype    = g(row, ci.eventType) || "unknown";
+        const correct  = g(row, ci.correct);
+        const ttrRaw   = g(row, ci.ttrMs);
+        const hintRaw  = g(row, ci.hint);
+ 
         sessions.add(sid);
-        if (!byCourse.has(c)) byCourse.set(c, { sessions: new Set(), events: 0, retries: 0, hints: 0, ttrSum: 0, ttrCount: 0 });
-        const row = byCourse.get(c);
-        row.sessions.add(sid);
-        const pe = Array.isArray(p.events) ? p.events : [];
-        row.events += pe.length;
-
-        for (const e of pe) {
-          const t = String(e.type || "unknown");
-          byType.set(t, (byType.get(t) || 0) + 1);
-          if (t === "step_attempt" && e.correct === false) { retries++; row.retries++; }
-          if (t === "hint_used") { hints++; row.hints++; }
-          if (t === "step_completed" && Number.isFinite(e.ttrMs)) {
-            ttrSum += e.ttrMs; ttrCount++;
-            row.ttrSum += e.ttrMs; row.ttrCount++;
-          }
+ 
+        if (!byCourse.has(course)) byCourse.set(course, {sessions:new Set(),events:0,retries:0,hints:0,ttrSum:0,ttrCount:0});
+        const cr = byCourse.get(course);
+        cr.sessions.add(sid);
+        cr.events++;
+ 
+        byType.set(etype, (byType.get(etype)||0) + 1);
+ 
+        // Retries: event type contains "attempt" and correct is false/no/0
+        const isIncorrect = correct !== undefined && /^(false|no|0|f|n)$/i.test(correct.trim());
+        const isAttempt   = /attempt/i.test(etype);
+        if (isAttempt && isIncorrect) { retries++; cr.retries++; }
+ 
+        // Hints: event type or hint column
+        const isHint = /hint/i.test(etype) || (hintRaw && /^(true|yes|1|t|y)$/i.test(hintRaw.trim()));
+        if (isHint) { hints++; cr.hints++; }
+ 
+        // TTR
+        const ttrVal = parseFloat(ttrRaw);
+        if (Number.isFinite(ttrVal) && ttrVal > 0) {
+          // auto-detect if stored as seconds vs ms (assume >1000 = ms)
+          const ms = ttrVal > 1000 ? ttrVal : ttrVal * 1000;
+          ttrSum += ms; ttrCount++;
+          cr.ttrSum += ms; cr.ttrCount++;
         }
       }
-
-      document.getElementById("kPackets").textContent = packets.length;
-      document.getElementById("kEvents").textContent = allEvents.length;
+ 
+      document.getElementById("kPackets").textContent  = sliced.length;
+      document.getElementById("kEvents").textContent   = sliced.length;
       document.getElementById("kSessions").textContent = sessions.size;
-      document.getElementById("kRetries").textContent = retries;
-      document.getElementById("kHints").textContent = hints;
-      document.getElementById("kTTR").textContent = fmtSec(ttrCount ? ttrSum / ttrCount : 0);
-
+      document.getElementById("kRetries").textContent  = retries;
+      document.getElementById("kHints").textContent    = hints;
+      document.getElementById("kTTR").textContent      = fmtSec(ttrCount ? ttrSum / ttrCount : 0);
+ 
       const courseBody = emptyBody("#courseTable");
       [...byCourse.entries()]
-        .sort((a, b) => b[1].events - a[1].events)
+        .sort((a,b) => b[1].events - a[1].events)
         .forEach(([course, r]) => {
           const tr = document.createElement("tr");
           const c = document.createElement("td");
@@ -235,78 +323,80 @@
           tr.appendChild(td(fmtSec(r.ttrCount ? r.ttrSum / r.ttrCount : 0)));
           courseBody.appendChild(tr);
         });
-
+ 
       const typeBody = emptyBody("#typeTable");
       [...byType.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .forEach(([type, count]) => {
+        .sort((a,b) => b[1]-a[1])
+        .forEach(([type,count]) => {
           const tr = document.createElement("tr");
           tr.appendChild(td(type));
           tr.appendChild(td(count));
           typeBody.appendChild(tr);
         });
-
+ 
       const packetBody = emptyBody("#packetTable");
-      packets.slice().reverse().slice(0, 60).forEach((p) => {
+      [...sliced].reverse().slice(0,60).forEach(row => {
         const tr = document.createElement("tr");
-        tr.appendChild(td(fmtTime(p.receivedAt)));
-        tr.appendChild(td(p.courseId || "unknown"));
-        tr.appendChild(td(String(p.sessionId || "unknown").slice(0, 14)));
-        tr.appendChild(td(p.reason || "-"));
-        tr.appendChild(td(Array.isArray(p.events) ? p.events.length : 0));
-        tr.appendChild(td((p.page || "").slice(0, 36)));
+        const recv = g(row, ci.receivedAt);
+        tr.appendChild(td(recv || "—"));
+        tr.appendChild(td(g(row, ci.courseId)  || "unknown"));
+        tr.appendChild(td(String(g(row, ci.sessionId) || "unknown").slice(0,14)));
+        tr.appendChild(td(g(row, ci.eventType) || "—"));
+        tr.appendChild(td(g(row, ci.correct)   || "—"));
+        tr.appendChild(td(String(g(row, ci.page) || "").slice(0,40)));
         packetBody.appendChild(tr);
       });
     }
-
+ 
     async function loadData() {
-      const key = keyEl.value.trim();
-      if (!key) {
-        setStatus("Please enter ANALYTICS_DASHBOARD_KEY first.", "warn");
-        return;
-      }
-      localStorage.setItem(storeKey, key);
-      setStatus("Loading analytics...", "warn");
+      setStatus("Fetching from Google Sheets…", "warn");
       try {
-        const limit = Number(limitEl.value || 500);
-        const res = await fetch(`/api/analytics-recent?limit=${limit}&key=${encodeURIComponent(key)}`);
-        if (!res.ok) {
-          if (res.status === 401) setStatus("Unauthorized. Check ANALYTICS_DASHBOARD_KEY.", "bad");
-          else setStatus(`Load failed (${res.status}).`, "bad");
+        // Try multiple CORS proxies in sequence until one works
+        const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+        const proxies = [
+          `https://corsproxy.io/?url=${encodeURIComponent(sheetUrl)}`,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(sheetUrl)}`,
+          `https://thingproxy.freeboard.io/fetch/${sheetUrl}`,
+        ];
+        let res = null, lastErr = null;
+        for (const proxyUrl of proxies) {
+          try {
+            const attempt = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+            if (attempt.ok) { res = attempt; break; }
+          } catch(e) { lastErr = e; }
+        }
+        if (!res) throw new Error(lastErr?.message || "All proxies failed — check sheet is public");
+        const text = await res.text();
+        const parsed = parseCSV(text);
+        if (parsed.length < 2) {
+          setStatus("Sheet appears empty or returned no data rows.", "warn");
           return;
         }
-        const data = await res.json();
-        render(data);
-        setStatus(`Loaded ${data.count || 0} packets at ${new Date().toLocaleTimeString()}.`, "ok");
+        const headers = parsed[0];
+        const rows    = parsed.slice(1).filter(r => r.some(c => c.trim()));
+        render(rows, headers);
+        setStatus(`✓ Loaded ${rows.length} rows at ${new Date().toLocaleTimeString()}`, "ok");
       } catch (err) {
         setStatus(`Load error: ${String(err.message || err)}`, "bad");
+        console.error(err);
       }
     }
-
+ 
     function setAuto(on) {
-      if (autoTimer) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-      }
-      if (on) {
-        autoTimer = setInterval(loadData, 15000);
-      }
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+      if (on) autoTimer = setInterval(loadData, 30000);
       autoBtn.textContent = `Auto: ${on ? "On" : "Off"}`;
-      localStorage.setItem(storeAuto, on ? "1" : "0");
     }
-
+ 
     loadBtn.addEventListener("click", loadData);
     autoBtn.addEventListener("click", () => {
       const next = autoBtn.textContent.includes("Off");
       setAuto(next);
       if (next) loadData();
     });
-    keyEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") loadData();
-    });
-
-    setAuto(localStorage.getItem(storeAuto) === "1");
+ 
+    // Load immediately on page open
+    loadData();
   </script>
 </body>
 </html>
-
