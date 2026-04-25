@@ -155,9 +155,8 @@
  
   <script>
     // ─── CONFIG ──────────────────────────────────────────────────────────────
-    const SHEET_ID  = "1IjJhdUguxOjC6NwyKIZlLxH0k--4UYvULWEf8yhz_H4";
-    const GID       = "0";   // the sheet tab id from your URL  (#gid=0)
-    const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+    // Direct "Publish to Web" CSV URL — no proxy needed
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThFLNDBXzrEweY6lkODABDnLZREggOc-zrqkWSx9_O80SEX7l8h6rJBqPTuPMCHUSiRWK4duRA18E1/pub?output=csv";
  
     // ─── COLUMN NAME MAPPING ─────────────────────────────────────────────────
     // These are the column headers we look for (case-insensitive, partial match).
@@ -351,21 +350,9 @@
     async function loadData() {
       setStatus("Fetching from Google Sheets…", "warn");
       try {
-        // Try multiple CORS proxies in sequence until one works
-        const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-        const proxies = [
-          `https://corsproxy.io/?url=${encodeURIComponent(sheetUrl)}`,
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(sheetUrl)}`,
-          `https://thingproxy.freeboard.io/fetch/${sheetUrl}`,
-        ];
-        let res = null, lastErr = null;
-        for (const proxyUrl of proxies) {
-          try {
-            const attempt = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
-            if (attempt.ok) { res = attempt; break; }
-          } catch(e) { lastErr = e; }
-        }
-        if (!res) throw new Error(lastErr?.message || "All proxies failed — check sheet is public");
+        // Fetch directly — no proxy needed with Publish to Web URL
+        const res = await fetch(CSV_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         const parsed = parseCSV(text);
         if (parsed.length < 2) {
