@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Station Delta Analytics</title>
+  <style>
+    :root{
+      --bg:#060b11;
+      --surface:#0d1622;
+      --surface2:#121d2a;
+      --border:#1f3144;
+      --text:#d8e6f5;
+      --muted:#8ea3bb;
+      --green:#00d17a;
+      --blue:#4db8ff;
+      --amber:#ffb700;
+      --red:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 10% -5%,rgba(77,184,255,.08),transparent 65%),
+        radial-gradient(900px 500px at 95% 0%,rgba(0,209,122,.08),transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+      min-height:100vh;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:22px}
+    .top{
+      display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .title{font-size:22px;font-weight:700;letter-spacing:.04em}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .controls{
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    }
+    .card{
+      background:linear-gradient(180deg,var(--surface),var(--surface2));
+      border:1px solid var(--border);
+      border-radius:8px;
+    }
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px;margin-bottom:10px}
+    .kpi{padding:12px}
+    .kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    .kpi .val{font-size:24px;font-weight:700;margin-top:6px}
+    .kpi .hint{font-size:11px;color:var(--muted)}
+    .panes{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
+    .pane{padding:12px}
+    .pane h3{margin:0 0 10px 0;font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+    th{color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+    .mono{font-family:inherit}
+    button,select{
+      background:#08111b;color:var(--text);
+      border:1px solid var(--border);border-radius:6px;
+      padding:10px 16px;font:12px inherit;
+    }
+    button:focus,select:focus{outline:none;border-color:var(--blue)}
+    button{
+      cursor:pointer;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      background:linear-gradient(180deg,#12314f,#0e253a);
+    }
+    button:hover{filter:brightness(1.1)}
+    .status{
+      margin:8px 0 14px 0;padding:8px 10px;border-radius:6px;border:1px solid var(--border);
+      background:rgba(0,0,0,.2);font-size:12px;color:var(--muted);
+    }
+    .ok{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)}
+    .course-chip{
+      display:inline-block;padding:3px 8px;border:1px solid var(--border);border-radius:99px;
+      font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)
+    }
+    /* Raw columns debug panel */
+    #debugPanel{
+      margin-bottom:10px;display:none;
+    }
+    #debugPanel pre{
+      background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:6px;
+      padding:12px;font-size:11px;color:var(--amber);overflow-x:auto;white-space:pre-wrap;
+      word-break:break-all;margin:0;
+    }
+    @media (max-width: 980px){
+      .kpi-grid{grid-template-columns:repeat(3,minmax(120px,1fr))}
+      .panes{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">Station Delta Analytics Console</div>
+        <div class="sub">Live session telemetry · pulled from Google Sheets</div>
+      </div>
+      <div class="controls">
+        <select id="limit">
+          <option value="100">Last 100 rows</option>
+          <option value="200">Last 200 rows</option>
+          <option value="500" selected>Last 500 rows</option>
+          <option value="99999">All rows</option>
+        </select>
+        <button id="loadBtn">↺ Refresh</button>
+        <button id="autoBtn">Auto: Off</button>
+      </div>
+    </div>
+
+    <div id="status" class="status">Loading data from Google Sheets…</div>
+
+    <!-- Debug panel: shown only on first load so you can confirm column names -->
+    <div id="debugPanel" class="card pane">
+      <h3>📋 Column Headers Detected — confirm these match your sheet, then this panel hides itself</h3>
+      <pre id="debugPre"></pre>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="label">Rows</div><div id="kPackets" class="val">0</div><div class="hint">total sheet rows</div></div>
+      <div class="card kpi"><div class="label">Events</div><div id="kEvents" class="val">0</div><div class="hint">total events</div></div>
+      <div class="card kpi"><div class="label">Sessions</div><div id="kSessions" class="val">0</div><div class="hint">distinct session IDs</div></div>
+      <div class="card kpi"><div class="label">Retries</div><div id="kRetries" class="val">0</div><div class="hint">incorrect attempts</div></div>
+      <div class="card kpi"><div class="label">Hints Used</div><div id="kHints" class="val">0</div><div class="hint">hint expansions</div></div>
+      <div class="card kpi"><div class="label">Avg TTR</div><div id="kTTR" class="val">0s</div><div class="hint">time-to-respond</div></div>
+    </div>
+
+    <div class="panes">
+      <div class="card pane">
+        <h3>Course Summary</h3>
+        <table id="courseTable">
+          <thead><tr><th>Course</th><th>Sessions</th><th>Events</th><th>Retries</th><th>Hints</th><th>Avg TTR</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card pane">
+        <h3>Event Mix</h3>
+        <table id="typeTable">
+          <thead><tr><th>Event Type</th><th>Count</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card pane" style="margin-top:10px">
+      <h3>Recent Rows</h3>
+      <table id="packetTable">
+        <thead><tr><th>Received</th><th>Course</th><th>Session</th><th>Event Type</th><th>Correct?</th><th>Page / Step</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ─── CONFIG ──────────────────────────────────────────────────────────────
+    const SHEET_ID  = "1IjJhdUguxOjC6NwyKIZlLxH0k--4UYvULWEf8yhz_H4";
+    const GID       = "0";   // the sheet tab id from your URL  (#gid=0)
+    const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+
+    // ─── COLUMN NAME MAPPING ─────────────────────────────────────────────────
+    // These are the column headers we look for (case-insensitive, partial match).
+    // Edit them here if your sheet uses different names.
+    const COL = {
+      receivedAt : ["receivedat","received_at","timestamp","time","date","created"],
+      courseId   : ["courseid","course_id","course"],
+      sessionId  : ["sessionid","session_id","session"],
+      eventType  : ["eventtype","event_type","type","event"],
+      correct    : ["correct","iscorrect","is_correct","result"],
+      ttrMs      : ["ttrms","ttr_ms","ttr","time_to_respond","responsetime","response_time"],
+      hint       : ["hint_used","hintused","hint"],
+      page       : ["page","pageid","page_id","step","stepid","step_id","url"],
+    };
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const statusEl   = document.getElementById("status");
+    const loadBtn    = document.getElementById("loadBtn");
+    const autoBtn    = document.getElementById("autoBtn");
+    const debugPanel = document.getElementById("debugPanel");
+    const debugPre   = document.getElementById("debugPre");
+    let autoTimer    = null;
+    let firstLoad    = true;
+
+    function setStatus(msg, cls) {
+      statusEl.className = "status " + (cls || "");
+      statusEl.textContent = msg;
+    }
+    function emptyBody(id) {
+      const tb = document.querySelector(id + " tbody");
+      tb.innerHTML = "";
+      return tb;
+    }
+    function td(v) {
+      const x = document.createElement("td");
+      x.textContent = v ?? "";
+      return x;
+    }
+    function fmtSec(ms) {
+      if (!Number.isFinite(ms) || ms <= 0) return "—";
+      return (ms / 1000).toFixed(1) + "s";
+    }
+
+    // ── CSV parser (handles quoted fields with commas) ──
+    function parseCSV(text) {
+      const lines = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+      function splitLine(line) {
+        const out = [];
+        let cur = "", inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+            else inQ = !inQ;
+          } else if (ch === ',' && !inQ) {
+            out.push(cur); cur = "";
+          } else cur += ch;
+        }
+        out.push(cur);
+        return out;
+      }
+      return lines.filter(l => l.trim()).map(splitLine);
+    }
+
+    // ── Find column index by matching COL aliases ──
+    function findCol(headers, aliases) {
+      const h = headers.map(s => String(s).toLowerCase().replace(/[^a-z0-9]/g,""));
+      for (const alias of aliases) {
+        const idx = h.indexOf(alias.toLowerCase().replace(/[^a-z0-9]/g,""));
+        if (idx !== -1) return idx;
+      }
+      // fuzzy: check if any header contains alias
+      for (const alias of aliases) {
+        const a = alias.toLowerCase().replace(/[^a-z0-9]/g,"");
+        const idx = h.findIndex(hh => hh.includes(a) || a.includes(hh));
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    }
+
+    function g(row, idx) { return idx === -1 ? undefined : (row[idx] ?? "").trim(); }
+
+    function render(rows, headers) {
+      // Show debug panel on first load
+      if (firstLoad) {
+        debugPre.textContent = "Columns found:\n" + headers.map((h,i) => `  [${i}] "${h}"`).join("\n") +
+          "\n\nFirst data row (sample):\n" + (rows[0] ? rows[0].map((v,i) => `  [${i}] "${v}"`).join("\n") : "  (no data rows)");
+        debugPanel.style.display = "block";
+        firstLoad = false;
+        // Auto-hide debug after 30 s
+        setTimeout(() => { debugPanel.style.display = "none"; }, 30000);
+      }
+
+      // Map columns
+      const ci = {};
+      for (const [key, aliases] of Object.entries(COL)) {
+        ci[key] = findCol(headers, aliases);
+      }
+
+      const limit = Number(document.getElementById("limit").value || 500);
+      const sliced = rows.slice(-limit);
+
+      const sessions = new Set();
+      let retries = 0, hints = 0, ttrSum = 0, ttrCount = 0;
+      const byCourse = new Map();
+      const byType   = new Map();
+
+      for (const row of sliced) {
+        const course   = g(row, ci.courseId)  || "unknown";
+        const sid      = g(row, ci.sessionId) || "unknown";
+        const etype    = g(row, ci.eventType) || "unknown";
+        const correct  = g(row, ci.correct);
+        const ttrRaw   = g(row, ci.ttrMs);
+        const hintRaw  = g(row, ci.hint);
+
+        sessions.add(sid);
+
+        if (!byCourse.has(course)) byCourse.set(course, {sessions:new Set(),events:0,retries:0,hints:0,ttrSum:0,ttrCount:0});
+        const cr = byCourse.get(course);
+        cr.sessions.add(sid);
+        cr.events++;
+
+        byType.set(etype, (byType.get(etype)||0) + 1);
+
+        // Retries: event type contains "attempt" and correct is false/no/0
+        const isIncorrect = correct !== undefined && /^(false|no|0|f|n)$/i.test(correct.trim());
+        const isAttempt   = /attempt/i.test(etype);
+        if (isAttempt && isIncorrect) { retries++; cr.retries++; }
+
+        // Hints: event type or hint column
+        const isHint = /hint/i.test(etype) || (hintRaw && /^(true|yes|1|t|y)$/i.test(hintRaw.trim()));
+        if (isHint) { hints++; cr.hints++; }
+
+        // TTR
+        const ttrVal = parseFloat(ttrRaw);
+        if (Number.isFinite(ttrVal) && ttrVal > 0) {
+          // auto-detect if stored as seconds vs ms (assume >1000 = ms)
+          const ms = ttrVal > 1000 ? ttrVal : ttrVal * 1000;
+          ttrSum += ms; ttrCount++;
+          cr.ttrSum += ms; cr.ttrCount++;
+        }
+      }
+
+      document.getElementById("kPackets").textContent  = sliced.length;
+      document.getElementById("kEvents").textContent   = sliced.length;
+      document.getElementById("kSessions").textContent = sessions.size;
+      document.getElementById("kRetries").textContent  = retries;
+      document.getElementById("kHints").textContent    = hints;
+      document.getElementById("kTTR").textContent      = fmtSec(ttrCount ? ttrSum / ttrCount : 0);
+
+      const courseBody = emptyBody("#courseTable");
+      [...byCourse.entries()]
+        .sort((a,b) => b[1].events - a[1].events)
+        .forEach(([course, r]) => {
+          const tr = document.createElement("tr");
+          const c = document.createElement("td");
+          c.innerHTML = `<span class="course-chip">${course}</span>`;
+          tr.appendChild(c);
+          tr.appendChild(td(r.sessions.size));
+          tr.appendChild(td(r.events));
+          tr.appendChild(td(r.retries));
+          tr.appendChild(td(r.hints));
+          tr.appendChild(td(fmtSec(r.ttrCount ? r.ttrSum / r.ttrCount : 0)));
+          courseBody.appendChild(tr);
+        });
+
+      const typeBody = emptyBody("#typeTable");
+      [...byType.entries()]
+        .sort((a,b) => b[1]-a[1])
+        .forEach(([type,count]) => {
+          const tr = document.createElement("tr");
+          tr.appendChild(td(type));
+          tr.appendChild(td(count));
+          typeBody.appendChild(tr);
+        });
+
+      const packetBody = emptyBody("#packetTable");
+      [...sliced].reverse().slice(0,60).forEach(row => {
+        const tr = document.createElement("tr");
+        const recv = g(row, ci.receivedAt);
+        tr.appendChild(td(recv || "—"));
+        tr.appendChild(td(g(row, ci.courseId)  || "unknown"));
+        tr.appendChild(td(String(g(row, ci.sessionId) || "unknown").slice(0,14)));
+        tr.appendChild(td(g(row, ci.eventType) || "—"));
+        tr.appendChild(td(g(row, ci.correct)   || "—"));
+        tr.appendChild(td(String(g(row, ci.page) || "").slice(0,40)));
+        packetBody.appendChild(tr);
+      });
+    }
+
+    async function loadData() {
+      setStatus("Fetching from Google Sheets…", "warn");
+      try {
+        // Use a CORS proxy for the Google Sheets CSV export
+        // The sheet must be shared as "Anyone with the link can view"
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const parsed = parseCSV(text);
+        if (parsed.length < 2) {
+          setStatus("Sheet appears empty or returned no data rows.", "warn");
+          return;
+        }
+        const headers = parsed[0];
+        const rows    = parsed.slice(1).filter(r => r.some(c => c.trim()));
+        render(rows, headers);
+        setStatus(`✓ Loaded ${rows.length} rows at ${new Date().toLocaleTimeString()}`, "ok");
+      } catch (err) {
+        setStatus(`Load error: ${String(err.message || err)}`, "bad");
+        console.error(err);
+      }
+    }
+
+    function setAuto(on) {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+      if (on) autoTimer = setInterval(loadData, 30000);
+      autoBtn.textContent = `Auto: ${on ? "On" : "Off"}`;
+    }
+
+    loadBtn.addEventListener("click", loadData);
+    autoBtn.addEventListener("click", () => {
+      const next = autoBtn.textContent.includes("Off");
+      setAuto(next);
+      if (next) loadData();
+    });
+
+    // Load immediately on page open
+    loadData();
+  </script>
+</body>
+</html>
