@@ -409,6 +409,32 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
 @media(max-width:520px){
   .tracks-grid{grid-template-columns:1fr}
 }
+  /* ── BIGGER J.A.N.E.T. QUIZ TEXT ── */
+.jq-q-prompt {
+  font-size: 26px !important;      /* was 20px */
+  line-height: 1.35;
+}
+
+.jq-intro,
+.jq-result {
+  font-size: 14px !important;      /* was 12px */
+  line-height: 1.85;
+}
+
+.jq-opt {
+  font-size: 16px !important;      /* was 14px */
+  line-height: 1.5;
+}
+
+/* Mobile adjustment (keeps it readable on phones) */
+@media (max-width: 760px) {
+  .jq-q-prompt {
+    font-size: 22px !important;
+  }
+  .jq-opt {
+    font-size: 15px !important;
+  }
+}
 </style>
 </head>
 <body>
