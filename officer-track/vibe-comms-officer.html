@@ -1445,7 +1445,7 @@ function syncDots(){
   }
 }
 
-const SAVE_KEY='vco_v1';
+const SAVE_KEY='vcmo_v1';
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
 
