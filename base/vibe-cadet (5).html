@@ -2803,6 +2803,7 @@ function trackEaster(id){
  
 /* ── AGENT CARDS ── */
 function addAgent(role,name){
+  if(G.agents && G.agents.some(a => a.role === role && a.title === title)) return;
   document.getElementById('crew-empty').style.display='none';
   const tips={manager:'Click for tips on delegating tasks.',specialist:'Click for code generation tips.'};
   const c=document.createElement('div');
@@ -4076,6 +4077,13 @@ if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
 }
 applyUIPreferences();
 </script>
-<script src="analytics-client.js"></script>
+<script>
+  (function(){
+    var s=document.createElement('script');
+    s.src='analytics-client.js';
+    s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
+    document.body.appendChild(s);
+  })();
+</script>
 </body>
 </html>
