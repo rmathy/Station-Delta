@@ -77,7 +77,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;gap:14px;padding:0 18px;
 }
-#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap;display:flex;flex-direction:column;line-height:1.1}
+#logo-sub{font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
 #cadet-tag{font-size:11px;color:var(--muted2)}
 #cadet-tag b{color:var(--blue)}
  
@@ -616,7 +617,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
-.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.modal-sub-title{font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:18px}
 .mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
 .mbtn-p{background:var(--green);color:#000}.mbtn-p:hover{opacity:.85}
@@ -736,7 +738,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
   <!-- TOP BAR -->
   <div id="topbar">
-    <div id="logo">Cadet</div>
+   <div id="logo">STATION DELTA<span id="logo-sub">CADET</span></div>
     <div id="cadet-tag">Cadet: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -3967,7 +3969,7 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 function bootTerminal(){
   const pathLabel = {explorer:'GUIDED MODE', practitioner:'PRACTITIONER MODE', expert:'EXPERT MODE'};
   const lines=[
-    {t:'Station Delta: Cadet',c:'ln-success'},
+    {t:'STATION DELTA: CADET — OPERATIONAL READINESS v1.0',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'GNU coreutils: OK',c:'ln-sys'},
     {t:'Git subsystem: OK',c:'ln-sys'},
