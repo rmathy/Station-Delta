@@ -504,9 +504,6 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px;
 }
 
-#shell.strip-hidden{grid-template-rows:48px 0 1fr}
-#shell.strip-hidden #lola-strip{display:none}
- 
 /* ── MOBILE CTX MIRROR (right panel expand section) ── */
 #mobile-ctx-section{
   display:none; /* hidden on desktop; shown on mobile via media query */
@@ -746,7 +743,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
-      <button id="mobile-strip-toggle-btn" aria-label="Toggle L.O.L.A. guidance strip" onclick="toggleStripDismiss()" title="Show/hide L.O.L.A. strip"></button>
+     
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
@@ -764,7 +761,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <div id="lola-strip-ctrls">
       <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
-      <button class="strip-btn" id="strip-dismiss-btn" aria-pressed="false" aria-label="Hide scrolling guidance" onclick="toggleStripDismiss()">Hide</button>
+    
     </div>
   </div>
 
@@ -3181,11 +3178,7 @@ function toggleStripPause(){
   save();
 }
 
-function toggleStripDismiss(){
-  G.stripHidden = !G.stripHidden;
-  applyUIPreferences();
-  save();
-}
+
 
 function toggleRightPanel(){
   G.rightCollapsed = !G.rightCollapsed;
