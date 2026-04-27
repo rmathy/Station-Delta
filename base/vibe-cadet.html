@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Cadet Academy</title>
+<title>Station Delta: Cadet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -77,7 +77,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;gap:14px;padding:0 18px;
 }
-#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap;display:flex;flex-direction:column;line-height:1.1}
+#logo-sub{font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
 #cadet-tag{font-size:11px;color:var(--muted2)}
 #cadet-tag b{color:var(--blue)}
  
@@ -109,6 +110,29 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   letter-spacing:.04em;
 }
 #mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
+/* Persistent strip toggle — lives in topbar, survives strip hidden state */
+#mobile-strip-toggle-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:30px;height:30px;
+  background:var(--green-bg);
+  border:1px solid var(--green-d);
+  color:var(--green);
+  border-radius:var(--r4);
+  font-size:14px;
+  cursor:pointer;
+  transition:all .15s;
+  padding:0;
+  line-height:1;
+  flex-shrink:0;
+}
+#mobile-strip-toggle-btn:hover{background:var(--s3);border-color:var(--green)}
+#mobile-strip-toggle-btn.strip-is-hidden{
+  background:var(--s2);
+  border-color:var(--b2);
+  color:var(--muted2);
+}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
@@ -455,6 +479,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #input-row{flex-shrink: 0;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
 #prompt-pre{font-size:14px;color:var(--green);white-space:nowrap;user-select:none}
 #cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
+#boot-name{color:var(--text)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
 #input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
 
@@ -482,6 +507,30 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #shell.strip-hidden{grid-template-rows:48px 0 1fr}
 #shell.strip-hidden #lola-strip{display:none}
  
+/* ── MOBILE CTX MIRROR (right panel expand section) ── */
+#mobile-ctx-section{
+  display:none; /* hidden on desktop; shown on mobile via media query */
+  flex-shrink:0;
+  padding:10px 13px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--blue-bg);
+  border-left:2px solid var(--blue-d);
+}
+#mobile-ctx-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--blue);margin-bottom:5px;font-weight:700;
+}
+#mobile-ctx-title{
+  font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4;
+}
+#mobile-ctx-body{
+  font-size:11px;color:var(--muted2);line-height:1.7;
+}
+#mobile-ctx-body code{
+  background:var(--s3);padding:1px 4px;border-radius:3px;
+  color:var(--cyan);font-size:10px;
+}
+
 /* ── OBJECTIVE CARD (NOW SCROLLABLE) ── */
 #obj-card{
   border-bottom:1px solid var(--border);
@@ -568,7 +617,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
-.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.modal-sub-title{font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:18px}
 .mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
 .mbtn-p{background:var(--green);color:#000}.mbtn-p:hover{opacity:.85}
@@ -648,6 +698,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── responsive ── */
 @media(max-width:820px){
   #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  /* When strip hidden, recover the 28px row for terminal */
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  /* Right panel collapsed variants */
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
   #topbar{padding:0 10px;gap:8px}
   #logo{font-size:10px;letter-spacing:.12em}
   #cadet-tag{font-size:10px}
@@ -656,17 +711,18 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #tb-right .tbbtn{display:none}
   #career-impact-btn{padding:3px 8px;font-size:10px}
   #mobile-tools-btn{display:inline-flex}
+  #mobile-strip-toggle-btn{display:inline-flex}
   #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
   #term-panel #lola-sec{max-height:118px}
   #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
   #lola-sec,#crew-sec,#telem-sec{display:none}
+  #mobile-ctx-section{display:block}
   #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
   #prompt-pre{font-size:13px}
   #cmd{font-size:16px}
   #lola-strip-ctrls .strip-btn,
   #right-collapse-btn{min-height:36px;min-width:44px}
-  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
   #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
   #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
   #shell.right-collapsed #right-collapse-btn{
@@ -682,7 +738,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
   <!-- TOP BAR -->
   <div id="topbar">
-    <div id="logo">Vibe Cadet</div>
+   <div id="logo">STATION DELTA<span id="logo-sub">CADET</span></div>
     <div id="cadet-tag">Cadet: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -690,6 +746,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
+      <button id="mobile-strip-toggle-btn" aria-label="Toggle L.O.L.A. guidance strip" onclick="toggleStripDismiss()" title="Show/hide L.O.L.A. strip"></button>
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
@@ -758,6 +815,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="right-header">
       <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
     </div>
+    <!-- Mobile-only ctx mirror: surfaces objective context in the expanded panel -->
+    <div id="mobile-ctx-section">
+      <div id="mobile-ctx-label">📍 Current Objective</div>
+      <div id="mobile-ctx-title"></div>
+      <div id="mobile-ctx-body"></div>
+    </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Learn your first command to unlock it here</span></div>
@@ -784,8 +847,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🛸</div>
-    <div class="mtitle" style="color:var(--green);font-size:19px">Vibe Cadet Academy</div>
-    <div class="msub">A hands-on simulation for learning real CLI skills, Git, AI agents, MCP, and how to ship — by actually doing it.</div>
+    <div class="mtitle">Station Delta<span class="modal-sub-title">Cadet</span></div>    <div class="msub">A hands-on simulation for learning real CLI skills, Git, AI agents, MCP, and how to ship — by actually doing it.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real commands · smart wrong-answer diagnosis<br>
       <span>▸</span><b style="color:var(--green)">Just-in-time learning</b> — every command explained as you learn it<br>
@@ -829,11 +891,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🎖️</div>
     <div class="mtitle" style="text-align:center;color:var(--green)">Graduation Day</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Cadet Academy.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Cadet.</div>
     <div class="grad-cert">
       <div class="grad-ct">Certificate of Completion</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Cadet Academy · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Cadet · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Terminal navigation &amp; file operations (pwd, ls, cd, cat, echo, touch)<br>
@@ -929,7 +991,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE CADET ACADEMY — ENHANCED EDITION v4.0
+   Station Delta: Cadet
    L&D improvements: smart diagnosis, 3 paths, spaced repetition,
    constructed-response, break-it mode, career log, glossary links
    Bug fixes: boot input focus/visibility, modal padding/scroll
@@ -1226,7 +1288,7 @@ const ACHS = [
   {id:'crew_leader', icon:'👥', name:'Crew Leader',         desc:'Assembled a two-agent crew.'},
   {id:'prompter',    icon:'💬', name:'Prompt Crafter',      desc:'Sent your first structured agent prompt.'},
   {id:'shipper',     icon:'🚀', name:'Shipper',             desc:'Deployed your first app to production.'},
-  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Vibe Cadet Academy.'},
+  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Station Delta: Cadet.'},
   {id:'senior_cadet',icon:'⭐', name:'Senior Cadet',        desc:'Completed the post-graduation capstone.'},
   {id:'quiz_ace',    icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on the first try.'},
   {id:'eagle',       icon:'🦅', name:'Eagle Eye',           desc:'Completed a phase without revealing the answer.'},
@@ -2743,6 +2805,7 @@ function trackEaster(id){
  
 /* ── AGENT CARDS ── */
 function addAgent(role,name){
+  if(G.agents && G.agents.some(a => a.role === role && a.title === title)) return;
   document.getElementById('crew-empty').style.display='none';
   const tips={manager:'Click for tips on delegating tasks.',specialist:'Click for code generation tips.'};
   const c=document.createElement('div');
@@ -3007,11 +3070,16 @@ function lolaMessageForStep(step, phase, includeIntro=false){
 }
 
 function syncObjCard(){
+  const mCtxTitle=document.getElementById('mobile-ctx-title');
+  const mCtxBody=document.getElementById('mobile-ctx-body');
+
   if(G.sandbox){
     document.getElementById('obj-phase-label').textContent='SANDBOX MODE';
     document.getElementById('obj-title').textContent='Free exploration';
     document.getElementById('obj-context').textContent='All objectives complete. Any command accepted.';
     document.getElementById('obj-cmd-row').style.display='none';
+    if(mCtxTitle) mCtxTitle.textContent='Sandbox mode';
+    if(mCtxBody)  mCtxBody.textContent='All phases complete. Any command accepted.';
     return;
   }
   const ph=PHASES[G.phase];if(!ph)return;
@@ -3027,6 +3095,10 @@ function syncObjCard(){
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
   document.getElementById('obj-prog-fill').style.width=pct+'%';
+
+  // Mirror the objective title + ctx into the mobile expanded panel
+  if(mCtxTitle) mCtxTitle.textContent=s.obj||'';
+  if(mCtxBody)  mCtxBody.innerHTML=s.ctx||'';
 }
  
 function syncDots(){
@@ -3056,6 +3128,7 @@ function applyUIPreferences(){
   const pauseBtn=document.getElementById('strip-pause-btn');
   const hideBtn=document.getElementById('strip-dismiss-btn');
   const rightBtn=document.getElementById('right-collapse-btn');
+  const mobileStripBtn=document.getElementById('mobile-strip-toggle-btn');
   if(!shell) return;
 
   shell.classList.toggle('strip-hidden', !!G.stripHidden);
@@ -3075,6 +3148,13 @@ function applyUIPreferences(){
   if(rightBtn){
     rightBtn.textContent = G.rightCollapsed ? 'Expand' : 'Collapse';
     rightBtn.setAttribute('aria-pressed', G.rightCollapsed ? 'true' : 'false');
+  }
+  // Keep the persistent topbar strip toggle in sync
+  if(mobileStripBtn){
+    mobileStripBtn.textContent = G.stripHidden ? '⬢' : '⬡';
+    mobileStripBtn.title = G.stripHidden ? 'Show L.O.L.A. strip' : 'Hide L.O.L.A. strip';
+    mobileStripBtn.setAttribute('aria-label', G.stripHidden ? 'Show L.O.L.A. guidance strip' : 'Hide L.O.L.A. guidance strip');
+    mobileStripBtn.classList.toggle('strip-is-hidden', !!G.stripHidden);
   }
 }
 
@@ -3843,7 +3923,7 @@ function doRestart(){
 }
  
 function shareGrad(){
-  const txt=`Just graduated Vibe Cadet Academy v4 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
+  const txt=`Just graduated Station Delta: Cadet 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
   closeModal('grad-modal');
 }
@@ -3874,14 +3954,14 @@ function startAcademy(){
  
 // ── BUG FIX: Focus boot name input on mount ──
 window.addEventListener('load',()=>{
+  // Single consolidated focus — 300ms matches the startup decision block
+  // Style fix moved to CSS where it belongs
   setTimeout(()=>{
     const bootInput=document.getElementById('boot-name');
     if(bootInput && document.getElementById('boot-modal').classList.contains('open')){
       bootInput.focus();
-      // Ensure placeholder and caret are visible
-      bootInput.style.color='var(--text)';
     }
-  },200);
+  },300);
 });
  
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
@@ -3889,7 +3969,7 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 function bootTerminal(){
   const pathLabel = {explorer:'GUIDED MODE', practitioner:'PRACTITIONER MODE', expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE CADET ACADEMY v4.0 — ENHANCED EDITION',c:'ln-success'},
+    {t:'STATION DELTA: CADET — OPERATIONAL READINESS v1.0',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'GNU coreutils: OK',c:'ln-sys'},
     {t:'Git subsystem: OK',c:'ln-sys'},
@@ -3947,7 +4027,7 @@ function resumeSession(){
     blank();showBossStep(G.bossStep);
   } else if(G.pendingPhaseStart){
     const ph=PHASES[G.phase];
-    renderStaticStep(ph.steps[0]);
+    renderStaticStep(ph.steps[G.step]);
     setLola('Checkpoint reached. You finished a phase, and this is a good place to pause. When you are ready, start the next phase from the checkpoint dialog.');
     openPhaseCheckpoint(PHASES[G.phase-1], ph);
   } else {
@@ -3999,6 +4079,13 @@ if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
 }
 applyUIPreferences();
 </script>
-<script src="analytics-client.js"></script>
+<script>
+  (function(){
+    var s=document.createElement('script');
+    s.src='analytics-client.js';
+    s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
+    document.body.appendChild(s);
+  })();
+</script>
 </body>
 </html>
