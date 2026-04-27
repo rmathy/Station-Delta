@@ -478,6 +478,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #input-row{flex-shrink: 0;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
 #prompt-pre{font-size:14px;color:var(--green);white-space:nowrap;user-select:none}
 #cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
+#boot-name{color:var(--text)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
 #input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
 
@@ -3952,14 +3953,14 @@ function startAcademy(){
  
 // ── BUG FIX: Focus boot name input on mount ──
 window.addEventListener('load',()=>{
+  // Single consolidated focus — 300ms matches the startup decision block
+  // Style fix moved to CSS where it belongs
   setTimeout(()=>{
     const bootInput=document.getElementById('boot-name');
     if(bootInput && document.getElementById('boot-modal').classList.contains('open')){
       bootInput.focus();
-      // Ensure placeholder and caret are visible
-      bootInput.style.color='var(--text)';
     }
-  },200);
+  },300);
 });
  
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
