@@ -736,7 +736,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
   <!-- TOP BAR -->
   <div id="topbar">
-    <div id="logo">Vibe Cadet</div>
+    <div id="logo">Cadet</div>
     <div id="cadet-tag">Cadet: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -845,8 +845,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🛸</div>
-    <div class="mtitle" style="color:var(--green);font-size:19px">Vibe Cadet Academy</div>
-    <div class="msub">A hands-on simulation for learning real CLI skills, Git, AI agents, MCP, and how to ship — by actually doing it.</div>
+    <div class="mtitle">Station Delta<span class="modal-sub-title">Cadet</span></div>    <div class="msub">A hands-on simulation for learning real CLI skills, Git, AI agents, MCP, and how to ship — by actually doing it.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real commands · smart wrong-answer diagnosis<br>
       <span>▸</span><b style="color:var(--green)">Just-in-time learning</b> — every command explained as you learn it<br>
@@ -894,7 +893,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div class="grad-cert">
       <div class="grad-ct">Certificate of Completion</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Cadet Academy · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Cadet · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Terminal navigation &amp; file operations (pwd, ls, cd, cat, echo, touch)<br>
@@ -990,7 +989,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE CADET ACADEMY — ENHANCED EDITION v4.0
+   Station Delta: Cadet
    L&D improvements: smart diagnosis, 3 paths, spaced repetition,
    constructed-response, break-it mode, career log, glossary links
    Bug fixes: boot input focus/visibility, modal padding/scroll
@@ -1287,7 +1286,7 @@ const ACHS = [
   {id:'crew_leader', icon:'👥', name:'Crew Leader',         desc:'Assembled a two-agent crew.'},
   {id:'prompter',    icon:'💬', name:'Prompt Crafter',      desc:'Sent your first structured agent prompt.'},
   {id:'shipper',     icon:'🚀', name:'Shipper',             desc:'Deployed your first app to production.'},
-  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Vibe Cadet Academy.'},
+  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Station Delta: Cadet.'},
   {id:'senior_cadet',icon:'⭐', name:'Senior Cadet',        desc:'Completed the post-graduation capstone.'},
   {id:'quiz_ace',    icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on the first try.'},
   {id:'eagle',       icon:'🦅', name:'Eagle Eye',           desc:'Completed a phase without revealing the answer.'},
@@ -3922,7 +3921,7 @@ function doRestart(){
 }
  
 function shareGrad(){
-  const txt=`Just graduated Vibe Cadet Academy v4 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
+  const txt=`Just graduated Station Delta: Cadet 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
   closeModal('grad-modal');
 }
@@ -3968,7 +3967,7 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 function bootTerminal(){
   const pathLabel = {explorer:'GUIDED MODE', practitioner:'PRACTITIONER MODE', expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE CADET ACADEMY v4.0 — ENHANCED EDITION',c:'ln-success'},
+    {t:'Station Delta: Cadet',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'GNU coreutils: OK',c:'ln-sys'},
     {t:'Git subsystem: OK',c:'ln-sys'},
