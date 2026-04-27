@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Cadet Academy</title>
+<title>Station Delta: Cadet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -3148,7 +3148,7 @@ function applyUIPreferences(){
   }
   // Keep the persistent topbar strip toggle in sync
   if(mobileStripBtn){
-    mobileStripBtn.textContent = G.stripHidden ? '⬡' : '⬡';
+    mobileStripBtn.textContent = G.stripHidden ? '⬢' : '⬡';
     mobileStripBtn.title = G.stripHidden ? 'Show L.O.L.A. strip' : 'Hide L.O.L.A. strip';
     mobileStripBtn.setAttribute('aria-label', G.stripHidden ? 'Show L.O.L.A. guidance strip' : 'Hide L.O.L.A. guidance strip');
     mobileStripBtn.classList.toggle('strip-is-hidden', !!G.stripHidden);
@@ -4024,7 +4024,7 @@ function resumeSession(){
     blank();showBossStep(G.bossStep);
   } else if(G.pendingPhaseStart){
     const ph=PHASES[G.phase];
-    renderStaticStep(ph.steps[0]);
+    renderStaticStep(ph.steps[G.step]);
     setLola('Checkpoint reached. You finished a phase, and this is a good place to pause. When you are ready, start the next phase from the checkpoint dialog.');
     openPhaseCheckpoint(PHASES[G.phase-1], ph);
   } else {
