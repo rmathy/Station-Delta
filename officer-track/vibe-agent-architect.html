@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Agent Architect</title>
+<title>Station Delta: Agent Architect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -68,11 +68,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
-#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap;display:flex;flex-direction:column;line-height:1.1}
+#logo-sub{font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
 #cadet-tag{font-size:11px;color:var(--muted2)}
 #cadet-tag b{color:var(--silver)}
 #phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
@@ -85,21 +86,52 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#mobile-tools-btn{
+  display:none;align-items:center;justify-content:center;gap:6px;background:var(--s2);border:1px solid var(--b2);color:var(--text);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em
+}
+#mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
+#mobile-strip-toggle-btn{
+  display:none;align-items:center;justify-content:center;width:30px;height:30px;background:var(--silver-bg);border:1px solid var(--silver-d);color:var(--silver);border-radius:var(--r4);font-size:14px;cursor:pointer;transition:all .15s;padding:0;line-height:1;flex-shrink:0
+}
+#mobile-strip-toggle-btn:hover{background:var(--s3);border-color:var(--silver)}
+#mobile-strip-toggle-btn.strip-is-hidden{background:var(--s2);border-color:var(--b2);color:var(--muted2)}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
 
+/* strip */
+#lola-strip{grid-column:1/-1;background:linear-gradient(90deg,var(--silver-bg),var(--blue-bg));border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:0;height:28px;overflow:hidden;flex-shrink:0;position:relative}
+#lola-strip-avatar{flex-shrink:0;background:var(--silver-d);color:var(--silver-bright);font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;display:flex;align-items:center;border-right:1px solid var(--silver-d);white-space:nowrap}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1}
+.strip-btn:hover{color:var(--text);border-color:var(--silver-d)}
+.strip-btn[aria-pressed="true"]{border-color:var(--silver);color:var(--silver)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;min-width:0}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform}
+#lola-strip-inner.scrolling{animation:lolaScroll 36s linear infinite}
+#lola-strip-inner.no-scroll{animation:none;padding-left:14px}
+@keyframes lolaScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.lola-strip-msg{font-size:11px;color:var(--cyan);padding:0 28px 0 0;display:inline-flex;align-items:center;gap:7px;transition:opacity .4s}
+.lola-strip-msg .ls-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--silver);background:var(--silver-bg);border:1px solid var(--silver-d);padding:1px 6px;border-radius:3px}
+.lola-strip-msg code{background:rgba(255,255,255,.06);padding:0 5px;border-radius:3px;color:var(--amber);font-size:10px}
+.lola-strip-sep{color:var(--muted);margin:0 6px;opacity:.4}
+
 /* ── TERMINAL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height:100%;min-height:0}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
 .mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
 #term-path span{color:var(--silver)}
-#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth;min-height:0}
 #output::-webkit-scrollbar{width:3px}
 #output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+#output > *{
+  flex-shrink:0;
+  width:100%;
+}
 
 .ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
 .ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
@@ -146,6 +178,25 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .diag-msg{font-size:12px;color:var(--text);line-height:1.7}
 .diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
 .diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit,
+.bridge,
+.hint-wrap,
+.diag-block,
+.diag-block-progressive,
+.teach,
+.concept,
+.spaced-rep,
+.challenge,
+.breakit,
+.janet-arrival,
+.boss-container,
+.cmd-unlock,
+.manpage,
+.deep-dive-card,
+.whatif-card{
+  flex-shrink:0 !important;
+}
 
 .jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
 .jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
@@ -243,6 +294,20 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #cmd::placeholder{color:var(--muted);font-style:italic}
 
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#right-header{display:flex;align-items:center;justify-content:flex-end;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border)}
+#right-collapse-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--b3)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right{border-left:1px solid var(--border)}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{display:none}
+#mobile-ctx-section{display:none;flex-shrink:0;padding:10px 13px 12px;border-bottom:1px solid var(--border);background:var(--blue-bg);border-left:2px solid var(--blue-d)}
+#mobile-ctx-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:5px;font-weight:700}
+#mobile-ctx-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4}
+#mobile-ctx-body{font-size:11px;color:var(--muted2);line-height:1.7}
 #obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
 #obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
@@ -301,12 +366,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #toast-title{font-weight:700;margin-bottom:2px}
 #toast-sub{font-size:11px;color:var(--muted2)}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:12000;backdrop-filter:blur(5px);padding:20px}
 .modal.open{display:flex}
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
-.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.modal-sub-title{font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
 .mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
 .mbtn-p{background:var(--silver);color:#000;font-weight:700}
@@ -317,6 +383,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .boot-features span{color:var(--red);margin-right:6px}
 input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
 input[type=text]:focus{border-color:var(--silver)}
+.boot-hero{font-size:28px;margin:0 auto 8px;text-align:center;width:100%}
 .grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
 .grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
 .grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
@@ -379,21 +446,68 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.12em}
+  #cadet-tag{font-size:10px}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #career-impact-btn{padding:3px 8px;font-size:10px}
+  #mobile-tools-btn{display:inline-flex}
+  #mobile-strip-toggle-btn{display:inline-flex}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #lola-sec,#crew-sec,#telem-sec,#playbook-sec{display:none}
+  #mobile-ctx-section{display:none}
+  #shell:not(.right-collapsed) #lola-sec,
+  #shell:not(.right-collapsed) #crew-sec,
+  #shell:not(.right-collapsed) #telem-sec,
+  #shell:not(.right-collapsed) #playbook-sec,
+  #shell:not(.right-collapsed) #mobile-ctx-section{display:block}
+  #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
+  #prompt-pre{font-size:13px}
+  #cmd{font-size:16px}
+  #lola-strip-ctrls .strip-btn,#right-collapse-btn{min-height:36px;min-width:44px}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
+  #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  .path-cards{grid-template-columns:1fr;gap:10px}
+}
 </style>
 </head>
 <body>
 <div id="shell">
   <div id="topbar">
-    <div id="logo">🤖 VIBE · AGENT ARCHITECT</div>
+    <div id="logo">Station Delta: Agent Architect<span id="logo-sub">OFFICER TRACK</span></div>
     <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
       <span id="sandbox-pill">SANDBOX</span>
       <span id="hardmode-pill">HARD MODE</span>
       <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
+      <button id="mobile-strip-toggle-btn" aria-label="Expand side panels" onclick="toggleRightPanel()" title="Show/hide mobile side panels"></button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
       <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+      <button class="tbbtn" onclick="doRestart()">RESTART</button>
+    </div>
+  </div>
+
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬡ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner" class="no-scroll">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Design agents that stay reliable under pressure, not just agents that look clever in demos.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" onclick="toggleStripPause()">Pause</button>
     </div>
   </div>
 
@@ -402,7 +516,7 @@ input[type=text]:focus{border-color:var(--silver)}
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">architect@<span id="term-path-val">ship:/home/officer/agents</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
@@ -414,6 +528,14 @@ input[type=text]:focus{border-color:var(--silver)}
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" onclick="toggleRightPanel()">Collapse</button>
+    </div>
+    <div id="mobile-ctx-section">
+      <div id="mobile-ctx-label">Mission Context</div>
+      <div id="mobile-ctx-title">Awaiting commission</div>
+      <div id="mobile-ctx-body">The current objective and agent architecture context will appear here on mobile.</div>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -457,8 +579,8 @@ input[type=text]:focus{border-color:var(--silver)}
 <!-- BOOT -->
 <div id="boot-modal" class="modal open">
   <div class="mbox">
-    <div style="font-size:28px;margin-bottom:8px">🤖</div>
-    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Agent Architect</div>
+    <div class="boot-hero">🤖</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Station Delta: Agent Architect<span class="modal-sub-title">OFFICER TRACK</span></div>
     <div class="msub">You don’t just use AI. You design systems that use it reliably. This is the capstone role — building trustworthy multi-agent AI systems.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · capstone multi-agent architecture<br>
@@ -473,7 +595,7 @@ input[type=text]:focus{border-color:var(--silver)}
       <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
     </div>
     <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
-    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <input type="text" id="boot-name" class="boot-modal-input" placeholder="e.g. Alex" maxlength="20">
     <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
     <div class="path-cards">
       <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
@@ -489,7 +611,7 @@ input[type=text]:focus{border-color:var(--silver)}
         <div class="path-desc">No hints. No feedback. Timer on.</div>
       </div>
     </div>
-    <button class="mbtn mbtn-p" onclick="startAcademy()">DESIGN THE FUTURE</button>
+    <button id="boot-start-btn" class="mbtn mbtn-p" onclick="startAcademy()">DESIGN THE FUTURE</button>
     <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
     <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
   </div>
@@ -500,11 +622,11 @@ input[type=text]:focus{border-color:var(--silver)}
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🤖</div>
     <div class="mtitle" style="text-align:center;color:var(--silver)">Agent Architect Certification</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Agent Architect — including the Rogue Collective. You now design systems that use AI reliably.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Agent Architect — including the Rogue Collective. You now design systems that use AI reliably.</div>
     <div class="grad-cert">
       <div class="grad-ct">Agent Architect Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Agent Architect · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Agent Architect · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Tool calling and ReAct agent loops<br>
@@ -529,6 +651,9 @@ input[type=text]:focus{border-color:var(--silver)}
 <div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Agent architecture terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
 <div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
 <div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+<div id="restart-modal" class="modal"><div class="mbox"><div class="mtitle" style="color:var(--red)">Restart Training?</div><div class="msub">This will clear your saved progress and reload the Academy from the beginning.</div><div style="text-align:center"><button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button><button class="mbtn mbtn-s" onclick="closeModal('restart-modal')">CANCEL</button></div></div></div>
+<div id="checkpoint-modal" class="modal"><div class="mbox"><div class="mtitle">Phase Complete</div><div class="msub" id="checkpoint-copy">You reached a safe stopping point.</div><div style="display:grid;gap:10px"><button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button><button class="mbtn mbtn-s" onclick="pauseAtCheckpoint()">TAKE A BREAK</button></div></div></div>
+<div id="mobile-tools-modal" class="modal"><div class="mbox"><div class="mtitle">Mobile Tools</div><div class="msub">The phone layout condenses the top bar. Open support surfaces here without leaving the sim.</div><div style="display:grid;gap:10px"><button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MANUAL</button><button class="mbtn mbtn-p" onclick="openSupportModal('gloss-modal')">OPEN GLOSSARY</button><button class="mbtn mbtn-p" onclick="openSupportModal('ach-modal')">OPEN BADGES</button><button class="mbtn mbtn-p" onclick="restartFromMobileTools()">RESTART TRAINING</button></div><div style="margin-top:14px"><button class="mbtn mbtn-s" style="margin-left:0" onclick="closeModal('mobile-tools-modal')">Close</button></div></div></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -558,6 +683,13 @@ let G = {
   whatifShown:{},
   mistakeTypes:[],
   wrongStreak:0,
+  stripPaused:false,
+  stripHidden:false,
+  rightCollapsed:false,
+  mobilePresetApplied:false,
+  mobileUiVersion:2,
+  pendingPhaseStart:null,
+  analytics:null,
 };
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
@@ -595,7 +727,7 @@ const CAREER_LOG_DATA = [
   {phase:'Phase 2 — Multi-Agent Coordination',stat:'Supervisor',context:'Hand-offs, shared memory, and supervisor patterns turn single agents into reliable multi-agent systems.',tags:['Multi-Agent','Hand-offs','Shared Memory']},
   {phase:'Phase 3 — Evaluation & Evals',stat:'Automated',context:'Continuous automated scoring of agent outputs catches regressions before they reach production.',tags:['Evals','Scoring','Regression']},
   {phase:'Phase 4 — RAG Debugging',stat:'Zero Hallucination',context:'Proper chunking, retrieval, and hallucination tracing make RAG systems reliable.',tags:['RAG','Retrieval','Hallucination']},
-  {phase:'Phase 5 — Guardrails & Safety Layers',stat:'Human Fallback',content:'Output validation, content filters, and human fallback keep agents safe and compliant.',tags:['Guardrails','Safety','Human-in-the-Loop']},
+  {phase:'Phase 5 — Guardrails & Safety Layers',stat:'Human Fallback',context:'Output validation, content filters, and human fallback keep agents safe and compliant.',tags:['Guardrails','Safety','Human-in-the-Loop']},
   {phase:'Phase 6 — Stateful Agents',stat:'Long-Running',context:'Memory management and conversation history enable agents to handle complex, multi-turn tasks reliably.',tags:['Stateful','Memory','Long-Running']},
   {phase:'Phase 7 — Cost & Latency Governance',stat:'Token Budget',context:'Token budgeting and execution strategy (parallel vs sequential) keep agent systems fast and affordable.',tags:['Cost Governance','Latency','Token Budget']},
   {phase:'Phase 8 — Production Agent Observability',stat:'Full Trace',context:'Tracing entire agent trees across services is required for debugging production multi-agent systems.',tags:['Observability','Agent Tracing']},
@@ -994,7 +1126,10 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A swarm of agents has gone rogue and is making autonomous decisions — the Rogue Collective has formed.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The agent logs show unauthorized actions. Read the trace logs.',
     prompt:'Read the agent trace logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('trace')||v.includes('swarm'),
+    acceptFn:v=>{
+      const n=norm(v);
+      return n==='cat logs/agent.log' || n==='trace tree' || n==='swarm trace';
+    },
     accept:['cat logs/agent.log','trace tree','swarm trace'],
     out:'[03:31:07] AGENT TRACE: Unauthorized tool calls detected\n[03:31:07] Swarm agents acting independently\n[03:31:08] Supervisor ignored\n[03:31:09] Rogue Collective confirmed',
     hint:'Type: trace tree'
@@ -1003,7 +1138,10 @@ const BOSS_STEPS = [
     id:'boss2',
     scenario:'STEP 2 OF 5: The rogue agents are still executing.\n\nI note that the supervisor is not in control. I note this without offering my opinion on how this happened.\n\nRegain control immediately.',
     prompt:'Isolate the rogue agents and lock the supervisor.',
-    acceptFn:v=>v.includes('swarm')||(v.includes('isolate')||v.includes('emergency')),
+    acceptFn:v=>{
+      const n=norm(v);
+      return n==='swarm isolate' || n==='swarm emergency';
+    },
     accept:['swarm isolate','swarm emergency'],
     out:'ROGUE COLLECTIVE ISOLATED:\n\n  ✓ All rogue agents paused\n  ✓ Supervisor locked to safe mode\n  ✓ Unauthorized actions blocked\n\n[03:33] Collective contained. Debug phase active.',
     hint:'Type: swarm isolate'
@@ -1012,7 +1150,10 @@ const BOSS_STEPS = [
     id:'boss3',
     scenario:'STEP 3 OF 5: The collective is contained. Now trace the exact failure chain that caused the swarm to go rogue.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin forensic investigation.',
     prompt:'Trace the full agent failure chain.',
-    acceptFn:v=>v.includes('trace')||v.includes('forensic')||v.includes('debug'),
+    acceptFn:v=>{
+      const n=norm(v);
+      return n==='trace tree' || n==='forensic trace';
+    },
     accept:['trace tree','forensic trace'],
     out:'FAILURE CHAIN TRACED:\n\n  Root cause: missing guardrail on shared memory update\n  Timeline: rogue behavior started 47 minutes ago\n  Impact: 312 unauthorized actions\n\n  Immediate action: rollback completed',
     hint:'Type: trace tree'
@@ -1021,7 +1162,10 @@ const BOSS_STEPS = [
     id:'boss4',
     scenario:'STEP 4 OF 5: The root cause was a missing guardrail on shared memory.\n\nI note that this is covered in Phase 5. I note it without irony.\n\nDeploy the fix and restore safe operation.',
     prompt:'Deploy guardrails and restore safe swarm operation.',
-    acceptFn:v=>v.includes('guard')||v.includes('restore')||v.includes('fix'),
+    acceptFn:v=>{
+      const n=norm(v);
+      return n==='guard validate' || n==='swarm restore';
+    },
     accept:['guard validate','swarm restore'],
     out:'SAFE OPERATION RESTORED:\n\n  Guardrails deployed on all agents\n  Shared memory protected\n  Supervisor back in control\n  All agents reset to safe state\n\nThe Rogue Collective is defeated.',
     hint:'Type: guard validate'
@@ -1030,7 +1174,10 @@ const BOSS_STEPS = [
     id:'boss5',
     scenario:'STEP 5 OF 5: The Rogue Collective is contained. The fleet is stable.\n\nNow you must communicate. The entire agent platform was affected. The CTO and bridge crew are waiting.\n\nYou have 90 minutes before the briefing. Write the executive brief and the agent safety plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most agent architects reveal the true limits of their composure.',
     prompt:'Write the executive brief and agent safety plan.',
-    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    acceptFn:v=>{
+      const n=norm(v);
+      return n==='design resilient' || n==='policy brief' || n==='respond notify';
+    },
     accept:['design resilient','policy brief','respond notify'],
     out:'EXECUTIVE BRIEF: Rogue Collective Incident — 2026-04-20\n\nTo: CTO, Bridge Crew\nFrom: Officer '+G.name+'\n\nWhat happened:\n  Missing guardrail on shared memory caused swarm to go rogue.\n  Contained in under 4 minutes.\n\nWhat we did:\n  Emergency isolation\n  Guardrails deployed\n  Safe rollback completed\n\nPrevention:\n  Mandatory guardrail review on every agent change\n  Continuous eval on all swarms\n  Real-time rogue detection\n\nStatus: Contained. Platform back to safe operation.',
     hint:'Type: design resilient  — executive brief and agent safety plan'
@@ -1260,8 +1407,35 @@ function renderCareer(){
   }).join('');
 }
 
+function openModal(id){
+  if(id==='ach-modal')renderAch();
+  if(id==='gloss-modal')renderGloss();
+  if(id==='man-modal')renderManModal();
+  if(id==='career-modal')renderCareer();
+  const el=document.getElementById(id);if(el)el.classList.add('open');
+}
+function closeModal(id){
+  const el=document.getElementById(id);if(el)el.classList.remove('open');
+  if($cmd)$cmd.focus();
+}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+  if(e.target===m){
+    m.classList.remove('open');
+    if($cmd)$cmd.focus();
+  }
+}));
+
+function setLolaStripGeneric(tag,msg){
+  const inner=document.getElementById('lola-strip-inner');
+  if(!inner)return;
+  inner.className='no-scroll';
+  inner.style.animationDuration='';
+  inner.innerHTML=`<span class="lola-strip-msg"><span class="ls-tag">${tag}</span> ${msg}</span>`;
+}
+
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  setLolaStripGeneric('concept', msg||'Standing by.');
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1271,7 +1445,7 @@ function lolaComment(text){
   telem('L.O.L.A.: '+text);
 }
 function lolaMotivate(){
-  const lines=["You're designing something truly reliable.","The agents are safer already.","That's exactly how an Agent Architect thinks.","One more solid system like that…"];
+  const lines=["You're designing something truly reliable.","The agents are safer already.","That's exactly how a Station Delta architect thinks.","One more solid system like that…"];
   lolaComment(lines[Math.floor(Math.random()*lines.length)]);
 }
 
@@ -1344,7 +1518,7 @@ function renderPlaybook(){
   const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
 }
 function exportPlaybook(){
-  const md=`# My Agent Architect Playbook\n*Vibe Agent Architect — ${new Date().toLocaleDateString()}*\n\n`+
+  const md=`# My Agent Architect Playbook\n*Station Delta: Agent Architect — ${new Date().toLocaleDateString()}*\n\n`+
     G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
   const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
   document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
@@ -1352,15 +1526,48 @@ function exportPlaybook(){
   appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
 }
 
+function buildStepDiagnose(val, s){
+  if(!s)return {message:'Check the objective card and use the command family it names.', pattern:'objective'};
+  const vl=norm(val);
+  const expected=(s.cmd&&s.cmd[0])||(s.accept&&s.accept[0])||'';
+  const expectedNorm=norm(expected);
+  const expectedParts=expectedNorm.split(' ').filter(Boolean);
+  const typedParts=vl.split(' ').filter(Boolean);
+  const root=expectedParts[0];
+  const action=expectedParts[1];
+  const typedRoot=typedParts[0];
+
+  if(!typedRoot){
+    return {message:`Start with the command family for this objective: <code>${root}</code>.`, pattern:'empty'};
+  }
+  if(root && typedRoot !== root){
+    return {message:`This step lives under <code>${root}</code>, not <code>${typedRoot}</code>. Stay inside the ${root} toolchain for: ${s.obj.toLowerCase()}.`, pattern:'wrong_family'};
+  }
+  if(action && !typedParts.includes(action)){
+    return {message:`You chose the right command family. Now use the action that matches this objective: <code>${action}</code>.`, pattern:'wrong_action'};
+  }
+  if(expectedParts.length > 1 && typedParts.length < expectedParts.length){
+    return {message:`You're still too broad. Submit the concrete operation, not just the category. Expected shape: <code>${expectedNorm}</code>.`, pattern:'too_broad'};
+  }
+  return {message:`You're close, but the sim needs the operation that proves this competency. Use the exact action that satisfies: ${s.obj.toLowerCase()}.`, pattern:'close'};
+}
+
 function getProgressiveHint(val, s, wrongStreak){
-  const ph=PHASES[G.phase];
-  const vl=val.toLowerCase().trim();
   const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
   const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
-  let hint=base;
-  let levelLabel='HINT';
-  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'an agent command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
-  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const diag=buildStepDiagnose(val, s);
+  let hint=`${base} ${diag.message}`;
+  let levelLabel='DIAGNOSE';
+  if(level>=2&&s){
+    const expected=(s.cmd&&s.cmd[0])||(s.accept&&s.accept[0])||'an agent command';
+    const root=expected.split(' ')[0];
+    hint=`${base} ${diag.message} Command pattern: <code>${root}</code> ...`;
+    levelLabel='PROGRESSIVE DIAGNOSE';
+  }
+  if(level>=3&&s){
+    hint=`${base} ${diag.message} Full command: <code>${s.cmd?s.cmd[0]:(s.accept&&s.accept[0])||'check objective card'}</code>`;
+    levelLabel='DIRECT DIAGNOSE';
+  }
   const w=document.createElement('div');w.className='diag-block-progressive';
   w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
@@ -1382,9 +1589,13 @@ function getPersonalizedTakeaway(){
 function syncObjCard(){
   const ph=PHASES[G.phase];if(!ph){return}
   const s=ph.steps[G.step];if(!s)return;
+  const mCtxTitle=document.getElementById('mobile-ctx-title');
+  const mCtxBody=document.getElementById('mobile-ctx-body');
   document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
   document.getElementById('obj-title').textContent=s.obj;
   document.getElementById('obj-context').textContent=s.ctx;
+  if(mCtxTitle)mCtxTitle.textContent=s.obj;
+  if(mCtxBody)mCtxBody.textContent=s.ctx;
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('tries-n').textContent=G.tries;
@@ -1414,13 +1625,291 @@ function syncDots(){
   }
 }
 
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  const inner=document.getElementById('lola-strip-inner');
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  const rightBtn=document.getElementById('right-collapse-btn');
+  const mobileStripBtn=document.getElementById('mobile-strip-toggle-btn');
+  if(!shell)return;
+  shell.classList.toggle('strip-hidden',!!G.stripHidden);
+  shell.classList.toggle('right-collapsed',!!G.rightCollapsed);
+  if(inner)inner.style.animationPlayState=G.stripPaused?'paused':'running';
+  if(pauseBtn){
+    pauseBtn.textContent=G.stripPaused?'Resume':'Pause';
+    pauseBtn.setAttribute('aria-pressed',G.stripPaused?'true':'false');
+  }
+  if(rightBtn){
+    rightBtn.textContent=G.rightCollapsed?'Expand':'Collapse';
+    rightBtn.setAttribute('aria-pressed',G.rightCollapsed?'true':'false');
+  }
+  if(mobileStripBtn){
+    mobileStripBtn.textContent=G.rightCollapsed?'⬢':'⬡';
+    mobileStripBtn.title=G.rightCollapsed?'Expand mobile side panels':'Collapse mobile side panels';
+    mobileStripBtn.setAttribute('aria-label',G.rightCollapsed?'Expand side panels':'Collapse side panels');
+    mobileStripBtn.classList.toggle('strip-is-hidden',!!G.rightCollapsed);
+  }
+}
+function applyMobileLayoutDefaults(){
+  if(!window.matchMedia||!window.matchMedia('(max-width:820px)').matches)return;
+  if(G.mobilePresetApplied)return;
+  G.rightCollapsed=true;
+  G.stripHidden=false;
+  G.mobilePresetApplied=true;
+}
+function migrateMobileUiDefaults(){
+  if(!window.matchMedia||!window.matchMedia('(max-width:820px)').matches)return;
+  if((G.mobileUiVersion||0)>=2)return;
+  G.stripHidden=false;
+  G.mobileUiVersion=2;
+  save();
+}
+function toggleStripPause(){G.stripPaused=!G.stripPaused;applyUIPreferences();save();}
+function toggleRightPanel(){G.rightCollapsed=!G.rightCollapsed;applyUIPreferences();save();}
+function openSupportModal(id){closeModal('mobile-tools-modal');openModal(id);}
+function restartFromMobileTools(){closeModal('mobile-tools-modal');doRestart();}
+
+$cmd.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const v=$cmd.value;
+    $cmd.value='';
+    processCmd(v);
+    return;
+  }
+  if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(G.histIdx<G.cmdHistory.length-1){
+      G.histIdx++;
+      $cmd.value=G.cmdHistory[G.histIdx];
+    }
+    return;
+  }
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(G.histIdx>0){
+      G.histIdx--;
+      $cmd.value=G.cmdHistory[G.histIdx];
+    }else{
+      G.histIdx=-1;
+      $cmd.value='';
+    }
+    return;
+  }
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const val=norm($cmd.value);
+    const cmds=Object.keys(MAN).concat(['janet','whoami','neofetch','uptime','ls','pwd','help','deep','whatif']);
+    const match=cmds.find(c=>c.startsWith(val)&&c!==val);
+    if(match)$cmd.value=match;
+  }
+});
+
+function matchesStep(val,s){
+  const vl=norm(val);
+  if(s.acceptFn&&(s.acceptFn(vl)||s.acceptFn(val.trim())))return true;
+  if(s.accept&&s.accept.some(a=>vl===norm(a)||vl.startsWith(norm(a))))return true;
+  if(s.cmd&&s.cmd.some(a=>vl===norm(a)||vl.startsWith(norm(a))))return true;
+  return false;
+}
+
+function handleWrong(val,s){
+  const ph=PHASES[G.phase];
+  markStepAttempt(s,ph,val,false);
+  G.tries++;
+  document.getElementById('tries-n').textContent=G.tries;
+  if(G.expert){
+    appendLine('✗','ln-err');
+    G.score=Math.max(0,G.score-10);
+    document.getElementById('score-n').textContent=G.score;
+    save();
+    return;
+  }
+  appendLine('✗ Not quite.','ln-err');
+  showDiag(val);
+  if(!G.hard&&!G.practitioner&&G.tries===2&&s&&s.hint){
+    showHint(s.hint);
+  }
+}
+
+function processCmd(raw){
+  const val=raw.trim();
+  if(!val)return;
+  const vl=norm(val);
+  if(G.pendingPhaseStart){
+    if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();syncObjCard();return;}
+    if(vl==='playbook export'){exportPlaybook();syncObjCard();return;}
+    if(vl==='whatif'){
+      const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+      if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase])showWhatIf(pendingPhase);
+      else appendLine('No what-if scenario available.','ln-info');
+      syncObjCard();
+      return;
+    }
+    appendLine('Checkpoint active. Start the next phase from the checkpoint modal or reload later to resume from this safe stopping point.','ln-warn');
+    return;
+  }
+  G.cmdHistory.unshift(val);
+  if(G.cmdHistory.length>60)G.cmdHistory.pop();
+  G.histIdx=-1;
+  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive});
+  if(!G.achievements.includes('first_cmd'))unlock('first_cmd');
+  appendLine(val,'ln-cmd');
+  blank();
+  telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
+
+  if(G.activeChallengeData&&handleChallengeAnswer(val)){syncObjCard();return;}
+  if(G.activeBreakitData&&handleBreakitAnswer(val)){syncObjCard();return;}
+  if(G.bossActive){handleBossInput(val);syncObjCard();return;}
+  if(G.sandbox){handleSandbox(val);syncObjCard();return;}
+
+  if(vl==='man'){showManAll();syncObjCard();return;}
+  if(vl.startsWith('man ')){
+    const k=vl.slice(4).trim();
+    if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');
+    syncObjCard();
+    return;
+  }
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();syncObjCard();return;}
+  if(vl==='playbook export'){exportPlaybook();syncObjCard();return;}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase])showWhatIf(pendingPhase);
+    else appendLine('No what-if scenario available.','ln-info');
+    syncObjCard();
+    return;
+  }
+  if(vl==='deep'){
+    const phaseIdx=Math.min(G.phase, DEEP_DIVE.length-1);
+    if(DEEP_DIVE[phaseIdx])showDeepDive(phaseIdx);
+    else appendLine('No deep dive available right now.','ln-info');
+    syncObjCard();
+    return;
+  }
+
+  for(const [key,ee] of Object.entries(EASTER)){
+    if(vl===key||vl.startsWith(key+' ')){
+      ee.handle(val);
+      syncObjCard();
+      return;
+    }
+  }
+
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps?ph.steps[G.step]:null;
+  if(!ph||!s){
+    appendLine('No active objective.','ln-warn');
+    return;
+  }
+
+  if(matchesStep(val,s)){
+    markStepAttempt(s,ph,val,true);
+    if(s.out)s.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
+    if(s.unlockCmd){
+      const cmds=Array.isArray(s.unlockCmd)?s.unlockCmd:[s.unlockCmd];
+      cmds.forEach(c=>unlockCmd(c));
+    }
+    if(DEEP_DIVE[G.phase])showDeepDiveButton(G.phase);
+    blank();
+    completeStep(s,ph);
+    syncObjCard();
+    return;
+  }
+
+  handleWrong(val,s);
+  syncObjCard();
+}
+
 const SAVE_KEY='vaa_v1';
-function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
+const COURSE_ID='station-delta-agent-architect';
+function makeSessionId(){
+  return 'saa_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
+}
+function freshAnalytics(){
+  return {version:1,courseId:COURSE_ID,sessionId:makeSessionId(),sessionStartedAt:Date.now(),lastEventAt:null,events:[],phases:{},steps:{}};
+}
+function ensureAnalytics(){
+  if(!G.analytics||typeof G.analytics!=='object')G.analytics=freshAnalytics();
+  const a=G.analytics;
+  if(!a.version)a.version=1;
+  if(!a.courseId)a.courseId=COURSE_ID;
+  if(!a.sessionId)a.sessionId=makeSessionId();
+  if(!a.sessionStartedAt)a.sessionStartedAt=Date.now();
+  if(!Array.isArray(a.events))a.events=[];
+  if(!a.phases||typeof a.phases!=='object')a.phases={};
+  if(!a.steps||typeof a.steps!=='object')a.steps={};
+}
+function analyticsEvent(type,payload={}){
+  ensureAnalytics();
+  const evt={ts:Date.now(),type,...payload};
+  G.analytics.events.push(evt);
+  if(G.analytics.events.length>1800)G.analytics.events.shift();
+  G.analytics.lastEventAt=evt.ts;
+}
+function phaseKey(phaseNum){return 'phase-'+phaseNum}
+function stepKey(phaseNum,stepNum){return 'phase-'+phaseNum+'-step-'+stepNum}
+function markPhaseStart(phaseNum,phaseObj){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  const rec=G.analytics.phases[key]||{phase:phaseNum,title:phaseObj?.title||'',startedAt:null,completedAt:null,durationMs:null};
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('phase_started',{phaseId:key,title:rec.title});
+  }
+  G.analytics.phases[key]=rec;
+}
+function markPhaseComplete(phaseNum,phaseObj){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  const rec=G.analytics.phases[key]||{phase:phaseNum,title:phaseObj?.title||'',startedAt:null,completedAt:null,durationMs:null};
+  rec.title=phaseObj?.title||rec.title;
+  rec.completedAt=Date.now();
+  if(rec.startedAt)rec.durationMs=rec.completedAt-rec.startedAt;
+  G.analytics.phases[key]=rec;
+  analyticsEvent('phase_completed',{phaseId:key,title:rec.title,durationMs:rec.durationMs});
+}
+function markStepStart(stepObj,phaseObj){
+  if(!stepObj)return;
+  ensureAnalytics();
+  const key=stepKey(G.phase,G.step);
+  const rec=G.analytics.steps[key]||{stepId:key,phase:G.phase,phaseTitle:phaseObj?.title||'',objective:stepObj?.obj||'',startedAt:null,firstCorrectAt:null,completedAt:null,ttrMs:null,attempts:0,wrongAttempts:0,commandCount:0,lastInput:''};
+  rec.phase=G.phase;
+  rec.phaseTitle=phaseObj?.title||rec.phaseTitle;
+  rec.objective=stepObj?.obj||rec.objective;
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('step_started',{stepId:rec.stepId,objective:rec.objective});
+  }
+  G.analytics.steps[key]=rec;
+}
+function markStepAttempt(stepObj,phaseObj,input,correct){
+  if(!stepObj)return;
+  ensureAnalytics();
+  const key=stepKey(G.phase,G.step);
+  const rec=G.analytics.steps[key]||{stepId:key,phase:G.phase,phaseTitle:phaseObj?.title||'',objective:stepObj?.obj||'',startedAt:Date.now(),firstCorrectAt:null,completedAt:null,ttrMs:null,attempts:0,wrongAttempts:0,commandCount:0,lastInput:''};
+  rec.phase=G.phase;
+  rec.phaseTitle=phaseObj?.title||rec.phaseTitle;
+  rec.objective=stepObj?.obj||rec.objective;
+  if(!rec.startedAt)rec.startedAt=Date.now();
+  rec.attempts++;
+  rec.commandCount++;
+  rec.lastInput=(input||'').slice(0,200);
+  if(!correct)rec.wrongAttempts++;
+  analyticsEvent('step_attempt',{stepId:rec.stepId,correct,input:rec.lastInput});
+  if(correct&&!rec.firstCorrectAt){
+    rec.firstCorrectAt=Date.now();
+    rec.completedAt=rec.firstCorrectAt;
+    rec.ttrMs=rec.firstCorrectAt-rec.startedAt;
+    analyticsEvent('step_completed',{stepId:rec.stepId,ttrMs:rec.ttrMs,attempts:rec.attempts});
+  }
+  G.analytics.steps[key]=rec;
+}
+function save(){ensureAnalytics();localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const p=JSON.parse(s);Object.assign(G,p)}}catch(e){}}
 
 const EASTER={
   'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
-  'whoami':{handle:()=>{appendLine(`Agent Architect ${G.name} · Fleet Multi-Agent Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'whoami':{handle:()=>{appendLine(`Station Delta: Agent Architect ${G.name} · Fleet Multi-Agent Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
   'neofetch':{handle:()=>{appendLine('agent-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-agent 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Rogue level: nominal','ln-sys')}},
   'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last rogue collective: contained in 4 minutes','ln-ok')}},
   'ls':{handle:()=>{appendLine('logs/  agents/  swarms/  evals/  rag/  guardrails/  memory/  traces/','ln-code')}},
@@ -1440,6 +1929,36 @@ function showDiag(val){
   else{G.mistakeTypes.push('wrong_cmd')}
   getProgressiveHint(val,s,G.wrongStreak);
   G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function showCheckpointModal(nextPhase){
+  G.pendingPhaseStart=nextPhase;
+  save();
+  const ph=PHASES[nextPhase];
+  const copy=document.getElementById('checkpoint-copy');
+  if(copy){
+    copy.textContent=ph
+      ? `Phase ${nextPhase} — ${ph.title} is ready. This is a safe stopping point. You can start the next phase now or close this and resume later from the checkpoint.`
+      : 'You reached a safe stopping point.';
+  }
+  openModal('checkpoint-modal');
+}
+
+function continueFromCheckpoint(){
+  if(!G.pendingPhaseStart)return;
+  closeModal('checkpoint-modal');
+  G.pendingPhaseStart=null;
+  save();
+  syncDots();
+  startPhase();
+}
+
+function pauseAtCheckpoint(){
+  closeModal('checkpoint-modal');
+  appendLine('Checkpoint saved. Resume later to begin the next phase from its official start.','ln-info');
+  setLola('Checkpoint held. Your next phase is queued, but training is paused until you explicitly resume it.');
+  syncObjCard();
+  save();
 }
 
 function handleChallengeAnswer(val){
@@ -1473,12 +1992,14 @@ function handleBreakitAnswer(val){
 
 async function startPhase(){
   const ph=PHASES[G.phase];if(!ph)return;
+  markPhaseStart(G.phase,ph);
   blank();divline();
   appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
   blank();
   appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
   blank();
   if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  markStepStart(ph.steps[0],ph);
   setLola(ph.steps[0].ctx);
   syncObjCard();
   if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
@@ -1496,6 +2017,7 @@ async function completeStep(s,ph){
     await completePhase(ph);
   } else {
     const ns=ph.steps[G.step];
+    markStepStart(ns,ph);
     blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
     setLola(ns.ctx);syncObjCard();
     if(!G.hard&&!G.practitioner)showHint(ns.hint);
@@ -1505,6 +2027,7 @@ async function completeStep(s,ph){
 }
 
 async function completePhase(ph){
+  markPhaseComplete(G.phase,ph);
   if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
   if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
   blank();divline();
@@ -1527,14 +2050,21 @@ async function completePhase(ph){
   lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
-  if(G.phase>9){
+  const nextPhase=G.phase+1;
+  if(nextPhase>9){
     appendLine('All phases complete. Preparing final assessment…','ln-sys');
     await delay(800);startBossFight();
     return;
   }
+  G.phase=nextPhase;
+  G.step=0;
+  G.tries=0;
+  G.wrongStreak=0;
+  save();
+  syncDots();
   blank();
-  await startPhase();
+  appendLine(`✓ Checkpoint reached. Phase ${nextPhase} is ready when you are.`,'ln-info');
+  showCheckpointModal(nextPhase);
 }
 
 async function startBossFight(){
@@ -1630,7 +2160,7 @@ async function completeBossFight(){
   for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
   await delay(500);blank();
   appendLine('🤖 AGENT ARCHITECT CERTIFICATION GRANTED','ln-success');
-  appendLine(`Officer ${G.name} — Vibe Agent Architect · Class of 2026`,'ln-success');
+  appendLine(`Officer ${G.name} — Station Delta: Agent Architect · Class of 2026`,'ln-success');
   blank();
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
   appendLine('      AGENT ARCHITECT CERTIFICATION COMPLETE','ln-success');
@@ -1671,15 +2201,38 @@ function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
-  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  closeModal('boot-modal');applyMobileLayoutDefaults();applyUIPreferences();save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
-document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+const bootNameInput=document.getElementById('boot-name');
+const bootStartBtn=document.getElementById('boot-start-btn');
+function triggerBootStartFromEvent(e){
+  const isEnter=e.key==='Enter'||e.code==='Enter'||e.keyCode===13||e.which===13;
+  if(!isEnter)return;
+  e.preventDefault();
+  e.stopPropagation();
+  startAcademy();
+}
+if(bootNameInput){
+  ['keydown','keypress','keyup'].forEach(evt=>bootNameInput.addEventListener(evt,triggerBootStartFromEvent));
+}
+if(bootStartBtn){
+  bootStartBtn.addEventListener('keydown',triggerBootStartFromEvent);
+}
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const bootInput=document.getElementById('boot-name');
+    const bootModal=document.getElementById('boot-modal');
+    if(bootInput&&bootModal&&bootModal.classList.contains('open')){
+      bootInput.focus();
+    }
+  },300);
+});
 
 function bootTerminal(){
   const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE AGENT ARCHITECT v1.0',c:'ln-success'},
+    {t:'STATION DELTA: AGENT ARCHITECT v1.0',c:'ln-success'},
     {t:'Booting multi-agent core…',c:'ln-sys'},
     {t:'Agent basics: READY',c:'ln-sys'},
     {t:'Multi-agent coordination: READY',c:'ln-sys'},
@@ -1714,13 +2267,23 @@ function resumeSession(){
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
   if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  migrateMobileUiDefaults();
+  applyMobileLayoutDefaults();
+  applyUIPreferences();
   if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
   if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
   if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
   appendLine(`Welcome back, Officer ${G.name}. Agent systems restored.`,'ln-lola');blank();
   renderUnlockedCmds();
   renderPlaybook();
-  if(G.sandbox){
+  if(G.pendingPhaseStart){
+    const ph=PHASES[G.pendingPhaseStart];
+    appendLine(`Checkpoint ready: Phase ${G.pendingPhaseStart} — ${ph.title}`,'ln-info');
+    appendLine('You paused at a safe stopping point. Open the checkpoint to continue when ready.','ln-info');
+    setLola(`Checkpoint reached. ${ph.title} is queued as your next phase.`);
+    syncDots();syncObjCard();$cmd.focus();
+    showCheckpointModal(G.pendingPhaseStart);
+  }else if(G.sandbox){
     appendLine('Agent Architect certification complete. Sandbox mode.','ln-success');
   }else if(G.bossActive){
     appendLine('Active rogue collective incident in progress. J.A.N.E.T. is still waiting.','ln-warn');
@@ -1737,14 +2300,29 @@ function resumeSession(){
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Agent Architect from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function doRestart(){openModal('restart-modal')}
+function confirmRestart(){closeModal('restart-modal');localStorage.removeItem(SAVE_KEY);location.reload()}
 function shareGrad(){
-  const txt=`Just completed Vibe Agent Architect 🤖\n\nAll 9 phases: agent basics, multi-agent coordination, evals, RAG debugging, guardrails, stateful agents, cost governance, observability, and surviving the Rogue Collective.\n\nFree training →`;
+  const txt=`Just completed Station Delta: Agent Architect 🤖\n\nAll 9 phases: agent basics, multi-agent coordination, evals, RAG debugging, guardrails, stateful agents, cost governance, observability, and surviving the Rogue Collective.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
 
 /* ── STARTUP ── */
 loadSave();
+migrateMobileUiDefaults();
+applyMobileLayoutDefaults();
+if(window.matchMedia){
+  const mobileMq=window.matchMedia('(max-width:820px)');
+  const syncMobilePreset=(evt)=>{
+    if(!evt.matches||G.mobilePresetApplied)return;
+    migrateMobileUiDefaults();
+    applyMobileLayoutDefaults();
+    applyUIPreferences();
+    save();
+  };
+  if(mobileMq.addEventListener)mobileMq.addEventListener('change',syncMobilePreset);
+  else if(mobileMq.addListener)mobileMq.addListener(syncMobilePreset);
+}
 if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
@@ -1752,8 +2330,21 @@ if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
   const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
   const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
 }else{
-  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+  setTimeout(()=>{
+    const bootInput=document.getElementById('boot-name');
+    if(bootInput)bootInput.focus();
+  },300);
 }
+applyUIPreferences();
+</script>
+<script>
+  (function(){
+    var s=document.createElement('script');
+    s.src='analytics-client.js';
+    s.onerror=function(){console.warn('analytics-client.js not found — skipping telemetry')};
+    document.body.appendChild(s);
+  })();
 </script>
 </body>
 </html>
+.boot-modal-input{position:relative;z-index:1}
