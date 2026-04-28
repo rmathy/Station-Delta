@@ -714,15 +714,20 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #mobile-strip-toggle-btn{display:inline-flex}
   #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
-  #term-panel #lola-sec{max-height:118px}
+  #term-panel #lola-sec{display:none;max-height:118px}
   #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
-  #lola-sec,#crew-sec,#telem-sec{display:none}
-  #mobile-ctx-section{display:block}
+  #crew-sec,#telem-sec{display:none}
+  #mobile-ctx-section{display:none}
+  #shell:not(.right-collapsed) #term-panel #lola-sec{display:block}
+  #shell:not(.right-collapsed) #crew-sec,
+  #shell:not(.right-collapsed) #telem-sec,
+  #shell:not(.right-collapsed) #mobile-ctx-section{display:block}
   #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
   #prompt-pre{font-size:13px}
   #cmd{font-size:16px}
   #lola-strip-ctrls .strip-btn,
   #right-collapse-btn{min-height:36px;min-width:44px}
+  #right-header{display:none}
   #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
   #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
   #shell.right-collapsed #right-collapse-btn{
@@ -746,7 +751,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
-      <button id="mobile-strip-toggle-btn" aria-label="Toggle L.O.L.A. guidance strip" onclick="toggleStripDismiss()" title="Show/hide L.O.L.A. strip"></button>
+      <button id="mobile-strip-toggle-btn" aria-label="Expand side panels" onclick="toggleRightPanel()" title="Show/hide mobile side panels"></button>
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
@@ -3161,10 +3166,10 @@ function applyUIPreferences(){
   }
   // Keep the persistent topbar strip toggle in sync
   if(mobileStripBtn){
-    mobileStripBtn.textContent = G.stripHidden ? '⬢' : '⬡';
-    mobileStripBtn.title = G.stripHidden ? 'Show L.O.L.A. strip' : 'Hide L.O.L.A. strip';
-    mobileStripBtn.setAttribute('aria-label', G.stripHidden ? 'Show L.O.L.A. guidance strip' : 'Hide L.O.L.A. guidance strip');
-    mobileStripBtn.classList.toggle('strip-is-hidden', !!G.stripHidden);
+    mobileStripBtn.textContent = G.rightCollapsed ? '⬢' : '⬡';
+    mobileStripBtn.title = G.rightCollapsed ? 'Expand mobile side panels' : 'Collapse mobile side panels';
+    mobileStripBtn.setAttribute('aria-label', G.rightCollapsed ? 'Expand side panels' : 'Collapse side panels');
+    mobileStripBtn.classList.toggle('strip-is-hidden', !!G.rightCollapsed);
   }
 }
 
