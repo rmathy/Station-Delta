@@ -569,12 +569,91 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 .glitch{animation:shake .2s ease}
 
+/* ── MOBILE TOOLS BUTTON (topbar, mobile only) ── */
+#mobile-tools-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  background:var(--s2);
+  border:1px solid var(--b2);
+  color:var(--text);
+  padding:3px 10px;
+  border-radius:var(--r4);
+  font-family:var(--mono);
+  font-size:10px;
+  cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.04em;
+}
+#mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
+/* Persistent strip toggle in topbar */
+#mobile-strip-toggle-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:30px;height:30px;
+  background:var(--amber-bg);
+  border:1px solid var(--amber-d);
+  color:var(--gold);
+  border-radius:var(--r4);
+  font-size:14px;
+  cursor:pointer;
+  transition:all .15s;
+  padding:0;
+  line-height:1;
+  flex-shrink:0;
+}
+#mobile-strip-toggle-btn:hover{background:var(--s3);border-color:var(--gold)}
+#mobile-strip-toggle-btn.strip-is-hidden{
+  background:var(--s2);
+  border-color:var(--b2);
+  color:var(--muted2);
+}
+/* Mobile-only objective mirror in right panel */
+#mobile-ctx-section{
+  display:none;
+  flex-shrink:0;
+  padding:10px 13px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--blue-bg);
+  border-left:2px solid var(--blue-d);
+}
+#mobile-ctx-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:5px;font-weight:700}
+#mobile-ctx-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4}
+#mobile-ctx-body{font-size:11px;color:var(--muted2);line-height:1.7}
+#mobile-ctx-body code{background:var(--s3);padding:1px 4px;border-radius:3px;color:var(--cyan);font-size:10px}
+
 @media(max-width:820px){
-  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 260px}
-  #right{border-top:1px solid var(--border)}
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.12em}
+  #cadet-tag{font-size:10px}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #career-impact-btn{padding:3px 8px;font-size:10px}
+  #mobile-tools-btn{display:inline-flex}
+  #mobile-strip-toggle-btn{display:inline-flex}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
   #lola-sec,#crew-sec,#telem-sec{display:none}
+  #mobile-ctx-section{display:block}
+  #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
+  #prompt-pre{font-size:12px}
+  #cmd{font-size:16px}
   #lola-strip-ctrls .strip-btn,
-  #right-collapse-btn{min-height:32px;min-width:44px}
+  #right-collapse-btn{min-height:36px;min-width:44px}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
+  #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{
+    writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #lola-strip-inner.scrolling{animation:none;padding-left:14px;}
 }
 </style>
 </head>
@@ -592,9 +671,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="hardmode-pill">HARD MODE</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
+      <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
+      <button id="mobile-strip-toggle-btn" aria-label="Toggle L.O.L.A. guidance strip" onclick="toggleStripDismiss()" title="Show/hide L.O.L.A. strip">▸</button>
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
+      <button class="tbbtn" id="strip-toggle-desktop-btn" onclick="toggleStripDismiss()" title="Show/hide L.O.L.A. guidance strip">HIDE STRIP</button>
       <button class="tbbtn" onclick="doRestart()">RESTART</button>
     </div>
   </div>
@@ -625,7 +707,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">lt@vibe:~$&nbsp;</span>
-      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
       <span id="input-hint"></span>
     </div>
   </div>
@@ -633,7 +715,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <!-- RIGHT PANEL -->
   <div id="right">
     <div id="right-header">
-      <button id="right-collapse-btn" aria-pressed="false" onclick="toggleRightPanel()">Collapse</button>
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
+    <!-- Mobile objective mirror -->
+    <div id="mobile-ctx-section">
+      <div id="mobile-ctx-label">📍 Current Objective</div>
+      <div id="mobile-ctx-title"></div>
+      <div id="mobile-ctx-body"></div>
     </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
@@ -756,6 +844,34 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
+<!-- RESTART CONFIRM -->
+<div id="restart-confirm-modal" class="modal">
+  <div class="mbox" style="text-align:center;max-width:400px">
+    <div style="font-size:28px;margin-bottom:10px">⚠️</div>
+    <div class="mtitle">Restart training?</div>
+    <div class="msub">All progress will be erased. This cannot be undone.</div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+      <button class="mbtn mbtn-p" style="background:var(--red);color:#fff" onclick="confirmRestart()">ERASE & RESTART</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('restart-confirm-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE TOOLS -->
+<div id="mobile-tools-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">⚙️ Mobile Tools</div>
+    <div class="msub">The phone layout condenses the top bar. Open reference surfaces here without leaving the sim.</div>
+    <div style="display:grid;gap:10px">
+      <button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MAN PAGES</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('gloss-modal')">OPEN GLOSSARY</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('ach-modal')">OPEN ACHIEVEMENTS</button>
+      <button class="mbtn mbtn-p" onclick="restartFromMobileTools()">RESTART</button>
+    </div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" style="margin-left:0" onclick="closeModal('mobile-tools-modal')">Close</button></div>
+  </div>
+</div>
+
 <!-- ACHIEVEMENTS -->
 <div id="ach-modal" class="modal">
   <div class="mbox">
@@ -845,6 +961,8 @@ let G = {
   stripPaused:false,
   stripHidden:false,
   rightCollapsed:false,
+  mobilePresetApplied:false,
+  mobileUiVersion:2,
   analytics:null,
 };
 
@@ -880,7 +998,40 @@ function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.
 function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
 function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
 
-/* ── LOLA STRIP MESSAGES BY PHASE ── */
+/* ── LIEUTENANT GLOSSARY ── */
+const GLOSSARY = [
+  {term:'Codebase navigation',def:'The skill of orienting yourself in an unfamiliar project. Start with <code>ls -la</code> to see the structure, <code>cat package.json</code> to understand the stack, and <code>find . -name "*.ts"</code> to count the scope.'},
+  {term:'Git diff',def:'Shows exactly what changed between commits or branches — lines added (<code>+</code>) and removed (<code>-</code>). Context lines (no prefix) are unchanged. Reading diffs before merging is the primary quality gate in every professional team.'},
+  {term:'Stack trace',def:'The error report a runtime produces when code crashes. Read top-down for the crash site, bottom-up for the origin. Your first <code>src/</code> frame is almost always where the bug lives. Ignore <code>node_modules/</code> frames — those are library code.'},
+  {term:'TypeScript / tsc',def:'A typed superset of JavaScript that catches bugs at compile time. <code>tsc --noEmit</code> type-checks without writing output — use it in CI pipelines. TS2345 = type mismatch. TS2304 = missing import.'},
+  {term:'null guard',def:'A defensive check before accessing a property that could be null. Pattern: <code>if (!result) return error;</code>. The most common runtime crash in JavaScript is "Cannot read properties of null/undefined" — a null guard prevents it.'},
+  {term:'HTTP status codes',def:'Every API response carries one. 2xx = success. 4xx = client error (your fault). 5xx = server error (their fault). Key ones: 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Validation error, 500 Server Error, 503 Unavailable.'},
+  {term:'Prisma',def:'A TypeScript ORM for databases. Key method: <code>findUnique</code> (not <code>findOne</code> — that\'s Mongoose). Always check the return value — <code>findUnique</code> returns <code>null</code> if the record doesn\'t exist.'},
+  {term:'Incident response',def:'The structured process for handling production outages. Order: (1) read logs, (2) identify root cause, (3) mitigate fast (rollback), (4) restore service, (5) investigate properly, (6) write blameless post-mortem.'},
+  {term:'Rollback',def:'Reverting to a known-good deployment when a new release causes errors. <code>git revert HEAD</code> creates a new commit undoing the last one — safe on shared branches. Always rollback first; investigate after service is restored.'},
+  {term:'Post-mortem',def:'A blameless document written after an incident. Records: timeline, root cause, contributing factors, action items. Goal is system improvement, not blame assignment. Teams that do post-mortems well have dramatically fewer repeated incidents.'},
+  {term:'AI hallucination',def:'When an AI model confidently produces plausible but incorrect output — wrong method names (findOne vs findUnique), non-existent APIs, outdated usage, missing null checks. Always verify AI-generated code against official documentation.'},
+  {term:'Conventional commits',def:'A standard commit message format: <code>type: description</code>. Types: <code>fix</code> (bug fix), <code>feat</code> (new feature), <code>chore</code> (maintenance), <code>refactor</code>, <code>docs</code>, <code>test</code>. Tools like semantic-release use these to auto-generate changelogs.'},
+  {term:'Branch hygiene',def:'Keeping your branch strategy clean and traceable. Use prefixes: <code>fix/</code> for bug fixes, <code>feat/</code> for features, <code>chore/</code> for maintenance. Never commit directly to main. Every hotfix should have a branch and a PR.'},
+  {term:'CI/CD',def:'Continuous Integration / Continuous Deployment. A pipeline that runs tests, type checks, and linting on every push, then deploys automatically if everything passes. The pipeline is a decision system — it determines whether code is safe to move forward.'},
+  {term:'Release gate',def:'A quality checkpoint code must pass before it ships. Common gates: tests passing, type check clean, code review approved, health checks green. Lieutenant-level work is making the go/no-go call based on gate evidence.'},
+  {term:'Type safety',def:'Using TypeScript\'s type system to prevent runtime errors at compile time. <code>string | undefined</code> from query params must be validated before use. <code>tsc --noEmit</code> clean = no type-related production crashes.'},
+  {term:'Blast radius',def:'How many users, services, or systems would be affected if a specific bug or change fails in production. Estimating blast radius before acting is Lieutenant-level judgment.'},
+  {term:'Feature flag',def:'A configuration toggle that enables or disables features without deploying code. Allows instant rollback without git revert. Standard technique for risk management in continuous deployment.'},
+];
+
+/* ── LIEUTENANT CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Codebase Navigation',stat:'Day 1',context:'The first thing a senior engineer does when joining a new team: read before you write. Navigating an unfamiliar codebase cold — finding the entry point, mapping the structure, reading the manifest — is the skill that separates engineers who contribute immediately from those who need two weeks of onboarding.',tags:['Code review','Onboarding','Architecture','Senior engineering']},
+  {phase:'Phase 2 — Diff Review',stat:'Every PR',context:'Every professional code change passes through code review. Reading a git diff fluently — spotting what changed, what was removed, what the risk is — is the primary quality gate between "AI wrote this" and "this is safe to ship." LGTM without reading is how bugs reach production.',tags:['Code review','Git','Pull requests','AI-augmented dev']},
+  {phase:'Phase 3 — Stack Trace Triage',stat:'94%',context:'of runtime errors produce a stack trace. Engineers who can read a trace — find the first src/ frame, identify the failed assumption, distinguish a local fix from a rollback situation — debug in minutes. Those who can\'t spend hours guessing.',tags:['Debugging','Node.js','Production','On-call','TypeScript']},
+  {phase:'Phase 4 — TypeScript Fluency',stat:'0 errors',context:'A TypeScript codebase with zero compiler errors is a deployable codebase. <code>tsc --noEmit</code> clean in CI means no type-related production crashes. The compiler is your first line of defense — every error it catches is a 3am incident that didn\'t happen.',tags:['TypeScript','CI/CD','Type safety','Production hardening']},
+  {phase:'Phase 5 — API & Data Literacy',stat:'Every API',context:'REST, GraphQL, webhooks, AI model responses — they\'re all JSON. Engineers who can trace a JSON shape to a JavaScript access path, read status codes fluently, and reason about client impact from a response shape can work with any API without guessing.',tags:['REST','JSON','API design','Integration','Backend']},
+  {phase:'Phase 6 — Testing Fundamentals',stat:'Green CI',context:'Tests are evidence, not ceremony. When you ask Claude or Cursor to implement a function, the tests are the specification. Lieutenant-level work means deciding whether the tests you have are strong enough to support a merge — or whether you lack the evidence to ship safely.',tags:['Vitest','Jest','TDD','CI/CD','AI-assisted dev']},
+  {phase:'Phase 7 — Incident Response',stat:'3:11',context:'average incident duration when the responder reads logs first, mitigates fast, and sequences the follow-through. Engineers who improvise under pressure extend incidents. The ones who follow a clear mental model — logs → identify → rollback → investigate → post-mortem — restore service faster every time.',tags:['SRE','On-call','Production','Incident management','Observability']},
+  {phase:'Phase 8 — AI Code Review',stat:'~30%',context:'of AI-generated code contains at least one subtle bug — wrong method names, missing null checks, outdated APIs, incorrect error codes. The developers who ship AI code safely are not the ones who trust it blindly. They are the ones who can review AI output quickly and block the right things.',tags:['Claude Code','Cursor','Copilot','AI safety','Code review']},
+  {phase:'Phase 9 — Release Gate & Team Workflow',stat:'Ship safely',context:'The structures that let multiple engineers ship without stepping on each other: branch hygiene, reviewer-ready commits, clear PR descriptions, CI gates. Lieutenant-level work is feeding the pipeline with enough evidence that the release decision is easy for whoever makes it.',tags:['GitHub','CI/CD','Pull requests','Team workflow','Deployment']},
+];
 const LOLA_STRIP = {
   0: [
     {tag:'WELCOME',msg:"You graduated Vibe Cadet. The commands are the same — the stakes are higher."},
@@ -1000,40 +1151,6 @@ function stopExpertTimer(){
   if(el)el.classList.remove('urgent');
 }
 
-/* ── CAREER LOG DATA ── */
-const CAREER_LOG_DATA = [
-  {phase:'Phase 1 — Codebase Navigation',stat:'~70%',context:'of a senior developer\'s time is spent reading code, not writing it. The ability to open an unfamiliar codebase and quickly understand its structure — entry points, conventions, dependencies — is what separates a contributor from a maintainer.',tags:['Code review','Onboarding','Open source','Technical interviews']},
-  {phase:'Phase 2 — Diff Review',stat:'Every PR',context:'every professional code change goes through a diff review before merging. Reading git diff output is how you catch bugs, security issues, and AI hallucinations before they reach production. This is the most important quality gate in any engineering team.',tags:['Git','Code review','GitHub','Pull requests','AI safety']},
-  {phase:'Phase 3 — Stack Trace Debugging',stat:'#1 skill',context:'most requested by engineering managers when surveying what separates junior from mid-level developers. Reading a stack trace cold — finding the actual line, understanding the call chain, ignoring irrelevant frames — is a skill that dramatically improves debugging speed.',tags:['Debugging','Node.js','TypeScript','On-call','Production']},
-  {phase:'Phase 4 — TypeScript & Build Errors',stat:'78%',context:'of professional JavaScript projects now use TypeScript. The ability to read a TypeScript compiler error, understand what the type system is actually telling you, and fix it correctly (not just suppress it) is the fastest way to level up from junior to mid-level.',tags:['TypeScript','tsc','Vite','Next.js','Type safety']},
-  {phase:'Phase 5 — API & Data Literacy',stat:'Every feature',context:'every feature that touches external data requires reading API documentation, understanding JSON response shapes, and tracing data through layers of transformation. Developers who can read a spec and implement against it without hand-holding are 3-5× more productive with AI assistance.',tags:['REST','JSON','OpenAPI','Fetch','Data modeling']},
-  {phase:'Phase 6 — Testing Fundamentals',stat:'50-80%',context:'of AI-generated code contains subtle bugs that only tests catch. The ability to write a basic test — not deep TDD, just "does this function do what it says" — is the difference between shipping code you trust and code that works on your machine.',tags:['Vitest','Jest','Unit tests','CI/CD','AI verification']},
-  {phase:'Phase 7 — Production Incident Response',stat:'2am',context:'is when production incidents happen. Every engineer who gets paged learns the same sequence: identify, isolate, mitigate, then fix. The ability to run through this loop calmly under pressure is how on-call rotations get survived and how reputations get built.',tags:['SRE','On-call','Incident management','Observability','Runbooks']},
-  {phase:'Phase 8 — AI Code Review',stat:'~30%',context:'of AI-generated code contains at least one subtle logical error that passes visual inspection. Knowing the patterns where AI confidently goes wrong — off-by-one errors, security anti-patterns, wrong library APIs — and being able to catch them in review is one of the most valuable skills of the next decade.',tags:['AI safety','Code review','Security','Claude Code','Cursor']},
-  {phase:'Phase 9 — Team Workflow',stat:'10×',context:'multiplier on individual output when you can effectively operate within a team: writing clear PR descriptions, leaving useful review comments, understanding deployment gates, and coordinating a release. The terminal skills from Vibe Cadet are the foundation. This is the structure that makes them count.',tags:['GitHub','PRs','Team coordination','Engineering culture','Leadership']},
-];
-
-/* ── GLOSSARY ── */
-const GLOSSARY = [
-  {term:'Stack trace',def:'The chain of function calls that led to an error. Read it bottom-up for origin, top-down for the crash point. The most important line is usually the first one from <i>your</i> code, not from a library.'},
-  {term:'git diff',def:'Shows the exact lines added (<code>+</code>) and removed (<code>-</code>) between two versions of a file. The most important tool for understanding what changed and why.'},
-  {term:'TypeScript',def:'A superset of JavaScript that adds static types. The compiler catches type mismatches before runtime. A type error means the compiler detected an inconsistency — read it carefully rather than suppressing it.'},
-  {term:'tsconfig.json',def:'TypeScript\'s configuration file. Controls strictness, output target, included files, and paths. <code>strict: true</code> enables all safety checks and is the professional standard.'},
-  {term:'Entry point',def:'The file where a program starts executing. In Node.js apps, often <code>index.ts</code> or <code>server.ts</code>. In Vite/Next.js, it\'s the framework\'s boot file. Finding the entry point is how you orient yourself in any unfamiliar codebase.'},
-  {term:'package.json scripts',def:'The <code>scripts</code> field defines runnable commands. <code>dev</code>, <code>build</code>, <code>test</code>, <code>lint</code> are the four you need to know by heart. Run them with <code>bun run scriptname</code>.'},
-  {term:'REST API',def:'An interface where resources are identified by URLs and actions are HTTP verbs: GET (read), POST (create), PUT/PATCH (update), DELETE (remove). Every web service exposes one.'},
-  {term:'JSON shape',def:'The structure of a JSON object — which keys exist, what types they have, whether they\'re optional. Understanding the shape of an API response tells you exactly what you can do with the data.'},
-  {term:'Unit test',def:'A test that verifies a single function in isolation, with no network calls, database, or side effects. Fast, deterministic, and the first thing to break when you change logic.'},
-  {term:'Test assertion',def:'The line in a test that checks the result. <code>expect(result).toBe(42)</code>. If the assertion fails, the test fails. One assertion per test is the professional convention.'},
-  {term:'Incident',def:'An unplanned interruption to a service. Incidents have a lifecycle: detected → triaged → mitigated → resolved → post-mortemed. The goal during an incident is to restore service, not to find blame.'},
-  {term:'Post-mortem',def:'A written record of what happened, why, and what changes will prevent recurrence. Blameless post-mortems — focusing on systems, not people — are the engineering culture standard.'},
-  {term:'Pull Request (PR)',def:'A proposal to merge a branch into main. PRs should be small, focused, and include a clear description of the change and why. The diff view shows exactly what will be merged.'},
-  {term:'LGTM',def:'Looks Good To Me — the approval signal in code review. Should only be given after actually reading the diff, not as a rubber stamp. One of the most overused phrases in engineering.'},
-  {term:'Hallucination (AI)',def:'When an AI model confidently produces plausible-looking but incorrect output — wrong function names, non-existent APIs, subtly broken logic. The confidence is the danger. Always verify AI-generated code.'},
-  {term:'off-by-one error',def:'A bug where a loop runs one too many or one too few times. Often appears as <code><</code> vs <code><=</code> or array index errors. One of the most common AI code generation bugs.'},
-  {term:'Environment variable',def:'A named value stored outside your code. Read in Node.js as <code>process.env.NAME</code>. Never hardcode secrets — use env vars and a secrets manager in production.'},
-  {term:'Linter',def:'A tool that statically analyzes code for style and correctness issues without running it. ESLint for JS/TS. Catches errors, enforces conventions, prevents common bugs before they ship.'},
-];
 
 /* ── MAN PAGES ── */
 const MAN = {
@@ -1147,6 +1264,48 @@ const DIAGNOSE = {
     if(v.includes('commit')&&!v.includes('branch')) return {msg:'Good — but before committing to main, you should be on a feature branch. Branch first.',next:'Try: git checkout -b fix/escape-pod-timeout'};
     return null;
   },
+  /* ── s2/s3 steps ── */
+  'p4s2':(v)=>{
+    if(v.includes('tsc')&&!v.includes('noEmit')&&!v.includes('no-emit')) return {msg:'<code>tsc</code> without <code>--noEmit</code> will attempt to compile and write output files. Add <code>--noEmit</code> to check types only, without touching the filesystem.',next:'Try: tsc --noEmit'};
+    if(v.includes('build')) return {msg:'The build step runs tsc internally, but for a type-only check you want <code>tsc --noEmit</code> directly — it gives you the full error list without producing any output.',next:'Try: tsc --noEmit'};
+    if(v.startsWith('type')||v.startsWith('check')) return {msg:'That\'s not a CLI command. To type-check a TypeScript project from the terminal, use the TypeScript compiler directly.',next:'Try: tsc --noEmit'};
+    return null;
+  },
+  'p5s2':(v)=>{
+    if(v.includes('curl')&&!v.includes('pods')) return {msg:'You\'re making an HTTP request, good. But you need the pods endpoint specifically — <code>/api/pods</code> is the route for the resource you\'re investigating.',next:'Try: curl /api/pods'};
+    if(v.includes('get')||v.includes('fetch')) return {msg:'<code>fetch</code> and <code>GET</code> are the right concept, but in the terminal you use <code>curl</code> to make HTTP requests.',next:'Try: curl /api/pods'};
+    if(v.includes('pods')&&!v.includes('curl')) return {msg:'Good target — you need the pods endpoint. Use <code>curl</code> to hit it from the terminal.',next:'Try: curl /api/pods'};
+    return null;
+  },
+  'p6s2':(v)=>{
+    if(v.startsWith('read')||v.startsWith('cat')) return {msg:'Reading test files shows the code — but the objective is to actually run the suite so you can see which tests pass and what the output looks like.',next:'Try: test'};
+    if(v.includes('bun test')||v.includes('npm test')||v.includes('npx vitest')) return null; // accept these
+    if(v.includes('vitest')&&!v.startsWith('bun')&&!v.startsWith('npx')) return {msg:'Close — but in this project, tests are run through the package scripts. Try the standard test runner command.',next:'Try: test'};
+    return null;
+  },
+  'p7s2':(v)=>{
+    if(v.includes('debug')||v.includes('investigate')||v.includes('check')) return {msg:'Debugging is the next step. Right now, service is down. Mitigation (rollback) comes first, then investigation. Sequence matters in incidents.',next:'Try: fix rollback'};
+    if(v.includes('git revert')&&!v.toLowerCase().includes('head')) return {msg:'<code>git revert</code> needs a reference. To revert the most recent commit, use <code>git revert HEAD</code>.',next:'Try: git revert HEAD'};
+    if(v.includes('restart')||v.includes('redeploy')) return {msg:'Redeploying the same broken version won\'t help. You need to roll back to the known-good state first.',next:'Try: fix rollback'};
+    return null;
+  },
+  'p8s2':(v)=>{
+    if(v.includes('approve')||v.includes('lgtm')||v.includes('looks good')) return {msg:'The AI-generated code has issues — hardcoded credentials and a localhost URL in a production config. This should be blocked, not approved.',next:'Try: review block'};
+    if(v.startsWith('read')||v.startsWith('cat')) return {msg:'You\'ve already reviewed the diff. Now make the call: block this PR with a clear reason. That\'s the objective.',next:'Try: review block'};
+    return null;
+  },
+  'p9s2':(v)=>{
+    if(v.includes('git add')&&!v.includes('git commit')&&!v.includes('&&')&&!v.includes(';')) return {msg:'Good start — <code>git add</code> stages the file. Now finish the sequence with <code>git commit -m "your message"</code>.',next:'Try: git add src/routes/pods.ts && git commit -m "fix: ..."'};
+    if(v.includes('git commit')&&!v.includes('git add')) return {msg:'You need to stage the file first with <code>git add</code> before committing. Add → commit, always in that order.',next:'Try: git add src/routes/pods.ts && git commit -m "fix: ..."'};
+    if(v.includes('git commit')&&!v.includes('-m')) return {msg:'Add the <code>-m</code> flag to include your commit message inline. Without it, git opens an editor.',next:'Try: git commit -m "fix: your message here"'};
+    return null;
+  },
+  'p9s3':(v)=>{
+    if(v.includes('git push')&&!v.includes('origin')) return {msg:'Specify the remote explicitly: <code>git push origin fix/escape-pod-timeout</code>. Always include the remote name to avoid accidental pushes.',next:'Try: git push origin fix/escape-pod-timeout'};
+    if(v.includes('git push')&&v.includes('origin')&&!v.includes('fix/')) return {msg:'You\'re almost there — include the branch name: <code>git push origin fix/escape-pod-timeout</code>.',next:'Try: git push origin fix/escape-pod-timeout'};
+    if(v.includes('push')&&!v.includes('git')) return {msg:'<code>push</code> alone isn\'t a command. Use <code>git push</code>.',next:'Try: git push origin fix/escape-pod-timeout'};
+    return null;
+  },
 };
 
 /* ── SPACED REPETITION ── */
@@ -1217,6 +1376,16 @@ const CHALLENGES = {
 
 /* ── BREAK-IT SCENARIOS ── */
 const BREAKIT = {
+  2:{
+    title:'This diff is being approved incorrectly',
+    scenario:'A teammate reviewed this diff and left an LGTM:\n\n- const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour\n+ const SESSION_TIMEOUT = 60 * 1000;       // 1 hour\n\nThe comment says "1 hour" but the reviewer approved it without checking the math.\n\nWhat is the actual timeout in the NEW code, and should this have been approved?',
+    diagnose:(v)=>{
+      const vl=v.toLowerCase();
+      return vl.includes('60 second')||vl.includes('1 minute')||vl.includes('minute')||vl.includes('millisecond')||vl.includes('should not')||vl.includes('wrong')||vl.includes('block')||vl.includes('request changes');
+    },
+    solution:'The new value is 60,000ms = 60 seconds = 1 minute, not 1 hour. Should be blocked.',
+    explanation:'<code>60 * 1000</code> = 60,000 milliseconds = <b>60 seconds</b>. The comment says "1 hour" but the original <code>60 * 60 * 1000</code> = 3,600,000ms = 1 hour. This diff silently reduces session timeout from 1 hour to 1 minute. Users would be logged out constantly. The reviewer read the comment instead of evaluating the code — the most common diff review failure mode.',
+  },
   3:{
     title:'This stack trace is being misread',
     scenario:'A junior dev says "the bug is in node_modules/express/lib/router.js" because that\'s the first line of the stack trace.\n\nError at node_modules/express/lib/router.js:284\n  at src/middleware/auth.ts:15\n  at src/routes/login.ts:8\n\nWhat\'s wrong with their conclusion, and where is the real bug?',
@@ -1324,7 +1493,7 @@ const PHASES = [null,
     correct:1,fb:'Correct! <code>+</code> = added in new version. <code>-</code> = removed from old version. Lines with neither sign are context lines — unchanged, shown for reference.'}}
  ],
  challenge:CHALLENGES[2],
- breakit:BREAKIT[3],
+ breakit:BREAKIT[2],
  done:'Diff review unlocked. git diff and git show now feed a harder skill: approve, request changes, or block with a clear reason.',
  ach:'diff_reader'},
 
@@ -1946,8 +2115,48 @@ function typedLine(text,cls,delay=0){
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
 
 /* ── MODALS ── */
-function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='ach-modal')renderAch();
+  if(id==='gloss-modal')renderGloss();
+  if(id==='man-modal')renderManModal();
+  if(id==='career-modal')renderCareerModal();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  // Restore terminal focus after modal closes
+  requestAnimationFrame(()=>{
+    if(!document.querySelector('.modal.open'))$cmd.focus();
+  });
+}
+// Click outside to close
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+  if(e.target===m){m.classList.remove('open');requestAnimationFrame(()=>{if(!document.querySelector('.modal.open'))$cmd.focus()});}
+}));
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{
+    const a=ACHS.find(x=>x.id===id);if(!a)return'';
+    return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`;
+  }).join('');
+}
+/* ── CAREER LOG ── */
+function addCareerEntry(phaseIdx){
+  if(G.careerLog.includes(phaseIdx))return;
+  G.careerLog.push(phaseIdx);
+  document.getElementById('career-impact-btn').style.display='inline';
+  save();
+}
+function renderCareerModal(){
+  if(G.careerLog.length===0){document.getElementById('career-list').innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to unlock career entries.</p>';return}
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i];if(!d)return'';
+    return`<div class="career-entry"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-context">${d.context}</div><div class="career-tags">${(d.tags||[]).map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+function openSupportModal(id){closeModal('mobile-tools-modal');openModal(id);}
+function restartFromMobileTools(){closeModal('mobile-tools-modal');doRestart();}
 
 /* ── TEACH ── */
 function showTeach(tb){
@@ -2154,18 +2363,10 @@ function unlock(id){
   setTimeout(()=>t.classList.remove('show'),3500);
   telem('Achievement: '+a.name);
 }
-function renderAch(){
-  const list=document.getElementById('ach-list');
-  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
-  list.innerHTML=G.achievements.map(id=>{
-    const a=ACHS.find(x=>x.id===id);if(!a)return'';
-    return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`;
-  }).join('');
-}
 
 /* ── GLOSSARY ── */
 function renderGloss(){
-  document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('');
+  document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,'&apos;')}')">${g.term} ↗</div><div class="gloss-def">${g.def}</div></div>`).join('');
 }
 function lookupTerm(term){
   closeModal('gloss-modal');
@@ -2206,20 +2407,6 @@ function renderUnlockedCmds(){
   list.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k]||{label:k,desc:k};return`<span class="ac-pill" title="${m.desc}" onclick="showManPage('${k}')">${m.label}</span>`}).join('');
 }
 
-/* ── CAREER LOG ── */
-function addCareerEntry(phaseIdx){
-  if(G.careerLog.includes(phaseIdx))return;
-  G.careerLog.push(phaseIdx);
-  document.getElementById('career-impact-btn').style.display='inline';
-  save();
-}
-function renderCareerModal(){
-  if(G.careerLog.length===0){document.getElementById('career-list').innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to unlock career entries.</p>';return}
-  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
-    const d=CAREER_LOG_DATA[i];if(!d)return'';
-    return`<div class="career-entry"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-context">${d.context}</div><div class="career-tags">${(d.tags||[]).map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
-  }).join('');
-}
 
 /* ── SAVE / LOAD ── */
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
@@ -2383,12 +2570,16 @@ function addAgent(role,name){
 
 /* ── UI SYNC ── */
 function syncObjCard(){
+  const mCtxTitle=document.getElementById('mobile-ctx-title');
+  const mCtxBody=document.getElementById('mobile-ctx-body');
   if(G.sandbox||G.bossActive){
     if(!G.bossActive){
       document.getElementById('obj-phase-label').textContent='FIELD CERTIFIED';
       document.getElementById('obj-title').textContent='Free exploration';
       document.getElementById('obj-context').textContent='All phases complete. Any command accepted.';
       document.getElementById('obj-cmd-row').style.display='none';
+      if(mCtxTitle) mCtxTitle.textContent='Sandbox mode';
+      if(mCtxBody) mCtxBody.textContent='All phases complete. Any command accepted.';
     }
     return;
   }
@@ -2404,6 +2595,8 @@ function syncObjCard(){
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
   document.getElementById('obj-prog-fill').style.width=pct+'%';
+  if(mCtxTitle) mCtxTitle.textContent=s.obj||'';
+  if(mCtxBody) mCtxBody.textContent=s.ctx||'';
 }
 function syncDots(){
   const track=document.getElementById('phase-track');track.innerHTML='';
@@ -2428,6 +2621,8 @@ function applyUIPreferences(){
   const pauseBtn=document.getElementById('strip-pause-btn');
   const hideBtn=document.getElementById('strip-dismiss-btn');
   const rightBtn=document.getElementById('right-collapse-btn');
+  const mobileStripBtn=document.getElementById('mobile-strip-toggle-btn');
+  const desktopStripBtn=document.getElementById('strip-toggle-desktop-btn');
   if(!shell) return;
 
   shell.classList.toggle('strip-hidden', !!G.stripHidden);
@@ -2447,10 +2642,37 @@ function applyUIPreferences(){
     rightBtn.textContent = G.rightCollapsed ? 'Expand' : 'Collapse';
     rightBtn.setAttribute('aria-pressed', G.rightCollapsed ? 'true' : 'false');
   }
+  // Desktop topbar strip toggle
+  if(desktopStripBtn){
+    desktopStripBtn.textContent = G.stripHidden ? 'SHOW STRIP' : 'HIDE STRIP';
+    desktopStripBtn.title = G.stripHidden ? 'Show L.O.L.A. guidance strip' : 'Hide L.O.L.A. guidance strip';
+  }
+  // Mobile topbar strip toggle
+  if(mobileStripBtn){
+    mobileStripBtn.textContent = '▸';
+    mobileStripBtn.title = G.stripHidden ? 'Show L.O.L.A. strip' : 'Hide L.O.L.A. strip';
+    mobileStripBtn.setAttribute('aria-label', G.stripHidden ? 'Show L.O.L.A. guidance strip' : 'Hide L.O.L.A. guidance strip');
+    mobileStripBtn.classList.toggle('strip-is-hidden', !!G.stripHidden);
+  }
 }
 function toggleStripPause(){ G.stripPaused=!G.stripPaused; applyUIPreferences(); save(); }
 function toggleStripDismiss(){ G.stripHidden=!G.stripHidden; applyUIPreferences(); save(); }
 function toggleRightPanel(){ G.rightCollapsed=!G.rightCollapsed; applyUIPreferences(); save(); }
+
+function applyMobileLayoutDefaults(){
+  if(!window.matchMedia || !window.matchMedia('(max-width:820px)').matches) return;
+  if(G.mobilePresetApplied) return;
+  G.rightCollapsed = true;
+  G.stripHidden = false;
+  G.mobilePresetApplied = true;
+}
+function migrateMobileUiDefaults(){
+  if(!window.matchMedia || !window.matchMedia('(max-width:820px)').matches) return;
+  if((G.mobileUiVersion || 0) >= 2) return;
+  G.stripHidden = false;
+  G.mobileUiVersion = 2;
+  save();
+}
 function lolaMessageForStep(step,phaseNum){
   if(!step)return 'Operational guidance unavailable.';
   const phaseTitle=(PHASES[phaseNum]&&PHASES[phaseNum].title)?PHASES[phaseNum].title:'Current phase';
@@ -2538,7 +2760,10 @@ async function processCmd(raw){
   }
 
   // objective matching
-  const ph=PHASES[G.phase];const s=ph.steps[G.step];
+  const ph=PHASES[G.phase];
+  if(!ph){appendLine('All phases complete. Type freely.','ln-sys');return}
+  const s=ph.steps[G.step];
+  if(!s){appendLine('Phase complete.','ln-sys');return}
   if(matchesStep(val,s)){markStepAttempt(G.phase,s,true);await handleCorrect(s,ph);syncObjCard();return}
 
   // persistent unlocked cmds
@@ -2857,7 +3082,11 @@ function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Lieutenant';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
-  closeModal('boot-modal');applyUIPreferences();save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  closeModal('boot-modal');
+  migrateMobileUiDefaults();
+  applyMobileLayoutDefaults();
+  applyUIPreferences();
+  save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
@@ -2921,6 +3150,8 @@ function resumeSession(){
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
   if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  migrateMobileUiDefaults();
+  applyMobileLayoutDefaults();
   applyUIPreferences();
   analyticsEvent('session_resumed',{phase:G.phase,step:G.step,pendingPhaseStart:!!G.pendingPhaseStart,bossActive:!!G.bossActive,sandbox:!!G.sandbox});
   if(G.completedPhases.includes(5))addAgent('Analyst','Sigma');
@@ -2944,13 +3175,14 @@ function resumeSession(){
     if(si)si.innerHTML='<span class="lola-strip-msg"><span class="ls-tag" style="color:var(--red);border-color:var(--red-d)">OFFLINE</span>L.O.L.A. intelligence temporarily suspended — J.A.N.E.T. assessment in progress.</span>';
     showBossStep(G.bossStep);
   }else{
-    const ph=PHASES[G.phase];const s=ph.steps[G.step];
+    const ph=PHASES[G.phase];
+    const s=ph&&ph.steps?ph.steps[G.step]:null;
     if(G.pendingPhaseStart&&G.step===0){
       appendLine(`Resuming at checkpoint before Phase ${G.phase}.`,'ln-info');
       setLola('Checkpoint restored. Start next phase when you are ready.');
       setLolaStrip(G.phase);
       setTimeout(()=>showPhaseCheckpoint(G.checkpointFromPhase||Math.max(1,G.phase-1),G.phase),200);
-    }else{
+    }else if(ph&&s){
       appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
       appendLine(`Current objective: ${s.obj}`,'ln-info');
       if(!G.hard&&!G.practitioner)showHint(s.hint);
@@ -2958,12 +3190,20 @@ function resumeSession(){
       setLolaStrip(G.phase);
       markStepStarted(G.phase,s,G.step);
       if(G.expert)startExpertTimer();
+    }else{
+      // State inconsistency — fall back to phase 1 step 0
+      G.phase=1;G.step=0;
+      const fallPh=PHASES[1];
+      appendLine('State restored. Returning to Phase 1.','ln-warn');
+      setLola(fallPh.lolaIntro);
+      setLolaStrip(1);
     }
   }
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Lieutenant from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function doRestart(){openModal('restart-confirm-modal')}
+function confirmRestart(){localStorage.removeItem(SAVE_KEY);location.reload()}
 function shareGrad(){
   const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');closeModal('grad-modal');
@@ -2972,6 +3212,20 @@ function shareGrad(){
 /* ── STARTUP ── */
 loadSave();
 ensureAnalytics();
+migrateMobileUiDefaults();
+applyMobileLayoutDefaults();
+if(window.matchMedia){
+  const mobileMq = window.matchMedia('(max-width:820px)');
+  const syncMobilePreset = (evt)=>{
+    if(!evt.matches || G.mobilePresetApplied) return;
+    migrateMobileUiDefaults();
+    applyMobileLayoutDefaults();
+    applyUIPreferences();
+    save();
+  };
+  if(mobileMq.addEventListener) mobileMq.addEventListener('change', syncMobilePreset);
+  else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
+}
 if(G.phase>1||G.completedPhases.length>0||G.pendingPhaseStart||G.bossActive||G.sandbox){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
