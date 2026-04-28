@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
@@ -85,19 +85,35 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#mobile-tools-btn,#mobile-strip-toggle-btn{display:none}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--green-d);color:var(--green);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
 
+/* ── LOLA STRIP ── */
+#lola-strip{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:0 14px;background:linear-gradient(90deg,var(--green-bg),#111807 45%,var(--surface));border-bottom:1px solid var(--green-d);overflow:hidden}
+#lola-strip-avatar{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#65a30d,var(--green));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:18px}
+#lola-strip-inner{display:inline-flex;align-items:center;gap:10px;min-width:max-content;white-space:nowrap;color:#dff5af;font-size:10px;letter-spacing:.04em;will-change:transform}
+.lola-strip-msg{display:inline-flex;align-items:center;gap:10px}
+.lola-strip-sep{color:rgba(132,204,22,.5)}
+.strip-static #lola-strip-inner{min-width:100%;justify-content:center;animation:none}
+.strip-scrolling #lola-strip-inner{animation:lolaTicker 30s linear infinite}
+.strip-paused #lola-strip-inner{animation-play-state:paused}
+.strip-btn{background:rgba(255,255,255,.03);border:1px solid rgba(132,204,22,.25);color:var(--green);padding:1px 7px;border-radius:999px;font-family:var(--mono);font-size:9px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.strip-btn:hover{background:rgba(132,204,22,.08);border-color:var(--green)}
+@keyframes lolaTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
 /* ── TERMINAL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);min-height:0}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
 .mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
 #term-path span{color:var(--green)}
-#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth;min-height:0}
+#output > *{flex-shrink:0;width:100%}
 #output::-webkit-scrollbar{width:3px}
 #output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
@@ -242,7 +258,19 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--green)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
 
-#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden;min-height:0}
+#right-header{display:none;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--s2);flex-shrink:0}
+#right-header-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2)}
+#right-collapse-btn{margin-left:auto;background:transparent;border:1px solid var(--b2);color:var(--muted2);padding:3px 9px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s}
+#right-collapse-btn:hover{border-color:var(--green);color:var(--green)}
+#mobile-ctx-section{display:none;border-bottom:1px solid var(--border);padding:10px 12px;background:var(--s2);flex-shrink:0}
+#mobile-ctx-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#mobile-ctx-title{font-size:12px;color:var(--text);font-weight:700;margin-bottom:4px}
+#mobile-ctx-body{font-size:11px;color:var(--muted2);line-height:1.6}
+#shell.right-collapsed{grid-template-columns:1fr 0}
+#shell.right-collapsed #right{border-left:1px solid transparent;opacity:0;pointer-events:none}
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{border-bottom-color:transparent}
 #obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
 #obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
@@ -385,6 +413,34 @@ input[type=text]:focus{border-color:var(--green)}
 .checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
 .checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
 .checkpoint-next b{color:var(--blue)}
+
+@media (max-width:820px){
+  #shell{grid-template-columns:1fr}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.08em}
+  #cadet-tag{display:none}
+  #phase-track{justify-content:flex-start;overflow:hidden}
+  #tb-right .tbbtn:not(#mobile-tools-btn):not(#mobile-strip-toggle-btn),
+  #tb-right #sandbox-pill,
+  #tb-right #hardmode-pill,
+  #tb-right #career-impact-btn{display:none!important}
+  #mobile-tools-btn,#mobile-strip-toggle-btn{display:inline-flex;align-items:center;justify-content:center}
+  #lola-strip{padding:0 10px}
+  #term-panel{border-right:none}
+  #right{position:fixed;top:76px;right:0;bottom:0;width:min(88vw,360px);border-left:1px solid var(--border);box-shadow:-18px 0 40px rgba(0,0,0,.35);z-index:2500;transform:translateX(0);transition:transform .22s ease,opacity .22s ease}
+  #shell.right-collapsed #right{transform:translateX(100%);opacity:0;pointer-events:none}
+  #right-header{display:flex}
+  #mobile-ctx-section{display:block}
+  #obj-card{padding:10px 12px}
+  #crew-sec{max-height:none}
+  #playbook-sec{max-height:180px}
+  #telem-sec{height:88px}
+  #input-row{padding:0 10px}
+  .mbox{padding:18px 16px}
+  .path-cards{grid-template-columns:1fr;gap:10px}
+  .path-card{text-align:left;display:flex;align-items:flex-start;gap:10px}
+  .path-icon{margin-bottom:0;flex-shrink:0}
+}
 </style>
 </head>
 <body>
@@ -396,11 +452,22 @@ input[type=text]:focus{border-color:var(--green)}
     <div id="tb-right">
       <span id="sandbox-pill">SANDBOX</span>
       <span id="hardmode-pill">HARD MODE</span>
+      <button id="mobile-strip-toggle-btn" class="tbbtn" onclick="toggleStripVisibility()">▤ Strip</button>
+      <button id="mobile-tools-btn" class="tbbtn" onclick="openModal('mobile-tools-modal')">☰ Tools</button>
       <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
       <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
     </div>
+  </div>
+
+  <div id="lola-strip" class="strip-static">
+    <div id="lola-strip-avatar">L</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner"></div>
+    </div>
+    <button class="strip-btn" onclick="toggleStripPause()">pause</button>
+    <button class="strip-btn" onclick="toggleRightPanel()">focus</button>
   </div>
 
   <div id="term-panel">
@@ -420,6 +487,15 @@ input[type=text]:focus{border-color:var(--green)}
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <div id="right-header-label">Mission Support</div>
+      <button id="right-collapse-btn" onclick="toggleRightPanel()">hide</button>
+    </div>
+    <div id="mobile-ctx-section">
+      <div id="mobile-ctx-label">Current Objective</div>
+      <div id="mobile-ctx-title">Loading…</div>
+      <div id="mobile-ctx-body">Initializing…</div>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -563,6 +639,21 @@ input[type=text]:focus{border-color:var(--green)}
 <div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">FinOps terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
 <div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
 <div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+<div id="mobile-tools-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">Mobile Tools</div>
+    <div class="msub">Quick access to support surfaces while you work the terminal.</div>
+    <button class="mbtn mbtn-p" onclick="toggleRightPanel();closeModal('mobile-tools-modal')">Show / Hide Mission Panel</button>
+    <button class="mbtn mbtn-s" onclick="toggleStripPause()">Pause / Resume L.O.L.A. Strip</button>
+    <button class="mbtn mbtn-s" onclick="openSupportModal('gloss-modal')">Open Glossary</button>
+    <button class="mbtn mbtn-s" onclick="openSupportModal('man-modal')">Open Manual</button>
+    <button class="mbtn mbtn-s" onclick="openSupportModal('ach-modal')">Open Badges</button>
+    <button class="mbtn mbtn-s" onclick="openSupportModal('career-modal')">Open Career Log</button>
+    <button class="mbtn mbtn-s" onclick="exportPlaybook();closeModal('mobile-tools-modal')">Export Playbook</button>
+    <button class="mbtn mbtn-s" onclick="restartFromMobileTools()">Restart Training</button>
+    <button class="mbtn mbtn-s" onclick="closeModal('mobile-tools-modal')">Close</button>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -594,6 +685,11 @@ let G = {
   wrongStreak:0,
   pendingPhaseStart:false,
   analytics:null,
+  stripPaused:false,
+  stripHidden:false,
+  rightCollapsed:false,
+  mobileUiVersion:1,
+  mobilePresetApplied:false,
 };
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
@@ -1397,6 +1493,99 @@ function renderCareer(){
 
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  renderLolaStrip();
+}
+function getCurrentPhaseStep(){
+  const ph=PHASES[G.phase];
+  const step=ph&&ph.steps?ph.steps[G.step]:null;
+  return {ph,step};
+}
+function buildStripMessages(){
+  const {ph,step}=getCurrentPhaseStep();
+  const msgs=[];
+  if(!ph||!step){
+    msgs.push('L.O.L.A. intel: Stand by for the next FinOps objective.');
+  }else{
+    msgs.push(`Now working: ${step.obj}. Watch for the command pattern ${step.cmd&&step.cmd[0]?step.cmd[0]:'shown in the objective card'}.`);
+    if(step.teach&&step.teach.body) msgs.push(`Production lens: ${step.teach.body}`);
+    if(step.jit&&step.jit.body) msgs.push(`JIT cue: ${step.jit.body}`);
+    if(step.bridge&&step.bridge.body) msgs.push(`Business bridge: ${step.bridge.body}`);
+    if(step.quiz&&step.quiz.janetQuiz) msgs.push('JANET is coming: memorize the mechanism, not just the command.');
+    if(ph.spacedRep&&G.phase>1) msgs.push(`Recall check later: ${ph.spacedRep.q}`);
+    if(ph.breakit) msgs.push(`Break-it ahead: expect a failure pattern around ${ph.breakit.title.toLowerCase()}.`);
+    if(ph.challenge) msgs.push('Challenge ahead: be ready to explain the business recommendation, not only the technical action.');
+  }
+  if(G.pendingPhaseStart){
+    const next=PHASES[G.phase];
+    if(next) msgs.unshift(`Checkpoint ready. Next phase: ${next.title}. Use the pause to save your playbook or review the manual.`);
+  }
+  if(G.bossActive) msgs.unshift('Emergency mode: JANET is testing prioritization under live margin pressure.');
+  if(G.sandbox) msgs.unshift('Sandbox mode: explore commands, export your playbook, and review what-if scenarios.');
+  return msgs.filter(Boolean);
+}
+function renderLolaStrip(){
+  const shell=document.getElementById('shell');
+  const wrap=document.getElementById('lola-strip');
+  const inner=document.getElementById('lola-strip-inner');
+  if(!shell||!wrap||!inner)return;
+  const messages=buildStripMessages();
+  const html=messages.map(msg=>`<span class="lola-strip-msg">${msg}</span>`).join('<span class="lola-strip-sep">•</span>');
+  inner.innerHTML=html?`${html}<span class="lola-strip-sep">•</span>${html}`:'<span class="lola-strip-msg">L.O.L.A. standing by.</span>';
+  shell.classList.toggle('strip-hidden',!!G.stripHidden);
+  wrap.classList.toggle('strip-paused',!!G.stripPaused);
+  requestAnimationFrame(()=>{
+    const shouldScroll=inner.scrollWidth>wrap.querySelector('#lola-strip-scroll').clientWidth+40;
+    wrap.classList.toggle('strip-scrolling',shouldScroll);
+    wrap.classList.toggle('strip-static',!shouldScroll);
+  });
+}
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  shell.classList.toggle('right-collapsed',!!G.rightCollapsed);
+  shell.classList.toggle('strip-hidden',!!G.stripHidden);
+  const collapseBtn=document.getElementById('right-collapse-btn');
+  if(collapseBtn) collapseBtn.textContent=G.rightCollapsed?'show':'hide';
+  const toggleBtn=document.getElementById('mobile-strip-toggle-btn');
+  if(toggleBtn) toggleBtn.textContent=G.stripHidden?'▥ Strip':'▤ Strip';
+  renderLolaStrip();
+}
+function applyMobileLayoutDefaults(){
+  if(window.innerWidth>820||G.mobilePresetApplied)return;
+  G.rightCollapsed=true;
+  G.mobilePresetApplied=true;
+  save();
+}
+function migrateMobileUiDefaults(){
+  if(typeof G.mobileUiVersion!=='number'||G.mobileUiVersion<1){
+    G.mobileUiVersion=1;
+    if(typeof G.rightCollapsed!=='boolean') G.rightCollapsed=window.innerWidth<=820;
+    if(typeof G.stripHidden!=='boolean') G.stripHidden=false;
+    if(typeof G.stripPaused!=='boolean') G.stripPaused=false;
+  }
+}
+function toggleStripPause(){
+  G.stripPaused=!G.stripPaused;
+  applyUIPreferences();
+  save();
+}
+function toggleStripVisibility(){
+  G.stripHidden=!G.stripHidden;
+  applyUIPreferences();
+  save();
+}
+function toggleRightPanel(force){
+  if(typeof force==='boolean') G.rightCollapsed=!force;
+  else G.rightCollapsed=!G.rightCollapsed;
+  applyUIPreferences();
+  save();
+}
+function openSupportModal(id){
+  closeModal('mobile-tools-modal');
+  openModal(id);
+}
+function restartFromMobileTools(){
+  closeModal('mobile-tools-modal');
+  openModal('restart-modal');
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1521,6 +1710,8 @@ function syncObjCard(){
   document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
   document.getElementById('obj-title').textContent=s.obj;
   document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('mobile-ctx-title').textContent=s.obj;
+  document.getElementById('mobile-ctx-body').textContent=s.ctx;
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('tries-n').textContent=G.tries;
@@ -1528,6 +1719,7 @@ function syncObjCard(){
   const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
   const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
   document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+  renderLolaStrip();
 }
 let eaglePhase=true;
 function revealCmd(){
@@ -1949,7 +2141,7 @@ function startAcademy(){
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
   ensureAnalytics();
-  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  closeModal('boot-modal');applyUIPreferences();save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
@@ -1983,7 +2175,7 @@ function bootTerminal(){
   ];
   let d=0;
   lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
-  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();applyUIPreferences();$cmd.focus()},d+300);
 }
 
 function resumeSession(){
@@ -2019,6 +2211,7 @@ function resumeSession(){
       markStepStart(s,ph);
     }
   }
+  applyUIPreferences();
   syncDots();syncObjCard();$cmd.focus();
 }
 
@@ -2037,6 +2230,8 @@ function shareGrad(){
 
 /* ── STARTUP ── */
 loadSave();
+migrateMobileUiDefaults();
+applyMobileLayoutDefaults();
 if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
@@ -2051,6 +2246,14 @@ renderGloss();
 renderManModal();
 renderCareer();
 renderPlaybook();
+applyUIPreferences();
+renderLolaStrip();
+window.addEventListener('resize',()=>{
+  if(window.innerWidth<=820&&!G.mobilePresetApplied){
+    applyMobileLayoutDefaults();
+  }
+  applyUIPreferences();
+});
 window.addEventListener('load',()=>{
   try{
     const s=document.createElement('script');
@@ -2058,6 +2261,8 @@ window.addEventListener('load',()=>{
     s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
     document.head.appendChild(s);
   }catch(_){}
+  applyUIPreferences();
+  renderLolaStrip();
 });
 </script>
 </body>
