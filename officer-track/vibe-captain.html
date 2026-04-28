@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Captain</title>
+<title>Station Delta: Captain</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -20,9 +20,9 @@
   --text:#c4d4e0;
   --muted:#4a6275;
   --muted2:#6a8090;
-  --green:#1db954;
-  --green-d:#0d5c28;
-  --green-bg:#040f09;
+  --green:#f97316;
+  --green-d:#7c2d12;
+  --green-bg:#0f0800;
   --blue:#3b9eff;
   --blue-d:#0c3d6e;
   --blue-bg:#030d18;
@@ -68,42 +68,179 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
-#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap;display:flex;flex-direction:column;line-height:1.1}
+#logo-sub{font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
 #cadet-tag{font-size:11px;color:var(--muted2)}
-#cadet-tag b{color:var(--silver)}
+#cadet-tag b{color:var(--green)}
 #phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
 .pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
 .pdot+.pdot{margin-left:3px}
-.pdot.done{background:var(--silver);border-color:var(--silver)}
-.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot.done{background:var(--green);border-color:var(--green)}
+.pdot.active{background:var(--green);border-color:var(--green);animation:pulseGlow 2s infinite}
 .pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
 .phase-sep{font-size:9px;color:var(--border);margin:0 5px}
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#mobile-tools-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  background:var(--s2);
+  border:1px solid var(--b2);
+  color:var(--text);
+  padding:3px 10px;
+  border-radius:var(--r4);
+  font-family:var(--mono);
+  font-size:10px;
+  cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.04em;
+}
+#mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
+#mobile-strip-toggle-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:30px;height:30px;
+  background:var(--green-bg);
+  border:1px solid var(--green-d);
+  color:var(--green);
+  border-radius:var(--r4);
+  font-size:14px;
+  cursor:pointer;
+  transition:all .15s;
+  padding:0;
+  line-height:1;
+  flex-shrink:0;
+}
+#mobile-strip-toggle-btn:hover{background:var(--s3);border-color:var(--green)}
+#mobile-strip-toggle-btn.strip-is-hidden{
+  background:var(--s2);
+  border-color:var(--b2);
+  color:var(--muted2);
+}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
-#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--green-d);color:var(--green);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── LOLA STRIP ── */
+#lola-strip{
+  grid-column:1/-1;
+  background:linear-gradient(90deg,var(--green-bg),var(--blue-bg));
+  border-bottom:1px solid var(--green-d);
+  display:flex;align-items:center;gap:0;
+  height:28px;overflow:hidden;flex-shrink:0;
+  position:relative;
+}
+#lola-strip-avatar{
+  flex-shrink:0;
+  background:var(--green-d);
+  color:var(--green);
+  font-size:9px;font-weight:700;letter-spacing:.1em;
+  padding:0 10px;height:100%;display:flex;align-items:center;
+  border-right:1px solid var(--green-d);white-space:nowrap;
+}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1;
+}
+.strip-btn:hover{color:var(--text);border-color:var(--green-d)}
+.strip-btn[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform}
+#lola-strip-inner.scrolling{animation:lolaScroll 22s linear infinite}
+#lola-strip-inner.no-scroll{animation:none;padding-left:14px}
+@keyframes lolaScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){#lola-strip-inner.scrolling{animation:none;padding-left:14px;}}
+.lola-strip-msg{font-size:11px;color:var(--cyan);padding:0 28px 0 0;display:inline-flex;align-items:center;gap:7px;transition:opacity .4s}
+.lola-strip-msg .ls-tag{
+  font-size:9px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--green);background:var(--green-bg);border:1px solid var(--green-d);
+  padding:1px 6px;border-radius:3px;
+}
+.lola-strip-msg code{background:rgba(255,255,255,.06);padding:0 5px;border-radius:3px;color:var(--amber);font-size:10px}
+.lola-strip-sep{color:var(--muted);margin:0 6px;opacity:.4}
 
 /* ── TERMINAL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height:100%;min-height:0}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
 .mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
-#term-path span{color:var(--silver)}
-#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#term-path span{color:var(--green)}
+#action-rail{
+  display:grid;
+  grid-template-columns:minmax(360px, 1.35fr) minmax(260px, .75fr);
+  gap:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  align-items:start;
+}
+#term-panel #obj-card,
+#term-panel #lola-sec{
+  border:1px solid var(--border);
+  border-radius:var(--r8);
+  background:var(--s2);
+}
+#term-panel #obj-card{
+  max-height:none;
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+}
+#term-panel #lola-sec{
+  padding:12px 14px;
+  max-height:208px;
+  overflow-y:auto;
+}
+#output > *{flex-shrink:0;width:100%}
+.jit,.bridge,.hint-wrap,.diag-block,.teach,.concept,.spaced-rep,.janet-arrival,.boss-container,.breakit,.challenge,.cmd-unlock,.manpage{flex-shrink:0!important}
+#output-static{
+  flex-shrink:0;
+  overflow-y:auto;
+  max-height:132px;
+  padding:12px 20px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  scroll-behavior:smooth;
+  border-bottom:1px solid var(--b2);
+  background:var(--surface);
+}
+#output-static::-webkit-scrollbar{width:3px}
+#output-static::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+#output-divider{
+  flex-shrink:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:3px 18px;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  user-select:none;
+}
+#output-divider::after{content:'';flex:1;height:1px;background:var(--border);margin-left:8px}
+#output{flex:1 1 auto;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth;min-height:0}
 #output::-webkit-scrollbar{width:3px}
 #output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
 /* line types */
 .ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
-.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--green)}
 .ln-ok{color:var(--green)}
 .ln-err{color:var(--red)}
 .ln-warn{color:var(--amber)}
@@ -111,7 +248,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .ln-lola{color:var(--cyan)}
 .ln-sys{color:var(--muted2)}
 .ln-blank{height:10px}
-.ln-success{color:var(--silver);font-weight:700}
+.ln-success{color:var(--green);font-weight:700}
 .ln-code{color:var(--green);font-size:11px;opacity:.65}
 .ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
 .ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
@@ -153,10 +290,10 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
 
 /* JIT */
-.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
-.jit-hd{background:var(--silver-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--silver);border-bottom:1px solid var(--silver-d);display:flex;align-items:center;gap:7px}
+.jit{margin:10px 0;border:1px solid var(--green-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--green-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--green);border-bottom:1px solid var(--green-d);display:flex;align-items:center;gap:7px}
 .jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
-.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--silver);font-size:11px}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--green);font-size:11px}
 .jit-bd b{color:var(--cyan)}
 
 /* bridge */
@@ -253,13 +390,45 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* input */
 #input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
-#prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
-#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
+#prompt-pre{font-size:14px;color:var(--green);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
+#input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
 
 /* right panel */
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
-#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#right #active-cmds{border-top:none}
+#right-header{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);
+}
+#right-collapse-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em;
+}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--b3)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right{border-left:1px solid var(--border)}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{display:none}
+#mobile-ctx-section{
+  display:none;
+  flex-shrink:0;
+  padding:10px 13px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--blue-bg);
+  border-left:2px solid var(--blue-d);
+}
+#mobile-ctx-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:5px;font-weight:700}
+#mobile-ctx-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.4}
+#mobile-ctx-body{font-size:11px;color:var(--muted2);line-height:1.7}
+#mobile-ctx-body code{background:var(--s3);padding:1px 4px;border-radius:3px;color:var(--cyan);font-size:10px}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0;max-height:320px;overflow-y:auto;scrollbar-width:thin}
+#obj-card::-webkit-scrollbar{width:3px}
+#obj-card::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
 #obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
 #obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
@@ -274,17 +443,17 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #obj-tries span{color:var(--red)}
 #obj-score{font-size:11px;color:var(--muted)}
 #obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
-#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .5s ease;width:0%}
 
 /* path cards */
 .path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
 .path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
 .path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
-.path-card.selected{border-color:var(--silver);background:var(--silver-bg)}
+.path-card.selected{border-color:var(--green);background:var(--green-bg)}
 .path-icon{font-size:20px;margin-bottom:4px}
 .path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
 .path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
-.path-card.selected .path-name{color:var(--silver)}
+.path-card.selected .path-name{color:var(--green)}
 
 /* lola */
 #lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -293,7 +462,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
 #lola-online{font-size:10px;color:var(--green);margin-left:auto}
 #lola-online::before{content:'● '}
-#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+#lola-msg{font-size:13px;line-height:1.72;color:var(--text);padding-left:32px;white-space:pre-line}
+#lola-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
 
 /* crew */
 #crew-sec{flex:1;overflow-y:auto;padding:11px 13px;min-height:0}
@@ -317,7 +487,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
 
 /* toast */
-#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--green-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--green);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
 #toast.show{transform:translateX(0)}
 #toast-title{font-weight:700;margin-bottom:2px}
 #toast-sub{font-size:11px;color:var(--muted2)}
@@ -326,25 +496,33 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
 .modal.open{display:flex}
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
-.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.modal-sub-title{font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:18px}
 .mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
-.mbtn-p{background:var(--silver);color:#000}.mbtn-p:hover{opacity:.85}
+.mbtn-p{background:var(--green);color:#000}.mbtn-p:hover{opacity:.85}
 .mbtn-s{background:transparent;border:1px solid var(--b2);color:var(--muted2);margin-left:8px}.mbtn-s:hover{color:var(--text);border-color:var(--muted2)}
 
 /* boot */
-#boot-modal .mbox{border-color:var(--silver-d);text-align:center;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px 32px 32px}
-#boot-modal .mbox input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b3);color:var(--text);padding:11px 14px;border-radius:var(--r4);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:8px;caret-color:var(--silver);-webkit-text-fill-color:var(--text)}
-#boot-modal .mbox input[type=text]:focus{border-color:var(--silver-d);box-shadow:0 0 0 2px rgba(176,190,197,.1)}
+#boot-modal .mbox{border-color:var(--green);text-align:center;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px 32px 32px}
+#boot-modal .mbox input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b3);color:var(--text);padding:11px 14px;border-radius:var(--r4);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:8px;caret-color:var(--green);-webkit-text-fill-color:var(--text)}
+#boot-modal .mbox input[type=text]::placeholder{color:var(--muted2)}
+#boot-modal .mbox input[type=text]:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(249,115,22,.15)}
 .boot-features{background:var(--s2);border-radius:var(--r8);padding:14px 16px;text-align:left;margin:14px 0;font-size:11px;color:var(--muted2);line-height:2}
-.boot-features span{color:var(--silver);margin-right:6px}
+.boot-features span{color:var(--green);margin-right:6px}
 
 /* grad */
-#grad-modal .mbox{text-align:center;border-color:var(--silver-d);box-shadow:0 0 50px rgba(176,190,197,.08)}
-.grad-cert{background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:18px;margin:18px 0}
+#grad-modal .mbox{text-align:center;border-color:var(--green);box-shadow:0 0 50px rgba(249,115,22,.12)}
+.grad-cert{background:var(--s2);border:1px solid var(--green-d);border-radius:var(--r8);padding:18px;margin:18px 0}
 .grad-ct{font-family:var(--display);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
-.grad-name{font-family:var(--display);font-size:20px;font-weight:900;color:var(--silver);margin-bottom:4px;animation:glow 3s infinite}
+.grad-name{font-family:var(--display);font-size:20px;font-weight:900;color:var(--green);margin-bottom:4px;animation:glow 3s infinite}
 .grad-sub{font-size:11px;color:var(--muted2)}
+.checkpoint-box{background:var(--s2);border:1px solid var(--blue-d);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:700}
+.checkpoint-title{font-family:var(--display);font-size:18px;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
+.checkpoint-next b{color:var(--blue)}
 .skills-list{text-align:left;font-size:12px;color:var(--muted2);line-height:2;margin-bottom:16px}
 .skills-list span{color:var(--silver);margin-right:6px}
 
@@ -358,18 +536,78 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .gloss-def{font-size:12px;color:var(--muted2);line-height:1.7}
 .gloss-def code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px;font-size:11px}
 .career-entry{padding:12px 0;border-bottom:1px solid var(--border)}
-.career-phase{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--silver);margin-bottom:4px;font-weight:700}
+.career-phase{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:4px;font-weight:700}
 .career-stat{font-family:var(--display);font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px;animation:glow 3s infinite}
 .career-context{font-size:12px;color:var(--muted2);line-height:1.7}
 .career-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
 
+/* deep dive / playbook / what-if */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
 .glitch{animation:shake .2s ease}
 
 @media(max-width:820px){
-  #shell{grid-template-columns:1fr;grid-template-rows:48px 1fr 260px}
-  #right{border-top:1px solid var(--border)}
-  #lola-sec,#crew-sec,#telem-sec{display:none}
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.12em}
+  #cadet-tag{font-size:10px}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #career-impact-btn{padding:3px 8px;font-size:10px}
+  #mobile-tools-btn{display:inline-flex}
+  #mobile-strip-toggle-btn{display:inline-flex}
+  #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
+  #term-panel #obj-card{padding:10px 11px}
+  #term-panel #lola-sec{display:none;max-height:118px}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #crew-sec,#telem-sec,#playbook-sec{display:none}
+  #mobile-ctx-section{display:none}
+  #shell:not(.right-collapsed) #term-panel #lola-sec{display:block}
+  #shell:not(.right-collapsed) #crew-sec,
+  #shell:not(.right-collapsed) #telem-sec,
+  #shell:not(.right-collapsed) #playbook-sec,
+  #shell:not(.right-collapsed) #mobile-ctx-section{display:block}
+  #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
+  #prompt-pre{font-size:13px}
+  #cmd{font-size:16px}
+  #lola-strip-ctrls .strip-btn,
+  #right-collapse-btn{min-height:36px;min-width:44px}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
+  #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  .path-cards{grid-template-columns:1fr;gap:10px}
 }
 </style>
 </head>
@@ -377,13 +615,15 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 <div id="shell">
   <div id="topbar">
-    <div id="logo">Vibe Captain</div>
+    <div id="logo">STATION DELTA<span id="logo-sub">CAPTAIN</span></div>
     <div id="cadet-tag">Captain: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
       <div id="hardmode-pill">HARD MODE</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
+      <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
+      <button id="mobile-strip-toggle-btn" aria-label="Expand side panels" onclick="toggleRightPanel()" title="Show/hide mobile side panels"></button>
       <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
       <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
@@ -391,42 +631,67 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
   </div>
 
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬟ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Captain runs on evidence, not vibes. Read the objective card, then issue the exact command.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+    </div>
+  </div>
+
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">captain@vibe-ship — <span id="path-display">~/bridge</span></div>
+      <div id="term-path">captain@station-delta — <span id="path-display">~/bridge</span></div>
       <div style="width:50px"></div>
     </div>
-    <div id="output" onclick="focusCmd()"></div>
+    <div id="action-rail">
+      <div id="obj-card">
+        <div id="obj-phase-label">Phase 1 of 9</div>
+        <div id="obj-title">Read the architecture</div>
+        <div id="obj-context">You command the whole ship now.</div>
+        <div id="obj-cmd-label">Expected command</div>
+        <div id="obj-cmd-row">
+          <div id="obj-cmd-val" class="blurred">arch review</div>
+          <button id="obj-reveal" onclick="revealCmd()">show</button>
+        </div>
+        <div id="obj-meta">
+          <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+          <span id="obj-score">Score: <span id="score-n">1000</span></span>
+        </div>
+        <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+      </div>
+      <div id="lola-sec">
+        <div id="lola-hd">
+          <div id="lola-avatar">L</div>
+          <div id="lola-name">L.O.L.A.</div>
+          <div id="lola-online">ready</div>
+        </div>
+        <div id="lola-msg">Captain on the bridge. The ship is yours.</div>
+      </div>
+    </div>
+    <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
+    <div id="output-divider">▶ Terminal — type commands below</div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
       <span id="prompt-pre">captain@vibe:~$&nbsp;</span>
-      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
+      <span id="input-hint"></span>
     </div>
   </div>
 
   <div id="right">
-    <div id="obj-card">
-      <div id="obj-phase-label">Phase 1 of 9</div>
-      <div id="obj-title">Read the architecture</div>
-      <div id="obj-context">You command the whole ship now.</div>
-      <div id="obj-cmd-label">Expected command</div>
-      <div id="obj-cmd-row">
-        <div id="obj-cmd-val" class="blurred">arch review</div>
-        <button id="obj-reveal" onclick="revealCmd()">show</button>
-      </div>
-      <div id="obj-meta">
-        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
-        <span id="obj-score">Score: <span id="score-n">1000</span></span>
-      </div>
-      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
     </div>
-    <div id="lola-sec">
-      <div id="lola-hd">
-        <div id="lola-avatar">L</div>
-        <div id="lola-name">L.O.L.A.</div>
-        <div id="lola-online">ready</div>
-      </div>
-      <div id="lola-msg">Captain on the bridge. The ship is yours.</div>
+    <div id="mobile-ctx-section">
+      <div id="mobile-ctx-label">📍 Current Objective</div>
+      <div id="mobile-ctx-title"></div>
+      <div id="mobile-ctx-body"></div>
     </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
@@ -435,6 +700,10 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="crew-sec">
       <div id="crew-hd">Active Crew</div>
       <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 Personal Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
     </div>
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
@@ -448,9 +717,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <!-- BOOT -->
 <div id="boot-modal" class="modal open">
   <div class="mbox">
-    <div style="font-size:28px;margin-bottom:8px">🎗️</div>
-    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Captain</div>
-    <div class="msub">You commanded Vibe Lieutenant. Now you command the ship. Architecture decisions. Scalability. Observability. Mentoring. Stakeholder management. Technical strategy. And a boss fight you won't forget.</div>
+    <div style="font-size:28px;margin-bottom:8px">⬟</div>
+    <div class="mtitle">Station Delta<span class="modal-sub-title">Captain</span></div>
+    <div class="msub">The command track for staff-plus engineering judgment: architecture, scaling, reliability, AI orchestration, mentoring, stakeholder leadership, and incident command under pressure.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · staff-level engineering judgment<br>
       <span>▸</span>L.O.L.A. — your trusted first officer<br>
@@ -460,7 +729,10 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <span>▸</span>Mentoring, ownership, stakeholder management<br>
       <span>▸</span>Technical strategy & roadmapping<br>
       <span>▸</span><b style="color:var(--red)">Boss Fight</b> — Phase 9 final test. JANET oversees it.<br>
-      <span>▸</span>Smart diagnosis · spaced repetition · career log
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable command reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
     </div>
     <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
     <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
@@ -481,20 +753,20 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">TAKE COMMAND</button>
     <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
-    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Third in the Vibe series. No account needed.</div>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Station Delta command track. No account needed.</div>
   </div>
 </div>
 
 <!-- GRAD -->
 <div id="grad-modal" class="modal">
   <div class="mbox">
-    <div style="font-size:32px;text-align:center;margin-bottom:8px">🎗️</div>
-    <div class="mtitle" style="text-align:center;color:var(--silver)">Full Command</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Captain — including the boss fight. The ship is yours.</div>
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">⬟</div>
+    <div class="mtitle" style="text-align:center;color:var(--green)">Command Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Captain — including the final assessment.</div>
     <div class="grad-cert">
-      <div class="grad-ct">Command Certification</div>
+      <div class="grad-ct">Station Delta Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Captain · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Captain · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Advanced architecture reading & layer analysis<br>
@@ -511,7 +783,49 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
-    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--blue)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Architecture Reading complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is saved automatically.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>Diff &amp; PR Strategy at Scale</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
+<div id="restart-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--red)">Restart Training?</div>
+    <div class="msub">This will clear your saved progress and reload Station Delta: Captain from the beginning.</div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('restart-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div id="mobile-tools-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">Mobile Tools</div>
+    <div class="msub">The phone layout condenses the top bar. Open support surfaces here without leaving the sim.</div>
+    <div style="display:grid;gap:10px">
+      <button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MAN PAGES</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('gloss-modal')">OPEN GLOSSARY</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('ach-modal')">OPEN ACHIEVEMENTS</button>
+      <button class="mbtn mbtn-p" onclick="restartFromMobileTools()">RESTART TRAINING</button>
+    </div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" style="margin-left:0" onclick="closeModal('mobile-tools-modal')">Close</button></div>
   </div>
 </div>
 
@@ -545,7 +859,20 @@ let G = {
   bossActive:false,
   bossStep:0,
   bossScore:0,
+  pendingPhaseStart:false,
+  stripPaused:false,
+  stripHidden:false,
+  rightCollapsed:false,
+  mobilePresetApplied:false,
+  mobileUiVersion:2,
+  analytics:null,
+  playbook:[],
+  whatifShown:{},
+  _pendingWhatIf:null,
 };
+
+const COURSE_ID='station-delta-captain';
+const CAPTAIN_SAVE_KEY='station_delta_captain_v1';
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
 const JANET_INTROS = [
@@ -621,6 +948,9 @@ const MAN = {
   'git':    {synopsis:'git [subcommand]',desc:'Version control',why:'All code changes flow through git.',flags:[],example:'$ git log --oneline -10\n$ git diff main..feature\n$ git show HEAD'},
   'grep':   {synopsis:'grep [flags] [pattern] [file]',desc:'Search text in files',why:'Find patterns across the entire codebase.',flags:[{f:'-r',d:'Recursive'},{f:'-n',d:'Line numbers'}],example:'$ grep -rn "TODO" src/'},
   'cat':    {synopsis:'cat [file]',desc:'Read file contents',why:'Read any config, runbook, or source file.',flags:[],example:'$ cat runbooks/auth-incident.md'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal command playbook',why:'Build your own exportable Captain reference.',flags:[{f:'save',d:'Save the current phase insight'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'Alternate incident timeline',why:'See the failure path you just avoided.',flags:[],example:'$ whatif'},
+  'deep':    {synopsis:'deep',desc:'Production-depth explainer',why:'Go deeper on the skill behind the current step.',flags:[],example:'$ deep'},
 };
 
 /* ── ACHIEVEMENTS ── */
@@ -635,7 +965,7 @@ const ACHS = [
   {id:'mentor',        icon:'🎓', name:'Mentor',                desc:'Completed Phase 7 — mentoring framework.'},
   {id:'exec',          icon:'📊', name:'Executive Presence',    desc:'Completed Phase 8 — stakeholder leadership.'},
   {id:'boss_slayer',   icon:'💀', name:'Boss Slayer',           desc:'Defeated the Phase 9 Boss Fight. JANET was unimpressed.'},
-  {id:'captain',       icon:'🎗️', name:'Full Captain',          desc:'Completed all 9 phases. The Vibe Trilogy is yours.'},
+  {id:'captain',       icon:'🎗️', name:'Full Captain',          desc:'Completed all 9 phases of Station Delta: Captain.'},
   {id:'janet_ace',     icon:'🧊', name:'JANET Ace',             desc:'Answered a JANET quiz correctly on first try. She noted it without enthusiasm.'},
   {id:'eagle',         icon:'🦅', name:'Eagle Eye',             desc:'Completed a phase without revealing the answer.'},
   {id:'speed_run',     icon:'⚡', name:'Speed Runner',          desc:'Completed a phase on first attempt per step.'},
@@ -645,6 +975,44 @@ const ACHS = [
   {id:'easter_hunter', icon:'🔭', name:'Easter Hunter',         desc:'Found 3 Easter eggs.'},
   {id:'hacker',        icon:'💀', name:'Hacker',                desc:'Tried to sudo rm -rf. Captain privileges revoked momentarily.'},
 ];
+
+const DEEP_DIVE = [
+  null,
+  {title:'Architecture Review at Staff Depth',body:'A captain does not stop at naming layers. You identify ownership seams, coupling debt, implied reliability boundaries, and the exact places where scale or team growth will break the architecture. In production this becomes an architecture memo, a migration plan, and a set of rollback-safe milestones.'},
+  {title:'PR Strategy that Protects the Fleet',body:'At this level, a diff review is about <b>pattern quality</b>, not just correctness. You ask: will this migration block traffic, will this new abstraction spread, can this rollback cleanly, and what future operator now inherits this decision? That is the difference between approving code and protecting a system.'},
+  {title:'Decision Records that Survive Turnover',body:'A strong ADR names the constraints, the rejected options, the operational trade-off, and the trigger for revisiting the decision. Production teams use ADRs as future incident evidence: when things go wrong, the record explains whether the system failed or the assumptions did.'},
+  {title:'Scaling Before Pain Turns Political',body:'Performance work at captain level starts with bottleneck proof, then stages the intervention: instrumentation, read-path optimization, cache safety, queue boundaries, and blast-radius control. You are not just making it faster. You are choosing where complexity enters the platform and who has to operate it.'},
+  {title:'Observability as Decision Infrastructure',body:'Dashboards are not the goal. Decision speed is. Mature observability ties SLOs, traces, alerts, deploy markers, and ownership maps together so the on-call engineer can decide in minutes whether to roll forward, roll back, or isolate. That is what keeps incidents short and leadership calm.'},
+  {title:'AI Orchestration Beyond the Demo',body:'Production multi-agent systems need role boundaries, eval gates, fallback logic, cost ceilings, and auditability. A captain’s job is to decide where automation ends and accountability begins. If an agent cannot be explained, evaluated, and safely interrupted, it is not production-ready.'},
+  {title:'Mentoring as System Design',body:'Captain-level mentoring is not ad hoc coaching. It is building decision scaffolding: review rubrics, onboarding paths, escalation rules, and examples of good judgment. When your standards are explicit, every new engineer inherits the platform’s operating philosophy instead of guessing at it.'},
+  {title:'Stakeholder Translation Under Pressure',body:'The move from senior to staff is often the move from code explanation to consequence explanation. You frame trade-offs in revenue, trust, roadmap timing, and incident risk so non-technical leaders can make informed calls. Precision matters more than persuasion theatrics.'},
+  {title:'Incident Command as Executive Engineering',body:'The best incident commander protects parallel work: diagnosis, comms, logging, and decision review. You are managing uncertainty, not just restoring service. That means time-boxing theories, assigning owners, and choosing the smallest safe action that restores the system without creating a second incident.'},
+];
+
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'You skipped the architecture pass',alt:'The team jumped straight into implementation without mapping boundaries or noticing route-layer database access.',outcome:'Three weeks later a “small” feature touched auth, admin, and booking flows at once, turning one change into a fleet-wide regression risk.',learning:'Cold architectural orientation is not ceremony. It is how you avoid shipping changes into invisible coupling.'},
+  {title:'The migration review was waved through',alt:'The index migration shipped without a rollback plan and with assumptions nobody pressure-tested.',outcome:'A peak-hour deploy pinned the database, queue latency spiked, and rollback took longer than the original change.',learning:'Captain-level review treats migrations as operational events, not just SQL text.'},
+  {title:'The design decision stayed in someone’s head',alt:'Everyone agreed in the meeting, but no ADR captured why the monolith-first choice was made.',outcome:'Six months later a new team restarted the microservices debate and nearly repeated the same costly analysis from scratch.',learning:'Unwritten decisions decay into folklore. Documentation preserves engineering leverage.'},
+  {title:'You scaled by instinct',alt:'The org bought larger boxes and added replicas before proving the bottleneck path.',outcome:'Costs rose, tail latency stayed ugly, and the real culprit turned out to be an unbounded read pattern in one service.',learning:'Performance fixes without evidence become expensive superstition.'},
+  {title:'Observability remained partial',alt:'Logs existed, but alerts, service ownership, and trace links never got hardened.',outcome:'During the next outage, four engineers chased different theories for twenty minutes while leadership asked for updates nobody could ground in data.',learning:'Observability is what makes coordination possible when stress is highest.'},
+  {title:'The AI orchestration shipped as a demo',alt:'The multi-agent flow looked impressive in staging, so evals and fallback rules were postponed.',outcome:'A tool-call loop burned budget overnight and surfaced low-confidence outputs to customers before anyone noticed.',learning:'A clever agent without control planes is a liability, not a feature.'},
+  {title:'Mentoring stayed informal',alt:'Standards lived in senior engineers’ heads and onboarding depended on whoever had time that week.',outcome:'PR quality drifted, repeated mistakes looked like “people problems,” and every new engineer had to rediscover the same expectations.',learning:'Systemic mentoring reduces variance. Informal mentoring preserves it.'},
+  {title:'The stakeholder brief stayed technical',alt:'Engineering explained complexity, but never translated the consequences into roadmap or revenue terms.',outcome:'Leadership delayed reliability work until the quarter’s biggest launch window, when the risk finally became visible the hard way.',learning:'If leaders cannot compare cost now vs cost later, they will optimize for the wrong thing.'},
+  {title:'Incident command collapsed into debugging',alt:'The captain jumped into logs and queries instead of assigning roles and driving the response.',outcome:'Work duplicated, updates stalled, rollback took longer, and the incident created almost as much confusion as outage impact.',learning:'The IC protects the response structure so specialists can solve the actual fault.'},
+];
+
+const PLAYBOOK_NOTES = {
+  1:'Architecture review checklist: map service boundaries, find layer leaks, note ownership seams, and identify the first coupling risk that will punish future change.',
+  2:'PR review checklist: scope first, migration safety second, pattern quality third, rollback path always. Review for the next 50 PRs, not just today’s one.',
+  3:'ADR template: context, constraints, options, decision, consequences, review trigger. If future engineers cannot tell why the choice was made, the ADR is incomplete.',
+  4:'Scaling playbook: instrument first, prove the bottleneck, choose the smallest intervention that moves p99, and document what new operational burden the fix introduces.',
+  5:'Observability stack: health checks, error-rate alerts, p99 latency, deploy markers, clear ownership, and traces that connect symptom to service fast enough to act.',
+  6:'AI system rule: no orchestration ships without evals, fallback rules, cost ceilings, and a clean kill switch. Reliability beats novelty every time.',
+  7:'Mentoring system: make expectations repeatable with standards, examples, and feedback loops so quality survives even when senior attention is scarce.',
+  8:'Stakeholder translation formula: technical condition → business consequence → cost of inaction → smallest investment that changes the risk profile.',
+  9:'Incident command mantra: assign roles, stabilize comms, choose evidence over speculation, and keep the response coordinated enough that debugging can actually work.',
+};
 
 /* ── DIAGNOSIS ENGINE ── */
 const DIAGNOSE = {
@@ -1151,7 +1519,7 @@ function typedLine(text,cls,delayMs=0){
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
 
 /* ── MODALS ── */
-function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();}
+function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();if(id==='career-modal')renderCareerModal();}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 
 /* ── TEACH / CONCEPT / HINT / JIT / BRIDGE ── */
@@ -1411,15 +1779,216 @@ function renderCareerModal(){
   document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{const d=CAREER_LOG_DATA[i];if(!d)return'';return`<div class="career-entry"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-context">${d.context}</div><div class="career-tags">${(d.tags||[]).map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`}).join('');
 }
 
+function togglePlaybook(){
+  const sec=document.getElementById('playbook-sec');
+  if(!sec)return;
+  sec.style.maxHeight = sec.style.maxHeight === '34px' ? '220px' : '34px';
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];
+  return ph ? `Phase ${phaseIdx} — ${ph.title}` : `Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx = Math.max(1, Math.min(9, (G.phase > 9 ? 9 : (G.phase > 1 ? G.phase-1 : G.phase))));
+  const entry = {phase:getPlaybookPhaseTitle(phaseIdx),note:PLAYBOOK_NOTES[phaseIdx] || 'Captain-level operating note recorded.',ts:Date.now()};
+  G.playbook.push(entry);
+  save();
+  renderPlaybook();
+  setLola('Saved to your Personal Playbook. Type <code>playbook export</code> any time to copy the full reference.');
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(!body||!count) return;
+  if(!Array.isArray(G.playbook) || G.playbook.length===0){
+    body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';
+    count.style.display='none';
+    return;
+  }
+  count.style.display='inline';
+  count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map(e=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+`<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  document.getElementById('playbook-sec').style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My Captain Playbook\n*Station Delta: Captain — ${new Date().toLocaleDateString()}*\n\n`+G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(md).then(()=>{
+      appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+      setLola('Your Personal Playbook is copied. Drop it into docs, onboarding, or your incident prep notes.');
+    }).catch(()=>{
+      appendLine(md,'ln-info');
+    });
+  }else{
+    appendLine(md,'ln-info');
+  }
+}
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd) return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span><span>Deep Dive: ${dd.title}</span>`;
+  btn.onclick=()=>showDeepDive(phaseIdx);
+  $out.appendChild(btn);
+  $out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd) return;
+  const w=document.createElement('div');
+  w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);
+  $out.scrollTop=$out.scrollHeight;
+}
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi) return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key]) return;
+  G._pendingWhatIf=phaseIdx;
+  setLola('Want the alternate timeline? Type <code>whatif</code> to see the failure path you just avoided.');
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi) return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;
+  G._pendingWhatIf=null;
+  save();
+  const w=document.createElement('div');
+  w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(29,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);
+  $out.scrollTop=$out.scrollHeight;
+}
+
 /* ── SAVE / LOAD ── */
-function save(){localStorage.setItem('vbc_v1',JSON.stringify(G))}
-function loadSave(){const raw=localStorage.getItem('vbc_v1');if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}}
+function makeSessionId(){
+  return 'captain-'+Math.random().toString(36).slice(2,10)+'-'+Date.now().toString(36);
+}
+function freshAnalytics(){
+  return {
+    version:1,
+    courseId:COURSE_ID,
+    sessionId:makeSessionId(),
+    createdAt:new Date().toISOString(),
+    updatedAt:new Date().toISOString(),
+    lastEventAt:null,
+    events:[],
+    phases:{},
+    steps:{},
+  };
+}
+function ensureAnalytics(){
+  if(!G.analytics || typeof G.analytics!=='object') G.analytics=freshAnalytics();
+  const a=G.analytics;
+  if(!a.courseId) a.courseId=COURSE_ID;
+  if(!a.sessionId) a.sessionId=makeSessionId();
+  if(!Array.isArray(a.events)) a.events=[];
+  if(!a.phases || typeof a.phases!=='object') a.phases={};
+  if(!a.steps || typeof a.steps!=='object') a.steps={};
+  a.updatedAt=new Date().toISOString();
+  return a;
+}
+function analyticsEvent(type,payload={}){
+  ensureAnalytics();
+  const evt={ts:new Date().toISOString(),type,payload};
+  G.analytics.events.push(evt);
+  if(G.analytics.events.length>1800) G.analytics.events.shift();
+  G.analytics.lastEventAt=evt.ts;
+}
+function phaseKey(phaseNum){return 'phase-'+phaseNum}
+function stepKeyFromState(stepObj){return stepObj?.id || `p${G.phase}s${G.step+1}`}
+function ensurePhaseRecord(phaseNum, phaseObj){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  const rec=G.analytics.phases[key] || {phase:phaseNum,title:phaseObj?.title||'',startedAt:null,completedAt:null,durationMs:null};
+  rec.phase=phaseNum;
+  if(phaseObj?.title) rec.title=phaseObj.title;
+  G.analytics.phases[key]=rec;
+  return rec;
+}
+function ensureStepRecord(stepObj, phaseObj){
+  const key=stepKeyFromState(stepObj);
+  ensureAnalytics();
+  const rec=G.analytics.steps[key] || {
+    stepId:key,phase:G.phase,phaseTitle:phaseObj?.title||'',objective:stepObj?.obj||'',
+    startedAt:null,firstCorrectAt:null,completedAt:null,ttrMs:null,attempts:0,wrongAttempts:0,commandCount:0,lastInput:'',
+  };
+  rec.phase=G.phase;
+  if(phaseObj?.title) rec.phaseTitle=phaseObj.title;
+  if(stepObj?.obj) rec.objective=stepObj.obj;
+  G.analytics.steps[key]=rec;
+  return rec;
+}
+function markPhaseStart(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('phase_started',{phaseId:phaseKey(phaseNum),title:rec.title});
+  }
+}
+function markPhaseComplete(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.completedAt=Date.now();
+  rec.durationMs=Math.max(0, rec.completedAt-rec.startedAt);
+  analyticsEvent('phase_completed',{phaseId:phaseKey(phaseNum),title:rec.title,durationMs:rec.durationMs});
+}
+function markStepStart(stepObj, phaseObj){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('step_started',{stepId:rec.stepId,objective:rec.objective});
+  }
+}
+function markStepAttempt(stepObj, phaseObj, input, correct){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.attempts += 1;
+  rec.commandCount += 1;
+  rec.lastInput = (input||'').slice(0,160);
+  if(!correct) rec.wrongAttempts += 1;
+  analyticsEvent('step_attempt',{stepId:rec.stepId,correct,input:rec.lastInput});
+  if(correct){
+    const now=Date.now();
+    if(!rec.firstCorrectAt) rec.firstCorrectAt=now;
+    rec.completedAt=now;
+    rec.ttrMs=Math.max(0, now-rec.startedAt);
+    analyticsEvent('step_completed',{stepId:rec.stepId,ttrMs:rec.ttrMs,attempts:rec.attempts});
+  }
+}
+function getAnalyticsSnapshot(){
+  ensureAnalytics();
+  return JSON.parse(JSON.stringify({
+    meta:{courseId:COURSE_ID,generatedAt:new Date().toISOString(),learner:G.name,phase:G.phase,step:G.step},
+    raw:G.analytics,
+  }));
+}
+window.vibeAnalytics={
+  getRaw:()=>JSON.parse(JSON.stringify(G.analytics||{})),
+  getSnapshot:getAnalyticsSnapshot,
+  exportJSON:()=>JSON.stringify(getAnalyticsSnapshot(),null,2),
+};
+function save(){
+  ensureAnalytics();
+  localStorage.setItem(CAPTAIN_SAVE_KEY,JSON.stringify(G));
+}
+function loadSave(){
+  const raw=localStorage.getItem(CAPTAIN_SAVE_KEY);
+  if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
+  ensureAnalytics();
+}
 
 /* ── EASTER EGGS ── */
 const EASTER={
   'sudo rm -rf':{handle(){appendLine('CRITICAL: ROOT DELETION INITIATED…','ln-err');let i=0;const dirs=['Wiping /bridge…','Wiping /crew-manifest…','Wiping /strategy/'];const iv=setInterval(()=>{appendLine(dirs[i]||'','ln-code');i++;if(i>2){clearInterval(iv);setTimeout(()=>{appendLine('💥 JANET: I have logs of this. They will be attached to your file.','ln-janet');setTimeout(()=>location.reload(),3000)},600)}},400);trackEaster('sudo');unlock('hacker');return true;}},
-  'whoami':{handle(){appendLine('captain@vibe-ship — Vibe Captain, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE COMMAND','ln-info');trackEaster('whoami');return true;}},
-  'neofetch':{handle(){appendLine('       captain@vibe-ship','ln-janet');appendLine('       ─────────────────','ln-sys');appendLine('       OS: VibOS 3.0 / Command Edition','ln-sys');appendLine('       Stack: Hono · Prisma · Bun · TypeScript · Redis','ln-sys');appendLine('       AI: L.O.L.A. v3.1 + J.A.N.E.T. v?.?','ln-sys');appendLine('       Crew: '+G.agents.length+' agents deployed','ln-sys');appendLine('       Mission: Vibe Captain · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
+  'whoami':{handle(){appendLine('captain@station-delta — Station Delta: Captain, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE COMMAND','ln-info');trackEaster('whoami');return true;}},
+  'neofetch':{handle(){appendLine('       captain@station-delta','ln-janet');appendLine('       ─────────────────────','ln-sys');appendLine('       OS: Station Delta Command Edition','ln-sys');appendLine('       Stack: Hono · Prisma · Bun · TypeScript · Redis','ln-sys');appendLine('       AI: L.O.L.A. v3.1 + J.A.N.E.T. v?.?','ln-sys');appendLine('       Crew: '+G.agents.length+' agents deployed','ln-sys');appendLine('       Mission: Station Delta: Captain · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
   'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship.','ln-janet');trackEaster('janet');return true;}},
   'git log':{handle(){appendLine('a1b2c3 strategy: complete fleet incident command','ln-info');appendLine('b2c3d4 observe: add SLO for booking endpoint','ln-info');appendLine('c3d4e5 design: ADR-007 fleet architecture','ln-info');appendLine('d4e5f6 fix: N+1 query in pods/reserve','ln-info');trackEaster('gitlog');return true;}},
   'clear':{handle(){document.getElementById('output').innerHTML='';return true;}},
@@ -1440,15 +2009,27 @@ function addAgent(role,name){
 
 /* ── UI SYNC ── */
 function syncObjCard(){
+  const mobileTitle=document.getElementById('mobile-ctx-title');
+  const mobileBody=document.getElementById('mobile-ctx-body');
   if(G.sandbox||G.bossActive){
-    if(!G.bossActive){document.getElementById('obj-phase-label').textContent='COMMAND CERTIFIED';document.getElementById('obj-title').textContent='Free exploration';document.getElementById('obj-context').textContent='All phases complete.';document.getElementById('obj-cmd-row').style.display='none';}
+    if(!G.bossActive){
+      document.getElementById('obj-phase-label').textContent='COMMAND CERTIFIED';
+      document.getElementById('obj-title').textContent='Free exploration';
+      document.getElementById('obj-context').textContent='All phases complete.';
+      document.getElementById('obj-cmd-row').style.display='none';
+      if(mobileTitle) mobileTitle.textContent='Free exploration';
+      if(mobileBody) mobileBody.textContent='All phases complete.';
+    }
     return;
   }
   const ph=PHASES[G.phase];if(!ph)return;
   const s=ph.steps[G.step];if(!s)return;
   document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of ${PHASES.length-1} — ${ph.title}`;
   document.getElementById('obj-title').textContent=s.obj;
-  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-context').innerHTML=s.ctx;
+  if(mobileTitle) mobileTitle.textContent=s.obj;
+  if(mobileBody) mobileBody.innerHTML=s.ctx;
+  document.getElementById('obj-cmd-row').style.display='flex';
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('obj-reveal').textContent='show';
@@ -1469,9 +2050,57 @@ function syncDots(){
   }
   const sep2=document.createElement('span');sep2.className='phase-sep';sep2.textContent='SHIP';track.appendChild(sep2);
 }
-function setLola(msg){document.getElementById('lola-msg').textContent=msg}
+function setLola(msg){document.getElementById('lola-msg').innerHTML=msg}
 function revealCmd(){document.getElementById('obj-cmd-val').classList.remove('blurred');document.getElementById('obj-reveal').textContent='✓';telem('Hint revealed');G.phaseReveal=true;}
-function focusCmd(){$cmd.focus()}
+function focusCmd(){if(document.activeElement!==$cmd)$cmd.focus()}
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  const inner=document.getElementById('lola-strip-inner');
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  const rightBtn=document.getElementById('right-collapse-btn');
+  const mobileStripBtn=document.getElementById('mobile-strip-toggle-btn');
+  if(!shell) return;
+  shell.classList.toggle('strip-hidden', !!G.stripHidden);
+  shell.classList.toggle('right-collapsed', !!G.rightCollapsed);
+  if(inner) inner.style.animationPlayState=G.stripPaused?'paused':'running';
+  if(pauseBtn){
+    pauseBtn.textContent=G.stripPaused?'Resume':'Pause';
+    pauseBtn.setAttribute('aria-pressed',G.stripPaused?'true':'false');
+  }
+  if(rightBtn){
+    rightBtn.textContent=G.rightCollapsed?'Expand':'Collapse';
+    rightBtn.setAttribute('aria-pressed',G.rightCollapsed?'true':'false');
+  }
+  if(mobileStripBtn){
+    mobileStripBtn.textContent=G.rightCollapsed?'◫':'◧';
+    mobileStripBtn.classList.toggle('strip-is-hidden', !!G.rightCollapsed);
+  }
+}
+function applyMobileLayoutDefaults(){
+  if(!window.matchMedia || !window.matchMedia('(max-width:820px)').matches) return;
+  if(G.mobilePresetApplied) return;
+  G.rightCollapsed=true;
+  G.stripHidden=false;
+  G.mobilePresetApplied=true;
+}
+function migrateMobileUiDefaults(){
+  if(!window.matchMedia || !window.matchMedia('(max-width:820px)').matches) return;
+  if((G.mobileUiVersion||0) >= 2) return;
+  G.stripHidden=false;
+  G.mobileUiVersion=2;
+  save();
+}
+function toggleStripPause(){G.stripPaused=!G.stripPaused;applyUIPreferences();save()}
+function toggleRightPanel(){G.rightCollapsed=!G.rightCollapsed;applyUIPreferences();save()}
+function openSupportModal(id){closeModal('mobile-tools-modal');openModal(id)}
+function restartFromMobileTools(){closeModal('mobile-tools-modal');openModal('restart-modal')}
+function confirmRestart(){localStorage.removeItem(CAPTAIN_SAVE_KEY);location.reload()}
+function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.pendingPhaseStart=false;
+  save();
+  startPhase();
+}
 
 /* ── KEYBOARD ── */
 $cmd.addEventListener('keydown',e=>{
@@ -1494,10 +2123,28 @@ async function processCmd(raw){
   if(!G.achievements.includes('first_cmd'))unlock('first_cmd');
   appendLine(val,'ln-cmd');blank();
   telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
+  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive});
   const vl=val.toLowerCase().trim();
 
   if(vl==='man'){showManAll();syncObjCard();return}
   if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');syncObjCard();return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();syncObjCard();return}
+  if(vl==='playbook export'){exportPlaybook();syncObjCard();return}
+  if(vl==='whatif'){
+    if(G._pendingWhatIf) showWhatIf(G._pendingWhatIf);
+    else appendLine('No what-if scenario available right now.','ln-info');
+    syncObjCard();return;
+  }
+  if(vl==='deep'){
+    const phaseIdx=Math.min(G.phase, DEEP_DIVE.length-1);
+    if(DEEP_DIVE[phaseIdx]) showDeepDive(phaseIdx);
+    else appendLine('No deep dive available right now.','ln-info');
+    syncObjCard();return;
+  }
+  if(G.pendingPhaseStart){
+    appendLine('Checkpoint active. Start the next phase from the checkpoint modal or resume later. Support commands like man, playbook, deep, and whatif still work here.','ln-warn');
+    syncObjCard();return;
+  }
 
   if(G.sandbox){handleSandbox(val);return}
 
@@ -1532,10 +2179,11 @@ async function processCmd(raw){
   }
 
   const ph=PHASES[G.phase];const s=ph.steps[G.step];
-  if(matchesStep(val,s)){await handleCorrect(s,ph);syncObjCard();return}
+  if(matchesStep(val,s)){markStepAttempt(s,ph,val,true);await handleCorrect(s,ph);syncObjCard();return}
 
   if(G.unlockedCmds.length>0){const handled=handlePersistentCmd(vl,val);if(handled){syncObjCard();return}}
 
+  markStepAttempt(s,ph,val,false);
   handleWrong(val,s);syncObjCard();
 }
 
@@ -1566,6 +2214,7 @@ async function handleCorrect(s,ph){
 
   // J.A.N.E.T. quiz (replaces standard quiz)
   if(s.quiz&&s.quiz.janetQuiz){blank();await showJanetQuizWithQ(s.quiz);blank()}
+  showDeepDiveButton(G.phase);
 
   if(s.achievement)unlock(s.achievement);
   if(G.phase===5&&G.step===0)addAgent('SRE Specialist','Orion');
@@ -1578,6 +2227,7 @@ async function handleCorrect(s,ph){
   if(G.step>=ph.steps.length){await completePhase()}
   else{
     const next=ph.steps[G.step];blank();
+    markStepStart(next,ph);
     appendLine(`▸ Next: ${next.obj}`,'ln-info');
     if(!G.hard&&!G.practitioner)showHint(next.hint);
     if(next.jit&&!G.hard)showJIT(next.jit);
@@ -1601,6 +2251,7 @@ function handleWrong(val,s){
 
 async function completePhase(){
   const ph=PHASES[G.phase];
+  markPhaseComplete(G.phase,ph);
   G.completedPhases.push(G.phase);addCareerEntry(G.phase-1);
   if(!G.phaseReveal)unlock('eagle');if(G.tries===0)unlock('speed_run');G.phaseReveal=false;
   if(ph.ach)unlock(ph.ach);
@@ -1610,13 +2261,27 @@ async function completePhase(){
   blank();appendLine(`Score: ${G.score}`,'ln-info');blank();
   if(ph.challenge&&!G.expert){blank();await showChallenge(ph.challenge);blank()}
   if(ph.breakit&&!G.expert){blank();await showBreakIt(ph.breakit);blank()}
+  setLola('Want to keep this phase? Type <code>playbook save</code>. Want the alternate timeline? Type <code>whatif</code>.');
+  showWhatIfButton(G.phase);
   G.phase++;G.step=0;G.tries=0;
-  if(G.phase<=PHASES.length-1){setTimeout(startPhase,900)}
+  if(G.phase<=PHASES.length-1){
+    G.pendingPhaseStart=true;
+    const next=PHASES[G.phase];
+    document.getElementById('phase-modal-title').textContent=`${ph.title} complete`;
+    document.getElementById('phase-modal-copy').textContent='Good place to pause. Your progress is saved automatically.';
+    document.getElementById('phase-modal-next').innerHTML=`Next up: <b>${next.title}</b>`;
+    openModal('phase-modal');
+  }
   syncDots();save();
 }
 
 function startPhase(){
+  if(G.pendingPhaseStart){
+    G.pendingPhaseStart=false;
+    save();
+  }
   const ph=PHASES[G.phase];divline();
+  markPhaseStart(G.phase,ph);
   appendLine(`┌── PHASE ${G.phase} OF ${PHASES.length-1}: ${ph.title.toUpperCase()} ──`,'ln-info');blank();
   const sr=ph.spacedRep;
   if(sr&&!G.expert){
@@ -1628,6 +2293,7 @@ function startPhase(){
 
 function continuePhaseStart(ph){
   blank();const s=ph.steps[0];
+  markStepStart(s,ph);
   appendLine(`▸ ${s.obj}`,'ln-info');
   if(!G.hard&&!G.practitioner)showHint(s.hint);
   if(s.jit&&!G.hard)showJIT(s.jit);
@@ -1819,7 +2485,7 @@ async function runFinalCommission(){
   for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
   await delay(500);blank();
   appendLine('🎗️ FULL COMMAND COMMISSION GRANTED','ln-success');
-  appendLine(`Captain ${G.name} — Vibe Captain · Class of 2026`,'ln-success');
+  appendLine(`Captain ${G.name} — Station Delta: Captain · Class of 2026`,'ln-success');
   blank();
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
   appendLine('       THE VIBE TRILOGY COMPLETE','ln-success');
@@ -1856,16 +2522,16 @@ function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Captain';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  ensureAnalytics();
   closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
 document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
-window.addEventListener('load',()=>{setTimeout(()=>{const bi=document.getElementById('boot-name');if(bi&&document.getElementById('boot-modal').classList.contains('open')){bi.focus();bi.style.color='var(--text)'}},200)});
 
 function bootTerminal(){
   const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE CAPTAIN v1.0 — COMMAND EDITION',c:'ln-success'},
+    {t:'STATION DELTA: CAPTAIN — COMMAND EDITION',c:'ln-success'},
     {t:'Booting bridge systems…',c:'ln-sys'},
     {t:'Architecture analysis engine: READY',c:'ln-sys'},
     {t:'System design workspace: READY',c:'ln-sys'},
@@ -1876,19 +2542,24 @@ function bootTerminal(){
     {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
     {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
     {t:'',c:'ln-blank'},
-    {t:`Welcome aboard, Captain ${G.name}. You commanded the Lieutenant track. Now you command the ship.`,c:'ln-lola'},
+    {t:`Welcome aboard, Captain ${G.name}. You command Station Delta now.`,c:'ln-lola'},
     {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
     {t:'Architecture. Scalability. Reliability. Leadership. Strategy.',c:'ln-lola'},
     {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
     {t:'',c:'ln-blank'},
     {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
     {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: After each step, type  deep  for production depth. After each phase, use  playbook save  or  whatif',c:'ln-info'},
     {t:'TIP: Try janet, whoami, neofetch, uptime, or git log',c:'ln-info'},
     {t:'',c:'ln-blank'},
   ];
   let d=0;
   lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
-  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+  setTimeout(()=>{
+    applyMobileLayoutDefaults();
+    applyUIPreferences();
+    startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus();
+  },d+300);
 }
 
 function resumeSession(){
@@ -1901,24 +2572,33 @@ function resumeSession(){
   if(G.completedPhases.includes(6))addAgent('AI Evaluator','Vega');
   appendLine(`Welcome back, Captain ${G.name}. Progress restored.`,'ln-lola');blank();
   renderUnlockedCmds();
+  renderPlaybook();
   if(G.sandbox){
     appendLine('Command certification complete. Sandbox mode.','ln-success');
   }else if(G.bossActive){
     appendLine('You were mid-boss-fight. J.A.N.E.T. is waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
+  }else if(G.pendingPhaseStart){
+    appendLine(`Welcome back, Captain ${G.name}. Checkpoint restored.`,'ln-lola');blank();
+    setLola('Checkpoint reached. You finished a phase, and the next one is queued. Start it when you are ready.');
+    openModal('phase-modal');
   }else{
     const ph=PHASES[G.phase];const s=ph.steps[G.step];
     appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
     appendLine(`Current objective: ${s.obj}`,'ln-info');
     if(!G.hard&&!G.practitioner)showHint(s.hint);
     setLola(s.ctx);
+    markPhaseStart(G.phase,ph);
+    markStepStart(s,ph);
   }
+  applyMobileLayoutDefaults();
+  applyUIPreferences();
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Captain from scratch?')){localStorage.removeItem('vbc_v1');location.reload()}}
+function doRestart(){openModal('restart-modal')}
 function shareGrad(){
-  const txt=`Just completed Vibe Captain — the full Vibe Trilogy 🎗️\n\nVibe Cadet → Vibe Lieutenant → Vibe Captain\n\nI can now: read architecture cold, design scalable systems, build observability stacks, lead multi-agent AI systems, mentor engineers, manage stakeholders, command incidents, and navigate a final boss fight administered by a passive-aggressive AI.\n\nFree training →`;
+  const txt=`Just completed Station Delta: Captain ⬟\n\nI can now read architecture cold, review system-level diffs, design scalable systems, build observability stacks, lead multi-agent AI systems, mentor engineers, manage stakeholders, and command incidents under pressure.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
 
@@ -1933,6 +2613,27 @@ if(G.name!=='Captain'&&(G.phase>1||G.completedPhases.length>0)){
 }else{
   setTimeout(()=>document.getElementById('boot-name').focus(),300);
 }
+
+migrateMobileUiDefaults();
+applyMobileLayoutDefaults();
+applyUIPreferences();
+renderPlaybook();
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const bi=document.getElementById('boot-name');
+    if(bi&&document.getElementById('boot-modal').classList.contains('open')){
+      bi.focus();
+      bi.style.color='var(--text)';
+    }
+  },200);
+  try{
+    const s=document.createElement('script');
+    s.src='../analytics-client.js';
+    s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
+    document.head.appendChild(s);
+  }catch(_){}
+});
 </script>
 </body>
 </html>
