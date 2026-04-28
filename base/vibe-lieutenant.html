@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Lieutenant</title>
+<title>Lieutenant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -663,7 +663,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
   <!-- TOPBAR -->
   <div id="topbar">
-    <div id="logo">Vibe Lieutenant</div>
+    <div id="logo">Lieutenant</div>
     <div id="cadet-tag">Lieutenant: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -772,7 +772,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🎖️</div>
-    <div class="mtitle" style="color:var(--gold);font-size:19px">Vibe Lieutenant</div>
+    <div class="mtitle" style="color:var(--gold);font-size:19px">Lieutenant</div>
     <div class="msub">The senior-dev bridge in the series. You already know the terminal, Git, and how to ship. Now learn to <i>operate safely under pressure</i>: orient fast, make review calls, choose validation scope, govern AI-generated changes, and coordinate a crew through a production incident.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · AI-augmented development workflows<br>
@@ -818,11 +818,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🌟</div>
     <div class="mtitle" style="text-align:center;color:var(--gold)">Commission Complete</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
     <div class="grad-cert">
       <div class="grad-ct">Field Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Lieutenant · Class of 2026</div>
+      <div class="grad-sub">Lieutenant · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Codebase navigation — reading real project structures cold<br>
@@ -932,7 +932,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE LIEUTENANT v2.0
+   Lieutenant v2.0
    Sequel to Vibe Cadet Academy
    Phases: Codebase reading · Diff review · Stack traces ·
    TypeScript errors · API literacy · Testing · Incidents ·
@@ -1183,7 +1183,7 @@ const ACHS = [
   {id:'incident_cmd',  icon:'🚨', name:'Incident Commander',  desc:'Led a production incident response.'},
   {id:'ai_auditor',    icon:'🤖', name:'AI Auditor',          desc:'Caught an AI hallucination in a review.'},
   {id:'team_player',   icon:'👥', name:'Team Player',         desc:'Completed a full PR and deployment workflow.'},
-  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Vibe Lieutenant.'},
+  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Lieutenant.'},
   {id:'boss_slayer',   icon:'💀', name:'Boss Slayer',          desc:'Defeated the J.A.N.E.T. Final Assessment. She updated your file. Without enthusiasm.'},
   {id:'janet_ace',     icon:'🧊', name:'J.A.N.E.T. Ace',       desc:'Answered a J.A.N.E.T. quiz correctly on first try. She noted it. Professionally.'},
   {id:'quiz_ace',      icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on first try.'},
@@ -2041,7 +2041,7 @@ const EASTER = {
       trackEaster('sudo');unlock('hacker');return true;
     }
   },
-  'whoami':{handle(){appendLine('lt — Vibe Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
+  'whoami':{handle(){appendLine('lt — Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
   'neofetch':{handle(){appendLine('       lt@vibe-ship','ln-lola');appendLine('       ───────────────','ln-sys');appendLine('       OS: VibOS 2.0 (based on Ubuntu 24)','ln-sys');appendLine('       Shell: zsh + oh-my-zsh','ln-sys');appendLine('       Stack: Hono + Prisma + Bun + TypeScript','ln-sys');appendLine('       AI: L.O.L.A. v2.4 (Claude-powered)','ln-sys');appendLine('       Assessment: J.A.N.E.T. v?.? (origin unknown)','ln-sys');appendLine('       Mission: Escape Pod Ops · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
   'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship until Phase 9.','ln-janet');trackEaster('janet');return true;}},
   'git log':{handle(){appendLine('a3b4c5d fix: correct findUnique call and add null guard','ln-info');appendLine('d4e5f6a fix: reduce pod reservation timeout','ln-info');appendLine('9f8e7d6 feat: add party size to reservations','ln-info');appendLine('c3d2e1f feat: initial pod booking API','ln-info');trackEaster('gitlog');return true;}},
@@ -3111,7 +3111,7 @@ function bootTerminal(){
     {t:'L.O.L.A.: If you enter something recognizably wrong, I\'ll tell you why. Otherwise you\'re on your own.',c:'ln-lola'},
   ];
   const lines=[
-    {t:'VIBE LIEUTENANT v2.0 — FIELD OPERATIONS EDITION',c:'ln-success'},
+    {t:'Lieutenant v2.0 — FIELD OPERATIONS EDITION',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'Codebase analysis engine: READY',c:'ln-sys'},
     {t:'Diff review module: READY',c:'ln-sys'},
@@ -3205,7 +3205,7 @@ function resumeSession(){
 function doRestart(){openModal('restart-confirm-modal')}
 function confirmRestart(){localStorage.removeItem(SAVE_KEY);location.reload()}
 function shareGrad(){
-  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
+  const txt=`Just completed Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');closeModal('grad-modal');
 }
 
