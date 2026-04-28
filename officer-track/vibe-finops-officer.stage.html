@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Station Delta: FinOps Officer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06090d;
+  --surface:#0b1018;
+  --s2:#101822;
+  --s3:#162030;
+  --border:#1c2a3a;
+  --b2:#243447;
+  --b3:#2d4160;
+  --text:#c4d4e0;
+  --muted:#4a6275;
+  --muted2:#6a8090;
+  --green:#84cc16;
+  --green-d:#1a2e05;
+  --green-bg:#0a0a02;
+  --blue:#3b9eff;
+  --blue-d:#0c3d6e;
+  --blue-bg:#030d18;
+  --amber:#f59e0b;
+  --amber-d:#7a4c05;
+  --amber-bg:#160e02;
+  --red:#ef4444;
+  --red-d:#7f1d1d;
+  --red-bg:#140404;
+  --purple:#a78bfa;
+  --purple-bg:#0c0818;
+  --cyan:#22d3ee;
+  --pink:#f472b6;
+  --orange:#fb923c;
+  --silver:#b0bec5;
+  --silver-d:#455a64;
+  --silver-bg:#0a0e10;
+  --silver-bright:#eceff1;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);overflow:hidden}
+
+body::after{content:'';pointer-events:none;position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);
+  z-index:9998}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 4px var(--silver)}50%{text-shadow:0 0 16px var(--silver),0 0 32px rgba(176,190,197,.2)}}
+@keyframes janetEntry{0%{opacity:0;transform:scaleX(0)}60%{transform:scaleX(1.02)}100%{opacity:1;transform:scaleX(1)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes bossFlicker{0%,100%{opacity:1}45%{opacity:.85}50%{opacity:.4}55%{opacity:.9}}
+@keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
+
+/* ── LAYOUT ── */
+#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap}
+#cadet-tag{font-size:11px;color:var(--muted2)}
+#cadet-tag b{color:var(--green)}
+#phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
+.pdot+.pdot{margin-left:3px}
+.pdot.done{background:var(--green);border-color:var(--green)}
+.pdot.active{background:var(--green);border-color:var(--green);animation:pulseGlow 2s infinite}
+.pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
+.phase-sep{font-size:9px;color:var(--border);margin:0 5px}
+#tb-right{display:flex;align-items:center;gap:6px}
+.tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--green-d);color:var(--green);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+
+/* ── TERMINAL ── */
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
+.macs{display:flex;gap:5px}
+.mac{width:11px;height:11px;border-radius:50%}
+.mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
+#term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
+#term-path span{color:var(--green)}
+#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
+.ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--green)}
+.ln-ok{color:var(--green)}
+.ln-err{color:var(--red)}
+.ln-warn{color:var(--amber)}
+.ln-info{color:var(--blue)}
+.ln-lola{color:var(--cyan)}
+.ln-sys{color:var(--muted2)}
+.ln-blank{height:10px}
+.ln-success{color:var(--green);font-weight:700}
+.ln-code{color:var(--green);font-size:11px;opacity:.65}
+.ln-matrix{color:#00ff41;text-shadow:0 0 6px #00ff41;font-size:11px}
+.ln-janet{color:var(--silver-bright);font-family:var(--janet);font-size:12px}
+.ln-boss{color:var(--red);font-family:var(--janet)}
+.ln-div{margin:6px 0}
+.ln-div::before{content:'';display:block;border-top:1px solid var(--border)}
+
+.teach{margin:10px 0;border-left:2px solid var(--blue);padding:10px 14px;background:var(--blue-bg);border-radius:0 var(--r4) var(--r4) 0;animation:slideIn .25s ease}
+.teach-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px;font-weight:700}
+.teach-body{font-size:12px;line-height:1.75;color:var(--text)}
+.teach-body code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.teach-body b{color:var(--text);font-weight:500}
+
+.concept{margin:10px 0;border:1px solid var(--b2);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.concept-hd{background:var(--s2);padding:7px 13px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.concept-bd{padding:11px 13px;font-size:12px;line-height:1.75;color:var(--text)}
+.concept-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ex-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:6px 8px;font-size:11px}
+.ex-cell .el{font-size:10px;color:var(--muted2);margin-bottom:2px}
+.ex-cell code{color:var(--green)}
+
+.hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle:hover{color:var(--amber)}
+.hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
+.hint-body.open{display:block;animation:fadeUp .2s ease}
+.hint-chevron{transition:transform .2s}
+.hint-toggle.open .hint-chevron{transform:rotate(90deg)}
+
+.diag-block{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700}
+.diag-msg{font-size:12px;color:var(--text);line-height:1.7}
+.diag-msg code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:11px}
+.diag-next{margin-top:6px;font-size:11px;color:var(--amber)}
+
+.jit{margin:10px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease}
+.jit-hd{background:var(--green-bg);padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--green);border-bottom:1px solid var(--green-d);display:flex;align-items:center;gap:7px}
+.jit-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.jit-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--green);font-size:11px}
+.jit-bd b{color:var(--cyan)}
+
+.bridge{margin:10px 0;border:1px solid var(--purple-bg);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg);border-color:var(--b3)}
+.bridge-hd{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px}
+.bridge-bd{padding:12px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.bridge-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11px}
+.bridge-bd .bridge-tag{display:inline-block;background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple);margin:2px 2px 2px 0}
+
+.spaced-rep{margin:10px 0;border:1px solid var(--cyan);border-radius:var(--r8);background:var(--blue-bg);padding:13px;animation:slideIn .3s ease}
+.spaced-rep-hd{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px;font-weight:700}
+.spaced-rep-q{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.spaced-rep-input{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:8px 12px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:6px}
+.spaced-rep-input:focus{border-color:var(--cyan)}
+.spaced-rep-fb{font-size:12px;line-height:1.6;display:none}
+.spaced-rep-fb.correct{color:var(--green)}
+.spaced-rep-fb.wrong{color:var(--red)}
+.spaced-rep-fb.show{display:block;animation:fadeUp .2s ease}
+
+.janet-arrival{margin:14px 0;border:1px solid var(--silver-d);border-radius:var(--r8);overflow:hidden;animation:janetEntry .4s cubic-bezier(.22,.68,0,1.2);position:relative}
+.janet-arrival::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(176,190,197,.03) 0%,transparent 100%);pointer-events:none}
+.janet-header{background:linear-gradient(90deg,#1a1f23 0%,#0d1114 100%);border-bottom:1px solid var(--silver-d);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.janet-logo{font-family:var(--janet);font-size:13px;font-weight:400;color:var(--silver-bright);letter-spacing:.25em;text-transform:uppercase}
+.janet-logo span{color:var(--silver-d)}
+.janet-status{margin-left:auto;font-family:var(--janet);font-size:9px;color:var(--silver-d);letter-spacing:.15em;text-transform:uppercase}
+.janet-intro{background:#0d1114;padding:11px 16px;font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.8;border-bottom:1px solid #1a2026}
+.janet-intro em{color:var(--silver-d);font-style:normal}
+.janet-q{background:#0a0d0f;padding:13px 16px;font-family:var(--janet);font-size:12px;color:var(--silver-bright);line-height:1.7;border-bottom:1px solid #1a2026}
+.janet-q-label{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:7px}
+.janet-opts{background:#060809;padding:10px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.janet-opt{background:#0d1114;border:1px solid #1a2026;border-radius:2px;padding:8px 13px;font-family:var(--janet);font-size:12px;color:var(--silver);cursor:pointer;transition:all .12s;text-align:left;letter-spacing:.02em}
+.janet-opt:hover:not(:disabled){border-color:var(--silver-d);background:#111619;color:var(--silver-bright)}
+.janet-opt.correct{border-color:#2e4a3a;background:#0a1510;color:#7cb899}
+.janet-opt.wrong{border-color:#3a1a1a;background:#0f0808;color:#8a4a4a;opacity:.7}
+.janet-fb{padding:10px 16px;font-family:var(--janet);font-size:11px;color:var(--silver-d);line-height:1.7;display:none;background:#060809;border-top:1px solid #1a2026}
+.janet-fb.show{display:block;animation:fadeUp .2s ease}
+.janet-fb.correct-fb{color:#7cb899}
+.janet-fb.wrong-fb{color:#8a7070}
+.janet-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(176,190,197,.08),transparent);animation:scanline 4s linear infinite;pointer-events:none}
+
+.challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
+.challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
+.challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
+.challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+.challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+
+.breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
+.breakit-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.breakit-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.breakit-title{font-size:12px;font-weight:700;color:var(--red)}
+.breakit-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--red)}
+.breakit-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
+
+/* ══ BOSS FIGHT ══ */
+.boss-container{margin:14px 0;border:2px solid var(--red);border-radius:var(--r8);overflow:hidden;animation:bossGlow 2s infinite;position:relative}
+.boss-header{background:linear-gradient(90deg,#1a0505,#0d0202);border-bottom:2px solid var(--red-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.boss-title{font-family:var(--janet);font-size:14px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;animation:bossFlicker 3s infinite}
+.boss-sub{font-family:var(--janet);font-size:10px;color:var(--red-d);letter-spacing:.15em;margin-left:auto}
+.boss-body{background:#080202;padding:14px 16px}
+.boss-scenario{font-family:var(--janet);font-size:12px;color:#c47070;line-height:1.8;margin-bottom:12px;border-left:3px solid var(--red-d);padding-left:12px}
+.boss-step-label{font-family:var(--janet);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--red-d);margin-bottom:6px}
+.boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
+.boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
+.boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+
+.cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
+.cmd-unlock .cu-badge{background:var(--green);color:#000;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700;white-space:nowrap}
+
+#active-cmds{border-top:1px solid var(--border);padding:7px 12px;flex-shrink:0;background:var(--s2)}
+#active-cmds-hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+#active-cmds-list{display:flex;flex-wrap:wrap;gap:4px}
+.ac-pill{background:var(--bg);border:1px solid var(--b2);border-radius:3px;padding:2px 7px;font-size:10px;color:var(--cyan);cursor:pointer;transition:all .15s}
+.ac-pill:hover{border-color:var(--cyan);color:var(--text)}
+
+.manpage{margin:10px 0;border:1px solid var(--b3);border-radius:var(--r8);overflow:hidden;animation:slideIn .25s ease}
+.manpage-hd{background:var(--s3);padding:8px 14px;font-size:10px;letter-spacing:.1em;color:var(--muted2);border-bottom:1px solid var(--b2);text-transform:uppercase}
+.manpage-bd{padding:12px 14px;font-size:12px;line-height:1.8}
+.man-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px solid var(--border)}
+.man-row:last-child{border-bottom:none}
+.man-cmd{color:var(--cyan);min-width:170px;font-size:12px}
+.man-desc{color:var(--text);flex:1}
+.man-why{color:var(--muted2);font-size:11px;margin-top:2px}
+.man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
+.man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
+
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#prompt-pre{font-size:13px;color:var(--green);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--green)}
+#cmd::placeholder{color:var(--muted);font-style:italic}
+
+#right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+#obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
+#obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
+#obj-cmd-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+#obj-cmd-row{display:flex;align-items:center;gap:8px}
+#obj-cmd-val{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r4);padding:7px 11px;font-size:12px;color:var(--amber);flex:1;transition:filter .4s}
+#obj-cmd-val.blurred{filter:blur(5px)}
+#obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
+#obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
+#obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
+#obj-tries{font-size:11px;color:var(--muted)}
+#obj-tries span{color:var(--red)}
+#obj-score{font-size:11px;color:var(--muted)}
+#obj-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+#obj-prog-fill{height:100%;background:linear-gradient(90deg,var(--silver-d),var(--silver));transition:width .5s ease;width:0%}
+
+.path-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.path-card{border:1px solid var(--b2);border-radius:var(--r8);padding:10px;cursor:pointer;transition:all .2s;background:var(--s2);text-align:center}
+.path-card:hover{border-color:var(--b3);transform:translateY(-2px)}
+.path-card.selected{border-color:var(--green);background:var(--green-bg)}
+.path-icon{font-size:20px;margin-bottom:4px}
+.path-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:3px}
+.path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
+.path-card.selected .path-name{color:var(--green)}
+
+#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+#lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#65a30d,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+#lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
+#lola-online{font-size:10px;color:var(--green);margin-left:auto}
+#lola-online::before{content:'● '}
+#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+
+#crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
+#crew-sec::-webkit-scrollbar{width:2px}
+#crew-sec::-webkit-scrollbar-thumb{background:var(--b2)}
+#crew-hd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+#crew-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#crew-empty{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px 0}
+.agent-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.ac-name{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px}
+.ac-role{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.ac-status{font-size:10px;color:var(--green)}
+.ac-status::before{content:'● '}
+.ac-tip{font-size:11px;color:var(--muted);margin-top:7px;border-top:1px solid var(--border);padding-top:6px;line-height:1.55;display:none}
+.agent-card.open .ac-tip{display:block}
+
+#telem-sec{border-top:1px solid var(--border);height:110px;display:flex;flex-direction:column;flex-shrink:0}
+#telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+#telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
+
+#toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--green-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--green);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
+#toast.show{transform:translateX(0)}
+#toast-title{font-weight:700;margin-bottom:2px}
+#toast-sub{font-size:11px;color:var(--muted2)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:24px 28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;font-size:13px}
+.mbox::-webkit-scrollbar{width:3px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2)}
+.mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
+.mbtn-p{background:var(--green);color:#081003;font-weight:700}
+.mbtn-p:hover{background:#9fe024}
+.mbtn-s{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
+.mbtn-s:hover{background:var(--b2);color:var(--text)}
+.boot-features{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted2);line-height:2}
+.boot-features span{color:var(--red);margin-right:6px}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--b2);color:var(--text);padding:9px 13px;border-radius:var(--r4);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:14px}
+input[type=text]:focus{border-color:var(--green)}
+.grad-cert{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:18px;text-align:center;margin:14px 0}
+.grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--green);margin-bottom:6px}
+.grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--green);margin-bottom:4px}
+.grad-sub{font-size:11px;color:var(--muted2)}
+.skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
+.skills-list span{color:var(--green);margin-right:8px}
+.ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ach-item:last-child{border-bottom:none}
+.ach-icon{font-size:22px;flex-shrink:0}
+.ach-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ach-desc{font-size:11px;color:var(--muted2)}
+.gloss-item{padding:9px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;margin-bottom:4px}
+.gloss-term:hover{text-decoration:underline}
+.gloss-def{font-size:11px;color:var(--muted2);line-height:1.65}
+.career-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.career-item:last-child{border-bottom:none}
+.career-phase{font-size:11px;color:var(--cyan);margin-bottom:4px}
+.career-stat{font-size:22px;font-weight:700;color:var(--green);margin-bottom:3px}
+.career-ctx{font-size:11px;color:var(--text);line-height:1.65}
+.career-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.career-tag{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 6px;font-size:10px;color:var(--purple)}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.1em;margin-left:auto}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--b2)}
+#playbook-empty{color:var(--muted);font-style:italic;font-size:11px;padding:4px 0}
+.pb-entry{padding:6px 0;border-bottom:1px solid var(--border);animation:fadeUp .2s ease}
+.pb-entry:last-child{border-bottom:none}
+.pb-phase{font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.pb-note{color:var(--text);font-size:11px;line-height:1.6}
+.pb-export-btn{display:block;width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--muted2);font-family:var(--mono);font-size:10px;padding:4px 0;border-radius:var(--r4);cursor:pointer;margin-top:6px;transition:all .15s;text-align:center}
+.pb-export-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+
+/* ── ENHANCED DIAG ── */
+.diag-block-progressive{margin:8px 0;border:1px solid var(--amber-d);border-radius:var(--r4);background:var(--amber-bg);padding:9px 13px;animation:slideDown .2s ease}
+.diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
+.diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
+.diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+.checkpoint-box{background:var(--s2);border:1px solid var(--blue-d);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:700}
+.checkpoint-title{font-family:var(--display);font-size:18px;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
+.checkpoint-next b{color:var(--blue)}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div id="logo">💰 STATION DELTA · FINOPS OFFICER</div>
+    <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
+    <div id="phase-track"></div>
+    <div id="tb-right">
+      <span id="sandbox-pill">SANDBOX</span>
+      <span id="hardmode-pill">HARD MODE</span>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+    </div>
+  </div>
+
+  <div id="term-panel">
+    <div id="term-titlebar">
+      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+      <div id="term-path">finops@<span id="term-path-val">ship:/home/officer/billing</span></div>
+    </div>
+    <div id="output"></div>
+    <div id="active-cmds">
+      <div id="active-cmds-hd">🔓 Unlocked Commands</div>
+      <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
+    </div>
+    <div id="input-row">
+      <div id="prompt-pre">$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div id="right">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Loading…</div>
+      <div id="obj-context">Initializing…</div>
+      <div id="obj-cmd-label">Next Command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">—</div>
+        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">1000</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Officer on deck. The AI is powerful. The bill is bigger. You decide what stays.</div>
+    </div>
+    <div id="crew-sec">
+      <div id="crew-hd">Active Crew</div>
+      <div id="crew-empty">No crew deployed yet</div>
+    </div>
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div></div>
+    </div>
+    <div id="telem-sec">
+      <div id="telem-hd">Telemetry</div>
+      <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
+
+<!-- BOOT -->
+<div id="boot-modal" class="modal open">
+  <div class="mbox">
+    <div style="font-size:28px;margin:0 auto 8px;text-align:center;width:100%">💰</div>
+    <div class="mtitle" style="color:var(--green);font-size:19px">Station Delta: FinOps Officer</div>
+    <div class="msub">The Station Delta placement for engineers who turn AI spend into business judgment: cost visibility, unit economics, ROI, guardrails, executive communication, and live margin protection under pressure.</div>
+    <div class="boot-features">
+      <span>▸</span>9 phases · real-world FinOps for AI infrastructure<br>
+      <span>▸</span>L.O.L.A. — your tactical intel officer<br>
+      <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all quizzes. She is… unimpressed.<br>
+      <span>▸</span>Cost visibility · token economics · feature attribution<br>
+      <span>▸</span>Revenue linkage · break-even analysis · optimization decisions<br>
+      <span>▸</span>Forecasting · executive reporting · The Margin Collapse<br>
+      <span>▸</span>Smart diagnosis · spaced repetition · career log<br>
+      <span>▸</span>⚡ <b style="color:var(--purple)">Deep Dive</b> after every step — go to production depth<br>
+      <span>▸</span>📓 <b style="color:var(--purple)">Personal Playbook</b> — build your exportable FinOps reference<br>
+      <span>▸</span>🔀 <b style="color:var(--purple)">What-If Scenarios</b> — see the alternate timeline after each phase
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
+    <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
+    <div class="path-cards">
+      <div class="path-card selected" id="path-explorer" onclick="selectPath('explorer')">
+        <div class="path-icon">🔭</div><div class="path-name">Explorer</div>
+        <div class="path-desc">Hints on. Full context. Recommended.</div>
+      </div>
+      <div class="path-card" id="path-practitioner" onclick="selectPath('practitioner')">
+        <div class="path-icon">⚙️</div><div class="path-name">Practitioner</div>
+        <div class="path-desc">No hints. Smart feedback only.</div>
+      </div>
+      <div class="path-card" id="path-expert" onclick="selectPath('expert')">
+        <div class="path-icon">🦅</div><div class="path-name">Expert</div>
+        <div class="path-desc">No hints. No feedback. Timer on.</div>
+      </div>
+    </div>
+    <button class="mbtn mbtn-p" onclick="startAcademy()">PROTECT THE MARGIN</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Station Delta placement sim. No account needed.</div>
+  </div>
+</div>
+
+<!-- GRAD -->
+<div id="grad-modal" class="modal">
+  <div class="mbox">
+    <div style="font-size:32px;text-align:center;margin:0 auto 8px;width:100%">💰</div>
+    <div class="mtitle" style="text-align:center;color:var(--green)">FinOps Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: FinOps Officer — including the Margin Collapse. You now turn AI spend into clear business decisions.</div>
+    <div class="grad-cert">
+      <div class="grad-ct">Station Delta Certification</div>
+      <div class="grad-name" id="grad-name">—</div>
+      <div class="grad-sub">Station Delta: FinOps Officer · Class of 2026</div>
+    </div>
+    <div class="skills-list">
+      <span>✓</span>Cost visibility and billing APIs<br>
+      <span>✓</span>Token economics and model pricing<br>
+      <span>✓</span>Feature-level cost attribution<br>
+      <span>✓</span>Revenue linkage and ROI calculation<br>
+      <span>✓</span>Break-even & payback analysis<br>
+      <span>✓</span>Optimization vs. elimination decisions<br>
+      <span>✓</span>Forecasting and budget guardrails<br>
+      <span>✓</span>Executive reporting and recommendations<br>
+      <span>✓</span>Margin collapse containment under pressure
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--blue)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Cost Visibility complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is saved automatically.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>Token Economics</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
+<div id="restart-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--red)">Restart Training?</div>
+    <div class="msub">This will clear your saved progress and reload Station Delta: FinOps Officer from the beginning.</div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('restart-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">FinOps milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">FinOps terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIBE FINOPS OFFICER v1.0
+   Exact same framework as all previous Vibe titles.
+   J.A.N.E.T. administers all quizzes. L.O.L.A. is your tactical FinOps officer.
+   Boss Fight: Phase 9 — The Margin Collapse. L.O.L.A. goes offline. JANET takes over.
+   ═══════════════════════════════════════════════════════════════ */
+
+let G = {
+  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  hard:false, practitioner:false, expert:false, sandbox:false,
+  learnerPath:'explorer',
+  agents:[], achievements:[], completedPhases:[],
+  cmdHistory:[], histIdx:-1,
+  currentPath:'/home/officer/billing',
+  easterEggsFound:[],
+  unlockedCmds:[],
+  careerLog:[],
+  activeChallengeData:null,
+  activeBreakitData:null,
+  bossActive:false,
+  bossStep:0,
+  bossScore:0,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  mistakeTypes:[],
+  wrongStreak:0,
+  pendingPhaseStart:false,
+  analytics:null,
+};
+
+/* ── J.A.N.E.T. PERSONALITY LINES ── */
+const JANET_INTROS = [
+  "Hello. I am J.A.N.E.T. — Just Another Normal Education Test. I will be administering your FinOps assessment today. I have reviewed your previous performance. I have chosen not to share my opinion of it.",
+  "J.A.N.E.T. here. I administer assessments on this vessel. I want you to know that I take no particular pleasure in this. I am simply executing my function. Please answer the following question.",
+  "This is J.A.N.E.T. I have been informed that you are ready for a FinOps assessment. I have prepared a question. It is not a difficult question. You may still find it challenging.",
+  "J.A.N.E.T. Assessment Protocol engaged. FinOps module loaded. I will now present a question. Please answer it correctly. Or incorrectly. Both outcomes have been observed. I document them all.",
+  "I am J.A.N.E.T. I have been asked to test your financial operations knowledge. I find 'the AI is powerful, the bill is bigger' a somewhat optimistic statement for most companies. Nonetheless. I will proceed.",
+  "J.A.N.E.T. online. I note you have reached a FinOps quiz. Statistically, most engineers believe they understand spend until they are asked a specific question. This is one of those.",
+];
+const JANET_CORRECT = [
+  "That is… correct. Statistically, someone had to get it right. Please do not read too much into this.",
+  "You answered correctly. I have updated your FinOps record. Your record now contains one correct answer. It previously contained fewer.",
+  "Correct. I will note this in your file without enthusiasm.",
+  "That answer is technically accurate. I am acknowledging it. Professionally.",
+  "You are correct. The cost issue has been correctly identified. I have encountered this outcome before. It does not surprise me as much as you might hope.",
+  "Correct. I want to be transparent: I had already prepared feedback for an incorrect response. I will repurpose it for a future assessment.",
+];
+const JANET_WRONG = [
+  "That is incorrect. Your FinOps file has been updated accordingly. The correct answer is available for your review, should you choose to engage with it.",
+  "Incorrect. This outcome was within the projected range. The correct answer follows. I recommend reading it carefully.",
+  "That response does not align with the expected answer. I note this without judgment. The judgment is implicit in the incorrect styling.",
+  "Not correct. I want to acknowledge that the correct answer, in hindsight, may seem obvious. This is common in FinOps. Especially after a margin collapse.",
+  "Incorrect. I have added this to your assessment history. Your assessment history is not something I recommend reviewing before important budget reviews.",
+];
+
+function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.length)]}
+function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
+function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
+
+/* ── CAREER LOG DATA ── */
+const CAREER_LOG_DATA = [
+  {phase:'Phase 1 — Cost Visibility Foundations',stat:'100%',context:'of AI spend is invisible without proper tagging and billing queries. Engineers who master cost explorers prevent 80% of surprise bills.',tags:['Billing APIs','Tagging','Cost Explorer']},
+  {phase:'Phase 2 — Token Economics',stat:'Model Pricing',context:'Understanding token pricing, context windows, and prompt optimization directly controls your monthly AI bill.',tags:['Token Economics','Model Pricing']},
+  {phase:'Phase 3 — Feature-Level Attribution',stat:'Per-Feature',context:'Tying spend to specific product features lets you make data-driven keep/kill decisions.',tags:['Cost Attribution','Feature Tagging']},
+  {phase:'Phase 4 — Revenue Linkage',stat:'ROI Visible',context:'Connecting AI cost to actual revenue shows true profitability per feature.',tags:['Revenue Linkage','ROI']},
+  {phase:'Phase 5 — Break-Even & Payback',stat:'Payback Math',context:'Knowing exactly when a feature pays for itself turns guesswork into business decisions.',tags:['Break-Even','Payback']},
+  {phase:'Phase 6 — Optimization vs. Elimination',stat:'Kill or Optimize',context:'Deciding which AI features to keep, optimize, or kill is the highest-leverage FinOps skill.',tags:['Optimization','Kill Switch']},
+  {phase:'Phase 7 — Forecasting & Budget Guardrails',stat:'Anomaly Alert',context:'Predicting next month’s bill and setting automated alerts prevents margin collapse.',tags:['Forecasting','Budget Guardrails']},
+  {phase:'Phase 8 — Executive Reporting',stat:'One-Page',context:'Turning raw data into clear “keep/kill/optimize” recommendations is what gets you a seat at the table.',tags:['Executive Reports','Recommendations']},
+  {phase:'Phase 9 — The Margin Collapse',stat:'CFO track',context:'Engineers who can contain a sudden AI spend explosion while protecting revenue become FinOps leaders and CFO partners.',tags:['Margin Collapse','Live Optimization','Leadership']},
+];
+
+/* ── GLOSSARY ── */
+const GLOSSARY = [
+  {term:'Token Economics',def:'Understanding how model pricing, context windows, and prompt length translate into real dollars spent per request.'},
+  {term:'Feature-Level Attribution',def:'Tagging every AI call so you can see exactly which product feature is driving cost.'},
+  {term:'Break-Even Analysis',def:'Calculating how many paying users or revenue a feature needs to cover its AI cost.'},
+  {term:'Margin Collapse',def:'When AI spend suddenly explodes while revenue stays flat — the ultimate FinOps test.'},
+  {term:'Cost Guardrail',def:'Automated script that pauses or throttles spend when it exceeds a predefined threshold.'},
+];
+
+/* ── MAN PAGES ── */
+const MAN = {
+  'cost':    {synopsis:'cost [command]',desc:'Cost visibility & billing',why:'See exactly what you’re spending.',flags:[{f:'explore',d:'Pull billing data'},{f:'tag',d:'Apply cost tags'}],example:'$ cost explore\n$ cost tag feature=chat'},
+  'token':   {synopsis:'token [command]',desc:'Token economics',why:'Break down model pricing.',flags:[{f:'price',d:'Show pricing table'},{f:'optimize',d:'Prompt cost impact'}],example:'$ token price\n$ token optimize'},
+  'feature': {synopsis:'feature [command]',desc:'Feature-level attribution',why:'Tie spend to product features.',flags:[{f:'allocate',d:'Allocate costs'},{f:'dashboard',d:'Show per-feature spend'}],example:'$ feature allocate\n$ feature dashboard'},
+  'roi':     {synopsis:'roi [command]',desc:'Revenue linkage & ROI',why:'Calculate true profitability.',flags:[{f:'link',d:'Connect to revenue'},{f:'calculate',d:'Show ROI'}],example:'$ roi link\n$ roi calculate'},
+  'break':   {synopsis:'break [command]',desc:'Break-even & payback',why:'Answer “when does it pay for itself?”',flags:[{f:'even',d:'Calculate break-even'},{f:'payback',d:'Show payback period'}],example:'$ break even\n$ break payback'},
+  'optimize':{synopsis:'optimize [command]',desc:'Optimization vs elimination',why:'Decide keep/kill/optimize.',flags:[{f:'kill',d:'Kill switch script'},{f:'downgrade',d:'Model downgrade'}],example:'$ optimize kill\n$ optimize downgrade'},
+  'forecast':{synopsis:'forecast [command]',desc:'Forecasting & budget guardrails',why:'Predict next month’s bill.',flags:[{f:'run',d:'Run forecast'},{f:'alert',d:'Set budget alerts'}],example:'$ forecast run\n$ forecast alert'},
+  'report':  {synopsis:'report [command]',desc:'Executive reporting',why:'Turn data into recommendations.',flags:[{f:'onepage',d:'Generate one-page report'},{f:'recommend',d:'Business recommendation'}],example:'$ report onepage\n$ report recommend'},
+  'playbook':{synopsis:'playbook [save|export]',desc:'Personal FinOps Playbook',why:'Build your own exportable reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
+  'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
+};
+
+/* ── ACHIEVEMENTS ── */
+const ACHS = [
+  {id:'first_cmd',    icon:'💰',name:'First Dollar',       desc:'Issued your first FinOps command.'},
+  {id:'costmaster',   icon:'📡',name:'Cost Visibility',    desc:'Completed Phase 1 — cost foundations.'},
+  {id:'tokenking',    icon:'🔢',name:'Token Economist',    desc:'Completed Phase 2 — token economics.'},
+  {id:'attributor',   icon:'🏷️',name:'Feature Attributor', desc:'Completed Phase 3 — feature-level attribution.'},
+  {id:'roianalyst',   icon:'📈',name:'ROI Analyst',        desc:'Completed Phase 4 — revenue linkage.'},
+  {id:'breakmaster',  icon:'📉',name:'Break-Even Master',  desc:'Completed Phase 5 — break-even analysis.'},
+  {id:'killswitch',   icon:'⚡',name:'Kill Switch Operator',desc:'Completed Phase 6 — optimization decisions.'},
+  {id:'forecaster',   icon:'🔮',name:'Forecaster',         desc:'Completed Phase 7 — forecasting & guardrails.'},
+  {id:'reportpro',    icon:'📋',name:'Executive Reporter', desc:'Completed Phase 8 — executive reporting.'},
+  {id:'marginhero',   icon:'🛡️',name:'Margin Hero',        desc:'Defeated the Phase 9 Margin Collapse. JANET was unimpressed.'},
+  {id:'finops',       icon:'💰',name:'Chief FinOps Officer',desc:'Completed all 9 phases. You protect the margin.'},
+  {id:'janet_ace',    icon:'🧊',name:'JANET Ace',          desc:'Answered a JANET quiz correctly on first try.'},
+  {id:'eagle',        icon:'🦅',name:'Eagle Eye',          desc:'Completed a phase without revealing the answer.'},
+  {id:'recall_master',icon:'🧠',name:'Recall Master',      desc:'Got 3+ spaced recall questions right in a row.'},
+];
+
+/* ── SPACED RECALL CALLBACKS ── */
+const SPACED_CALLBACKS = [
+  null,
+  {q:'What is the first step to achieve cost visibility?',answer:'Apply consistent tagging and pull billing data via APIs',acceptFn:v=>v.includes('tag')||v.includes('billing')},
+  {q:'What directly drives most AI cost?',answer:'Token count × model price per 1k tokens',acceptFn:v=>v.includes('token')||v.includes('price')},
+  {q:'Why is feature-level attribution critical?',answer:'It lets you tie spend directly to product features and calculate ROI',acceptFn:v=>v.includes('feature')||v.includes('roi')},
+  {q:'What is break-even analysis?',answer:'Calculating how much revenue a feature needs to cover its AI cost',acceptFn:v=>v.includes('break')||v.includes('even')},
+  {q:'When should you kill a feature instead of optimizing it?',answer:'When the projected ROI is negative even after all optimizations',acceptFn:v=>v.includes('kill')||v.includes('negative')},
+  {q:'What is the purpose of budget guardrails?',answer:'Automatically pause or alert when spend exceeds a threshold',acceptFn:v=>v.includes('budget')||v.includes('guardrail')},
+  {q:'What should an executive report contain?',answer:'Clear keep/kill/optimize recommendations with ROI numbers',acceptFn:v=>v.includes('report')||v.includes('recommend')},
+  {q:'During a margin collapse, what is the first action?',answer:'Pause non-critical traffic and look at feature-level cost attribution',acceptFn:v=>v.includes('pause')||v.includes('cost')},
+];
+
+/* ── SPACED EXIT ── */
+const SPACED_EXIT = [
+  null,
+  {q:'Why is token economics the foundation of FinOps?',answer:'Because every AI call is priced by tokens, not by CPU or requests',acceptFn:v=>v.includes('token')},
+  {q:'What is the difference between cost visibility and cost attribution?',answer:'Visibility shows total spend. Attribution shows which feature or user caused it',acceptFn:v=>v.includes('attribution')},
+  {q:'What makes a good FinOps decision during a margin collapse?',answer:'Fast, data-driven keep/kill/optimize recommendations based on real ROI',acceptFn:v=>v.includes('roi')||v.includes('kill')},
+];
+
+/* ── DEEP DIVE CONTENT ── */
+const DEEP_DIVE = [
+  null,
+  {title:'Cost Visibility in Production',body:'Pulling raw billing data from AWS Cost Explorer, GCP Billing, OpenAI/Anthropic usage endpoints, and applying consistent tagging is the only way to see true AI spend.'},
+  {title:'Token Economics Deep Dive',body:'Every model has different pricing per 1k tokens + context window fees. Prompt optimization, caching, and model routing can cut cost by 60-90% without changing UX.'},
+  {title:'Feature-Level Cost Attribution',body:'Every AI call must carry metadata tags (feature, user, model, prompt_hash). This turns a big bill into a prioritized list of features to optimize or kill.'},
+  {title:'Revenue Linkage & True ROI',body:'Connecting billing data to revenue APIs lets you calculate actual profit per feature. Most companies discover that 60% of their AI features are net-negative.'},
+  {title:'Break-Even & Payback Math',body:'Simple scripts that answer “how many paying users does this feature need to break even?” turn vague intuition into hard numbers.'},
+  {title:'Optimization vs. Elimination',body:'When ROI is negative even after caching, model downgrade, and prompt compression, the correct business decision is to kill the feature.'},
+  {title:'Forecasting & Automated Guardrails',body:'Spend forecasting models + anomaly detection + automatic pause scripts prevent margin collapse before it happens.'},
+  {title:'Executive Reporting That Drives Decisions',body:'One-page terminal reports with clear “keep / optimize / kill” recommendations and ROI numbers get immediate leadership action.'},
+  {title:'Surviving the Margin Collapse',body:'When spend explodes while revenue stays flat, the first 10 minutes decide survival. Pause non-critical traffic, attribute by feature, and present a recovery plan with hard numbers.'},
+];
+
+/* ── WHATIF SCENARIOS ── */
+const WHATIF_SCENARIOS = [
+  null,
+  {title:'What if you had no cost visibility?',alt:'The team only looked at total cloud bill.',outcome:'Result: One feature quietly consumed $180k/month with almost no revenue.',learning:'You cannot optimize what you cannot see.'},
+  {title:'What if you never calculated ROI?',alt:'Features were kept because they “sounded cool.”',outcome:'Result: 70% of AI spend produced almost no revenue.',learning:'Revenue linkage turns guesswork into business decisions.'},
+  {title:'What if you had no budget guardrails?',alt:'Spend alerts were manual and delayed.',outcome:'Result: A sudden 8× spike went unnoticed for 9 days.',learning:'Automated guardrails prevent margin collapse.'},
+];
+
+/* ── BREAK-IT SCENARIOS ── */
+const BREAKIT = [
+  null,
+  {title:'No Tagging Strategy',scenario:'All AI calls look identical in the billing dashboard.\n\nA single feature is quietly costing $120k/month.\n\nWhy can’t you find it?',acceptFn:v=>v.includes('tag')||v.includes('attribution'),answer:'No feature-level tagging. You cannot attribute cost without tags.'},
+  {title:'No ROI Calculation',scenario:'A feature costs $47k/month but generates only $9k in revenue.\n\nThe team still calls it a success.\n\nWhat is missing?',acceptFn:v=>v.includes('roi')||v.includes('revenue'),answer:'Revenue linkage is missing. Without it you cannot see true profitability.'},
+  {title:'No Budget Guardrails',scenario:'AI spend suddenly 12×’d overnight.\n\nNo alerts fired. No one noticed for 11 days.\n\nWhat failed?',acceptFn:v=>v.includes('budget')||v.includes('alert')||v.includes('guardrail'),answer:'No automated budget guardrails or anomaly detection.'},
+];
+
+/* ── CHALLENGE SCENARIOS ── */
+const CHALLENGES = [
+  null,
+  {title:'Calculate Feature ROI',scenario:'Feature “chat-assistant” costs $38,400/month and generates $14,200 in tracked revenue. What is the ROI and your recommendation?',acceptFn:v=>v.includes('roi')||v.includes('recommend')||v.includes('kill'),answer:'ROI = (14200 - 38400) / 38400 = -63%. Recommendation: kill or aggressively optimize.'},
+  {title:'Build a Simple Budget Guardrail',scenario:'Write the logic that would pause non-critical traffic if monthly spend exceeds $150k. What would the script check?',acceptFn:v=>v.includes('budget')||v.includes('pause')||v.includes('alert'),answer:'Check current month-to-date spend vs threshold. If over, pause non-critical features and alert.'},
+];
+
+/* ── PHASE DATA ── */
+const PHASES = [
+  null,
+  /* Phase 1: Cost Visibility Foundations */
+  {title:'Cost Visibility Foundations',
+   lolaIntro:"See exactly what you’re spending in the terminal.",
+   spacedRep:SPACED_CALLBACKS[1],
+   steps:[
+    {id:'p1s1',obj:'Pull raw billing data',ctx:'The bill is a mystery. Make it visible.',
+     cmd:['cost explore'],
+     accept:['cost explore','cost billing'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('explore')||v.includes('billing')),
+     hint:'Type: cost explore',
+     out:'BILLING DATA PULLED:\n\n  AWS Cost Explorer data loaded\n  GCP Billing export parsed\n  OpenAI/Anthropic usage fetched\n  Total AI spend this month: $184,720\n\nVisibility established.',
+     unlockCmd:'cost',
+     jit:{title:'Billing APIs are your eyes',body:'Without them you are guessing.'},
+     bridge:{title:'Cost visibility is the foundation of all FinOps',body:'You cannot optimize what you cannot see.',tags:['Cost Visibility','Billing']},
+     teach:{title:'Cost visibility checklist',body:'Raw billing data, consistent tagging, and terminal dashboards.'}},
+    {id:'p1s2',obj:'Apply consistent cost tagging',ctx:'Make every AI call traceable to a feature.',
+     cmd:['cost tag'],
+     accept:['cost tag','cost allocate'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('tag')||v.includes('allocate')),
+     hint:'Type: cost tag',
+     out:'COST TAGGING APPLIED:\n\n  Every AI call now tagged with feature, user, model\n  Historical data retroactively tagged\n  Dashboard now shows per-feature spend\n\nAttribution complete.',
+     jit:{title:'Tagging is non-negotiable',body:'No tag = invisible spend.'},
+     bridge:{title:'Feature-level tagging turns a big bill into a prioritized list',body:'This is where FinOps begins.',tags:['Tagging','Attribution']},
+     teach:{title:'Essential cost tags',body:'feature, user_id, model, prompt_hash, tokens_used.'},
+     quiz:{q:'You pull billing data but every call looks identical. What is missing?',
+      opts:['Better APIs','Consistent tagging','Revenue linkage','All of the above'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Without tagging you cannot attribute cost to features.'}}],
+   breakit:BREAKIT[1],
+   done:'Cost visibility foundations established. The bill is no longer a mystery.',
+   ach:'costmaster'},
+
+  /* Phase 2: Token Economics */
+  {title:'Token Economics',
+   lolaIntro:"Break down what a single token actually costs across models.",
+   spacedRep:SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Show model pricing table',ctx:'Understand what you are actually paying per token.',
+     cmd:['token price'],
+     accept:['token price','token table'],
+     acceptFn:v=>v.includes('token')&&(v.includes('price')||v.includes('table')),
+     hint:'Type: token price',
+     out:'MODEL PRICING TABLE:\n\n  gpt-4o      $5.00 / 1M input  $15.00 / 1M output\n  claude-3.5  $3.00 / 1M input  $15.00 / 1M output\n  gemini-1.5  $2.50 / 1M input   $7.00 / 1M output\n\nToken economics visible.',
+     unlockCmd:'token',
+     jit:{title:'Token pricing is the real cost driver',body:'Not CPU or requests — tokens.'},
+     bridge:{title:'Understanding token economics prevents surprise bills',body:'Every prompt has a price.',tags:['Token Economics','Model Pricing']},
+     teach:{title:'Token math basics',body:'Input tokens + output tokens × price per 1k tokens = real cost.'}},
+    {id:'p2s2',obj:'Calculate prompt optimization impact',ctx:'See how shortening prompts affects cost.',
+     cmd:['token optimize'],
+     accept:['token optimize','token impact'],
+     acceptFn:v=>v.includes('token')&&(v.includes('optimize')||v.includes('impact')),
+     hint:'Type: token optimize',
+     out:'PROMPT OPTIMIZATION IMPACT:\n\n  Original prompt: 1,240 tokens → $0.0184\n  Optimized prompt: 420 tokens → $0.0062\n  Monthly savings at 1M calls: $12,200\n\nOptimization value quantified.',
+     jit:{title:'Prompt optimization is free money',body:'Shorter prompts = lower cost and faster responses.'},
+     bridge:{title:'Token optimization is one of the highest-leverage FinOps levers',body:'It costs nothing and scales instantly.',tags:['Prompt Optimization','Token Economics']},
+     teach:{title:'Prompt optimization techniques',body:'Remove fluff, use few-shot sparingly, compress context, and cache common responses.'},
+     quiz:{q:'You reduce a prompt from 1,200 tokens to 400 tokens. What is the impact on cost?',
+      opts:['No impact — model price is fixed','Cost drops by ~67%','Cost increases because of caching','Only output tokens matter'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Input token reduction directly reduces cost by the same percentage.'}}],
+   breakit:BREAKIT[2],
+   done:'Token economics mastered. You now understand the real unit of AI cost.',
+   ach:'tokenking'},
+
+  /* Phase 3: Feature-Level Attribution */
+  {title:'Feature-Level Attribution',
+   lolaIntro:"Tie AI spend directly to specific product features.",
+   spacedRep:SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Allocate costs by feature tag',ctx:'See which product feature is driving spend.',
+     cmd:['feature allocate'],
+     accept:['feature allocate','feature tag'],
+     acceptFn:v=>v.includes('feature')&&(v.includes('allocate')||v.includes('tag')),
+     hint:'Type: feature allocate',
+     out:'FEATURE-LEVEL ATTRIBUTION:\n\n  chat-assistant     $47,820 (62%)\n  code-completion    $18,240 (24%)\n  summarizer          $9,110 (12%)\n\nSpending now visible by feature.',
+     unlockCmd:'feature',
+     jit:{title:'Feature attribution turns a big bill into a prioritized list',body:'You know exactly what to optimize.'},
+     bridge:{title:'Without feature attribution you are guessing which features to keep',body:'This is where real decisions begin.',tags:['Feature Attribution','Cost Allocation']},
+     teach:{title:'Feature tagging best practices',body:'Every AI call must carry feature=xxx metadata.'}},
+    {id:'p3s2',obj:'Generate per-feature cost dashboard',ctx:'See the numbers leadership actually cares about.',
+     cmd:['feature dashboard'],
+     accept:['feature dashboard','feature report'],
+     acceptFn:v=>v.includes('feature')&&(v.includes('dashboard')||v.includes('report')),
+     hint:'Type: feature dashboard',
+     out:'FEATURE DASHBOARD:\n\n  chat-assistant: $47,820 — ROI negative\n  code-completion: $18,240 — ROI positive\n  summarizer: $9,110 — break-even in 3 weeks\n\nClear business recommendations ready.',
+     jit:{title:'Dashboards must answer business questions',body:'Not just show totals.'},
+     bridge:{title:'Feature-level dashboards turn FinOps from technical to strategic',body:'Leadership can now make informed decisions.',tags:['Feature Dashboard','Business Reporting']},
+     teach:{title:'What a good FinOps dashboard shows',body:'Spend by feature, ROI, growth trend, and recommendation.'},
+     quiz:{q:'Feature A costs $47k/month and generates $12k revenue. Feature B costs $9k and generates $28k. What is your recommendation?',
+      opts:['Optimize both','Kill Feature A, keep Feature B','Keep both because they are AI','Ignore revenue and focus on total spend'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Kill or aggressively optimize negative-ROI features. Protect positive ones.'}}],
+   breakit:BREAKIT[3],
+   done:'Feature-level attribution is now fully operational.',
+   ach:'attributor'},
+
+  /* Phase 4: Revenue Linkage */
+  {title:'Revenue Linkage',
+   lolaIntro:"Pull income data and calculate true ROI per AI feature.",
+   spacedRep:SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Link AI cost to revenue data',ctx:'See which features actually make money.',
+     cmd:['roi link'],
+     accept:['roi link','roi connect'],
+     acceptFn:v=>v.includes('roi')&&(v.includes('link')||v.includes('connect')),
+     hint:'Type: roi link',
+     out:'REVENUE LINKAGE COMPLETE:\n\n  AI cost data joined with revenue API\n  Per-feature ROI calculated\n  chat-assistant: -63% ROI\n  code-completion: +184% ROI\n\nTrue profitability visible.',
+     unlockCmd:'roi',
+     jit:{title:'Revenue linkage is what makes FinOps strategic',body:'Cost without revenue context is meaningless.'},
+     bridge:{title:'ROI turns FinOps from cost-cutting into business decision support',body:'This is the real value.',tags:['Revenue Linkage','ROI']},
+     teach:{title:'Revenue linkage sources',body:'Stripe, subscription DB, usage logs — joined by feature tags.'}},
+    {id:'p4s2',obj:'Calculate ROI and payback period',ctx:'Answer “when does this feature pay for itself?”',
+     cmd:['roi calculate'],
+     accept:['roi calculate','roi payback'],
+     acceptFn:v=>v.includes('roi')&&(v.includes('calculate')||v.includes('payback')),
+     hint:'Type: roi calculate',
+     out:'ROI & PAYBACK CALCULATED:\n\n  Feature: summarizer\n  Monthly cost: $9,110\n  Monthly revenue: $28,400\n  ROI: +212%\n  Payback period: 11 days\n\nBusiness decision data ready.',
+     jit:{title:'Payback period answers the real business question',body:'“How long until this pays for itself?”'},
+     bridge:{title:'ROI and payback numbers drive executive decisions',body:'Not raw cost.',tags:['ROI','Payback']},
+     teach:{title:'Simple ROI formula',body:'(Revenue - Cost) / Cost. Payback = Cost / Monthly Revenue.'},
+     quiz:{q:'A feature costs $38k/month and generates $14k revenue. What is the correct business decision?',
+      opts:['Keep it — it’s AI','Optimize aggressively or kill','Ignore because it’s strategic','Add more features like it'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Negative ROI features should be optimized or eliminated.'}}],
+   breakit:BREAKIT[4],
+   done:'Revenue linkage and true ROI are now visible.',
+   ach:'roianalyst'},
+
+  /* Phase 5: Break-Even & Payback Analysis */
+  {title:'Break-Even & Payback Analysis',
+   lolaIntro:"Answer “When does this AI feature pay for itself?”",
+   spacedRep:SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Calculate break-even point',ctx:'How many users does this feature need?',
+     cmd:['break even'],
+     accept:['break even','break calculate'],
+     acceptFn:v=>v.includes('break')&&(v.includes('even')||v.includes('calculate')),
+     hint:'Type: break even',
+     out:'BREAK-EVEN CALCULATED:\n\n  Monthly AI cost: $47,820\n  Average revenue per user: $14\n  Break-even users: 3,416\n\nClear business threshold established.',
+     unlockCmd:'break',
+     jit:{title:'Break-even is the most important business question',body:'Everything else is noise.'},
+     bridge:{title:'Break-even analysis turns technical cost into business decisions',body:'This is FinOps at its best.',tags:['Break-Even','Business Math']},
+     teach:{title:'Break-even formula',body:'Monthly Cost ÷ Revenue per User = Break-even Users.'}},
+    {id:'p5s2',obj:'Calculate payback period',ctx:'How long until the feature pays for itself?',
+     cmd:['break payback'],
+     accept:['break payback','break period'],
+     acceptFn:v=>v.includes('break')&&(v.includes('payback')||v.includes('period')),
+     hint:'Type: break payback',
+     out:'PAYBACK PERIOD CALCULATED:\n\n  Monthly cost: $9,110\n  Monthly revenue: $28,400\n  Payback period: 11 days\n\nFeature pays for itself quickly.',
+     jit:{title:'Payback period answers “when do we get our money back?”',body:'Leadership loves this number.'},
+     bridge:{title:'Payback analysis helps prioritize which AI features to invest in',body:'Short payback = fast win.',tags:['Payback','ROI']},
+     teach:{title:'Payback formula',body:'Monthly Cost ÷ Monthly Revenue = Payback in months (or days).'},
+     quiz:{q:'A feature costs $38k/month and generates $62k/month revenue. What is the payback period?',
+      opts:['Less than 1 month','More than 3 months','Exactly 2 months','Negative ROI'],
+      janetQuiz:true,
+      correct:0,fb:'Correct. Payback is under 1 month — this feature is highly profitable.'}}],
+   breakit:BREAKIT[5],
+   done:'Break-even and payback analysis mastered.',
+   ach:'breakmaster'},
+
+  /* Phase 6: Optimization vs. Elimination */
+  {title:'Optimization vs. Elimination',
+   lolaIntro:"Decide whether to optimize or kill a feature based on profitability.",
+   spacedRep:SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Run optimization recommendations',ctx:'See what can be improved before killing.',
+     cmd:['optimize run'],
+     accept:['optimize run','optimize suggest'],
+     acceptFn:v=>v.includes('optimize')&&(v.includes('run')||v.includes('suggest')),
+     hint:'Type: optimize run',
+     out:'OPTIMIZATION RECOMMENDATIONS:\n\n  chat-assistant: add caching → -41% cost\n  summarizer: downgrade model → -62% cost\n  code-completion: already optimal\n\nClear optimization path identified.',
+     unlockCmd:'optimize',
+     jit:{title:'Always optimize before you kill',body:'Many features can be saved with simple changes.'},
+     bridge:{title:'Optimization vs. elimination is the core FinOps decision',body:'You must be able to do both.',tags:['Optimization','Kill Decision']},
+     teach:{title:'Optimization levers',body:'Caching, model downgrade, prompt compression, batching, and feature flags.'}},
+    {id:'p6s2',obj:'Execute a kill switch on a negative-ROI feature',ctx:'Some features should simply be turned off.',
+     cmd:['optimize kill'],
+     accept:['optimize kill','optimize eliminate'],
+     acceptFn:v=>v.includes('optimize')&&(v.includes('kill')||v.includes('eliminate')),
+     hint:'Type: optimize kill',
+     out:'KILL SWITCH EXECUTED:\n\n  Feature chat-assistant disabled\n  Traffic routed to fallback\n  Monthly savings: $47,820\n  No user impact (fallback active)\n\nUnprofitable feature removed.',
+     jit:{title:'Killing a feature is sometimes the best business decision',body:'Not every AI idea deserves to live.'},
+     bridge:{title:'The ability to kill is as important as the ability to build',body:'This protects the margin.',tags:['Kill Switch','Elimination']},
+     teach:{title:'Safe kill switch checklist',body:'Graceful fallback, user notification plan, and monitoring for impact.'},
+     quiz:{q:'A feature costs $47k/month and generates $12k revenue even after optimization. What is the correct decision?',
+      opts:['Keep it because it’s AI','Kill it','Optimize more','Add more features'],
+      janetQuiz:true,
+      correct:1,fb:'Correct. Negative ROI after optimization means the feature should be killed.'}}],
+   breakit:BREAKIT[5],
+   done:'Optimization vs. elimination decisions are now part of your skill set.',
+   ach:'killswitch'},
+
+  /* Phase 7: Forecasting & Budget Guardrails */
+  {title:'Forecasting & Budget Guardrails',
+   lolaIntro:"Predict next month’s bill and set automated alerts.",
+   spacedRep:SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Run a spend forecast',ctx:'Know what next month’s bill will look like.',
+     cmd:['forecast run'],
+     accept:['forecast run','forecast predict'],
+     acceptFn:v=>v.includes('forecast')&&(v.includes('run')||v.includes('predict')),
+     hint:'Type: forecast run',
+     out:'SPEND FORECAST:\n\n  Next month projection: $214,000\n  Trend: +18% from last month\n  Main driver: chat-assistant growth\n\nForecast delivered.',
+     unlockCmd:'forecast',
+     jit:{title:'Forecasting prevents surprise bills',body:'Leadership needs to know what’s coming.'},
+     bridge:{title:'Accurate forecasting turns FinOps from reactive to proactive',body:'This is how you protect the margin.',tags:['Forecasting','Budget']},
+     teach:{title:'Good forecasting inputs',body:'Historical spend, growth rate, planned feature launches.'}},
+    {id:'p7s2',obj:'Set automated budget guardrails',ctx:'Stop the bill before it explodes.',
+     cmd:['forecast alert'],
+     accept:['forecast alert','forecast guardrail'],
+     acceptFn:v=>v.includes('forecast')&&(v.includes('alert')||v.includes('guardrail')),
+     hint:'Type: forecast alert',
+     out:'BUDGET GUARDRAIL DEPLOYED:\n\n  Alert at 80% of monthly budget\n  Auto-pause non-critical traffic at 95%\n  Notification sent to FinOps team\n\nAutomated protection active.',
+     jit:{title:'Guardrails are your safety net',body:'They act when you can’t.'},
+     bridge:{title:'Budget guardrails prevent margin collapse',body:'They give you time to react.',tags:['Budget Guardrails','Anomaly Detection']},
+     teach:{title:'Effective guardrail rules',body:'Percentage thresholds, auto-pause logic, and escalation paths.'},
+     quiz:{q:'Your forecast shows next month at $280k while budget is $150k. What is the first action?',
+      opts:['Wait and see','Set aggressive guardrails now','Kill low-ROI features','All of the above'],
+      janetQuiz:true,
+      correct:3,fb:'Correct. Immediate action on guardrails + optimization + elimination is required.'}}],
+   breakit:BREAKIT[5],
+   done:'Forecasting and budget guardrails are now protecting the company.',
+   ach:'forecaster'},
+
+  /* Phase 8: Executive Reporting */
+  {title:'Executive Reporting',
+   lolaIntro:"Turn raw data into clear business recommendations.",
+   spacedRep:SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Generate a one-page executive report',ctx:'Leadership needs clear, actionable insights.',
+     cmd:['report onepage'],
+     accept:['report onepage','report executive'],
+     acceptFn:v=>v.includes('report')&&(v.includes('onepage')||v.includes('executive')),
+     hint:'Type: report onepage',
+     out:'EXECUTIVE REPORT GENERATED:\n\n  Total AI spend: $184k\n  Top feature: chat-assistant (-63% ROI)\n  Recommendation: kill or optimize immediately\n  Projected savings: $112k/month\n\nOne-page business summary ready.',
+     unlockCmd:'report',
+     jit:{title:'Executive reports must be one page and actionable',body:'No one reads 40-page decks.'},
+     bridge:{title:'Clear executive reporting gets you a seat at the table',body:'This is how FinOps creates real impact.',tags:['Executive Reporting','Recommendations']},
+     teach:{title:'What leadership actually wants',body:'Spend by feature, ROI, recommendation, and projected savings.'}},
+    {id:'p8s2',obj:'Present keep/kill/optimize recommendations',ctx:'Turn data into decisions.',
+     cmd:['report recommend'],
+     accept:['report recommend','report decision'],
+     acceptFn:v=>v.includes('report')&&(v.includes('recommend')||v.includes('decision')),
+     hint:'Type: report recommend',
+     out:'BUSINESS RECOMMENDATIONS:\n\n  KEEP: code-completion (+184% ROI)\n  OPTIMIZE: summarizer (add caching)\n  KILL: chat-assistant (-63% ROI)\n  Projected monthly savings: $112k\n\nDecision package ready for leadership.',
+     jit:{title:'Recommendations must be specific and numbered',body:'“Kill Feature X” is clearer than “optimize spend.”'},
+     bridge:{title:'Executive recommendations are the ultimate output of FinOps',body:'This is what protects the margin.',tags:['Executive Reporting','Business Decisions']},
+     teach:{title:'How to write a good recommendation',body:'Feature name, current ROI, action (keep/optimize/kill), projected savings.'},
+     quiz:{q:'Your report shows three features with negative ROI. What should the recommendation be?',
+      opts:['Optimize all three','Kill the worst one only','Kill or aggressively optimize all negative-ROI features','Keep them because they are strategic'],
+      janetQuiz:true,
+      correct:2,fb:'Correct. Negative ROI features should be killed or aggressively optimized.'}}],
+   breakit:BREAKIT[5],
+   done:'Executive reporting mastered. You can now translate data into business decisions.',
+   ach:'reportpro'},
+
+  /* Phase 9: The Margin Collapse (Boss Fight) */
+  {title:'The Margin Collapse',
+   lolaIntro:"The company’s AI spend has exploded while revenue stayed flat. Leadership (via J.A.N.E.T.) demands answers in 10 minutes. You must audit every feature, calculate real ROI, recommend which AI systems to keep/optimize/kill, and present the recovery plan.",
+   spacedRep:SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Pause non-critical traffic and audit spend',ctx:'The margin is collapsing. Stop the bleeding.',
+     cmd:['cost emergency'],
+     accept:['cost emergency','cost pause'],
+     acceptFn:v=>v.includes('cost')&&(v.includes('emergency')||v.includes('pause')),
+     hint:'Type: cost emergency',
+     out:'EMERGENCY MARGIN CONTAINMENT:\n\n  Non-critical AI traffic paused\n  Feature-level spend audit running\n  Top 3 offenders identified\n\nMeter slowed. Investigation active.',
+     unlockCmd:'cost',
+     jit:{title:'First 10 minutes decide survival',body:'Pause first, investigate second.'},
+     bridge:{title:'The Margin Collapse is the ultimate FinOps test',body:'Only the best officers can contain it live.',tags:['Margin Collapse','Live Optimization']},
+     teach:{title:'Margin collapse playbook',body:'1. Emergency pause. 2. Feature audit. 3. ROI calculation. 4. Keep/optimize/kill recommendations.'}},
+    {id:'p9s2',obj:'Calculate ROI and present recovery plan',ctx:'Leadership is waiting. Give them the plan.',
+     cmd:['report recovery'],
+     accept:['report recovery','roi audit'],
+     acceptFn:v=>v.includes('report')||v.includes('recovery')||v.includes('roi'),
+     hint:'Type: report recovery',
+     out:'RECOVERY PLAN DELIVERED:\n\n  Kill chat-assistant: +$47k/month savings\n  Optimize summarizer: +$18k/month savings\n  Keep code-completion: strategic asset\n  Projected margin recovery: $112k/month\n\nExecutive brief ready.',
+     isFinalBeforeBoss:true}],
+   done:null,
+   ach:null},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BOSS FIGHT — The Margin Collapse
+   ════════════════════════════════════════════════════════════════ */
+const BOSS_STEPS = [
+  {
+    id:'boss1',
+    scenario:'L.O.L.A. has gone offline. The company’s AI spend has exploded while revenue stayed flat — the Margin Collapse has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The cost dashboard is red. Read the cost logs.',
+    prompt:'Read the cost attribution logs.',
+    acceptFn:v=>v.includes('cat')&&v.includes('cost')||v.includes('cost')||v.includes('forensic'),
+    accept:['cat logs/cost.log','cost top','forensic logs'],
+    out:'[03:31:07] COST LOG: Monthly spend $1.2M — 8× normal rate\n[03:31:07] No revenue growth detected\n[03:31:08] Feature chat-assistant driving 68% of spike\n[03:31:09] Margin collapse confirmed',
+    hint:'Type: cost top'
+  },
+  {
+    id:'boss2',
+    scenario:'STEP 2 OF 5: The meter is still climbing rapidly.\n\nI note that non-critical traffic is still running. I note this without offering my opinion on how this happened.\n\nPause everything non-essential immediately.',
+    prompt:'Pause non-critical traffic and enable emergency cost controls.',
+    acceptFn:v=>v.includes('cost')||(v.includes('pause')||v.includes('emergency')),
+    accept:['cost emergency','cost pause'],
+    out:'EMERGENCY MARGIN CONTAINMENT EXECUTED:\n\n  ✓ Non-critical AI traffic paused\n  ✓ Feature-level cost attribution live\n  ✓ Top offenders isolated\n\n[03:33] Meter slowed dramatically. Recovery phase active.',
+    hint:'Type: cost emergency'
+  },
+  {
+    id:'boss3',
+    scenario:'STEP 3 OF 5: The collapse is slowed. Now determine which features are destroying margin.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin forensic cost investigation.',
+    prompt:'Begin forensic cost investigation.',
+    acceptFn:v=>v.includes('forensic')||v.includes('cost')||v.includes('trace'),
+    accept:['forensic logs','cost trace'],
+    out:'MARGIN FORENSICS:\n\n  Root cause: chat-assistant feature with no caching and high token usage\n  Timeline: spike started after last model upgrade\n  Impact: $1.2M monthly run rate\n\n  Immediate action: pause completed',
+    hint:'Type: cost top'
+  },
+  {
+    id:'boss4',
+    scenario:'STEP 4 OF 5: The root cause was an unoptimized high-volume feature.\n\nI note that this is covered in Phase 6. I note it without irony.\n\nRun full ROI audit and present recovery recommendations.',
+    prompt:'Run ROI audit and present recovery plan.',
+    acceptFn:v=>v.includes('roi')||v.includes('report')||v.includes('recover'),
+    accept:['roi audit','report recovery'],
+    out:'FULL ROI AUDIT COMPLETE:\n\n  Kill chat-assistant: +$47k/month savings\n  Optimize summarizer: +$18k/month savings\n  Keep code-completion: strategic asset\n  Projected margin recovery: $112k/month\n\nRecovery plan delivered.',
+    hint:'Type: roi audit'
+  },
+  {
+    id:'boss5',
+    scenario:'STEP 5 OF 5: The Margin Collapse is contained. The fleet is stable.\n\nNow you must communicate. The entire company’s margin was affected. The CFO and board are waiting.\n\nYou have 10 minutes before the briefing. Write the executive brief and the margin recovery plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most FinOps officers reveal the true limits of their composure.',
+    prompt:'Write the executive brief and margin recovery plan.',
+    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
+    accept:['design resilient','policy brief','respond notify'],
+    out:'EXECUTIVE BRIEF: Margin Collapse Incident — 2026-04-20\n\nTo: CFO, Board\nFrom: Officer '+G.name+'\n\nWhat happened:\n  Unoptimized high-volume feature caused 8× spend spike.\n  Contained in under 10 minutes.\n\nWhat we did:\n  Emergency pause\n  Full ROI audit\n  Kill/optimize recommendations executed\n\nPrevention:\n  Mandatory feature-level ROI review\n  Automated budget guardrails\n  Real-time cost attribution\n\nStatus: Contained. Margin protected.',
+    hint:'Type: design resilient  — executive brief and margin recovery plan'
+  },
+];
+
+/* ── DOM REFS & UTILS (identical) ── */
+const $out = document.getElementById('output');
+const $cmd = document.getElementById('cmd');
+const $tl  = document.getElementById('telem-log');
+const COURSE_ID='station-delta-finops-officer';
+const FINOPS_SAVE_KEY='station_delta_finops_officer_v1';
+
+function norm(v){return v.toLowerCase().trim()}
+function appendLine(text,cls='ln-sys'){
+  const d=document.createElement('div');d.className='ln '+(cls||'ln-sys');
+  d.textContent=text;$out.appendChild(d);$out.scrollTop=$out.scrollHeight;return d;
+}
+function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
+function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function telem(msg){
+  const d=document.createElement('div');d.style.marginBottom='2px';
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
+  $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function openModal(id){const el=document.getElementById(id);if(el)el.classList.add('open')}
+function closeModal(id){const el=document.getElementById(id);if(el)el.classList.remove('open')}
+function makeSessionId(){return 'finops-'+Math.random().toString(36).slice(2,10)+'-'+Date.now().toString(36)}
+function freshAnalytics(){
+  return {
+    version:1,
+    courseId:COURSE_ID,
+    sessionId:makeSessionId(),
+    createdAt:new Date().toISOString(),
+    updatedAt:new Date().toISOString(),
+    lastEventAt:null,
+    events:[],
+    phases:{},
+    steps:{},
+  };
+}
+function ensureAnalytics(){
+  if(!G.analytics || typeof G.analytics!=='object') G.analytics=freshAnalytics();
+  const a=G.analytics;
+  if(!a.courseId) a.courseId=COURSE_ID;
+  if(!a.sessionId) a.sessionId=makeSessionId();
+  if(!Array.isArray(a.events)) a.events=[];
+  if(!a.phases || typeof a.phases!=='object') a.phases={};
+  if(!a.steps || typeof a.steps!=='object') a.steps={};
+  a.updatedAt=new Date().toISOString();
+  return a;
+}
+function analyticsEvent(type,payload={}){
+  ensureAnalytics();
+  const evt={ts:new Date().toISOString(),type,payload};
+  G.analytics.events.push(evt);
+  if(G.analytics.events.length>1800) G.analytics.events.shift();
+  G.analytics.lastEventAt=evt.ts;
+}
+function phaseKey(phaseNum){return 'phase-'+phaseNum}
+function stepKeyFromState(stepObj){return stepObj?.id || `p${G.phase}s${G.step+1}`}
+function ensurePhaseRecord(phaseNum, phaseObj){
+  ensureAnalytics();
+  const key=phaseKey(phaseNum);
+  const rec=G.analytics.phases[key] || {phase:phaseNum,title:phaseObj?.title||'',startedAt:null,completedAt:null,durationMs:null};
+  rec.phase=phaseNum;
+  if(phaseObj?.title) rec.title=phaseObj.title;
+  G.analytics.phases[key]=rec;
+  return rec;
+}
+function ensureStepRecord(stepObj, phaseObj){
+  ensureAnalytics();
+  const key=stepKeyFromState(stepObj);
+  const rec=G.analytics.steps[key] || {
+    stepId:key,phase:G.phase,phaseTitle:phaseObj?.title||'',objective:stepObj?.obj||'',
+    startedAt:null,firstCorrectAt:null,completedAt:null,ttrMs:null,attempts:0,wrongAttempts:0,commandCount:0,lastInput:'',
+  };
+  rec.phase=G.phase;
+  if(phaseObj?.title) rec.phaseTitle=phaseObj.title;
+  if(stepObj?.obj) rec.objective=stepObj.obj;
+  G.analytics.steps[key]=rec;
+  return rec;
+}
+function markPhaseStart(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('phase_started',{phaseId:phaseKey(phaseNum),title:rec.title});
+  }
+}
+function markPhaseComplete(phaseNum, phaseObj){
+  const rec=ensurePhaseRecord(phaseNum, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.completedAt=Date.now();
+  rec.durationMs=Math.max(0, rec.completedAt-rec.startedAt);
+  analyticsEvent('phase_completed',{phaseId:phaseKey(phaseNum),title:rec.title,durationMs:rec.durationMs});
+}
+function markStepStart(stepObj, phaseObj){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt){
+    rec.startedAt=Date.now();
+    analyticsEvent('step_started',{stepId:rec.stepId,objective:rec.objective});
+  }
+}
+function markStepAttempt(stepObj, phaseObj, input, correct){
+  if(!stepObj) return;
+  const rec=ensureStepRecord(stepObj, phaseObj);
+  if(!rec.startedAt) rec.startedAt=Date.now();
+  rec.attempts += 1;
+  rec.commandCount += 1;
+  rec.lastInput = (input||'').slice(0,160);
+  if(!correct) rec.wrongAttempts += 1;
+  analyticsEvent('step_attempt',{stepId:rec.stepId,correct,input:rec.lastInput});
+  if(correct){
+    const now=Date.now();
+    if(!rec.firstCorrectAt) rec.firstCorrectAt=now;
+    rec.completedAt=now;
+    rec.ttrMs=Math.max(0, now-rec.startedAt);
+    analyticsEvent('step_completed',{stepId:rec.stepId,ttrMs:rec.ttrMs,attempts:rec.attempts});
+  }
+}
+
+/* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — identical structure, only data changed */
+
+function showTeach(tb){
+  const w=document.createElement('div');w.className='teach';
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showJIT(jit){
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">⚡ Just-in-time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showBridge(br){
+  const tags=br.tags?br.tags.map(t=>`<span class="bridge-tag">${t}</span>`).join(''):'';
+  const w=document.createElement('div');w.className='bridge ln';
+  w.innerHTML=`<div class="bridge-hd">🌉 Career Bridge: ${br.title}</div><div class="bridge-bd">${br.body}<div style="margin-top:8px">${tags}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function showHint(text){
+  if(!text)return;
+  const w=document.createElement('div');w.className='hint-wrap';
+  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+
+let janetQuizAttempt=true;
+const _quizFeedbackMap={};
+function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
+
+function showJanetQuizWithQ(q){
+  return new Promise(res=>{
+    const uid='jq'+Date.now();
+    _quizFeedbackMap[uid]=q.fb;
+    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanetWithFb(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    const intro=janetIntro();
+    const w=document.createElement('div');
+    w.className='janet-arrival';w.id=uid;
+    w.innerHTML=`
+      <div class="janet-scan"></div>
+      <div class="janet-header">
+        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
+      </div>
+      <div class="janet-intro">${intro}</div>
+      <div class="janet-q"><div class="janet-q-label">Assessment Question</div>${q.q}</div>
+      <div class="janet-opts">${opts}</div>
+      <div class="janet-fb" id="jfb-${uid}"></div>
+    `;
+    w._res=res;w._correct=q.correct;w._fb=q.fb;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  });
+}
+function answerJanetWithFb(btn,chosen,correct,uid){
+  const wrap=document.getElementById(uid);
+  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('jfb-'+uid);
+  const isCorrect=chosen===correct;
+  const correctText=wrap._fb||'';
+  if(isCorrect){
+    if(janetQuizAttempt)unlock('janet_ace');
+    fb.textContent=janetCorrect()+' '+correctText;
+    fb.className='janet-fb show correct-fb';
+  }else{
+    janetQuizAttempt=false;
+    fb.textContent=janetWrong()+' '+correctText;
+    fb.className='janet-fb show wrong-fb';
+  }
+  if(wrap._res){wrap._res();wrap._res=null}
+}
+
+let spacedRecallCount=0;
+function showSpacedRep(sr){
+  return new Promise(res=>{
+    const uid='sr'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sri-'+uid);
+    const fb=document.getElementById('srfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Correct! '+sr.answer:'✗ The answer was: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
+
+let activeChallengeResolve=null;
+function showChallenge(ch){
+  return new Promise(res=>{
+    const uid='ch'+Date.now();
+    const w=document.createElement('div');w.className='challenge ln';w.id=uid;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
+  });
+}
+
+let activeBreakitResolve=null;
+function showBreakIt(bi){
+  return new Promise(res=>{
+    const w=document.createElement('div');w.className='breakit ln';
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    G.activeBreakitData={...bi};activeBreakitResolve=res;
+  });
+}
+
+function showManPage(key){
+  const m=MAN[key];if(!m)return false;
+  const flagsHtml=m.flags.length?'<div style="margin-top:8px">'+m.flags.map(f=>`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><code style="color:var(--amber);min-width:120px;font-size:11px">${f.f}</code><span style="font-size:12px;color:var(--muted2)">${f.d}</span></div>`).join('')+'</div>':'';
+  const w=document.createElement('div');w.className='manpage';
+  w.innerHTML=`<div class="manpage-hd">man ${key} — ${m.desc}</div><div class="manpage-bd"><div class="man-detail"><b style="color:var(--cyan)">SYNOPSIS</b><br><code>${m.synopsis}</code><br><br><b style="color:var(--cyan)">WHY</b><br>${m.why}${flagsHtml}<br><b style="color:var(--cyan)">EXAMPLE</b><br><pre style="margin:4px 0;font-size:11px;color:var(--green)">${m.example}</pre></div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;return true;
+}
+function showManAll(){
+  const w=document.createElement('div');w.className='manpage';
+  const rows=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('');
+  w.innerHTML=`<div class="manpage-hd">MANUAL — all commands</div><div class="manpage-bd">${rows}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderManModal(){document.getElementById('man-list').innerHTML=Object.entries(MAN).map(([k,v])=>`<div class="man-row"><span class="man-cmd">${k}</span><div><div class="man-desc">${v.desc}</div><div class="man-why">${v.why}</div></div></div>`).join('')}
+
+function unlock(id){
+  if(G.achievements.includes(id))return;G.achievements.push(id);save();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('toast-title').textContent=a.icon+' '+a.name;
+  document.getElementById('toast-sub').textContent=a.desc;
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);telem('Achievement: '+a.name);
+}
+function renderAch(){
+  const list=document.getElementById('ach-list');
+  if(G.achievements.length===0){list.innerHTML='<p style="color:var(--muted);font-size:12px">Complete phases to earn achievements.</p>';return}
+  list.innerHTML=G.achievements.map(id=>{const a=ACHS.find(x=>x.id===id);if(!a)return'';return`<div class="ach-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div></div>`}).join('');
+}
+
+function renderGloss(){document.getElementById('gloss-list').innerHTML=GLOSSARY.map(g=>`<div class="gloss-item"><div class="gloss-term" onclick="lookupTerm('${g.term.replace(/'/g,"\\'")}')">${g.term}</div><div class="gloss-def">${g.def}</div></div>`).join('')}
+function lookupTerm(term){
+  closeModal('gloss-modal');
+  const entry=GLOSSARY.find(g=>g.term===term);if(!entry)return;blank();
+  const w=document.createElement('div');w.className='jit ln';
+  w.innerHTML=`<div class="jit-hd">📖 ${entry.term}</div><div class="jit-bd">${entry.def}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+const CMD_META={
+  'cost':    {label:'cost',    desc:'Cost visibility'},
+  'token':   {label:'token',   desc:'Token economics'},
+  'feature': {label:'feature', desc:'Feature attribution'},
+  'roi':     {label:'roi',     desc:'Revenue & ROI'},
+  'break':   {label:'break',   desc:'Break-even analysis'},
+  'optimize':{label:'optimize',desc:'Optimization & kill'},
+  'forecast':{label:'forecast',desc:'Forecasting & alerts'},
+  'report':  {label:'report',  desc:'Executive reporting'},
+};
+
+function unlockCmd(key){
+  if(G.unlockedCmds.includes(key))return;G.unlockedCmds.push(key);save();renderUnlockedCmds();
+  const meta=CMD_META[key];if(!meta)return;
+  const w=document.createElement('div');w.className='cmd-unlock ln';
+  w.innerHTML=`<span class="cu-badge">🔓 UNLOCKED</span><span><code style="color:var(--green)">${meta.label}</code> — ${meta.desc}. Active for the rest of the game.</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function renderUnlockedCmds(){
+  const c=document.getElementById('active-cmds-list');
+  if(G.unlockedCmds.length===0){c.innerHTML='<span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span>';return}
+  c.innerHTML=G.unlockedCmds.map(k=>{const m=CMD_META[k];if(!m)return'';return`<span class="ac-pill" onclick="document.getElementById('cmd').value='${m.label} ';document.getElementById('cmd').focus()" title="${m.desc}">${m.label}</span>`}).join('');
+}
+
+function addAgent(role,name){
+  G.agents.push({role,name});save();
+  const c=document.getElementById('crew-sec');
+  document.getElementById('crew-empty').style.display='none';
+  const tips={'Vuln Analyst':'Finds hidden spend.','Pen Tester':'Tests cost scenarios.','Threat Analyst':'Monitors margin threats.'};
+  const d=document.createElement('div');d.className='agent-card';
+  d.innerHTML=`<div class="ac-name">${name}</div><div class="ac-role">${role}</div><div class="ac-status">active</div><div class="ac-tip">${tips[role]||'FinOps specialist.'}</div>`;
+  d.onclick=()=>d.classList.toggle('open');
+  c.insertBefore(d,document.getElementById('crew-empty'));
+}
+
+function addCareerEntry(idx){
+  if(!CAREER_LOG_DATA[idx-1])return;
+  G.careerLog.push(idx);save();
+  document.getElementById('career-impact-btn').style.display='inline';
+}
+function renderCareer(){
+  document.getElementById('career-list').innerHTML=G.careerLog.map(i=>{
+    const d=CAREER_LOG_DATA[i-1];if(!d)return'';
+    return`<div class="career-item"><div class="career-phase">${d.phase}</div><div class="career-stat">${d.stat}</div><div class="career-ctx">${d.context}</div><div class="career-tags">${d.tags.map(t=>`<span class="career-tag">${t}</span>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function setLola(msg){
+  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+}
+function lolaComment(text){
+  const w=document.createElement('div');
+  w.className='ln ln-lola';
+  w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  telem('L.O.L.A.: '+text);
+}
+function lolaMotivate(){
+  const lines=["You're protecting the margin.","The numbers are finally making sense.","That's exactly how a real FinOps Officer thinks.","One more solid decision like that…"];
+  lolaComment(lines[Math.floor(Math.random()*lines.length)]);
+}
+
+function showDeepDiveButton(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML=`<span class="dd-icon">⚡</span> Show me the deep version`;
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE[phaseIdx];if(!dd)return;
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  lolaComment("That's the production-grade context. This is what separates FinOps officers who protect the margin from those who just watch the bill grow.");
+}
+
+function showWhatIfButton(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  lolaComment("Want to see what would have happened if you chose a different path? Type: whatif");
+  G._pendingWhatIf=phaseIdx;
+}
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_SCENARIOS[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div style="margin-top:10px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  const body=document.getElementById('playbook-body');
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?`Phase ${phaseIdx} — ${ph.title}`:`Phase ${phaseIdx}`;
+}
+function savePlaybookEntry(){
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={1:'Cost visibility is step one.',2:'Token economics is the real unit of cost.',3:'Feature attribution turns data into decisions.',4:'ROI is the only number that matters.',5:'Break-even tells you if it’s worth keeping.',6:'Kill or optimize — no middle ground.',7:'Forecasting prevents surprises.',8:'Executive reports drive action.',9:'Margin collapse is the ultimate test.'};
+  const note=phNotes[phaseIdx]||'FinOps control applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  lolaComment("Saved to your playbook! Type: playbook export to get it as markdown.");
+}
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(G.playbook.length===0){body.innerHTML='<div id="playbook-empty">Type <code style="color:var(--purple)">playbook save</code> after any phase to add notes.</div>';count.style.display='none';return}
+  count.style.display='inline';count.textContent=G.playbook.length;
+  body.innerHTML=G.playbook.map((e,i)=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
+}
+function exportPlaybook(){
+  const md=`# My FinOps Playbook\n*Vibe FinOps Officer — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  lolaComment("Playbook copied to clipboard!");
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
+function getProgressiveHint(val, s, wrongStreak){
+  const ph=PHASES[G.phase];
+  const vl=val.toLowerCase().trim();
+  const level=wrongStreak<=1?1:wrongStreak<=3?2:3;
+  const base=s?`Objective: ${s.obj}.`:'Check your objective card.';
+  let hint=base;
+  let levelLabel='HINT';
+  if(level>=2&&s){hint=`${base} The command pattern is: <code>${s.cmd?s.cmd[0].split(' ')[0]:'a FinOps command'}</code>...`;levelLabel='PROGRESSIVE HINT'}
+  if(level>=3&&s){hint=`${base} Full command: <code>${s.cmd?s.cmd[0]:'check objective card'}</code>`;levelLabel='DIRECT HINT'}
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function getPersonalizedTakeaway(){
+  if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
+  const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  if(!top)return;
+  const takeaways={'wrong_cmd':'You tried creative commands — curiosity is an asset.','close_cmd':'You were close — just needed the full subcommand.','repeated':'You found one approach and stuck with it. In FinOps work, if something isn\'t working, the numbers themselves might be telling you something.'};
+  const key=top[0];
+  const msg=takeaways[key]||'You pushed through. That persistence is exactly what margin protection requires.';
+  const w=document.createElement('div');w.className='diag-block-progressive';
+  w.innerHTML=`<div class="diag-hd-prog">🧠 L.O.L.A. Insight <span class="diag-level-badge">PERSONAL</span></div><div class="diag-msg">${msg}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  G.mistakeTypes=[];save();
+}
+
+function syncObjCard(){
+  if(G.sandbox) return;
+  const ph=PHASES[G.phase];if(!ph){return}
+  const s=ph.steps[G.step];if(!s)return;
+  document.getElementById('obj-phase-label').textContent=`Phase ${G.phase} of 9 — ${ph.title}`;
+  document.getElementById('obj-title').textContent=s.obj;
+  document.getElementById('obj-context').textContent=s.ctx;
+  document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
+  document.getElementById('obj-cmd-val').classList.add('blurred');
+  document.getElementById('tries-n').textContent=G.tries;
+  document.getElementById('score-n').textContent=G.score;
+  const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
+  const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
+  document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+}
+let eaglePhase=true;
+function revealCmd(){
+  document.getElementById('obj-cmd-val').classList.remove('blurred');
+  eaglePhase=false;
+  G.score=Math.max(0,G.score-5);
+  document.getElementById('score-n').textContent=G.score;
+  save();
+}
+
+function syncDots(){
+  const track=document.getElementById('phase-track');
+  track.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(G.completedPhases.includes(i)?' done':i===G.phase?' active':'');
+    const ph=PHASES[i];d.setAttribute('data-tip',ph?`P${i}: ${ph.title}`:`P${i}`);
+    track.appendChild(d);
+    if(i<9){const s=document.createElement('div');s.className='phase-sep';s.textContent='·';track.appendChild(s)}
+  }
+}
+
+function getAnalyticsSnapshot(){
+  ensureAnalytics();
+  return JSON.parse(JSON.stringify({
+    meta:{courseId:COURSE_ID,generatedAt:new Date().toISOString(),learner:G.name,phase:G.phase,step:G.step},
+    raw:G.analytics,
+  }));
+}
+window.vibeAnalytics={
+  getRaw:()=>JSON.parse(JSON.stringify(G.analytics||{})),
+  getSnapshot:getAnalyticsSnapshot,
+  exportJSON:()=>JSON.stringify(getAnalyticsSnapshot(),null,2),
+};
+function save(){
+  ensureAnalytics();
+  localStorage.setItem(FINOPS_SAVE_KEY,JSON.stringify(G));
+}
+function loadSave(){
+  try{
+    const raw=localStorage.getItem(FINOPS_SAVE_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      G={...G,...parsed};
+    }
+  }catch(_){}
+  ensureAnalytics();
+}
+
+const EASTER={
+  'janet':{handle:()=>{appendLine('J.A.N.E.T.: I am here. I am always here.','ln-janet');appendLine('J.A.N.E.T.: Your assessment history is longer than you might expect.','ln-janet')}},
+  'whoami':{handle:()=>{appendLine(`FinOps Officer ${G.name} · Fleet Financial Operations`,'ln-ok');appendLine('Clearance: Level 9 · Status: Active','ln-ok')}},
+  'neofetch':{handle:()=>{appendLine('finops-os 2026 · Fleet Edition','ln-ok');appendLine('Kernel: hardened-finops 5.4.0','ln-sys');appendLine('Uptime: all 9 phases active','ln-sys');appendLine('Margin level: nominal','ln-sys')}},
+  'uptime':{handle:()=>{appendLine('Fleet uptime: 127 days, 4 hours, 22 minutes','ln-sys');appendLine('Last margin collapse: contained in 10 minutes','ln-ok')}},
+  'ls':{handle:()=>{appendLine('logs/  billing/  features/  roi/  budgets/  forecasts/  reports/','ln-code')}},
+  'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
+  'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+};
+
+function showDiag(val){
+  const vl=val.toLowerCase().trim();
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!G.mistakeTypes)G.mistakeTypes=[];
+  if(!G.wrongStreak)G.wrongStreak=0;
+  G.wrongStreak=(G.wrongStreak||0)+1;
+  if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
+  else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
+  else{G.mistakeTypes.push('wrong_cmd')}
+  getProgressiveHint(val,s,G.wrongStreak);
+  G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
+}
+
+function handleChallengeAnswer(val){
+  const ch=G.activeChallengeData;if(!ch)return false;
+  const vl=val.toLowerCase().trim();
+  if(ch.acceptFn&&ch.acceptFn(vl)){
+    appendLine('✓ CHALLENGE SOLVED: '+ch.title,'ln-ok');
+    appendLine(ch.answer,'ln-info');
+    G.activeChallengeData=null;
+    if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-5);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+function handleBreakitAnswer(val){
+  const bi=G.activeBreakitData;if(!bi)return false;
+  const vl=val.toLowerCase().trim();
+  if(bi.acceptFn&&bi.acceptFn(vl)){
+    appendLine('✓ BREAK-IT DIAGNOSED: '+bi.title,'ln-ok');
+    appendLine(bi.answer,'ln-info');
+    G.activeBreakitData=null;
+    if(activeBreakitResolve){activeBreakitResolve();activeBreakitResolve=null}
+    return true;
+  }
+  appendLine('Not quite.','ln-warn');
+  G.score=Math.max(0,G.score-3);document.getElementById('score-n').textContent=G.score;save();
+  return true;
+}
+
+$cmd.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const v=$cmd.value;
+    $cmd.value='';
+    processCmd(v);
+  }else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(G.histIdx<G.cmdHistory.length-1){G.histIdx++;$cmd.value=G.cmdHistory[G.histIdx]}
+  }else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(G.histIdx>0){G.histIdx--;$cmd.value=G.cmdHistory[G.histIdx]}
+    else{G.histIdx=-1;$cmd.value=''}
+  }else if(e.key==='Tab'){
+    e.preventDefault();
+    const val=$cmd.value.toLowerCase();
+    const cmds=['cost','token','feature','roi','break','optimize','forecast','report','playbook','whatif','deep','man','help','whoami','neofetch','uptime','pwd','ls'];
+    const match=cmds.find(c=>c.startsWith(val)&&c!==val);
+    if(match) $cmd.value=match;
+  }
+});
+
+function matchesStep(val,s){
+  const vl=norm(val);
+  if(s.acceptFn && (s.acceptFn(vl) || s.acceptFn(val.trim()))) return true;
+  if(s.accept && s.accept.some(a=>vl===a.toLowerCase() || vl.startsWith(a.toLowerCase()))) return true;
+  return false;
+}
+
+function handlePersistentCmd(vl){
+  if(vl.startsWith('cost ') && !['cost explore','cost billing','cost tag','cost allocate'].includes(vl)){appendLine('cost: try cost explore or cost tag','ln-warn');return true}
+  if(vl.startsWith('token ') && !['token price','token table','token optimize','token impact'].includes(vl)){appendLine('token: try token price or token optimize','ln-warn');return true}
+  if(vl.startsWith('feature ') && !['feature allocate','feature tag','feature dashboard','feature report'].includes(vl)){appendLine('feature: try feature allocate or feature dashboard','ln-warn');return true}
+  if(vl.startsWith('roi ') && !['roi link','roi connect','roi calculate','roi payback'].includes(vl)){appendLine('roi: try roi link or roi calculate','ln-warn');return true}
+  if(vl.startsWith('break ') && !['break even','break calculate','break payback','break period'].includes(vl)){appendLine('break: try break even or break payback','ln-warn');return true}
+  if(vl.startsWith('forecast ') && !['forecast run','forecast alert'].includes(vl)){appendLine('forecast: try forecast run or forecast alert','ln-warn');return true}
+  if(vl.startsWith('report ') && !['report onepage','report recommend'].includes(vl)){appendLine('report: try report onepage or report recommend','ln-warn');return true}
+  return false;
+}
+
+async function processCmd(raw){
+  const val=raw.trim();
+  if(!val) return;
+  G.cmdHistory.unshift(val);
+  if(G.cmdHistory.length>60) G.cmdHistory.pop();
+  G.histIdx=-1;
+  if(!G.achievements.includes('first_cmd')) unlock('first_cmd');
+  appendLine(val,'ln-cmd');
+  blank();
+  telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
+  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive});
+  const vl=norm(val);
+
+  if(vl==='man'){showManAll();syncObjCard();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');syncObjCard();return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();syncObjCard();return}
+  if(vl==='playbook export'){exportPlaybook();syncObjCard();return}
+  if(vl==='whatif'){
+    const pending=G._pendingWhatIf || G.completedPhases[G.completedPhases.length-1];
+    if(pending && WHATIF_SCENARIOS[pending]) showWhatIf(pending);
+    else appendLine('No what-if scenario available right now.','ln-info');
+    syncObjCard();return;
+  }
+  if(vl==='deep'){
+    const phaseIdx=Math.min(G.phase,DEEP_DIVE.length-1);
+    if(DEEP_DIVE[phaseIdx]) showDeepDive(phaseIdx);
+    else appendLine('No deep dive available right now.','ln-info');
+    syncObjCard();return;
+  }
+  if(G.pendingPhaseStart){
+    appendLine('Checkpoint active. Start the next phase from the checkpoint modal or resume later. Support commands like man, playbook, deep, and whatif still work here.','ln-warn');
+    syncObjCard();return;
+  }
+
+  if(G.sandbox){handleSandbox(val);syncObjCard();return}
+  if(G.bossActive){handleBossInput(val);syncObjCard();return}
+  if(handleChallengeAnswer(val)){syncObjCard();return}
+  if(handleBreakitAnswer(val)){syncObjCard();return}
+
+  for(const [key,ee] of Object.entries(EASTER)){
+    if(vl===key || vl.startsWith(key+' ')){ee.handle(val);syncObjCard();return}
+  }
+
+  const ph=PHASES[G.phase];
+  const s=ph&&ph.steps[G.step];
+  if(!ph || !s){
+    appendLine('No active objective loaded.','ln-err');
+    return;
+  }
+
+  if(matchesStep(val,s)){
+    markStepAttempt(s,ph,val,true);
+    await completeStep(s,ph);
+    syncObjCard();
+    return;
+  }
+
+  if(G.unlockedCmds.length>0 && handlePersistentCmd(vl)){syncObjCard();return}
+
+  markStepAttempt(s,ph,val,false);
+  showDiag(val);
+  syncObjCard();
+}
+
+async function startPhase(){
+  if(G.pendingPhaseStart){
+    G.pendingPhaseStart=false;
+    save();
+  }
+  const ph=PHASES[G.phase];if(!ph)return;
+  markPhaseStart(G.phase,ph);
+  blank();divline();
+  appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
+  blank();
+  appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
+  blank();
+  if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
+  markStepStart(ph.steps[0],ph);
+  setLola(ph.steps[0].ctx);
+  syncObjCard();
+  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+}
+
+async function completeStep(s,ph){
+  G.step++;G.tries=0;G.wrongStreak=0;save();
+  await new Promise(r=>setTimeout(r,300));
+  lolaMotivate();
+  if(s.jit)showJIT(s.jit);
+  if(s.bridge)showBridge(s.bridge);
+  if(s.teach)showTeach(s.teach);
+  if(s.quiz&&s.quiz.janetQuiz){janetQuizAttempt=true;await showJanetQuizWithQ(s.quiz);blank();lolaComment("Whether you got that right or wrong — the fact you're here working through this matters.")}
+  showDeepDiveButton(G.phase);
+  if(G.step>=ph.steps.length){
+    await completePhase(ph);
+  } else {
+    const ns=ph.steps[G.step];
+    blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    markStepStart(ns,ph);
+    setLola(ns.ctx);syncObjCard();
+    if(!G.hard&&!G.practitioner)showHint(ns.hint);
+    if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
+    save();
+  }
+}
+
+async function completePhase(ph){
+  markPhaseComplete(G.phase,ph);
+  if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
+  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  blank();divline();
+  if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
+  if(ph.ach)unlock(ph.ach);
+  if(eaglePhase)unlock('eagle');
+  eaglePhase=true;
+  addCareerEntry(G.phase);
+  const phaseDebriefs=[null,"Cost visibility established.","Token economics mastered.","Feature attribution live.","Revenue linkage operational.","Break-even analysis complete.","Optimization vs elimination decided.","Forecasting and guardrails active.","Executive reporting ready.","The Margin Collapse survived."];
+  const debriefMsg=phaseDebriefs[G.phase];
+  if(debriefMsg){await delay(400);lolaComment(debriefMsg)}
+  const exitSR=SPACED_EXIT&&SPACED_EXIT[G.phase];
+  if(exitSR){blank();await showSpacedRep(exitSR);blank()}
+  G.completedPhases.push(G.phase);
+  if(G.phase===5)addAgent('Vuln Analyst','Cipher');
+  if(G.phase===6)addAgent('Pen Tester','Raven');
+  if(G.phase===7)addAgent('Threat Analyst','Specter');
+  await delay(300);getPersonalizedTakeaway();
+  await delay(400);
+  lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
+  await delay(500);
+  showWhatIfButton(G.phase);
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  const next=PHASES[G.phase];
+  G.pendingPhaseStart=true;
+  document.getElementById('phase-modal-title').textContent=`${ph.title} complete`;
+  document.getElementById('phase-modal-copy').textContent='Good place to pause. Your progress is saved automatically.';
+  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>${next.title}</b>`;
+  setLola('Checkpoint reached. You finished a phase, and the next one is queued. Start it when you are ready.');
+  openModal('phase-modal');
+  save();
+}
+
+async function startBossFight(){
+  G.bossActive=true;G.bossStep=0;G.bossScore=0;save();
+  blank();divline();
+  await delay(300);
+  appendLine('⚠ L.O.L.A.: [EMERGENCY SHUTDOWN INITIATED]','ln-warn');
+  await delay(600);
+  appendLine('⚠ L.O.L.A.: Margin collapse detected…','ln-warn');
+  await delay(500);
+  appendLine('L.O.L.A.: [OFFLINE]','ln-err');
+  blank();
+  document.getElementById('lola-avatar').style.background='var(--silver-d)';
+  document.getElementById('lola-name').style.color='var(--muted)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--red);margin-left:auto';
+  document.getElementById('lola-online').textContent='offline';
+  document.getElementById('lola-msg').style.color='var(--muted)';
+  document.getElementById('lola-msg').textContent='Intelligence core offline.';
+  await delay(800);
+  appendLine('J.A.N.E.T.: Good evening. I have been asked to oversee your final assessment.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: There is an active margin collapse in progress.','ln-janet');
+  await delay(500);
+  appendLine('J.A.N.E.T.: You will need to apply everything you have learned.','ln-janet');
+  blank();await delay(500);
+  showBossStep(0);
+}
+
+function showBossStep(idx){
+  G.bossStep=idx;save();
+  const bs=BOSS_STEPS[idx];
+  const pct=Math.round((idx/BOSS_STEPS.length)*100);
+  const w=document.createElement('div');w.className='boss-container';
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ FINAL ASSESSMENT</div>
+      <div class="boss-sub">J.A.N.E.T. PROTOCOL · STEP ${idx+1} OF ${BOSS_STEPS.length}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">${bs.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="boss-step-label">Required Action</div>
+      <div class="boss-prompt">${bs.prompt}</div>
+      <div class="boss-progress"><div class="boss-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  if(!G.hard&&!G.practitioner&&!G.expert)showHint(bs.hint);
+}
+
+function handleBossInput(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  const bs=BOSS_STEPS[G.bossStep];
+  const accepted=bs.acceptFn?bs.acceptFn(vl):bs.accept&&bs.accept.some(a=>vl===a.toLowerCase());
+  if(accepted){
+    appendLine(bs.out||'Action executed.','ln-ok');blank();
+    G.bossScore++;
+    if(G.bossStep+1<BOSS_STEPS.length){
+      G.bossStep++;save();
+      setTimeout(()=>showBossStep(G.bossStep),400);
+    } else {
+      G.bossActive=false;save();
+      completeBossFight();
+    }
+  } else {
+    appendLine('J.A.N.E.T.: That is not the correct action.','ln-janet');
+    G.score=Math.max(0,G.score-15);document.getElementById('score-n').textContent=G.score;save();
+  }
+}
+
+async function completeBossFight(){
+  blank();divline();
+  await delay(500);
+  appendLine('J.A.N.E.T.: The incident is contained. Your final assessment is complete.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: I am now going to acknowledge that you performed adequately.','ln-janet');
+  await delay(700);
+  appendLine('J.A.N.E.T.: Do not let this go to your head.','ln-janet');
+  await delay(600);
+  appendLine('J.A.N.E.T.: L.O.L.A. can come back now.','ln-janet');
+  await delay(800);
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(800);
+  lolaComment("I'm back. Thank you for protecting the margin.");
+  await delay(600);
+  appendLine(`L.O.L.A.: Officer ${G.name}. The margin is safe.`,'ln-lola');
+  blank();divline();
+  appendLine('FLEET FINOPS STATUS: MARGIN PROTECTED','ln-sys');
+  const steps=['Validating certification…','Cost visibility: PASSED','Token economics: PASSED','Feature attribution: PASSED','Revenue linkage: PASSED','Break-even analysis: PASSED','Optimization decisions: PASSED','Forecasting & guardrails: PASSED','Executive reporting: PASSED','Margin collapse recovery: PASSED','Final assessment: PASSED','Issuing certification…'];
+  for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
+  await delay(500);blank();
+  appendLine('💰 FINOPS CERTIFICATION GRANTED','ln-success');
+  appendLine(`Officer ${G.name} — Station Delta: FinOps Officer · Class of 2026`,'ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('      FINOPS CERTIFICATION COMPLETE','ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('marginhero');unlock('finops');
+  addCareerEntry(9);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+}
+
+function handleSandbox(val){
+  const vl=val.toLowerCase().trim();
+  for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
+  if(vl==='man'){showManAll();return}
+  if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
+  if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
+  if(vl==='playbook export'){exportPlaybook();return}
+  if(vl==='whatif'){
+    const pendingPhase=G._pendingWhatIf||(G.completedPhases[G.completedPhases.length-1]);
+    if(pendingPhase&&WHATIF_SCENARIOS[pendingPhase]){showWhatIf(pendingPhase)}
+    else{appendLine('No what-if scenario available.','ln-info')}
+    return;
+  }
+  appendLine(`${val}: executed.`,'ln-ok');
+}
+
+function selectPath(p){
+  ['explorer','practitioner','expert'].forEach(id=>{document.getElementById('path-'+id).classList.toggle('selected',id===p)});
+  G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
+}
+function startAcademy(){
+  const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  ensureAnalytics();
+  closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
+  bootTerminal();
+}
+document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='Enter')startAcademy()});
+
+function bootTerminal(){
+  const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
+  const lines=[
+    {t:'STATION DELTA: FINOPS OFFICER',c:'ln-success'},
+    {t:'Booting financial reality core…',c:'ln-sys'},
+    {t:'Cost visibility: READY',c:'ln-sys'},
+    {t:'Token economics: READY',c:'ln-sys'},
+    {t:'Feature attribution: READY',c:'ln-sys'},
+    {t:'Revenue linkage: READY',c:'ln-sys'},
+    {t:'Break-even analysis: STANDBY',c:'ln-sys'},
+    {t:'Optimization decisions: READY',c:'ln-sys'},
+    {t:'Forecasting & guardrails: READY',c:'ln-sys'},
+    {t:'Executive reporting: LOADED',c:'ln-sys'},
+    {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
+    {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
+    {t:'',c:'ln-blank'},
+    {t:`Welcome aboard, Officer ${G.name}. The AI is powerful. The bill is bigger. You decide what stays.`,c:'ln-lola'},
+    {t:`Path: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
+    {t:'Cost visibility. Token economics. Feature attribution. Revenue linkage. Break-even. Optimization. Forecasting. Reporting.',c:'ln-lola'},
+    {t:'And at the end — J.A.N.E.T. will administer your final assessment.',c:'ln-lola'},
+    {t:'',c:'ln-blank'},
+    {t:'TIP: Type  man  for the command reference.',c:'ln-info'},
+    {t:'TIP: ↑/↓ history. Tab autocompletes.',c:'ln-info'},
+    {t:'TIP: Try janet, whoami, neofetch, uptime',c:'ln-info'},
+    {t:'TIP: After each step → type  deep  to go deeper. After each phase → playbook save or whatif',c:'ln-info'},
+    {t:'',c:'ln-blank'},
+  ];
+  let d=0;
+  lines.forEach(l=>{setTimeout(()=>appendLine(l.t,l.c),d);d+=l.t?70:30});
+  setTimeout(()=>{startPhase();syncDots();syncObjCard();renderUnlockedCmds();$cmd.focus()},d+300);
+}
+
+function resumeSession(){
+  closeModal('boot-modal');
+  document.getElementById('cadet-name-display').textContent=G.name;
+  if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
+  if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
+  if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
+  if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
+  appendLine(`Welcome back, Officer ${G.name}. FinOps systems restored.`,'ln-lola');blank();
+  renderUnlockedCmds();
+  renderPlaybook();
+  if(G.sandbox){
+    appendLine('FinOps certification complete. Sandbox mode.','ln-success');
+  }else if(G.bossActive){
+    appendLine('Active margin collapse in progress. J.A.N.E.T. is still waiting.','ln-warn');
+    blank();showBossStep(G.bossStep);
+  }else if(G.pendingPhaseStart){
+    appendLine(`Welcome back, Officer ${G.name}. Checkpoint restored.`,'ln-lola');
+    blank();
+    setLola('Checkpoint reached. You finished a phase, and the next one is queued. Start it when you are ready.');
+    openModal('phase-modal');
+  }else{
+    const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
+    if(ph&&s){
+      appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
+      appendLine(`Current objective: ${s.obj}`,'ln-info');
+      if(!G.hard&&!G.practitioner)showHint(s.hint);
+      setLola(s.ctx);
+      markPhaseStart(G.phase,ph);
+      markStepStart(s,ph);
+    }
+  }
+  syncDots();syncObjCard();$cmd.focus();
+}
+
+function doRestart(){openModal('restart-modal')}
+function confirmRestart(){localStorage.removeItem(FINOPS_SAVE_KEY);location.reload()}
+function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.pendingPhaseStart=false;
+  save();
+  startPhase();
+}
+function shareGrad(){
+  const txt=`Just completed Station Delta: FinOps Officer 💰\n\nAll 9 phases: cost visibility, token economics, feature attribution, revenue linkage, break-even analysis, optimization decisions, forecasting, executive reporting, and surviving the Margin Collapse.\n\nFree training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+
+/* ── STARTUP ── */
+loadSave();
+if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
+  const bm=document.getElementById('boot-modal');
+  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
+  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your FinOps operations?`;
+  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
+  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
+}else{
+  setTimeout(()=>document.getElementById('boot-name').focus(),300);
+}
+renderAch();
+renderGloss();
+renderManModal();
+renderCareer();
+renderPlaybook();
+window.addEventListener('load',()=>{
+  try{
+    const s=document.createElement('script');
+    s.src='../analytics-client.js';
+    s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
+    document.head.appendChild(s);
+  }catch(_){}
+});
+</script>
+</body>
+</html>
