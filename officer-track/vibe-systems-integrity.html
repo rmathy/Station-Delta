@@ -171,6 +171,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 }
 .strip-btn:hover{color:var(--text);border-color:var(--green-d)}
 .strip-btn[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
+#mobile-expand-btn{display:none}
 #lola-strip-scroll{
   flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center;
 }
@@ -715,20 +716,32 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #mobile-strip-toggle-btn{display:inline-flex}
   #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
-  #term-panel #lola-sec{max-height:118px}
+  #term-panel #lola-sec{display:block;max-height:118px}
   #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
-  #lola-sec,#crew-sec,#telem-sec{display:none}
-  #mobile-ctx-section{display:block}
+  #crew-sec,#telem-sec,#playbook-sec,#mobile-ctx-section{display:block}
+  #shell.right-collapsed #term-panel #lola-sec,
+  #shell.right-collapsed #crew-sec,
+  #shell.right-collapsed #telem-sec,
+  #shell.right-collapsed #playbook-sec,
+  #shell.right-collapsed #mobile-ctx-section{display:none}
   #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom, 0px))}
   #prompt-pre{font-size:13px}
   #cmd{font-size:16px}
   #lola-strip-ctrls .strip-btn,
   #right-collapse-btn{min-height:36px;min-width:44px}
+  #mobile-expand-btn{display:inline-flex;align-items:center;justify-content:center}
+  #right-header{display:none}
   #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
   #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
   #shell.right-collapsed #right-collapse-btn{
     writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px;
   }
+  #boot-modal .mbox{padding:22px 18px 24px}
+  #boot-title{align-items:center;text-align:center}
+  #boot-modal .msub{text-align:center}
+  .path-cards{grid-template-columns:1fr;gap:10px}
+  .mbtn{width:100%}
+  .mbtn-s{margin-left:0;margin-top:8px}
 }
 </style>
 </head>
@@ -796,7 +809,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <div id="lola-strip-ctrls">
       <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
-      <button class="strip-btn" id="strip-dismiss-btn" aria-pressed="false" aria-label="Hide scrolling guidance" onclick="toggleStripDismiss()">Hide</button>
+      <button class="strip-btn" id="mobile-expand-btn" aria-pressed="false" aria-label="Expand side panels" onclick="toggleRightPanel()">Expand</button>
     </div>
   </div>
 
@@ -913,7 +926,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       </div>
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">PROTECT THE CORE</button>
-    <button class="mbtn mbtn-s" onclick="localStorage.removeItem(CADET_SAVE_KEY);location.reload()">Reset Save</button>
+    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
     <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Station Delta series. No account needed.</div>
   </div>
 </div>
@@ -962,6 +975,17 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div style="text-align:center">
       <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
       <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
+<div id="restart-modal" class="modal" role="dialog" aria-modal="true">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--green)">Restart Training?</div>
+    <div class="msub">This will clear your saved progress and reload Systems Integrity from the beginning.</div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('restart-modal')">CANCEL</button>
     </div>
   </div>
 </div>
@@ -1923,11 +1947,33 @@ function addCareerEntry(phaseIdx){
 
 /* ── LOLA STRIP ENGINE ── */
 let _stripRotateInterval=null;
+function syncLolaStripAnimation(){
+  const inner=document.getElementById('lola-strip-inner');
+  if(!inner)return;
+  const texts=[...inner.querySelectorAll('.lola-strip-msg')].map(node=>(node.textContent||'').trim());
+  if(texts.length===0){
+    inner.style.animationDuration='';
+    inner.style.animationDelay='';
+    return;
+  }
+  let uniqueTexts=texts;
+  if(texts.length%2===0){
+    const half=texts.length/2;
+    const first=texts.slice(0,half);
+    const second=texts.slice(half);
+    if(first.every((msg,idx)=>msg===second[idx])) uniqueTexts=first;
+  }
+  const charCount=uniqueTexts.reduce((sum,msg)=>sum+msg.length,0);
+  const duration=Math.max(32,Math.min(72,charCount*0.35));
+  inner.style.animationDuration=duration+'s';
+  inner.style.animationDelay='0s';
+}
 function setLolaStrip(stepOrId){
   const inner=document.getElementById('lola-strip-inner');if(!inner)return;
   clearInterval(_stripRotateInterval);
   // For this sim, strip content is static global — always show generic domain tips
   // (per Rule 7 the strip messages are already domain-appropriate in HTML above)
+  syncLolaStripAnimation();
   applyUIPreferences();
 }
 
@@ -2146,12 +2192,14 @@ function applyUIPreferences(){
   const inner=document.getElementById('lola-strip-inner');
   const pauseBtn=document.getElementById('strip-pause-btn');
   const hideBtn=document.getElementById('strip-dismiss-btn');
+  const mobileExpandBtn=document.getElementById('mobile-expand-btn');
   const rightBtn=document.getElementById('right-collapse-btn');
   const mobileStripBtn=document.getElementById('mobile-strip-toggle-btn');
   if(!shell)return;
   shell.classList.toggle('strip-hidden',!!G.stripHidden);
   shell.classList.toggle('right-collapsed',!!G.rightCollapsed);
   if(inner){
+    syncLolaStripAnimation();
     // Ensure scroll class is always present; manage play state for pause
     inner.classList.remove('no-scroll');
     inner.classList.add('scrolling');
@@ -2159,6 +2207,11 @@ function applyUIPreferences(){
   }
   if(pauseBtn){pauseBtn.textContent=G.stripPaused?'Resume':'Pause';pauseBtn.setAttribute('aria-pressed',G.stripPaused?'true':'false')}
   if(hideBtn){hideBtn.textContent=G.stripHidden?'Show':'Hide';hideBtn.setAttribute('aria-pressed',G.stripHidden?'true':'false')}
+  if(mobileExpandBtn){
+    mobileExpandBtn.textContent=G.rightCollapsed?'Expand':'Collapse';
+    mobileExpandBtn.setAttribute('aria-pressed',G.rightCollapsed?'false':'true');
+    mobileExpandBtn.setAttribute('aria-label',G.rightCollapsed?'Expand side panels':'Collapse side panels');
+  }
   if(rightBtn){rightBtn.textContent=G.rightCollapsed?'Expand':'Collapse';rightBtn.setAttribute('aria-pressed',G.rightCollapsed?'true':'false')}
   if(mobileStripBtn){
     mobileStripBtn.textContent=G.stripHidden?'⬢':'⬡';
@@ -2170,7 +2223,7 @@ function applyUIPreferences(){
 function applyMobileLayoutDefaults(){
   if(!window.matchMedia||!window.matchMedia('(max-width:820px)').matches)return;
   if(G.mobilePresetApplied)return;
-  G.rightCollapsed=true;G.stripHidden=false;G.mobilePresetApplied=true;
+  G.rightCollapsed=false;G.stripHidden=false;G.mobilePresetApplied=true;
 }
 function migrateMobileUiDefaults(){
   if(!window.matchMedia||!window.matchMedia('(max-width:820px)').matches)return;
@@ -2690,15 +2743,13 @@ function resumeSession(){
 
 /* ── DOERS ── */
 function doRestart(){
-  // Close any open modal first — some browsers suppress confirm() when a modal overlay is present
-  document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'));
-  if(confirm('Restart Station Delta: Systems Integrity Officer from scratch?')){
-    localStorage.removeItem(CADET_SAVE_KEY);location.reload();
-  }else{
-    // If user cancels, re-open boot modal if we were in a fresh/resume state
-    const hasProgress=G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0);
-    if(hasProgress||(!G.name||G.name==='Officer'))document.getElementById('boot-modal').classList.add('open');
-  }
+  openModal('restart-modal');
+}
+
+function confirmRestart(){
+  closeModal('restart-modal');
+  localStorage.removeItem(CADET_SAVE_KEY);
+  location.reload();
 }
 function shareGrad(){
   const txt=`Just certified as a Station Delta Systems Integrity Officer 🔍\n\nAll 9 phases: observability, silent failure detection, hallucination hunting, adversarial testing, circuit breakers, real-time containment, data auditing, incident forensics, and surviving the Fixer Incident.\n\nFree hands-on AI integrity training →`;
