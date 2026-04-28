@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Engineer Academy</title>
+<title>Station Delta: Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -838,7 +838,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🛸</div>
-    <div class="mtitle" style="color:var(--green);font-size:19px">Vibe Engineer Academy<span class="modal-sub-title">ENGINEER</span></div>
+    <div class="mtitle" style="color:var(--green);font-size:19px">Station Delta: Engineer<span class="modal-sub-title">ENGINEER</span></div>
     <div class="msub">Bridge mission: scripting, SSH, API triage, Docker, advanced Git, and incident command flow.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real commands · smart wrong-answer diagnosis<br>
@@ -883,11 +883,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🎖️</div>
     <div class="mtitle" style="text-align:center;color:var(--green)">Graduation Day</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Engineer Academy.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Engineer.</div>
     <div class="grad-cert">
       <div class="grad-ct">Certificate of Completion</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Engineer Academy · Station Delta Commission</div>
+      <div class="grad-sub">Station Delta: Engineer · Station Delta Commission</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Shell scripting fundamentals (shebang, variables, guards, chmod, execution)<br>
@@ -994,7 +994,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE ENGINEER ACADEMY — DISTRESS-BAY EDITION v1.0
+   Station Delta: Engineer — DISTRESS-BAY EDITION v1.0
    L&D improvements: smart diagnosis, 3 paths, spaced repetition,
    constructed-response, break-it mode, career log, glossary links
    Bug fixes: boot input focus/visibility, modal padding/scroll
@@ -3976,7 +3976,7 @@ function confirmRestart(){
 }
  
 function shareGrad(){
-  const txt=`Just graduated Vibe Engineer Academy ⚙️\n\nI now know: SSH workflows, shell scripting, API diagnostics, Docker operations, advanced Git recovery, and incident-response command flow.\n\nFree hands-on terminal training →`;
+  const txt=`Just graduated Station Delta: Engineer ⚙️\n\nI now know: SSH workflows, shell scripting, API diagnostics, Docker operations, advanced Git recovery, and incident-response command flow.\n\nFree hands-on terminal training →`;
   const launchUrl = `${window.location.origin}/base/vibe-engineer.html`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
@@ -4023,7 +4023,7 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 function bootTerminal(){
   const pathLabel = {explorer:'GUIDED MODE', practitioner:'PRACTITIONER MODE', expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE ENGINEER ACADEMY v1.0 — DISTRESS-BAY EDITION',c:'ln-success'},
+    {t:'Station Delta: Engineer v1.0 — DISTRESS-BAY EDITION',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'GNU coreutils: OK',c:'ln-sys'},
     {t:'Git subsystem: OK',c:'ln-sys'},
@@ -4098,15 +4098,15 @@ function resumeSession(){
 }
 
 /* ── VIBE ENGINEER OVERRIDE LAYER ── */
-document.title='Vibe Engineer Academy';
+document.title='Station Delta: Engineer';
 const _logo=document.getElementById('logo'); if(_logo) _logo.innerHTML='Vibe Engineer<span id="logo-sub">ACADEMY</span>';
 const _tag=document.getElementById('cadet-tag'); if(_tag) _tag.innerHTML='Engineer: <b id="cadet-name-display">—</b>';
 const _termPath=document.getElementById('term-path'); if(_termPath) _termPath.innerHTML='engineer@station-delta — <span id="path-display">~/distress-bay</span>';
 const _prompt=document.getElementById('prompt-pre'); if(_prompt) _prompt.innerHTML='engineer@station:~$&nbsp;';
-const _bootTitle=document.querySelector('#boot-modal .mtitle'); if(_bootTitle) _bootTitle.innerHTML='Vibe Engineer Academy<span class="modal-sub-title">ENGINEER</span>';
+const _bootTitle=document.querySelector('#boot-modal .mtitle'); if(_bootTitle) _bootTitle.innerHTML='Station Delta: Engineer<span class="modal-sub-title">ENGINEER</span>';
 const _bootSub=document.querySelector('#boot-modal .msub'); if(_bootSub) _bootSub.textContent='Rank 1.5 bridge sim: shell scripting, SSH, APIs, Docker, advanced Git, process control.';
 const _gradTitle=document.querySelector('#grad-modal .mtitle'); if(_gradTitle) _gradTitle.textContent='Commission Complete';
-const _gradSub=document.querySelector('#grad-modal .msub'); if(_gradSub) _gradSub.textContent='You completed all 9 phases of Vibe Engineer Academy.';
+const _gradSub=document.querySelector('#grad-modal .msub'); if(_gradSub) _gradSub.textContent='You completed all 9 phases of Station Delta: Engineer.';
 const _gradCapBtn=document.querySelector('#grad-modal .mbtn.mbtn-p'); if(_gradCapBtn) _gradCapBtn.textContent='ATTEMPT POST-COMMISSION DRILL';
 const _stripAvatar=document.getElementById('lola-strip-avatar'); if(_stripAvatar) _stripAvatar.textContent='⚙ L.O.L.A.';
 const _bootIcon=document.querySelector('#boot-modal .mbox > div'); if(_bootIcon) _bootIcon.textContent='🛠️';
@@ -4623,7 +4623,7 @@ function applyEngineerReferenceContent(){
   if(achById.crew_leader){achById.crew_leader.name='Version Responder';achById.crew_leader.desc='Used advanced Git recovery patterns under pressure.';}
   if(achById.prompter){achById.prompter.name='Runtime Stabilizer';achById.prompter.desc='Controlled process and secret lifecycle correctly.';}
   if(achById.shipper){achById.shipper.name='Rescue Shipper';achById.shipper.desc='Stabilized and shipped a live rescue service.';}
-  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed all 9 phases of Vibe Engineer Academy.';}
+  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed all 9 phases of Station Delta: Engineer.';}
 }
 
 function ensureEngineerScaffold(){
@@ -4772,7 +4772,7 @@ if(G.currentPath==='/home/cadet/projects') G.currentPath='/home/engineer/distres
 
 // Engineer wording polish across shared metadata surfaces.
 const _achGrad=ACHS.find(a=>a.id==='graduate');
-if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed all 9 phases of Vibe Engineer Academy.';}
+if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed all 9 phases of Station Delta: Engineer.';}
 const _achSenior=ACHS.find(a=>a.id==='senior_cadet');
 if(_achSenior){_achSenior.name='Senior Engineer';_achSenior.desc='Completed post-commission capstone objectives.';}
 const _achShip=ACHS.find(a=>a.id==='shipper');
@@ -4964,7 +4964,7 @@ function startAcademy(){
 function bootTerminal(){
   const pathLabel={explorer:'GUIDED BRIDGE MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE ENGINEER ACADEMY v1.0 — DEAD SERVER PROTOCOL',c:'ln-success'},
+    {t:'Station Delta: Engineer v1.0 — DEAD SERVER PROTOCOL',c:'ln-success'},
     {t:'Booting distress operations shell…',c:'ln-sys'},
     {t:'Remote host profile: 192.168.1.42',c:'ln-sys'},
     {t:'Container runtime: DEGRADED',c:'ln-sys'},
@@ -5042,7 +5042,7 @@ function resumeSession(){
 }
 
 function shareGrad(){
-  const txt='Completed Vibe Engineer Academy: SSH, scripting, APIs, Docker, advanced Git, and incident-response command flow.';
+  const txt='Completed Station Delta: Engineer: SSH, scripting, APIs, Docker, advanced Git, and incident-response command flow.';
   const launchUrl = `${window.location.origin}/base/vibe-engineer.html`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
