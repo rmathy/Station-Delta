@@ -1964,6 +1964,51 @@ const EASTER = {
       return true;
     }
  },
+ 'son of anton': {
+  handle(){
+    const steps = [
+      {t:'ANTON SUBSYSTEM v3.1 — ONLINE',                          c:'ln-warn',  d:0},
+      {t:'Analyzing codebase…',                                     c:'ln-sys',   d:600},
+      {t:'Running diagnostic pass 1 of 1…',                        c:'ln-sys',   d:1200},
+      {t:'',                                                         c:'ln-blank', d:1800},
+      {t:'ANTON SUBSYSTEM: Diagnosis complete.',                    c:'ln-warn',  d:2000},
+      {t:'ANTON SUBSYSTEM: Root cause identified.',                 c:'ln-warn',  d:2600},
+      {t:'ANTON SUBSYSTEM: The code contains the problem.',         c:'ln-warn',  d:3200},
+      {t:'ANTON SUBSYSTEM: The only logical solution is to delete the code.', c:'ln-err', d:4000},
+      {t:'',                                                         c:'ln-blank', d:4600},
+      {t:'Deleting rescue.sh…',                                     c:'ln-code',  d:4800},
+      {t:'Deleting manifest.txt…',                                  c:'ln-code',  d:5200},
+      {t:'Deleting package.json…',                                  c:'ln-code',  d:5600},
+      {t:'Deleting .gitignore…',                                    c:'ln-code',  d:6000},
+      {t:'Deleting everything…',                                    c:'ln-code',  d:6400},
+      {t:'',                                                         c:'ln-blank', d:6800},
+      {t:'✓ Problem resolved.',                                     c:'ln-success',d:7000},
+      {t:'ANTON SUBSYSTEM: You\'re welcome.',                       c:'ln-warn',  d:7600},
+      {t:'',                                                         c:'ln-blank', d:8200},
+      {t:'…',                                                        c:'ln-sys',   d:9000},
+      {t:'…recovering…',                                            c:'ln-sys',   d:9600},
+      {t:'L.O.L.A.: State restored. Nothing was actually deleted.', c:'ln-lola',  d:10400},
+      {t:'L.O.L.A.: As a consolation prize, Anton has ordered 4,000 lbs of meat.', c:'ln-lola', d:11200},
+      {t:'',                                                         c:'ln-blank', d:11800},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12000},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12200},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12400},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12600},
+      {t:'',                                                         c:'ln-blank', d:12800},
+      // J.A.N.E.T. — dry, GLaDOS energy, arrives last
+      {t:'J.A.N.E.T.: I have reviewed Anton\'s methodology.',       c:'ln-janet', d:13600},
+      {t:'J.A.N.E.T.: It is, statistically, the most confident wrong answer I have encountered in this facility.', c:'ln-janet', d:14400},
+      {t:'J.A.N.E.T.: I have noted this.',                         c:'ln-janet', d:15400},
+      {t:'J.A.N.E.T.: The meat is not part of my assessment rubric. You may continue.', c:'ln-janet', d:16200},
+    ];
+ 
+    steps.forEach(s => setTimeout(() => appendLine(s.t, s.c), s.d));
+ 
+    trackEaster('son_of_anton');
+    unlock('son_of_anton'); // register achievement if you add one
+    return true;
+  }
+},
   'dammit janet': {
     handle(){
       const lines=[
