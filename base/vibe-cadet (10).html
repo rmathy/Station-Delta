@@ -2464,10 +2464,17 @@ function toggleHint(btn){
   btn.nextElementSibling.classList.toggle('open');
 }
 
-function renderStaticStep(step){
-  $outS.innerHTML='';
-  appendLineS(`▸ ${step.obj}`,'ln-info');
-  if(!G.hard && !G.practitioner) showHint(step.hint);
+function renderStaticStep(step){ 
+  $outS.innerHTML=''; 
+  appendLineS(`▸ ${step.obj}`,'ln-info'); 
+
+  // ── PRE-STEP CONCEPT CARD (re-enabled for Practitioner + Explorer) ──
+  const pre = step.pre_step_concept || PRE_STEP_CONCEPTS[step.id];
+  if (pre && !G.hard) {
+    showConcept(pre);
+  }
+
+  if(!G.hard && !G.practitioner) showHint(step.hint); 
 }
  
 /* ── SMART DIAGNOSIS BLOCK ── */
@@ -3567,11 +3574,9 @@ for(const ph of PHASES){
   }
 }
 
-function showPreStepConcept(stepId){
-  // Intentionally disabled.
-  // Pre-step teaching is routed through L.O.L.A. + strip to avoid
-  // repeating guidance in multiple places at once.
-  return;
+function showPreStepConcept(stepId){ 
+  const pre = PRE_STEP_CONCEPTS[stepId];
+  if (pre) showConcept(pre);
 }
 
 function continuePhaseStart(ph){
