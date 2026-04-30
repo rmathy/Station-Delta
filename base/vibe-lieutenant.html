@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Station Delta: Lieutenant</title>
+<title>Vibe Lieutenant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -664,7 +664,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
   <!-- TOPBAR -->
   <div id="topbar">
-    <div id="logo">Station Delta: Lieutenant<span id="logo-sub">ACADEMY</span></div>
+    <div id="logo">Vibe Lieutenant<span id="logo-sub">ACADEMY</span></div>
     <div id="cadet-tag">Lieutenant: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -770,7 +770,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🎖️</div>
-    <div class="mtitle" style="color:var(--gold);font-size:19px">Station Delta: Lieutenant<span class="modal-sub-title">LIEUTENANT</span></div>
+    <div class="mtitle" style="color:var(--gold);font-size:19px">Vibe Lieutenant<span class="modal-sub-title">LIEUTENANT</span></div>
     <div class="msub">The senior-dev bridge in the series. You already know the terminal, Git, and how to ship. Now learn to <i>operate safely under pressure</i>: orient fast, make review calls, choose validation scope, govern AI-generated changes, and coordinate a crew through a production incident.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · AI-augmented development workflows<br>
@@ -816,11 +816,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🌟</div>
     <div class="mtitle" style="text-align:center;color:var(--gold)">Commission Complete</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
     <div class="grad-cert">
       <div class="grad-ct">Field Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Station Delta: Lieutenant · Class of 2026</div>
+      <div class="grad-sub">Vibe Lieutenant · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Codebase navigation — reading real project structures cold<br>
@@ -927,7 +927,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   Station Delta: Lieutenant v2.0
+   VIBE LIEUTENANT v2.0
    Sequel to Vibe Cadet Academy
    Phases: Codebase reading · Diff review · Stack traces ·
    TypeScript errors · API literacy · Testing · Incidents ·
@@ -1182,7 +1182,7 @@ const ACHS = [
   {id:'incident_cmd',  icon:'🚨', name:'Incident Commander',  desc:'Led a production incident response.'},
   {id:'ai_auditor',    icon:'🤖', name:'AI Auditor',          desc:'Caught an AI hallucination in a review.'},
   {id:'team_player',   icon:'👥', name:'Team Player',         desc:'Completed a full PR and deployment workflow.'},
-  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Station Delta: Lieutenant.'},
+  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Vibe Lieutenant.'},
   {id:'boss_slayer',   icon:'💀', name:'Boss Slayer',          desc:'Defeated the J.A.N.E.T. Final Assessment. She updated your file. Without enthusiasm.'},
   {id:'janet_ace',     icon:'🧊', name:'J.A.N.E.T. Ace',       desc:'Answered a J.A.N.E.T. quiz correctly on first try. She noted it. Professionally.'},
   {id:'quiz_ace',      icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on first try.'},
@@ -1988,7 +1988,7 @@ const EASTER = {
       trackEaster('sudo');unlock('hacker');return true;
     }
   },
-  'whoami':{handle(){appendLine('lt — Station Delta: Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
+  'whoami':{handle(){appendLine('lt — Vibe Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
   'neofetch':{handle(){appendLine('       lt@vibe-ship','ln-lola');appendLine('       ───────────────','ln-sys');appendLine('       OS: VibOS 2.0 (based on Ubuntu 24)','ln-sys');appendLine('       Shell: zsh + oh-my-zsh','ln-sys');appendLine('       Stack: Hono + Prisma + Bun + TypeScript','ln-sys');appendLine('       AI: L.O.L.A. v2.4 (Claude-powered)','ln-sys');appendLine('       Assessment: J.A.N.E.T. v?.? (origin unknown)','ln-sys');appendLine('       Mission: Escape Pod Ops · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
   'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship until Phase 9.','ln-janet');trackEaster('janet');return true;}},
   'git log':{handle(){appendLine('a3b4c5d fix: correct findUnique call and add null guard','ln-info');appendLine('d4e5f6a fix: reduce pod reservation timeout','ln-info');appendLine('9f8e7d6 feat: add party size to reservations','ln-info');appendLine('c3d2e1f feat: initial pod booking API','ln-info');trackEaster('gitlog');return true;}},
@@ -3022,7 +3022,7 @@ function bootTerminal(){
     {t:'L.O.L.A.: If you enter something recognizably wrong, I\'ll tell you why. Otherwise you\'re on your own.',c:'ln-lola'},
   ];
   const lines=[
-    {t:'Station Delta: Lieutenant v2.0 — FIELD OPERATIONS EDITION',c:'ln-success'},
+    {t:'VIBE LIEUTENANT v2.0 — FIELD OPERATIONS EDITION',c:'ln-success'},
     {t:'Booting mission OS…',c:'ln-sys'},
     {t:'Codebase analysis engine: READY',c:'ln-sys'},
     {t:'Diff review module: READY',c:'ln-sys'},
@@ -3108,9 +3108,577 @@ function resumeSession(){
 function doRestart(){openModal('restart-modal')}
 function confirmRestart(){closeModal('restart-modal');localStorage.removeItem(SAVE_KEY);location.reload()}
 function shareGrad(){
-  const txt=`Just completed Station Delta: Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
+  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');closeModal('grad-modal');
 }
+
+/* ── LIEUTENANT RESTRUCTURE OVERRIDES ── */
+const LT_SPACED_CALLBACKS = {
+  2:{q:'Rapid Triage recall: what command gives you the full directory listing, including hidden files?',answer:'ls -la',acceptFn:v=>v.includes('ls')&&v.includes('-la'),hint:'ls -__'},
+  3:{q:'Container recall: which command shows recent logs for a named container?',answer:'docker logs pod-monitor --tail 20',acceptFn:v=>v.includes('docker logs')&&v.includes('pod-monitor'),hint:'docker ____'},
+  4:{q:'Code Review recall: which git command shows the full patch for the latest commit?',answer:'git show HEAD',acceptFn:v=>v.includes('git show')&&v.includes('head'),hint:'git ____ HEAD'},
+  5:{q:'Stack Trace recall: what should you open after trace points at your own src/ frame?',answer:'the specific source file from the trace',acceptFn:v=>v.includes('src/')||v.includes('file')||v.includes('read'),hint:'Open the referenced ___ file'},
+  6:{q:'Audit recall: what flag keeps tsc from emitting build output during type checks?',answer:'--noEmit',acceptFn:v=>v.includes('noemit')||v.includes('noEmit'),hint:'tsc --___'},
+  7:{q:'Advanced Git recall: which command parks your local edits safely before a rebase?',answer:'git stash',acceptFn:v=>v.includes('git stash'),hint:'git ____'},
+  8:{q:'Secrets recall: which shell feature lets you assign command output directly into a variable?',answer:'command substitution',acceptFn:v=>v.includes('$(')||v.includes('command substitution'),hint:'export KEY=___'},
+  9:{q:'AI review recall: what Prisma method should replace the hallucinated findOne call?',answer:'findUnique',acceptFn:v=>v.includes('findunique'),hint:'find____'},
+};
+
+const LT_CHALLENGES = {
+  1:{
+    title:'Cold Repo Brief Challenge',
+    scenario:'You have 60 seconds to brief an incident lead on this service. Show the exact sequence you would use to inventory the repo, inspect the stack manifest, find the TypeScript surface area, and check recent history.',
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('ls -la')&&t.includes('cat package.json')&&t.includes('find . -name "*.ts"')&&t.includes('git log --oneline');
+    },
+    retryHint:'Inventory, manifest, scope, history.',
+    successMsg:'That is the Lieutenant triage loop: orient fast, map surface area, and establish timeline before anyone asks for an opinion.',
+    unlockMsg:'Challenge complete: executive repo brief under pressure.'
+  },
+  5:{
+    title:'Release Readiness Challenge',
+    scenario:'Mission control wants one chained sequence that proves code health, route intent, and API status before you approve the release. Type it.',
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('tsc --noemit')&&t.includes('read src/routes/pods.ts')&&t.includes('curl /api/health')&&t.includes('curl /api/pods');
+    },
+    retryHint:'Compiler, route, health, live payload.',
+    successMsg:'Correct. That is the kind of pre-merge evidence a release lead can actually trust.',
+    unlockMsg:'Challenge complete: release-readiness evidence chain.'
+  },
+  8:{
+    title:'AI Audit Challenge',
+    scenario:'You need to prove that the AI-reviewed change is safe before it merges. Show the command sequence that reads the diff, states the fix, validates the live API call path, and runs the tests.',
+    acceptFn:(v)=>{
+      const t=v.toLowerCase();
+      return t.includes('review diff')&&t.includes('fix findunique')&&t.includes('curl https://api.anthropic.com/v1/messages')&&t.includes('bun run test');
+    },
+    retryHint:'Review first, then fix, then live API, then tests.',
+    successMsg:'Exactly. Lieutenant-level AI review is evidence, not vibes.',
+    unlockMsg:'Challenge complete: AI merge gate under operational constraints.'
+  }
+};
+
+const LT_BREAKIT = {
+  2:{
+    title:'Broken Container Shell',
+    scenario:'A teammate tried:\n\ndocker exec -it rescue /bin/bash\n\nThe container answered: "exec: /bin/bash: no such file or directory". Fix it.',
+    diagnose:(v)=>v.includes('docker exec')&&v.includes('rescue')&&v.includes('/bin/sh'),
+    solution:'docker exec -it rescue /bin/sh',
+    explanation:'Small containers often ship only <code>/bin/sh</code>, not Bash. During incident work, choose the shell the image actually contains.',
+    retryHint:'Same command, different shell binary.'
+  },
+  7:{
+    title:'Broken Secret Rotation',
+    scenario:'A teammate wrote:\n\nexport API_KEY=curl -s https://station-delta.local/rotate | jq -r \'.new_key\'\n\nIt does not set the variable correctly. Fix it.',
+    diagnose:(v)=>{
+      const t=v.toLowerCase();
+      return t.startsWith('export api_key=$(')&&t.includes('curl -s')&&t.includes('| jq -r')&&t.includes('.new_key');
+    },
+    solution:'export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')',
+    explanation:'You need command substitution so the shell stores the command output, not the literal text of the command itself.',
+    retryHint:'Wrap the pipeline in $(...).'
+  }
+};
+
+const LT_LOLA_STRIP = {
+  0:[
+    {tag:'welcome',msg:'Lieutenant is about ownership: evidence first, decisions second, cleanup always.'},
+    {tag:'tip',msg:'You are not here to be fast in the abstract. You are here to be right under pressure.'}
+  ],
+  p1s1:[{tag:'triage',msg:'Start with full inventory. Hidden files and operational artifacts count.'}],
+  p1s2:[{tag:'manifest',msg:'<code>package.json</code> is the service brief: stack, scripts, and likely runtime expectations.'}],
+  p1s3:[{tag:'scope',msg:'Surface area first. <code>find . -name "*.ts"</code> tells you how wide the codebase really is.'}],
+  p1s4:[{tag:'history',msg:'Recent history is often the fastest path to likely blast radius.'}],
+  p2s1:[{tag:'container',msg:'Container state first. Do not guess which runtime is actually alive.'}],
+  p2s2:[{tag:'logs',msg:'Evidence before action. Logs tell you what kind of incident this is.'}],
+  p2s3:[{tag:'shell',msg:'Only drop into the container after you know why you are there.'}],
+  p3s1:[{tag:'diff',msg:'Diffs tell you what changed. Reviews decide whether that change is safe.'}],
+  p3s2:[{tag:'context',msg:'<code>git show HEAD</code> adds the commit message and metadata around the patch.'}],
+  p4s1:[{tag:'trace',msg:'The first useful frame is usually the first one from your own <code>src/</code> tree.'}],
+  p4s2:[{tag:'file',msg:'Open the exact file the trace named. Do not wander.'}],
+  p5s1:[{tag:'compiler',msg:'Type errors are release risk, not just syntax complaints.'}],
+  p5s2:[{tag:'route',msg:'Read the handler before you approve the handler.'}],
+  p5s3:[{tag:'health',msg:'Health checks tell you whether the service is alive. They do not prove feature correctness.'}],
+  p5s4:[{tag:'payload',msg:'Live payload shape decides client impact and rollback urgency.'}],
+  p6s1:[{tag:'stash',msg:'Preserve your local work before you rewrite history.'}],
+  p6s2:[{tag:'rebase',msg:'Fetch first, then rebase. Linear history is clarity under pressure.'}],
+  p6s3:[{tag:'cherry-pick',msg:'Cherry-pick is the precision tool when you need one good commit, not a whole branch.'}],
+  p6s4:[{tag:'bisect',msg:'Bisect turns a vague regression into a specific commit.'}],
+  p7s1:[{tag:'process',msg:'<code>ps aux</code> is system reality, not a dashboard summary.'}],
+  p7s2:[{tag:'signal',msg:'<code>kill -9</code> is force, not finesse. Use it intentionally.'}],
+  p7s3:[{tag:'env',msg:'Environment visibility prevents mystery config failures.'}],
+  p7s4:[{tag:'secret',msg:'Rotate secrets with command substitution so the shell stores the result.'}],
+  p8s1:[{tag:'ai',msg:'Review the AI diff like it is trying to fool you politely.'}],
+  p8s2:[{tag:'orm',msg:'Prisma wants <code>findUnique</code>, not a hallucinated cousin from another ORM.'}],
+  p8s3:[{tag:'api',msg:'The live API call path must be verifiable, not hand-waved.'}],
+  p8s4:[{tag:'tests',msg:'Tests are part of the merge decision, not a postscript.'}],
+  p9s1:[{tag:'incident',msg:'Logs establish timeline. Timeline drives the call.'}],
+  p9s2:[{tag:'rollback',msg:'Rollback restores service faster than debate does.'}],
+  p9s3:[{tag:'branch',msg:'Incident fixes still deserve branch hygiene and traceability.'}],
+  p9s4:[{tag:'commit',msg:'Clear commit messages are operational artifacts.'}],
+  p9s5:[{tag:'ship',msg:'Push the fix into review with enough context for a fast yes or no.'}]
+};
+
+const LT_PHASES = [
+  {title:'Rapid Triage',
+   lolaIntro:'Lieutenant starts where Engineer ended: you already know the tools. Now you use them to brief a room quickly, accurately, and without drift.',
+   steps:[
+    {id:'p1s1',obj:'Inventory the repo under pressure',ctx:'Run the full listing first so hidden files, env hints, and repo hygiene are visible immediately.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 88\ndrwxr-xr-x  10 lt   crew   4096 .\ndrwxr-xr-x   4 lt   crew   4096 ..\n-rw-r--r--   1 lt   crew    214 .env.example\n-rw-r--r--   1 lt   crew    138 .gitignore\n-rw-r--r--   1 lt   crew    612 package.json\ndrwxr-xr-x   7 lt   crew   4096 src\ndrwxr-xr-x   3 lt   crew   4096 tests\ndrwxr-xr-x   2 lt   crew   4096 docker',unlockCmd:'ls',bridge:{title:'This is the first 30 seconds of ownership',body:'A Lieutenant does not open random tabs. They inventory the environment, spot risk surfaces, and build a mental model before anyone else finishes describing the outage.',tags:['Triage','Incident leadership','Repo orientation']}},
+    {id:'p1s2',obj:'Read the service manifest',ctx:'Use the project manifest to understand runtime, scripts, and likely operational dependencies.',cmd:['cat package.json'],accept:['cat package.json'],hint:'Type: cat package.json',out:'{\n  "name": "escape-pod-api",\n  "runtime": "bun",\n  "scripts": {\n    "dev": "bun run src/index.ts",\n    "test": "vitest run",\n    "typecheck": "tsc --noEmit"\n  },\n  "dependencies": {\n    "hono": "^4.4.0",\n    "@prisma/client": "^5.14.0"\n  }\n}',unlockCmd:'cat'},
+    {id:'p1s3',obj:'Map the TypeScript surface area',ctx:'Get a fast sense of how wide the service is before you judge complexity or blast radius.',cmd:['find . -name "*.ts"'],accept:['find . -name "*.ts"'],hint:'Type: find . -name "*.ts"',out:'./src/index.ts\n./src/routes/pods.ts\n./src/routes/health.ts\n./src/middleware/auth.ts\n./src/db/client.ts\n./tests/pods.test.ts\n./tests/auth.test.ts',unlockCmd:'find'},
+    {id:'p1s4',obj:'Check recent commit history',ctx:'Review the recent timeline before you offer any theory about what changed.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',out:'f7c1a20 add AI-assisted pod capacity check\na1b2c3d reduce reservation timeout\n4e5f6a1 add container health logging',unlockCmd:'git log --oneline'}
+   ],
+   challenge:LT_CHALLENGES[1],
+   done:'Rapid triage complete. You can brief the room before the room starts freelancing theories.',
+   ach:'navigator'},
+
+  {title:'Container Debugging',
+   lolaIntro:'Now you inspect the deployed runtime, not just the source tree. The question is no longer "what does the code say?" It is "what is the container doing right now?"',
+   spacedRep:LT_SPACED_CALLBACKS[2],
+   steps:[
+    {id:'p2s1',obj:'Inspect running containers',ctx:'See what is actually alive before you touch logs or shells.',cmd:['docker ps'],accept:['docker ps'],hint:'Type: docker ps',out:'CONTAINER ID   IMAGE               STATUS          NAMES\n84ab21d1f0c2   pod-monitor:2.4.1   Up 19 minutes   pod-monitor\n7a91cc20f661   rescue:latest       Up 19 minutes   rescue',unlockCmd:'docker ps'},
+    {id:'p2s2',obj:'Read the recent container evidence',ctx:'Pull the last 20 log lines from pod-monitor so you can classify the failure mode.',cmd:['docker logs pod-monitor --tail 20'],acceptFn:v=>v.includes('docker logs')&&v.includes('pod-monitor')&&v.includes('--tail 20'),accept:['docker logs pod-monitor --tail 20'],hint:'Type: docker logs pod-monitor --tail 20',out:'[INFO] boot complete\n[WARN] reservation lookup slow: 812ms\n[ERR] prisma client initialization failed\n[ERR] DATABASE_URL missing in runtime env',unlockCmd:'docker logs'},
+    {id:'p2s3',obj:'Enter the rescue container shell',ctx:'Open a shell inside the rescue container so you can inspect the live environment.',cmd:['docker exec -it rescue /bin/sh'],acceptFn:v=>v.includes('docker exec')&&v.includes('rescue')&&v.includes('/bin/sh'),accept:['docker exec -it rescue /bin/sh'],hint:'Type: docker exec -it rescue /bin/sh',out:'/app # echo "inside rescue container"\ninside rescue container',unlockCmd:'docker exec'}
+   ],
+   breakit:LT_BREAKIT[2],
+   done:'Container debugging complete. You can move from source code assumptions to runtime facts.',
+   ach:'debugger'},
+
+  {title:'Code Review',
+   lolaIntro:'A Lieutenant does not read diffs for curiosity. They read them to decide whether code is safe to merge, revert, or block.',
+   spacedRep:LT_SPACED_CALLBACKS[3],
+   steps:[
+    {id:'p3s1',obj:'Inspect the latest patch directly',ctx:'Look at the last commit diff so you can judge the actual behavior change, not the ticket title.',cmd:['git diff HEAD~1'],accept:['git diff HEAD~1'],hint:'Type: git diff HEAD~1',out:'diff --git a/src/routes/pods.ts b/src/routes/pods.ts\n- const pod = await prisma.pods.findUnique({ where: { id: podId } })\n+ const pod = await prisma.pods.findOne({ where: { id: podId } })\n+ const timeoutMs = 60 * 1000; // 1 hour',unlockCmd:'git diff'},
+    {id:'p3s2',obj:'Show the full commit with metadata',ctx:'Review the commit message and patch together so you can decide whether the change belongs in main at all.',cmd:['git show HEAD'],accept:['git show HEAD'],hint:'Type: git show HEAD',out:'commit f7c1a20\nAuthor: AI Assistant\n\n    feat: improve pod capacity checks\n\ndiff --git a/src/routes/pods.ts b/src/routes/pods.ts\n@@ -12,7 +12,8 @@\n- const pod = await prisma.pods.findUnique({ where: { id: podId } })\n+ const pod = await prisma.pods.findOne({ where: { id: podId } })\n+ const timeoutMs = 60 * 1000; // 1 hour',unlockCmd:'git show'}
+   ],
+   done:'Code review complete. You are no longer scanning code; you are making merge decisions.',
+   ach:'historian'},
+
+  {title:'Stack Trace Triage',
+   lolaIntro:'Traces do not just tell you where the program crashed. They tell you where your attention should go next.',
+   spacedRep:LT_SPACED_CALLBACKS[4],
+   steps:[
+    {id:'p4s1',obj:'Trace the failure path',ctx:'Use the trace tool first so you know which frame is actually yours.',cmd:['trace'],accept:['trace'],hint:'Type: trace',out:'TypeError: Cannot read properties of undefined (reading "capacity")\n  at src/routes/pods.ts:18\n  at src/middleware/auth.ts:15\n  at node_modules/hono/router.js:284',unlockCmd:'trace'},
+    {id:'p4s2',obj:'Open the auth middleware file from the trace',ctx:'Read the file the trace named so you can inspect the missing guard in context.',cmd:['read src/middleware/auth.ts'],accept:['read src/middleware/auth.ts'],hint:'Type: read src/middleware/auth.ts',out:'// src/middleware/auth.ts\nexport async function authMiddleware(c,next){\n  const user = c.get("user")\n  if (!user.id) return c.json({ error: "Unauthorized" }, 401)\n  await next()\n}\n\n⚠ user may be undefined before user.id is read.',unlockCmd:'read'}
+   ],
+   done:'Stack trace triage complete. You can move from crash evidence to the exact file that deserves your time.',
+   ach:'ai_auditor'},
+
+  {title:'TypeScript & API Audit',
+   lolaIntro:'Now you decide whether the service is safe to release. That means compiler signal, route intent, and live endpoint behavior all have to agree.',
+   spacedRep:LT_SPACED_CALLBACKS[5],
+   steps:[
+    {id:'p5s1',obj:'Run the compiler in audit mode',ctx:'Type-check the project without emitting build artifacts so you can assess release risk safely.',cmd:['tsc --noEmit'],accept:['tsc --noEmit','tsc --noemit'],hint:'Type: tsc --noEmit',out:'src/routes/pods.ts:18:25 - error TS2339: Property \'findOne\' does not exist on type \'PrismaPodsDelegate\'',unlockCmd:'tsc'},
+    {id:'p5s2',obj:'Read the pods route implementation',ctx:'Open the route file so you can confirm whether the type error also represents a behavior risk.',cmd:['read src/routes/pods.ts'],accept:['read src/routes/pods.ts'],hint:'Type: read src/routes/pods.ts',out:'// src/routes/pods.ts\nconst pod = await prisma.pods.findOne({ where: { id: podId } })\nif (pod.capacity < seatsRequested) {\n  return c.json({ error: "No capacity" }, 409)\n}\n\n⚠ If pod is null or method is invalid, this route will fail before capacity logic runs.'},
+    {id:'p5s3',obj:'Check service health quickly',ctx:'Confirm whether the service is alive at all before you interpret deeper route failures.',cmd:['curl /api/health'],accept:['curl /api/health'],hint:'Type: curl /api/health',out:'{"status":"degraded","db":"disconnected","version":"2.4.1"}',unlockCmd:'curl'},
+    {id:'p5s4',obj:'Inspect the live pods payload',ctx:'Read the actual route response so you can connect code risk to client impact.',cmd:['curl /api/pods'],accept:['curl /api/pods'],hint:'Type: curl /api/pods',out:'{"error":"Internal Server Error","traceId":"pod-8842"}'}
+   ],
+   challenge:LT_CHALLENGES[5],
+   done:'TypeScript and API audit complete. You have enough evidence to approve, block, or roll back with reasons.',
+   ach:'packager'},
+
+  {title:'Advanced Git',
+   lolaIntro:'When the problem is history, you need more than add and commit. This phase is about surgical git moves made deliberately, not theatrically.',
+   spacedRep:LT_SPACED_CALLBACKS[6],
+   steps:[
+    {id:'p6s1',obj:'Safely park local edits',ctx:'Stash your current work so you can update your branch without trampling uncommitted changes.',cmd:['git stash'],accept:['git stash'],hint:'Type: git stash',out:'Saved working directory and index state WIP on main: triage notes',unlockCmd:'git stash'},
+    {id:'p6s2',obj:'Rebase onto the latest mainline',ctx:'Fetch origin and replay your work on top of the current main branch.',cmd:['git fetch origin && git rebase origin/main'],acceptFn:v=>v.includes('git fetch origin')&&v.includes('git rebase origin/main'),accept:['git fetch origin && git rebase origin/main'],hint:'Type: git fetch origin && git rebase origin/main',out:'Fetching origin...\nSuccessfully rebased and updated refs/heads/main.',unlockCmd:'git fetch'},
+    {id:'p6s3',obj:'Cherry-pick the one good fix',ctx:'Apply the exact known-good commit without bringing the rest of that branch with it.',cmd:['git cherry-pick a1b2c3d'],accept:['git cherry-pick a1b2c3d'],hint:'Type: git cherry-pick a1b2c3d',out:'[main 72dd911] fix: restore stable reservation timeout',unlockCmd:'git cherry-pick'},
+    {id:'p6s4',obj:'Start a bisect session',ctx:'Begin the binary search that will isolate the regression commit.',cmd:['git bisect start && git bisect bad && git bisect good v1.2.0'],acceptFn:v=>v.includes('git bisect start')&&v.includes('git bisect bad')&&v.includes('git bisect good v1.2.0'),accept:['git bisect start && git bisect bad && git bisect good v1.2.0'],hint:'Type: git bisect start && git bisect bad && git bisect good v1.2.0',out:'Bisecting: 7 revisions left to test after this.',unlockCmd:'git bisect'}
+   ],
+   done:'Advanced Git complete. You can now isolate, transplant, and reconcile history without making the room more nervous.',
+   ach:'git_mind'},
+
+  {title:'Process Management & Secrets',
+   lolaIntro:'Ownership includes the runtime itself. That means knowing which process is alive, when to kill it, and how to manage secrets without leaking them into history.',
+   spacedRep:LT_SPACED_CALLBACKS[7],
+   steps:[
+    {id:'p7s1',obj:'Inspect live processes',ctx:'List the active processes so you can confirm which service instance is actually consuming resources.',cmd:['ps aux'],accept:['ps aux'],hint:'Type: ps aux',out:'root      1  0.0  init\nlt     4242  8.8  hono-server --port 3000\nlt     4511  3.2  prisma-client',unlockCmd:'ps'},
+    {id:'p7s2',obj:'Kill the wedged process intentionally',ctx:'Terminate the hung service process by PID so the supervisor can restart it cleanly.',cmd:['kill -9 4242'],accept:['kill -9 4242'],hint:'Type: kill -9 4242',out:'Process 4242 terminated.\nSupervisor restarted hono-server with fresh env.',unlockCmd:'kill'},
+    {id:'p7s3',obj:'Inspect environment variables',ctx:'Read the current environment so you can confirm whether runtime config is missing or malformed.',cmd:['env','printenv'],accept:['env','printenv'],hint:'Type: env',out:'NODE_ENV=production\nPORT=3000\nDATABASE_URL=(missing)\nANTHROPIC_API_KEY=(missing)',unlockCmd:'env'},
+    {id:'p7s4',obj:'Rotate and export the API key inline',ctx:'Fetch the rotated key and store it in API_KEY in one command so the shell has the fresh credential immediately.',cmd:['export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')'],acceptFn:v=>v.startsWith('export api_key=$(')&&v.includes('curl -s https://station-delta.local/rotate')&&v.includes('| jq -r')&&v.includes('.new_key'),accept:['export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')'],hint:'Use export plus command substitution around the curl | jq pipeline.',out:'API_KEY exported for current shell.\nnew_key: sk-live-rotated-8842',unlockCmd:'export'}
+   ],
+   breakit:LT_BREAKIT[7],
+   done:'Process and secrets work complete. You can now stabilize the runtime without creating a second incident.',
+   ach:'crew_leader'},
+
+  {title:'AI Code Review & Live API',
+   lolaIntro:'This is where judgment becomes explicit. The AI gave you a patch. You decide whether it survives contact with real APIs, real ORMs, and real tests.',
+   spacedRep:LT_SPACED_CALLBACKS[8],
+   steps:[
+    {id:'p8s1',obj:'Review the AI-generated diff',ctx:'Read the proposed change before you bless it. You are the final gate, not the stenographer.',cmd:['review diff'],accept:['review diff'],hint:'Type: review diff',out:'AI Review Summary:\n- Replaced findUnique with findOne\n- Added timeoutMs = 60 * 1000 // 1 hour\n- No null guard for missing pod\n\n⚠ Multiple correctness and safety concerns found.',unlockCmd:'review'},
+    {id:'p8s2',obj:'State the exact fix the diff needs',ctx:'Call out the hallucinated ORM method and the missing guard so the patch cannot merge half-corrected.',cmd:['fix findUnique'],accept:['fix findUnique','fix prisma','fix hallucination'],acceptFn:v=>{const t=v.toLowerCase();return t.startsWith('fix')&&(t.includes('findunique')||t.includes('prisma')||t.includes('hallucination'));},hint:'Type: fix findUnique',out:'Required fix recorded:\n- Use prisma.pods.findUnique(...)\n- Add explicit 404/null guard before reading pod.capacity\n- Correct timeout comment or constant to match real duration',unlockCmd:'fix'},
+    {id:'p8s3',obj:'Verify the live Anthropic API call shape',ctx:'Use the rotated key in a real messages API request shape so you can validate headers, payload, and request construction.',cmd:['curl https://api.anthropic.com/v1/messages -H "x-api-key: $API_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" -d \'{"model":"claude-sonnet-4-5","max_tokens":128,"messages":[{"role":"user","content":"Summarize incident status"}]}\''],acceptFn:v=>{const t=v.toLowerCase();return t.startsWith('curl https://api.anthropic.com/v1/messages')&&t.includes('x-api-key: $api_key')&&t.includes('anthropic-version: 2023-06-01')&&t.includes('content-type: application/json')&&t.includes('"model":"claude-sonnet-4-5"');},accept:['curl https://api.anthropic.com/v1/messages'],hint:'Use curl against /v1/messages with x-api-key, anthropic-version, content-type, and a JSON body.',out:'{"id":"msg_lt_8842","type":"message","role":"assistant","content":[{"type":"text","text":"Incident status: degraded due to missing DATABASE_URL and invalid Prisma method."}]}'},
+    {id:'p8s4',obj:'Run the test suite before approving',ctx:'The patch still has to survive automated verification before it gets a yes.',cmd:['bun run test'],accept:['bun run test'],hint:'Type: bun run test',out:'✓ auth.test.ts (4)\n✓ pods.test.ts (6)\n\nTest Files  2 passed\nTests       10 passed',unlockCmd:'bun'}
+   ],
+   challenge:LT_CHALLENGES[8],
+   done:'AI code review complete. You validated the diff, the API shape, and the automated safety net before merge.',
+   ach:'ai_auditor'},
+
+  {title:'Incident Response & Ship',
+   lolaIntro:'Final phase before J.A.N.E.T. The job now is to restore service, document the fix path, and move the repair through the team workflow without cutting corners.',
+   spacedRep:LT_SPACED_CALLBACKS[9],
+   steps:[
+    {id:'p9s1',obj:'Read the production incident log',ctx:'Start with the incident timeline so you can confirm whether the deploy, env, and runtime evidence agree.',cmd:['cat logs/error.log'],accept:['cat logs/error.log'],hint:'Type: cat logs/error.log',out:'02:14:03 deploy started\n02:15:11 pod-monitor unhealthy\n02:15:14 ERROR PrismaClientInitializationError: DATABASE_URL missing\n02:15:19 ERROR pods route crashed on findOne\n02:15:25 alerts fired',unlockCmd:'cat logs'},
+    {id:'p9s2',obj:'Rollback the bad deployment',ctx:'Restore service first so the room gets breathing space before deeper cleanup.',cmd:['git revert HEAD','fix rollback'],accept:['git revert HEAD','fix rollback','git revert head'],acceptFn:v=>{const t=v.toLowerCase();return t.includes('git revert head')||t.includes('fix rollback');},hint:'Type: git revert HEAD',out:'[main 8c91dd2] Revert "feat: improve pod capacity checks"\n\nHealth checks after rollback:\nGET /api/health → 200 OK\nGET /api/pods   → 200 OK',unlockCmd:'git revert'},
+    {id:'p9s3',obj:'Open a fix branch for the real repair',ctx:'Even incident cleanups need a reviewable branch so the post-rollback repair stays auditable.',cmd:['git checkout -b fix/escape-pod-timeout'],accept:['git checkout -b fix/escape-pod-timeout'],hint:'Type: git checkout -b fix/escape-pod-timeout',out:'Switched to a new branch \'fix/escape-pod-timeout\'',unlockCmd:'git checkout -b'},
+    {id:'p9s4',obj:'Commit the repaired route cleanly',ctx:'Stage the route fix and create a reviewer-ready commit message that explains the operational change.',cmd:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"'],acceptFn:v=>{const t=v.toLowerCase();return t.includes('git add src/routes/pods.ts')&&t.includes('git commit -m')&&t.includes('fix: correct findunique call and add null guard');},accept:['git add src/routes/pods.ts && git commit -m "fix: correct findUnique call and add null guard"'],hint:'Use git add + git commit -m with the exact reviewer-ready message.',out:'[fix/escape-pod-timeout a3b4c5d] fix: correct findUnique call and add null guard',unlockCmd:'git commit'},
+    {id:'p9s5',obj:'Push the hotfix branch into review',ctx:'Push the branch so CI, reviewers, and release owners can make the final go/no-go call.',cmd:['git push origin fix/escape-pod-timeout'],accept:['git push origin fix/escape-pod-timeout'],hint:'Type: git push origin fix/escape-pod-timeout',out:'Branch pushed.\nPR #1043 opened.\nCI: typecheck + tests running.\nReviewer assigned: release-captain',unlockCmd:'git push',isFinalBeforeBoss:true}
+   ],
+   done:'Incident response and ship complete. You restored service, repaired the bug, and moved the change through a team-safe workflow.',
+   ach:'team_player'}
+];
+
+const LT_BOSS_STEPS = [
+  {
+    accept:['docker logs pod-monitor --tail 20'],
+    acceptFn:v=>v.includes('docker logs')&&v.includes('pod-monitor')&&v.includes('--tail 20'),
+    scenario:'J.A.N.E.T. has no patience for guesses. A fresh alert says pod-monitor is degraded again. She wants first-pass evidence from the live container before she hears any theory.',
+    prompt:'Read the recent pod-monitor container logs.',
+    hint:'Use docker logs against pod-monitor with a short tail.',
+    out:'[ERR] pod-monitor lost DATABASE_URL after redeploy\n[WARN] retry loop exhausted\n→ Runtime config issue reconfirmed.'
+  },
+  {
+    accept:['git show HEAD'],
+    acceptFn:v=>v.includes('git show')&&v.includes('head'),
+    scenario:'The runtime evidence points at the latest deploy. J.A.N.E.T. now wants the full patch and metadata for the change that just landed.',
+    prompt:'Show the latest commit in full.',
+    hint:'Use git show on HEAD.',
+    out:'commit f7c1a20\nAuthor: AI Assistant\n\nfeat: improve pod capacity checks\n\n- prisma.pods.findUnique(...)\n+ prisma.pods.findOne(...)\n+ timeoutMs = 60 * 1000 // 1 hour\n→ Diff confirms both ORM hallucination and timeout mismatch.'
+  },
+  {
+    accept:['read src/routes/pods.ts'],
+    acceptFn:v=>v.includes('read src/routes/pods.ts'),
+    scenario:'Patch evidence is not enough. J.A.N.E.T. wants you to confirm the exact code path that will crash when the pod lookup fails.',
+    prompt:'Open the pods route implementation.',
+    hint:'Read src/routes/pods.ts directly.',
+    out:'const pod = await prisma.pods.findOne({ where: { id: podId } })\nif (pod.capacity < seatsRequested) {\n  ...\n}\n→ The route can crash before it returns 404 because pod may be null and the method is invalid.'
+  },
+  {
+    accept:['export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')'],
+    acceptFn:v=>v.startsWith('export api_key=$(')&&v.includes('curl -s https://station-delta.local/rotate')&&v.includes('| jq -r')&&v.includes('.new_key'),
+    scenario:'During the incident review, J.A.N.E.T. discovers the prior API key was exposed in a build log. Service is stable, but the credential must be rotated immediately before the final remediation call.',
+    prompt:'Rotate and export the replacement API key inline.',
+    hint:'Use export plus command substitution around curl and jq.',
+    out:'API key rotated and loaded into shell.\nSecurity note attached to incident record.'
+  },
+  {
+    accept:['git push origin fix/escape-pod-timeout'],
+    acceptFn:v=>v.includes('git push origin fix/escape-pod-timeout'),
+    scenario:'Last step. Service is restored, the fix is documented, and the secret is rotated. J.A.N.E.T. wants the hotfix branch in review so the operational trail is complete.',
+    prompt:'Push the hotfix branch into review.',
+    hint:'Push the fix/escape-pod-timeout branch to origin.',
+    out:'Branch pushed.\nPR #1044 opened with rollback notes, fix summary, and secret-rotation follow-up.\nAll five final assessment steps complete.'
+  }
+];
+
+Object.keys(SPACED_CALLBACKS).forEach(k=>delete SPACED_CALLBACKS[k]);
+Object.assign(SPACED_CALLBACKS, LT_SPACED_CALLBACKS);
+Object.keys(CHALLENGES).forEach(k=>delete CHALLENGES[k]);
+Object.assign(CHALLENGES, LT_CHALLENGES);
+Object.keys(BREAKIT).forEach(k=>delete BREAKIT[k]);
+Object.assign(BREAKIT, LT_BREAKIT);
+Object.keys(LOLA_STRIP).forEach(k=>delete LOLA_STRIP[k]);
+Object.assign(LOLA_STRIP, LT_LOLA_STRIP);
+PHASES.splice(1, PHASES.length - 1, ...LT_PHASES);
+BOSS_STEPS.splice(0, BOSS_STEPS.length, ...LT_BOSS_STEPS);
+
+Object.keys(DIAGNOSE).forEach(k=>delete DIAGNOSE[k]);
+Object.assign(DIAGNOSE, {
+  p1s1:(v)=>{
+    if(v==='ls') return {msg:'<code>ls</code> is a partial view. You need the long listing with hidden files to spot env and repo artifacts.',next:'Try: ls -la'};
+    return null;
+  },
+  p1s2:(v)=>{
+    if(v==='cat') return {msg:'You need the manifest filename too. The goal is to read <code>package.json</code> directly.',next:'Try: cat package.json'};
+    return null;
+  },
+  p1s3:(v)=>{
+    if(v.includes('find')&&!v.includes('-name')) return {msg:'Add a filename pattern so <code>find</code> knows what surface you are mapping.',next:'Try: find . -name "*.ts"'};
+    return null;
+  },
+  p2s2:(v)=>{
+    if(v.includes('docker logs')&&!v.includes('--tail')) return {msg:'Keep the evidence tight. You want the recent log window, not the entire container history.',next:'Try: docker logs pod-monitor --tail 20'};
+    return null;
+  },
+  p2s3:(v)=>{
+    if(v.includes('/bin/bash')) return {msg:'This container image only ships <code>/bin/sh</code>. Choose the shell the image actually contains.',next:'Try: docker exec -it rescue /bin/sh'};
+    return null;
+  },
+  p3s1:(v)=>{
+    if(v.includes('git log')) return {msg:'History summary is useful, but this step needs the actual patch lines from the latest commit.',next:'Try: git diff HEAD~1'};
+    return null;
+  },
+  p3s2:(v)=>{
+    if(v.includes('git diff')) return {msg:'Close. This step wants the commit metadata and patch together, not just the diff body.',next:'Try: git show HEAD'};
+    return null;
+  },
+  p4s1:(v)=>{
+    if(v.startsWith('read ')||v.startsWith('cat ')) return {msg:'Trace first so you know which file deserves attention and why.',next:'Try: trace'};
+    return null;
+  },
+  p4s2:(v)=>{
+    if(v.startsWith('read ')&&!v.includes('auth.ts')) return {msg:'Open the exact file named by the trace. Do not wander into adjacent files yet.',next:'Try: read src/middleware/auth.ts'};
+    return null;
+  },
+  p5s1:(v)=>{
+    if(v==='tsc') return {msg:'Use audit mode so the compiler checks types without producing output files.',next:'Try: tsc --noEmit'};
+    return null;
+  },
+  p5s3:(v)=>{
+    if(v.startsWith('curl')&&!v.includes('/api/health')) return {msg:'Start with the health endpoint before you interpret deeper route failures.',next:'Try: curl /api/health'};
+    return null;
+  },
+  p6s2:(v)=>{
+    if(v.includes('git rebase')&&!v.includes('fetch')) return {msg:'Fetch origin first so you are rebasing against the actual latest remote state.',next:'Try: git fetch origin && git rebase origin/main'};
+    return null;
+  },
+  p6s4:(v)=>{
+    if(v.includes('git bisect start')&&!v.includes('good')) return {msg:'Bisect needs both a known bad state and a known good reference to begin the search.',next:'Try: git bisect start && git bisect bad && git bisect good v1.2.0'};
+    return null;
+  },
+  p7s4:(v)=>{
+    if(v.startsWith('export api_key=curl')) return {msg:'You are assigning literal command text. Wrap the pipeline in <code>$(...)</code> so the shell stores the output instead.',next:'Try: export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')'};
+    return null;
+  },
+  p8s2:(v)=>{
+    if(v.includes('findone')) return {msg:'You found the bad method. Now state the required fix using the correct Prisma API name.',next:'Try: fix findUnique'};
+    return null;
+  },
+  p8s3:(v)=>{
+    if(v.startsWith('curl')&&!v.includes('anthropic-version')) return {msg:'This live API shape needs the version header as well as the API key and JSON content type.',next:'Add: -H "anthropic-version: 2023-06-01"'};
+    return null;
+  },
+  p9s2:(v)=>{
+    if(v.includes('rollback')) return {msg:'Good instinct. Use the explicit git rollback path so the incident trail stays auditable.',next:'Try: git revert HEAD'};
+    return null;
+  },
+  p9s4:(v)=>{
+    if(v.includes('git commit')&&!v.includes('null guard')) return {msg:'The commit message should describe the operational fix clearly enough for a reviewer scanning incident work.',next:'Try the full reviewer-ready message in the objective card.'};
+    return null;
+  }
+});
+
+Object.keys(LOLA_RETRY_COACH).forEach(k=>delete LOLA_RETRY_COACH[k]);
+Object.assign(LOLA_RETRY_COACH, {
+  p1s1:['Use the full listing, not the short one.','Hidden files matter here too.','Think: long + all flags together.'],
+  p1s4:['You are checking recent history, not branch state.','Use the compact log view.','Think: git log --oneline.'],
+  p2s2:['Logs first, shell second.','You want the recent pod-monitor evidence window.','Use docker logs with --tail 20.'],
+  p3s1:['You need the patch, not the story around it.','Compare HEAD to the previous commit.','Use git diff HEAD~1.'],
+  p4s1:['Inspect the trace before opening files.','The stack trace tells you where to focus.','Use the trace command now.'],
+  p5s1:['Compiler signal comes before route theory.','Run TypeScript in check-only mode.','Use tsc --noEmit.'],
+  p6s2:['Update your base before replaying your work.','This is a fetch + rebase sequence.','Fetch origin, then rebase origin/main.'],
+  p7s4:['Store the command output, not the text of the command.','This needs command substitution.','Wrap the curl | jq pipeline in $(...).'],
+  p8s2:['Name the correct Prisma method explicitly.','The diff used the hallucinated method.','Say: fix findUnique.'],
+  p9s5:['Push the incident branch into review.','This is the final handoff into CI and approvals.','Use git push origin fix/escape-pod-timeout.']
+});
+
+CAREER_LOG_DATA.splice(0, CAREER_LOG_DATA.length,
+  {phase:'Phase 1 — Rapid Triage',stat:'< 60s',context:'Senior engineers are judged by how quickly they can orient without losing accuracy. Repo inventory, manifest reading, surface-area mapping, and commit history form the first operational brief.',tags:['Triage','Repo orientation','Incident leadership','Git']},
+  {phase:'Phase 2 — Container Debugging',stat:'Runtime truth',context:'Modern incidents often live inside containers, not just code. Knowing when to inspect state, logs, and an in-container shell keeps debugging grounded in reality.',tags:['Docker','Containers','Logs','Runtime']},
+  {phase:'Phase 3 — Code Review',stat:'Every merge',context:'The diff is where unsafe changes should die. Lieutenants read patches to decide whether behavior changed, whether intent is honest, and whether the code deserves review approval.',tags:['PR review','Diffs','Risk assessment','AI safety']},
+  {phase:'Phase 4 — Stack Trace Triage',stat:'Fastest path',context:'Following the trace to the first relevant application frame shortens incident time dramatically. It replaces random searching with disciplined attention.',tags:['Debugging','Stack traces','Node.js','Triage']},
+  {phase:'Phase 5 — TypeScript & API Audit',stat:'Release gate',context:'Compiler evidence, route intent, and live API responses all inform the same question: is this safe to release? Ownership means connecting those signals before you approve.',tags:['TypeScript','APIs','Release safety','Verification']},
+  {phase:'Phase 6 — Advanced Git',stat:'History surgery',context:'Rebase, cherry-pick, bisect, and stash are not prestige commands. They are the precision tools that let teams isolate regressions and move fixes safely under pressure.',tags:['Git','Rebase','Cherry-pick','Bisect']},
+  {phase:'Phase 7 — Process Management & Secrets',stat:'Operational hygiene',context:'Owning a service includes the process table and the config surface. Process control plus least-surprise secret handling prevents one incident from becoming two.',tags:['Processes','Secrets','Shell','Production']},
+  {phase:'Phase 8 — AI Code Review & Live API',stat:'High leverage',context:'AI-generated code can accelerate teams, but only when a human reviewer validates the diff, the library API correctness, and the live request shape before merge.',tags:['AI review','Anthropic API','Prisma','Testing']},
+  {phase:'Phase 9 — Incident Response & Ship',stat:'Leadership moment',context:'Rollback, repair, branch hygiene, and reviewer-ready commits turn incident work into a recoverable team process instead of a private act of heroism.',tags:['Incident response','Rollback','PR workflow','Team ops']}
+);
+
+GLOSSARY.splice(0, GLOSSARY.length,
+  {term:'Blast radius',def:'The scope of systems, users, or workflows a bad change can affect. Good triage narrows blast radius before it narrows root cause.'},
+  {term:'Container shell',def:'An interactive shell inside a running container, often <code>/bin/sh</code> on minimal images instead of Bash.'},
+  {term:'Cherry-pick',def:'A Git command that applies one specific commit onto your current branch without merging every change from the original branch.'},
+  {term:'Bisect',def:'Git’s binary-search workflow for isolating the exact commit that introduced a regression.'},
+  {term:'Command substitution',def:'Shell syntax <code>$(...)</code> that runs a command and inserts its output inline, commonly used for env var assignment.'},
+  {term:'Runtime config',def:'Configuration injected into a live process or container, usually through environment variables rather than hardcoded values.'},
+  {term:'Rollback',def:'A controlled return to a previous known-good version so service can recover before deeper repair work continues.'},
+  {term:'Operational evidence',def:'The combination of logs, traces, process state, compiler output, and API responses used to make a release or incident decision.'},
+  {term:'Prisma hallucination',def:'A common AI failure mode where code uses ORM methods that belong to another library, such as <code>findOne</code> instead of Prisma’s <code>findUnique</code>.'},
+  {term:'Release gate',def:'The point where a human decides whether the evidence is good enough for a change to move forward.'}
+);
+
+Object.assign(MAN, {
+  'docker': {synopsis:'docker [subcommand]',desc:'Inspect and operate containers',why:'Runtime evidence often lives in containers, not source files.',flags:[{f:'ps',d:'List running containers'},{f:'logs',d:'Read container output'},{f:'exec -it',d:'Open a shell inside a container'}],example:'$ docker ps\n$ docker logs pod-monitor --tail 20\n$ docker exec -it rescue /bin/sh'},
+  'ps': {synopsis:'ps [flags]',desc:'List running processes',why:'Confirms which services are actually alive and what PIDs they own.',flags:[{f:'aux',d:'Show all processes with useful details'}],example:'$ ps aux'},
+  'kill': {synopsis:'kill [signal] [pid]',desc:'Send a signal to a process',why:'Lets you terminate or restart wedged services intentionally.',flags:[{f:'-9',d:'Force kill the target process'}],example:'$ kill -9 4242'},
+  'env': {synopsis:'env',desc:'Print environment variables',why:'Shows runtime configuration directly from the shell.',flags:[],example:'$ env'},
+  'export': {synopsis:'export NAME=value',desc:'Set an environment variable',why:'Useful for temporary secrets and runtime config in your current shell session.',flags:[],example:'$ export API_KEY=$(curl -s https://station-delta.local/rotate | jq -r \'.new_key\')'},
+  'docker logs': {synopsis:'docker logs [name] --tail [n]',desc:'Read recent container logs',why:'This is often the fastest evidence source during incidents.',flags:[{f:'--tail',d:'Limit output to recent lines'}],example:'$ docker logs pod-monitor --tail 20'}
+});
+
+Object.assign(CMD_META, {
+  'docker ps': {label:'docker ps',desc:'List running containers'},
+  'docker logs': {label:'docker logs',desc:'Read recent container logs'},
+  'docker exec': {label:'docker exec',desc:'Open a shell inside a container'},
+  'git diff': {label:'git diff',desc:'Inspect a patch'},
+  'git show': {label:'git show',desc:'Show commit metadata + diff'},
+  'git stash': {label:'git stash',desc:'Park local edits safely'},
+  'git fetch': {label:'git fetch',desc:'Update remote refs'},
+  'git cherry-pick': {label:'git cherry-pick',desc:'Apply one specific commit'},
+  'git bisect': {label:'git bisect',desc:'Binary search for a regression commit'},
+  'ps': {label:'ps',desc:'Inspect running processes'},
+  'kill': {label:'kill',desc:'Terminate a process by PID'},
+  'env': {label:'env',desc:'Print environment variables'},
+  'export': {label:'export',desc:'Set a shell environment variable'},
+  'docker': {label:'docker',desc:'Container operations'}
+});
+
+Object.assign(EASTER, {
+  'sudo make me a sandwich': {
+    handle(){
+      const art=['','   🔥','  /   \\','  | 🍞 |','  | 🥩 |','  | 🧀 |','  | 🥬 |','  | 🍞 |','  \\___/','','  Sandwich deployed to /dev/mouth'];
+      art.forEach(l=>appendLine(l,'ln-easter'));
+      appendLine('L.O.L.A.: Command accepted. Culinary escalation noted.','ln-lola');
+      trackEaster('sandwich');
+      return true;
+    }
+  },
+  'dammit janet': {
+    handle(){
+      ['','Janet!..','Dr.Scott!..','Janet!..','Brad!..','ROCKY!',''].forEach((l,i)=>setTimeout(()=>appendLine(l,'ln-easter'),i*360));
+      setTimeout(()=>{
+        appendLine('J.A.N.E.T.: Reference understood. Humor remains unauthorized.','ln-janet');
+      },2600);
+      trackEaster('rocky_horror');
+      return true;
+    }
+  },
+  'printenv': {
+    handle(){
+      appendLine('NODE_ENV=production','ln-ok');
+      appendLine('PORT=3000','ln-ok');
+      appendLine('DATABASE_URL=(missing until repaired)','ln-warn');
+      appendLine('API_KEY='+(G.phase>=7?'sk-live-rotated-8842':'(not set yet)'),'ln-ok');
+      trackEaster('printenv');
+      return true;
+    }
+  },
+  'help': {
+    handle(){
+      appendLine('Available: ls, cat, find, git, docker, trace, read, curl, tsc, ps, kill, env, export, review, fix, bun','ln-info');
+      appendLine('Type  man  for the full reference. Type  man <command>  for details.','ln-info');
+      appendLine('Easter eggs still active: whoami, neofetch, git log, ps, date, uptime, printenv, sudo make me a sandwich, dammit janet','ln-info');
+      return true;
+    }
+  }
+});
+
+setLolaStrip = function(stepOrPhase){
+  const key = typeof stepOrPhase === 'object'
+    ? (stepOrPhase.id || 0)
+    : (typeof stepOrPhase === 'string'
+        ? stepOrPhase
+        : ((PHASES[G.phase] && PHASES[G.phase].steps && PHASES[G.phase].steps[G.step] && PHASES[G.phase].steps[G.step].id) || stepOrPhase));
+  const msgs = LOLA_STRIP[key] || LOLA_STRIP[stepOrPhase] || LOLA_STRIP[0] || [];
+  const inner = document.getElementById('lola-strip-inner');
+  if(!inner) return;
+  const normalizeStripTag=(tag)=>{
+    const t=String(tag||'tip').toLowerCase();
+    if(['tip','concept','new!','warning','habit','syntax','shortcut','command','triage','manifest','scope','history','container','logs','shell','diff','context','trace','file','compiler','health','payload','stash','rebase','cherry-pick','bisect','process','signal','env','secret','ai','orm','api','tests','incident','rollback','branch','commit','ship'].includes(t)) return t;
+    if(t.includes('welcome')) return 'new!';
+    return 'tip';
+  };
+  const activeMsgs = msgs.length === 1 ? [msgs[0], msgs[0], msgs[0], msgs[0]] : msgs;
+  const doubled = [...activeMsgs, ...activeMsgs];
+  inner.className = '';
+  inner.innerHTML = doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${normalizeStripTag(m.tag)}</span>${m.msg}</span><span class="lola-strip-sep">◆</span>`).join('');
+  const charCount = activeMsgs.reduce((sum,m)=>sum+String(m.msg||'').length,0);
+  inner.style.animationDuration = Math.max(26, Math.min(72, charCount * 0.28)) + 's';
+  void inner.offsetWidth;
+  inner.className='scrolling';
+  applyUIPreferences();
+};
+
+const _ltHandleCorrect = handleCorrect;
+handleCorrect = async function(s, ph){
+  await _ltHandleCorrect(s, ph);
+  if(!G.bossActive && !G.sandbox){
+    const activePhase = PHASES[G.phase];
+    const activeStep = activePhase && activePhase.steps ? activePhase.steps[G.step] : null;
+    if(activeStep) setLolaStrip(activeStep);
+  }
+};
+
+runFinalCommission = async function(){
+  blank();divline();
+  const janetFinal=document.createElement('div');
+  janetFinal.className='janet-arrival';
+  janetFinal.innerHTML=`
+    <div class="janet-scan"></div>
+    <div class="janet-header">
+      <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
+      <div class="janet-status">ASSESSMENT COMPLETE</div>
+    </div>
+    <div class="janet-intro">
+      You completed all five final assessment steps. Correctly.<br><br>
+      I observed container evidence collection, commit-level review, code-path confirmation, secret rotation, and reviewable deployment handoff. Those are ownership behaviors, not merely terminal behaviors.<br><br>
+      I do not give compliments. I classify outcomes. This one has been filed under <em>competent under pressure</em>.<br><br>
+      <em>You may proceed to your commission. Goodbye, Lieutenant.</em>
+    </div>
+  `;
+  $out.appendChild(janetFinal);$out.scrollTop=$out.scrollHeight;
+  await delay(1800);
+  blank();
+  appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
+  await delay(700);
+  appendLine('L.O.L.A.: Intelligence core restored.','ln-lola');
+  await delay(400);
+  appendLine(`L.O.L.A.: Lieutenant ${G.name}. You held the line. That counts.`,'ln-lola');
+  await delay(500);
+  document.getElementById('lola-avatar').style.background='linear-gradient(135deg,var(--gold),var(--amber))';
+  document.getElementById('lola-name').style.color='var(--gold)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--green);margin-left:auto';
+  document.getElementById('lola-online').textContent='online';
+  document.getElementById('lola-msg').style.color='var(--text)';
+  document.getElementById('lola-msg').textContent='Commission processing.';
+  const lstrip=document.getElementById('lola-strip');
+  if(lstrip){lstrip.style.background='';lstrip.style.borderBottomColor='';}
+  const lavatar=document.getElementById('lola-strip-avatar');
+  if(lavatar){lavatar.style.background='';lavatar.style.color='';lavatar.style.borderRightColor='';}
+  setLolaStrip(9);
+  blank();divline();
+  appendLine('PROCESSING FIELD COMMISSION…','ln-sys');
+  const steps=[
+    'Validating rapid triage discipline…',
+    'Container debugging: PASSED',
+    'Code review gate: PASSED',
+    'Stack trace triage: PASSED',
+    'TypeScript & API audit: PASSED',
+    'Advanced Git operations: PASSED',
+    'Process management & secrets: PASSED',
+    'AI code review & live API validation: PASSED',
+    'Incident response & ship: PASSED',
+    'Final assessment (J.A.N.E.T.): PASSED',
+    'Issuing field commission…'
+  ];
+  for(const s of steps){await delay(180);appendLine('  '+s,'ln-code')}
+  await delay(400);blank();
+  appendLine('🚀 LIVE: https://escape-pod-api-'+G.name.toLowerCase().replace(/\s+/g,'-')+'.vercel.app','ln-success');
+  blank();
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  appendLine('        FIELD COMMISSION GRANTED','ln-success');
+  appendLine(`  Lieutenant ${G.name} · Class of 2026`,'ln-success');
+  appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
+  blank();
+  unlock('boss_slayer');unlock('commissioned');
+  addCareerEntry(8);
+  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  document.getElementById('sandbox-pill').style.display='inline';
+  syncDots();save();
+  await delay(600);
+  document.getElementById('grad-name').textContent=G.name;
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  openModal('grad-modal');
+};
+
+shareGrad = function(){
+  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: triage a repo cold, debug live containers, review risky diffs, follow stack traces, audit TypeScript + API behavior, use advanced Git, manage runtime secrets, and lead an incident fix into review.\n\nAlso passed a final J.A.N.E.T. assessment without L.O.L.A. backup.\n\nFree hands-on training →`;
+  window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');
+  closeModal('grad-modal');
+};
 
 /* ── STARTUP ── */
 loadSave();
