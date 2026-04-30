@@ -346,6 +346,21 @@ section{position:relative;z-index:1}
 .bundle-cta{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;border:1px solid rgba(167,139,250,.3);border-radius:3px;color:var(--purple);background:rgba(167,139,250,.06);text-decoration:none;transition:all .15s;white-space:nowrap;}
 .bundle-cta:hover{background:rgba(167,139,250,.12);border-color:var(--purple)}
 
+/* FUTURE VALUE */
+.future-roadmap{margin-top:18px;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:linear-gradient(180deg,var(--surface),var(--s2))}
+.future-head{padding:18px 24px;border-bottom:1px solid var(--border)}
+.future-kicker{font-family:var(--janet);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
+.future-title{font-family:var(--display);font-size:28px;letter-spacing:.06em;color:var(--text-bright);margin-bottom:8px}
+.future-sub{font-family:var(--ui);font-size:14px;color:var(--muted2);line-height:1.7;max-width:760px}
+.future-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border)}
+.future-card{background:rgba(3,13,24,.75);padding:20px 18px}
+.future-label{font-family:var(--janet);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.future-card-title{font-family:var(--ui);font-size:16px;font-weight:700;color:var(--text-bright);margin-bottom:8px}
+.future-card-desc{font-family:var(--ui);font-size:13px;color:var(--muted2);line-height:1.7}
+.future-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.future-foot-note{font-family:var(--janet);font-size:10px;letter-spacing:.08em;color:var(--muted2);line-height:1.7}
+.future-foot-note strong{color:var(--text)}
+
 /* ═══ HOW IT WORKS ═══ */
 .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
 .how-step{background:var(--surface);padding:28px 24px;transition:background .15s}
@@ -408,32 +423,6 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
 }
 @media(max-width:520px){
   .tracks-grid{grid-template-columns:1fr}
-}
-  /* ── BIGGER J.A.N.E.T. QUIZ TEXT ── */
-.jq-q-prompt {
-  font-size: 26px !important;      /* was 20px */
-  line-height: 1.35;
-}
-
-.jq-intro,
-.jq-result {
-  font-size: 14px !important;      /* was 12px */
-  line-height: 1.85;
-}
-
-.jq-opt {
-  font-size: 16px !important;      /* was 14px */
-  line-height: 1.5;
-}
-
-/* Mobile adjustment (keeps it readable on phones) */
-@media (max-width: 760px) {
-  .jq-q-prompt {
-    font-size: 22px !important;
-  }
-  .jq-opt {
-    font-size: 15px !important;
-  }
 }
 </style>
 </head>
@@ -547,10 +536,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">Security · SRE · Platform · DevSecOps</div>
         <div class="track-desc">Keep systems secure, observable, and resilient. The most enterprise-relevant track for regulated industries — fintech, healthcare, regulated cloud.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Cadet + Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--red)"></div>Security Officer → Systems Integrity → Chaos Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Design secure, chaos-tested, fully observable systems and lead incident response.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -563,10 +552,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">DevOps · Platform eng · Backend · Full-stack</div>
         <div class="track-desc">Own the CI/CD pipeline, infrastructure, and the path from commit to production. The track engineering managers most frequently want their teams to complete.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Cadet + Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Deployment Officer → Comms Officer → Performance Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Ship reliably, debug production cold, and own a platform org. Most likely to unlock Fleet contracts.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -579,10 +568,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">AI engineers · ML platform · Applied AI · Founding engineers</div>
         <div class="track-desc">Build and operate AI-native products. The most differentiated track in the series — no competitor covers multi-agent coordination, guardrails, and cost governance at this depth.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Cadet + Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>VLieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--purple)"></div>Agent Architect → Systems Integrity → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Design, deploy, govern, and cost-manage multi-agent AI systems in production.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -595,10 +584,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">Data engineers · Analytics eng · ML infra · Backend with data ownership</div>
         <div class="track-desc">Own data pipelines, vector infrastructure, and the analytical layer. Increasingly relevant as every product becomes data-and-AI-driven. Includes FinOps for data teams watching burn.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Cadet + Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-paid-sm">Officer</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--amber)"></div>Data Officer → Performance Officer → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Own data quality, vector pipelines, query performance, and present ROI to leadership.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -622,7 +611,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- CADET -->
       <div class="sim-card free">
         <div class="sim-card-header">
-          <div class="sim-title">Cadet</div>
+          <div class="sim-title">Vibe Cadet</div>
           <div class="sim-rank-badge badge-free">● Free</div>
         </div>
         <p class="sim-desc">Your first mission: deploy an escape pod before oxygen runs out. Learn the terminal from scratch — navigation, files, Git, environment variables, AI agents, MCP, and your first production deployment.</p>
@@ -644,7 +633,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- VIBE ENGINEER -->
       <div class="sim-card free">
         <div class="sim-card-header">
-          <div class="sim-title">Engineer</div>
+          <div class="sim-title">Vibe Engineer</div>
           <div class="sim-rank-badge badge-free">● Free</div>
         </div>
         <p class="sim-desc">The second rung. Shell scripting, SSH, curl, jq, Docker, advanced Git, and .env — bridging Cadet to paid tier. Phase 4 includes a live Anthropic API call: real proof the training is real.</p>
@@ -666,7 +655,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- LIEUTENANT -->
       <div class="sim-card officer">
         <div class="sim-card-header">
-          <div class="sim-title">Lieutenant</div>
+          <div class="sim-title">Vibe Lieutenant</div>
           <div class="sim-rank-badge badge-officer">Officer</div>
         </div>
         <p class="sim-desc">You can deploy. Now prove you can operate. Read real codebases cold, review AI-generated diffs, debug stack traces, respond to production incidents, and catch what AI gets confidently wrong.</p>
@@ -886,7 +875,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- CAPTAIN -->
       <div class="sim-card captain">
         <div class="sim-card-header">
-          <div class="sim-title">Captain</div>
+          <div class="sim-title">Vibe Captain</div>
           <div class="sim-rank-badge badge-captain">Captain</div>
         </div>
         <p class="sim-desc">You commanded Lieutenant. Now you command the ship. Architecture decisions, scalability, observability, advanced AI orchestration, mentoring, stakeholder management, and technical strategy at staff level.</p>
@@ -1050,7 +1039,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div class="section-hd">
       <div class="section-eyebrow">Pricing</div>
       <div class="section-title">Start free. Scale when ready.</div>
-      <div class="section-sub">The first two simulations — Cadet and Engineer — are free forever. No credit card. No time limit. When you're ready for your career track, Officer unlocks all specialist sims.</div>
+      <div class="section-sub">The first two simulations — Vibe Cadet and Vibe Engineer — are free forever. No credit card. No time limit. When you're ready for your career track, Officer unlocks all specialist sims.</div>
     </div>
     <div class="pricing-grid">
 
@@ -1059,7 +1048,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="price-name">Recruit</div>
         <div class="price-amount">$0 <span>/ forever</span></div>
         <div class="price-annual" style="color:var(--muted2)">No account required · Runs in any browser</div>
-        <div class="price-sims"><strong>2 simulations included:</strong><br>Cadet · Engineer</div>
+        <div class="price-sims"><strong>2 simulations included:</strong><br>Vibe Cadet · Vibe Engineer</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All 9 phases per sim</li>
@@ -1085,6 +1074,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
           <li>Career track selection + structured path</li>
           <li>Cloud progress saves — any device</li>
           <li>Personal dashboard: scores + time-to-solution</li>
+          <li>Monthly mission drops + subscriber briefings</li>
           <li>Completion certificate per sim + track</li>
           <li>Shareable on LinkedIn</li>
           <li>Cancel anytime</li>
@@ -1097,14 +1087,15 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="price-name">Captain</div>
         <div class="price-amount">$39 <span>/ month</span></div>
         <div class="price-annual">Annual: $349/yr · save $119</div>
-        <div class="price-sims"><strong>All 13 simulations:</strong><br>Everything in Officer + Captain — staff-level engineering judgment + all 4 career tracks</div>
+        <div class="price-sims"><strong>All 13 simulations:</strong><br>Everything in Officer + Vibe Captain — staff-level engineering judgment + all 4 career tracks</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All Officer features</li>
-          <li>Captain sim — architecture &amp; leadership</li>
+          <li>Vibe Captain sim — architecture &amp; leadership</li>
           <li>All 4 career tracks — complete the full suite</li>
           <li>Expert mode leaderboard</li>
           <li>Full AI coaching reports</li>
+          <li>Captain's Table AMAs + priority roadmap voting</li>
           <li>Priority access to new sims</li>
         </ul>
         <a href="#waitlist" class="price-cta cta-amber waitlist-link" data-waitlist="Captain Access">Get Captain Access →</a>
@@ -1123,6 +1114,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
           <li>Career track assignment per team member</li>
           <li>CLI skill heat maps vs team benchmark</li>
           <li>Custom scenario editor (JSON, no eng needed)</li>
+          <li>Personalized team scenarios built from your worst-case incidents</li>
           <li>Slack + Jira completion notifications</li>
           <li>SSO + SCIM provisioning (coming soon)</li>
           <li>Volume discounts 20+ seats</li>
@@ -1139,11 +1131,50 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="bundle-label">New · One-time purchase</div>
         <div class="bundle-title">Career Track Bundle</div>
       </div>
-      <div class="bundle-desc">Pay once, own your chosen track forever — Lieutenant + 3 specialist sims + Captain. No subscription. For developers who know exactly what they want and prefer to own it outright.</div>
+      <div class="bundle-desc">Pay once, own your chosen track forever — Lieutenant + 3 specialist sims + Vibe Captain. Best for developers who want a fixed curriculum they can finish on their own timeline. Ongoing mission drops, member briefings, and future subscriber-only platform features stay with Officer and Captain.</div>
       <div>
         <div class="bundle-price">$149 <sub>one-time</sub></div>
       </div>
       <a href="#waitlist" class="bundle-cta waitlist-link" data-waitlist="Career Track Bundle">Choose your track →</a>
+    </div>
+
+    <div class="future-roadmap">
+      <div class="future-head">
+        <div class="future-kicker">Coming online</div>
+        <div class="future-title">Why members stay subscribed</div>
+        <div class="future-sub">Station Delta is being built as a living training platform, not a one-and-done course library. Subscribers keep getting new missions, better coaching, and a stronger operator network over time.</div>
+      </div>
+      <div class="future-grid">
+        <div class="future-card">
+          <div class="future-label">01 · Monthly Drops</div>
+          <div class="future-card-title">New missions tied to real AI-era failures</div>
+          <div class="future-card-desc">Subscriber-only simulation drops and major updates based on new tools, incidents, and production patterns so there is always a fresh commission waiting.</div>
+        </div>
+        <div class="future-card">
+          <div class="future-label">02 · Member Layer</div>
+          <div class="future-card-title">Captain's Table, private community, shared war stories</div>
+          <div class="future-card-desc">A paid member community for post-mortems, peer challenges, guest sessions, and the kind of operational knowledge people usually only get inside strong teams.</div>
+        </div>
+        <div class="future-card">
+          <div class="future-label">03 · Coaching Intel</div>
+          <div class="future-card-title">Personal dashboards and AI-guided skill maps</div>
+          <div class="future-card-desc">Expanded J.A.N.E.T. and L.O.L.A. reporting with weak-signal heat maps, time-to-solution benchmarks, next-sim recommendations, and career-facing proof of growth.</div>
+        </div>
+        <div class="future-card">
+          <div class="future-label">04 · Resource Vault</div>
+          <div class="future-card-title">Member briefings, scripts, templates, and field guides</div>
+          <div class="future-card-desc">A growing library of CLI cheat sheets, AI workflow templates, deep dives, and monthly member intel so value keeps compounding between simulations.</div>
+        </div>
+        <div class="future-card">
+          <div class="future-label">05 · Fleet Customization</div>
+          <div class="future-card-title">Your worst case becomes your best training</div>
+          <div class="future-card-desc">Fleet teams will be able to request personalized scenarios built around their own outages, tooling, and failure modes for role-specific readiness at team scale.</div>
+        </div>
+      </div>
+      <div class="future-foot">
+        <div class="future-foot-note"><strong>One-time bundle:</strong> own a track forever. <strong>Subscription:</strong> keep pace with new missions, coaching layers, community access, and platform updates.</div>
+        <a href="#waitlist" class="bundle-cta waitlist-link" data-waitlist="Subscriber Roadmap Updates">Get roadmap updates →</a>
+      </div>
     </div>
 
   </div>
@@ -1191,10 +1222,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div>
       <div class="footer-col-title">Simulations</div>
       <div class="footer-links">
-        <a href="base/vibe-cadet.html">Cadet — Free</a>
-        <a href="base/vibe-engineer.html">Engineer — Free</a>
+        <a href="base/vibe-cadet.html">Vibe Cadet — Free</a>
+        <a href="base/vibe-engineer.html">Vibe Engineer — Free</a>
         <a href="#pricing">Officer Suite</a>
-        <a href="#pricing">Captain</a>
+        <a href="#pricing">Vibe Captain</a>
         <a href="#pricing">Fleet / Teams</a>
       </div>
     </div>
