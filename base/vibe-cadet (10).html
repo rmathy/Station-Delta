@@ -777,7 +777,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">cadet@station-ship — <span id="path-display">~/projects</span></div>
+      <div id="term-path">cadet@vibe-ship — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
     <div id="action-rail">
@@ -809,7 +809,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
-      <span id="prompt-pre">cadet@station:~$&nbsp;</span>
+      <span id="prompt-pre">cadet@vibe:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
       <span id="input-hint"></span>
     </div>
@@ -979,7 +979,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="gloss-modal" class="modal">
   <div class="mbox">
     <div class="mtitle">📖 Glossary</div>
-    <div class="msub">Every term you'll encounter in the command coding world. Click any term to see its definition inline in the terminal.</div>
+    <div class="msub">Every term you'll encounter in the vibe coding world. Click any term to see its definition inline in the terminal.</div>
     <div id="gloss-list"></div>
     <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div>
   </div>
@@ -1041,8 +1041,8 @@ let G = {
   analytics:null,
 };
 
-const COURSE_ID='cadet';
-const CADET_SAVE_KEY='cadet_v1';
+const COURSE_ID='vibe-cadet-gold';
+const CADET_SAVE_KEY='vibe_cadet_gold_v1';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -1549,7 +1549,7 @@ const PHASES = [null,
  lolaIntro:"This phase is about self-sufficiency. You do not need to memorize every command. You do need to know how to find the answer without spiraling.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1', obj:'Open the manual for ls', ctx:'Name what this is: the command reference. It matters because manual reading turns confusion into a short lookup instead of a long detour. Open the manual <code>man</code> for <code>ls</code> now.',
+  {id:'p2s1', obj:'Open the manual for ls', ctx:'Name what this is: the command reference. It matters because manual reading turns confusion into a short lookup instead of a long detour. Open the manual for <code>ls</code> now.',
    cmd:['man ls'], accept:['man ls','ls --help'], hint:'Type: man ls', out:'NAME\n     ls — list directory contents\n\nSYNOPSIS\n     ls [options] [file ...]', unlockCmd:'man',
    teach:{title:'Manual pages',body:'A manual page tells you what a command does, how to call it, and which flags it understands. You do not need all of it at once. You need the habit of opening it.'},
    jit:{title:'How to read a man page without getting lost',body:'Jump straight to the <b>SYNOPSIS</b> section — it shows every valid flag in bracket notation. Use <code>/keyword</code> to search inside the page and <code>n</code> to jump to the next match. Press <code>q</code> to quit. For a faster summary, most modern commands also accept <code>--help</code>: try <code>ls --help</code>.'},
@@ -1614,7 +1614,7 @@ const PHASES = [null,
    teach:{title:'The repository begins here',body:'<code>git init</code> creates the hidden <code>.git/</code> directory. That directory holds the history and metadata Git needs.'},
    jit:{title:'What <code>.git/</code> really is',body:'The <code>.git/</code> folder stores commits, branches, and repository state. In practical terms, that hidden folder is the project history engine. If it disappears, the history disappears with it.'},
    bridge:{title:'Every serious codebase starts here',body:'GitHub, GitLab, and Bitbucket all sit on top of this same foundation. Whether you are joining a startup or reviewing an open-source fix, Git is the timeline everyone shares.',tags:['GitHub','Teams','Open source']}},
-  {id:'p4s2', obj:'Check repository status', ctx:'Ask Git what it currently sees by checking the status. It matters because status gives you the state before you save anything. Check it now.',
+  {id:'p4s2', obj:'Check repository status', ctx:'Ask Git what it currently sees. It matters because status gives you the state before you save anything. Check it now.',
    cmd:['git status'], accept:['git status','git status -s'], hint:'Type: git status', out:'On branch main\n\nUntracked files:\n  manifest.txt\n\nNothing added to commit yet',
    teach:{title:'Status before action',body:'<code>git status</code> tells you what is untracked, modified, or staged. It is the command that keeps the rest of Git honest.'},
    jit:{title:'What does "untracked" mean?',body:'Git sees <code>manifest.txt</code> exists in the folder but has not been told to track it yet. Think of Git as a photographer: <b>untracked</b> means the file is in the room but not in the photo. You have to explicitly add files with <code>git add</code>. Modified means it was in a previous photo but has changed since. Staged means it is queued for the next photo.'},
@@ -1841,7 +1841,7 @@ const EASTER = {
         '      ╚██████╔╝╚████╔╝ ██║██╔══██╗ ',
         '       ╚═════╝  ╚═══╝  ╚═╝╚═╝  ╚═╝',
         '',
-        '  Cadet_OS ELITE v4.0.0',
+        '  VIBE_OS ELITE v4.0.0',
         `  User: ${G.name}`,
         `  Path: ${G.learnerPath.toUpperCase()}`,
         `  Phase: ${G.phase}/9`,
@@ -1861,7 +1861,7 @@ const EASTER = {
     handle(){
       const log=[
         'commit a1b2c3d (HEAD -> main)',
-        'Author: '+G.name+' <cadet@station-ship>',
+        'Author: '+G.name+' <cadet@vibe-ship>',
         'Date:   '+new Date().toDateString(),
         '    Add mission manifest',
         '',
@@ -3344,7 +3344,8 @@ async function handleCorrect(s, ph, input){
   if (s.concept) showConcept(s.concept);
   if (s.jitAfter) showJIT(s.jitAfter);
   
-  if (s.bridge) showBridge(s.bridge);
+  // Skip bridge for step 0: continuePhaseStart already pre-showed it before the answer
+  if (s.bridge && G.step > 0) showBridge(s.bridge);
   if (s.unlockCmd) {
     const cmds = Array.isArray(s.unlockCmd) ? s.unlockCmd : [s.unlockCmd];
     cmds.forEach(c => unlockCmd(c));
@@ -3585,8 +3586,16 @@ function continuePhaseStart(ph){
   const s=ph.steps[0];
   markStepStart(s, ph);
   renderStaticStep(s);
-  if(s.jit && !G.hard) showJIT(s.jit);
-  if(s.bridge && !s.jitPreOnly && !G.hard) showBridge(s.bridge);
+  // JIT pre-answer cards belong in $outS (static zone) so they appear
+  // above the divider before the learner types anything
+  if(s.jit && !G.hard){
+    const w=document.createElement('div');
+    w.className='jit';
+    w.innerHTML=`<div class="jit-hd">⚡ Just-in-Time: ${s.jit.title}</div><div class="jit-bd">${s.jit.body}</div>`;
+    $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  }
+  // Bridge is pre-shown here for step 0 — handleCorrect must not repeat it
+  if(s.bridge && !G.hard) showBridge(s.bridge);
   setLola(lolaMessageForStep(s, ph, true));
   setLolaStrip(s);
   syncObjCard();
@@ -3743,7 +3752,7 @@ function handleSandbox(val){
     'echo $api_key':'sk-prod-abc123',
     'echo $API_KEY':'sk-prod-abc123',
     'git status':'On branch main\nYour branch is up to date.\nWorking tree clean.',
-    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@station-ship>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
+    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@vibe-ship>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
     'whoami':'certified-vibe-cadet',
     'cat manifest.txt':'Mission: Escape Pod',
     'cat logs.txt':'INFO: All systems nominal\nINFO: Escape pod deployed\nINFO: '+G.name+' has graduated',
