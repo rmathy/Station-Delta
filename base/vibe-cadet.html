@@ -614,6 +614,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── MODALS ── */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
 .modal.open{display:flex}
+ .modal.open {
+  pointer-events: none;   /* backdrop doesn't capture clicks */
+}
+.modal.open .mbox {
+  pointer-events: all;    /* content box captures clicks normally */
+}
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
