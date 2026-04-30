@@ -777,7 +777,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">cadet@vibe-ship — <span id="path-display">~/projects</span></div>
+      <div id="term-path">cadet@station — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
     <div id="action-rail">
@@ -1861,7 +1861,7 @@ const EASTER = {
     handle(){
       const log=[
         'commit a1b2c3d (HEAD -> main)',
-        'Author: '+G.name+' <cadet@vibe-ship>',
+        'Author: '+G.name+' <cadet@station>',
         'Date:   '+new Date().toDateString(),
         '    Add mission manifest',
         '',
@@ -3752,7 +3752,7 @@ function handleSandbox(val){
     'echo $api_key':'sk-prod-abc123',
     'echo $API_KEY':'sk-prod-abc123',
     'git status':'On branch main\nYour branch is up to date.\nWorking tree clean.',
-    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@vibe-ship>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
+    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@station>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
     'whoami':'certified-vibe-cadet',
     'cat manifest.txt':'Mission: Escape Pod',
     'cat logs.txt':'INFO: All systems nominal\nINFO: Escape pod deployed\nINFO: '+G.name+' has graduated',
