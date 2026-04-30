@@ -1549,7 +1549,7 @@ const PHASES = [null,
  lolaIntro:"This phase is about self-sufficiency. You do not need to memorize every command. You do need to know how to find the answer without spiraling.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1', obj:'Open the manual for ls', ctx:'Name what this is: the command reference. It matters because manual reading turns confusion into a short lookup instead of a long detour. Open the manual for <code>ls</code> now.',
+  {id:'p2s1', obj:'Open the manual for ls', ctx:'Name what this is: the command reference. It matters because manual reading turns confusion into a short lookup instead of a long detour. Open the manual <code>man</code> for <code>ls</code> now.',
    cmd:['man ls'], accept:['man ls','ls --help'], hint:'Type: man ls', out:'NAME\n     ls — list directory contents\n\nSYNOPSIS\n     ls [options] [file ...]', unlockCmd:'man',
    teach:{title:'Manual pages',body:'A manual page tells you what a command does, how to call it, and which flags it understands. You do not need all of it at once. You need the habit of opening it.'},
    jit:{title:'How to read a man page without getting lost',body:'Jump straight to the <b>SYNOPSIS</b> section — it shows every valid flag in bracket notation. Use <code>/keyword</code> to search inside the page and <code>n</code> to jump to the next match. Press <code>q</code> to quit. For a faster summary, most modern commands also accept <code>--help</code>: try <code>ls --help</code>.'},
