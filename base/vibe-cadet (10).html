@@ -3444,14 +3444,14 @@ async function completePhase(){
   blank();
  
   // Challenge (constructed response)
-  if(ph.challenge && !G.expert){
+  if(ph.challenge && G.expert){
     blank();
     await showChallenge(ph.challenge);
     blank();
   }
  
   // Break-it scenario
-  if(ph.breakit && !G.expert){
+  if(ph.breakit && G.expert){
     blank();
     await showBreakIt(ph.breakit);
     blank();
