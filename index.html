@@ -1529,7 +1529,7 @@ function submitWaitlist(event) {
   );
   statusEl.textContent = "Opening your email app to complete signup...";
   statusEl.style.color = "var(--green-m)";
-  window.location.href = `mailto:hello@stationdelta.dev?cc=richard@fccbrewery.com&subject=${subject}&body=${body}`;
+  window.location.href = `mailto:richard@fccbrewery.com&subject=${subject}&body=${body}`;
   setTimeout(closeWaitlistModal, 450);
 }
 
