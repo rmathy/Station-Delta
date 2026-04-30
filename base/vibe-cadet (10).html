@@ -3341,7 +3341,7 @@ async function handleCorrect(s, ph, input){
   if (s.teach) showTeach(s.teach);
   if (s.concept) showConcept(s.concept);
   if (s.jitAfter) showJIT(s.jitAfter);
-  else if (s.jit && !s.jitPreOnly) showJIT(s.jit);
+  
   if (s.bridge) showBridge(s.bridge);
   if (s.unlockCmd) {
     const cmds = Array.isArray(s.unlockCmd) ? s.unlockCmd : [s.unlockCmd];
