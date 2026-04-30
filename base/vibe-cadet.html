@@ -1032,6 +1032,7 @@ let G = {
   bossStep:0,
   bossScore:0,
   pendingPhaseStart:false,
+  phaseWrong:false,
   stripPaused:false,
   stripHidden:false,
   rightCollapsed:false,
@@ -1045,15 +1046,15 @@ const CADET_SAVE_KEY='vibe_cadet_gold_v1';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
-  {phase:'Phase 1 — Terminal Navigation',stat:'94%',context:'of professional developers use the terminal daily. pwd, ls, and cd are the three most-typed commands in software development. Every error message you ever read will contain a file path — you now know how to read them.',tags:['Linux','macOS','WSL','Docker','SSH']},
-  {phase:'Phase 2 — File Operations',stat:'~50×/day',context:'average number of file operations a dev performs via terminal. touch, echo, and cat are used in CI/CD pipelines, build scripts, and automation. The > redirect operator alone powers thousands of automated workflows.',tags:['CI/CD','Shell scripts','DevOps','Automation']},
-  {phase:'Phase 3 — Git',stat:'400M+',context:'Git commits pushed to GitHub every single day. 94% of professional developers use Git. The add → commit → push workflow you learned is used billions of times daily. Merge conflicts affect every team on every project.',tags:['GitHub','GitLab','Bitbucket','Open source','Career-critical']},
-  {phase:'Phase 4 — Package Management',stat:'2M+',context:'open-source packages in the npm registry — the largest software registry on earth. Every React, Next.js, and TypeScript project you\'ll ever work on uses a package manager. bun install is the first command you run after cloning any project.',tags:['npm','Bun','Node.js','React','Next.js']},
-  {phase:'Phase 5 — Pipes & Grep',stat:'Every',context:'DevOps script, CI pipeline, and server automation chains commands with pipes. kubectl get pods | grep Running, docker ps | grep myapp — you now understand how to read and write any shell one-liner. Log analysis skills are among the most valued on-call abilities.',tags:['DevOps','SRE','Kubernetes','Docker','On-call']},
-  {phase:'Phase 6 — AI Agents',stat:'$1.3T',context:'estimated value of AI-augmented software development by 2027. Understanding agent orchestration patterns puts you in a tiny minority of developers who can build with and on AI systems, not just use chat interfaces.',tags:['Claude Code','Devin','Cursor','AI engineering']},
-  {phase:'Phase 7 — MCP',stat:'Nov 2024',context:'MCP was open-sourced by Anthropic. Within 90 days it became the dominant standard for AI tool connectivity, adopted by GitHub, Slack, Postgres, and hundreds more. Developers who understand MCP have a significant advantage in the emerging AI tooling space.',tags:['Anthropic','Claude','Open standard','AI tooling']},
-  {phase:'Phase 8 — Prompt Engineering',stat:'10–100×',context:'quality difference between a vague prompt and a structured one. Format constraints are the single most underutilized technique. Every developer on an AI-augmented team writes prompts daily — the gap between good and bad prompting is the gap between 10 minutes and 2 hours of work.',tags:['LLMs','Claude','GPT-4','AI products']},
-  {phase:'Phase 9 — Ship to Production',stat:'Zero → Live',context:'You deployed a real application. Environment variables, production builds, Vercel — these are the exact steps used to ship every modern web app. You now know how to take something from nothing to accessible by anyone on earth.',tags:['Vercel','CI/CD','DevOps','Production']},
+  {phase:'Phase 1 — Where Are You?',stat:'94%',context:'of professional developers use the terminal daily. Location, listing, and navigation are still the first three moves before edits, installs, or deploys.',tags:['Linux','macOS','WSL','SSH']},
+  {phase:'Phase 2 — Reading the Manual',stat:'Self-serve',context:'The fastest juniors become independent by learning how to read built-in references instead of blocking on every unfamiliar flag.',tags:['man pages','PATH','CLI literacy']},
+  {phase:'Phase 3 — File Operations',stat:'~50×/day',context:'Developers create, read, copy, move, and delete files constantly. Calm file handling is one of the quiet skills teams notice fast.',tags:['Shell scripts','Automation','DevOps']},
+  {phase:'Phase 4 — Version Control',stat:'400M+',context:'Git commits pushed to GitHub every day. The add → commit loop and conflict recovery are baseline collaboration skills on modern teams.',tags:['GitHub','GitLab','Open source']},
+  {phase:'Phase 5 — Packages & Dependencies',stat:'2M+',context:'The npm ecosystem powers modern JavaScript projects. Package managers are how teams make projects reproducible across machines.',tags:['npm','Bun','Node.js','React']},
+  {phase:'Phase 6 — Reading & Filtering Output',stat:'Every on-call',context:'Log filtering and codebase search are operational survival skills. The ability to read, filter, count, and search quickly changes incident pace.',tags:['SRE','Logs','grep','On-call']},
+  {phase:'Phase 7 — Environment & Secrets',stat:'Every deploy',context:'A surprising number of production issues come down to missing or mis-scoped environment variables. Understanding session vs persistent config pays off immediately.',tags:['Secrets','Environment','Deployment']},
+  {phase:'Phase 8 — Build for Production',stat:'Artifact first',context:'A deploy is only as trustworthy as the artifact behind it. Strong teams build cleanly and inspect the output before they ship.',tags:['Builds','CI/CD','Production']},
+  {phase:'Phase 9 — Deploy & Verify',stat:'Zero → Live',context:'Shipping is not done when the platform says live. It is done when the live service responds and you verify it yourself.',tags:['Vercel','curl','DevOps','Production']},
 ];
  
 /* ── GLOSSARY DATA ── */
@@ -1089,15 +1090,21 @@ const MAN = {
   cat:{synopsis:'cat [file]',desc:'Concatenate / Read file',why:'Prints the full contents of a file to your terminal. For long files, prefer less.',flags:[{f:'-n',d:'Show line numbers'}],example:'$ cat README.txt\nWelcome to the project!\n$ cat logs.txt | grep ERROR'},
   touch:{synopsis:'touch [filename]',desc:'Create empty file (or update timestamp)',why:'Fastest way to create a blank file without opening an editor.',flags:[],example:'$ touch notes.txt\n$ ls\nnotes.txt  ← created!'},
   echo:{synopsis:'echo [text] [> file]',desc:'Print text or write to file',why:'Prints text to screen, or redirects it into a file with > (overwrite) or >> (append).',flags:[],example:'$ echo "hello"\nhello\n$ echo "hello" > file.txt   ← creates/overwrites\n$ echo "world" >> file.txt  ← appends'},
-  mkdir:{synopsis:'mkdir [dirname]',desc:'Make directory',why:'Creates a new folder. Use -p to create nested folders in one command.',flags:[{f:'-p',d:'Create parent directories as needed: mkdir -p a/b/c'}],example:'$ mkdir my-app\n$ mkdir -p src/components/ui'},
+  mkdir:{synopsis:'mkdir [dirname]',desc:'Make directory',why:'Creates a new folder. Use it when the filesystem is missing a place to put your work.',flags:[{f:'-p',d:'Create parent directories as needed: mkdir -p a/b/c'}],example:'$ mkdir mission_logs\n$ mkdir -p src/components/ui'},
+  cp:{synopsis:'cp [source] [destination]',desc:'Copy files or folders',why:'Makes a second copy before you edit, move, or test something risky. This is a professional safety habit.',flags:[{f:'-r',d:'Copy directories recursively'}],example:'$ cp manifest.txt manifest.bak\n$ cp -r src src-backup'},
+  mv:{synopsis:'mv [source] [destination]',desc:'Move or rename files',why:'Relocates a file or changes its name without opening an editor.',flags:[],example:'$ mv manifest.bak mission_logs/manifest.bak\n$ mv draft.txt final.txt'},
+  rm:{synopsis:'rm [file]',desc:'Remove file',why:'Deletes a file deliberately. Use it only when you are sure the target is correct.',flags:[{f:'-r',d:'Remove directories recursively'},{f:'-f',d:'Force removal without prompt'}],example:'$ rm manifest.bak\n$ rm old-notes.txt'},
+  which:{synopsis:'which [command]',desc:'Locate a command',why:'Shows where a command lives on your system, which helps demystify PATH and confirms whether a tool is installed.',flags:[],example:'$ which git\n/usr/bin/git\n$ which bun\n/home/cadet/.bun/bin/bun'},
   grep:{synopsis:'grep [pattern] [file]',desc:'Search text using patterns',why:'Filters output to lines matching a pattern. Combine with pipes to search command output.',flags:[{f:'-i',d:'Case-insensitive search'},{f:'-n',d:'Show line numbers'},{f:'-r',d:'Search recursively through directories'}],example:'$ grep ERROR logs.txt\n$ cat logs.txt | grep -i critical'},
   git:{synopsis:'git [subcommand]',desc:'Version control system',why:'Tracks every change to your code. Collaborate without overwriting each other.',flags:[],example:'$ git init        → start tracking\n$ git add .       → stage all\n$ git commit -m "message"\n$ git log --oneline'},
   bun:{synopsis:'bun [command]',desc:'JavaScript runtime + package manager',why:'Faster replacement for Node + npm. Reads package.json. Installs in milliseconds.',flags:[],example:'$ bun init        → create project\n$ bun add hono    → install package\n$ bun run dev     → start dev server\n$ bun run build   → production build'},
   wc:{synopsis:'wc [flags] [file]',desc:'Word / line / byte count',why:'Counts lines, words, or bytes in a file or from piped input. Used at the end of pipelines to count results.',flags:[{f:'-l',d:'Count lines (most common)'},{f:'-w',d:'Count words'},{f:'-c',d:'Count bytes/characters'}],example:'$ cat logs.txt | grep ERROR | wc -l\n3\n$ wc -l package.json\n24 package.json'},
   export:{synopsis:'export NAME=value',desc:'Set environment variable',why:'Stores a value in the shell environment. Use for API keys, config. Never hardcode secrets in source code.',flags:[],example:'$ export API_KEY="sk-abc123"\n$ echo $API_KEY\nsk-abc123\n$ printenv API_KEY\nsk-abc123'},
+  source:{synopsis:'source [file]',desc:'Reload shell file',why:'Runs a shell config file in your current terminal so new settings apply immediately.',flags:[],example:'$ source ~/.bashrc\n$ source ~/.zshrc'},
+  curl:{synopsis:'curl [url]',desc:'Make an HTTP request',why:'Checks whether a deployed service responds without opening a browser.',flags:[{f:'-I',d:'Fetch headers only'},{f:'-s',d:'Silent mode'}],example:'$ curl https://escape-pod-final.vercel.app/health\n{"status":"ok"}'},
   ps:{synopsis:'ps [flags]',desc:'Process status',why:'Lists all running programs and their Process IDs (PIDs). Essential for debugging.',flags:[{f:'aux',d:'Show all processes from all users with details'}],example:'$ ps\nPID  COMMAND\n1    kernel\n1337 rogue-agent ← suspicious!'},
   kill:{synopsis:'kill [PID]',desc:'Terminate a process',why:'Stops a running program using its PID number from ps.',flags:[{f:'-9',d:'Force-kill immediately, no cleanup'}],example:'$ ps\nPID 1337  rogue-agent\n$ kill 1337\nProcess terminated.'},
-  vibe:{synopsis:'vibe [subcommand]',desc:'AI orchestration CLI',why:'Custom command for managing AI agents, MCP connections, and deployments in this simulation.',flags:[],example:'$ vibe status\n$ vibe create --role manager --name Captain\n$ vibe deploy --platform vercel'},
+  vibe:{synopsis:'vibe [subcommand]',desc:'Deployment CLI',why:'Simulation command for shipping the project to production. In this Cadet course, you use it to deploy the final build.',flags:[],example:'$ vibe deploy --platform vercel'},
   man:{synopsis:'man [command]',desc:'Display manual page',why:'Shows detailed documentation for any command. Type just "man" to see all commands.',flags:[],example:'$ man git\n$ man grep\n$ man          → list all'},
 };
  /* ═══════════════════════════════════════════════════════════════
@@ -1105,144 +1112,168 @@ const MAN = {
    These fire BEFORE the learner types, giving context up front.
    ═══════════════════════════════════════════════════════════════ */
 const LOLA_STRIP = {
-  // ── Phase 1: Terminal Navigation ──
+  // ── Phase 1: Where Are You? ──
   p1s1: [
-    {tag:'tip',    msg:'The <code>$</code> at the left of the input is your shell prompt — it means "ready for a command." Click the box at the bottom and type.'},
-    {tag:'concept',msg:'Your computer stores files in a tree of folders. A <b>path</b> like <code>/home/cadet/projects</code> is the address of any file — slashes separate folders.'},
-    {tag:'command',msg:'<code>pwd</code> = Print Working Directory. It answers one question: "where am I right now?"'},
+    {tag:'concept',msg:'A <b>path</b> is a file or folder address. You are about to ask the terminal for your current address.'},
+    {tag:'command',msg:'<code>pwd</code> means Print Working Directory. It tells you exactly where you are before you do anything else.'},
+    {tag:'tip',msg:'When you feel lost, run <code>pwd</code> first. It is the fastest way to get your footing back.'},
   ],
   p1s2: [
-    {tag:'flags',  msg:'Flags modify commands. <code>ls</code> lists files. <code>ls -la</code> adds detail: <code>-l</code> = long format, <code>-a</code> = show hidden files too. You can chain short flags.'},
-    {tag:'tip',    msg:'Files starting with a dot like <code>.env</code> are hidden by default. <code>ls -a</code> reveals them. Your API keys often live in a hidden <code>.env</code> file.'},
-    {tag:'concept',msg:'<code>ls</code> alone works fine here — but <code>ls -la</code> gives you sizes, dates, permissions, and hidden files all at once. Most pros use it constantly.'},
+    {tag:'command',msg:'<code>ls</code> lists what is in the current directory. It answers: "what is around me?"'},
+    {tag:'syntax',msg:'<code>ls -la</code> is the fuller version: <code>-l</code> adds detail and <code>-a</code> includes hidden files.'},
+    {tag:'tip',msg:'A dot-file like <code>.env</code> is hidden by default. That matters later when you work with secrets.'},
   ],
   p1s3: [
-    {tag:'concept',msg:'<code>cd game_v1</code> is a relative path — "from where I am, go into game_v1." Absolute paths start with <code>/</code> and work from anywhere.'},
-    {tag:'tip',    msg:'Press <code>Tab</code> after typing a few letters to autocomplete folder names. It saves time and prevents typos.'},
-    {tag:'shortcut',msg:'<code>cd ..</code> goes up one level. <code>cd ~</code> jumps home instantly. <code>cd -</code> returns to wherever you just were.'},
+    {tag:'command',msg:'<code>cd</code> changes directories. You are moving from the outer folder into the project folder.'},
+    {tag:'concept',msg:'<code>cd game_v1</code> is a relative path. It means "from here, go into <code>game_v1</code>."' },
+    {tag:'shortcut',msg:'Use <code>Tab</code> to autocomplete folder names instead of typing the whole thing every time.'},
+  ],
+  p1s4: [
+    {tag:'new!',msg:'This is your first folder-creation step. <code>mkdir</code> means make directory.'},
+    {tag:'command',msg:'<code>mkdir mission_logs</code> creates a place to store files before you need them.'},
+    {tag:'habit',msg:'Good terminal work is not just moving around. It is also shaping the filesystem on purpose.'},
   ],
 
-  // ── Phase 2: File Operations ──
+  // ── Phase 2: Reading the Manual ──
   p2s1: [
-    {tag:'command',msg:'<code>touch filename</code> creates a blank file instantly — no editor needed. Perfect for scripting and automation.'},
-    {tag:'tip',    msg:'File extensions like <code>.txt</code> matter — include the full name: <code>touch manifest.txt</code> not just <code>manifest</code>.'},
+    {tag:'concept',msg:'You do not need to memorize every flag. You do need to know where to look.'},
+    {tag:'command',msg:'<code>man ls</code> opens the manual page for <code>ls</code>. <code>ls --help</code> is the quicker summary version.'},
+    {tag:'habit',msg:'When a command is unfamiliar, read its manual before guessing. That habit saves time.'},
   ],
   p2s2: [
-    {tag:'new!',   msg:'The <code>></code> symbol is a redirect operator. Without it, <code>echo "hi"</code> prints to screen. With it, <code>echo "hi" > file.txt</code> writes into the file instead.'},
-    {tag:'warning',msg:'<code>></code> overwrites. <code>>></code> appends. Using <code>></code> on an existing file erases its old content — choose carefully.'},
-    {tag:'tip',    msg:'The <code>></code> key is Shift+. on most keyboards (the "greater than" sign). It points toward the destination: output → file.'},
+    {tag:'command',msg:'<code>which</code> tells you where a command lives on the system.'},
+    {tag:'concept',msg:'If <code>which git</code> returns a path, the command exists and your shell knows where to find it.'},
+    {tag:'tip',msg:'This is a clean way to debug "command not found" confusion before you start changing anything.'},
   ],
   p2s3: [
-    {tag:'command',msg:'<code>cat filename</code> prints the whole file to your terminal. Short for "concatenate." For big files, use <code>less filename</code> to scroll (press <code>q</code> to quit).'},
+    {tag:'tip',msg:'Type a command to continue. Use <code>man</code> any time you want the reference in full.'},
   ],
 
-  // ── Phase 3: Git ──
+  // ── Phase 3: File Operations ──
   p3s1: [
-    {tag:'concept',msg:'Git is a version control system — infinite save states for your code. Every change is tracked with a message, author, and timestamp.'},
-    {tag:'new!',   msg:'<code>git init</code> is a one-time setup. It creates a hidden <code>.git/</code> folder that stores all history. You only run it once per project, at the start.'},
-    {tag:'warning',msg:'Never delete the <code>.git/</code> folder — that folder IS your entire project history. Deleting it means losing all your commits.'},
+    {tag:'command',msg:'<code>touch</code> creates an empty file without opening an editor.'},
+    {tag:'new!',msg:'You are creating <code>manifest.txt</code> on purpose so the next commands have something real to work with.'},
   ],
   p3s2: [
-    {tag:'habit',  msg:'Run <code>git status</code> constantly — before every add, commit, and push. Professional developers do this reflexively.'},
-    {tag:'concept',msg:'"Untracked" means Git sees the file exists but hasn\'t been told to track it yet. Like a photographer: the file is in the room but not in the photo.'},
+    {tag:'command',msg:'<code>echo</code> prints text. <code>></code> sends that output into a file.'},
+    {tag:'warning',msg:'A single <code>></code> overwrites the file. Use it deliberately.'},
+    {tag:'syntax',msg:'Pattern: <code>echo "text" > filename</code>.'},
   ],
   p3s3: [
-    {tag:'concept',msg:'Git uses a two-step process: <b>stage</b> then <b>commit</b>. <code>git add</code> is the staging step — it puts your changes in a "waiting room" before snapshotting.'},
-    {tag:'tip',    msg:'<code>git add .</code> stages everything in the current folder. <code>git add manifest.txt</code> stages just that one file. Use the specific form to control what goes in each commit.'},
+    {tag:'command',msg:'<code>cat</code> prints the file so you can verify what is actually inside it.'},
+    {tag:'habit',msg:'After you write a file, read it back. That one check catches a surprising number of mistakes.'},
   ],
   p3s4: [
-    {tag:'syntax', msg:'<code>git commit -m "message"</code> — the <code>-m</code> flag means "my message follows in quotes." Without <code>-m</code>, Git opens a text editor (confusing for beginners).'},
-    {tag:'habit',  msg:'Good commit messages: short, specific, imperative tense. "Add login form" ✓ — "stuff" ✗ — "fixed things" ✗. Your history is your professional record.'},
+    {tag:'habit',msg:'Copy a file before you edit or move something important. Backups are a behavior, not a panic move.'},
+    {tag:'command',msg:'<code>cp source destination</code> makes a second copy of the file.'},
   ],
   p3s5: [
-    {tag:'new!',   msg:'A merge conflict happens when two people edit the same line differently. Git marks it with <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> symbols in the file.'},
-    {tag:'concept',msg:'Above <code>=======</code> is YOUR version (HEAD). Below is the incoming change. You must manually choose which to keep, then delete all three marker lines.'},
-    {tag:'tip',    msg:'Start by reading the conflict: <code>cat manifest.txt</code> will show you the markers so you know what you\'re dealing with.'},
+    {tag:'command',msg:'<code>mv</code> moves or renames a file. Here you are moving the backup into <code>mission_logs/</code>.'},
+    {tag:'concept',msg:'The folder had to exist first. That is why you created it earlier instead of waiting until now.'},
   ],
   p3s6: [
-    {tag:'concept',msg:'In a real project you\'d open the file in an editor, delete the <code>&lt;&lt;&lt;</code> / <code>===</code> / <code>&gt;&gt;&gt;</code> markers, and keep what you want. Here we\'ll overwrite the file to simulate that.'},
-    {tag:'tip',    msg:'After fixing: <code>git add filename</code> marks it resolved, then <code>git commit</code> finalizes the merge. Git even pre-fills the commit message for you.'},
+    {tag:'warning',msg:'<code>rm</code> deletes the target immediately. You are removing one known file, not cleaning up blindly.'},
+    {tag:'habit',msg:'Read the filename twice before you press Enter. Calm deletion is safer than fast deletion.'},
   ],
 
-  // ── Phase 4: Package Management ──
+  // ── Phase 4: Git ──
   p4s1: [
-    {tag:'concept',msg:'<code>package.json</code> is your project\'s identity card — name, version, scripts, and all dependencies. Every JS/TS project on earth has one.'},
-    {tag:'tip',    msg:'The <code>-y</code> flag skips interactive prompts and accepts all defaults. Without it, Bun asks you questions. Add <code>-y</code> to go fast.'},
+    {tag:'new!',msg:'Git is your save system. This is where the project starts keeping history.'},
+    {tag:'command',msg:'<code>git init</code> creates the hidden <code>.git/</code> directory that stores that history.'},
   ],
   p4s2: [
-    {tag:'concept',msg:'<code>bun add hono</code> downloads Hono from the npm registry and adds it to <code>package.json</code>. The code lands in <code>node_modules/</code>.'},
-    {tag:'warning',msg:'NEVER commit <code>node_modules/</code> to Git — it can be gigabytes. Add it to <code>.gitignore</code>. Anyone can recreate it with <code>bun install</code>.'},
+    {tag:'habit',msg:'Run <code>git status</code> before you stage or commit. It tells you what Git thinks changed.'},
+    {tag:'concept',msg:'If a file is <b>untracked</b>, Git sees it but is not saving it yet.'},
   ],
   p4s3: [
-    {tag:'concept',msg:'<code>bun run dev</code> runs the <code>"dev"</code> script defined in <code>package.json</code>. That\'s where the name comes from — <code>scripts.dev</code> in your package file.'},
-    {tag:'tip',    msg:'The three universal scripts every project uses: <code>bun run dev</code> (local server), <code>bun run build</code> (production), <code>bun run test</code> (tests).'},
+    {tag:'command',msg:'<code>git add manifest.txt</code> moves one file into the staging area.'},
+    {tag:'habit',msg:'Stage only what you mean to save. That discipline keeps history readable later.'},
+  ],
+  p4s4: [
+    {tag:'syntax',msg:'<code>git commit -m "message"</code> saves the staged work with a human-readable message.'},
+    {tag:'habit',msg:'A good commit message says what changed, not how hard it felt.'},
+  ],
+  p4s5: [
+    {tag:'warning',msg:'Conflict markers mean Git could not decide for you. That is not a disaster. It is a reading task first.'},
+    {tag:'concept',msg:'Look at the file before fixing it. You need to see the conflict clearly before you choose the final content.'},
+  ],
+  p4s6: [
+    {tag:'habit',msg:'The conflict is not finished when the file looks right. It is finished when you stage and commit the resolution.'},
+    {tag:'tip',msg:'Stay calm and follow the loop: fix the file, <code>git add</code>, then <code>git commit</code>.'},
   ],
 
-  // ── Phase 5: Pipes & Grep ──
+  // ── Phase 5: Packages & Dependencies ──
   p5s1: [
-    {tag:'concept',msg:'Real log files have thousands of lines. Printing everything is noise. The pipe <code>|</code> lets you chain commands to filter down to what matters.'},
+    {tag:'command',msg:'<code>bun init -y</code> creates <code>package.json</code> with sensible defaults and no prompts.'},
+    {tag:'concept',msg:'<code>package.json</code> is the project manifest. It tells the runtime what this app is.'},
   ],
   p5s2: [
-    {tag:'new!',   msg:'The <code>|</code> pipe operator takes the output of the left command and feeds it as input to the right command. It\'s on your keyboard: Shift+\\ (above Enter on most keyboards).'},
-    {tag:'concept',msg:'<code>grep PATTERN</code> filters: only lines containing the pattern pass through. It stands for "global regular expression print." Case-sensitive by default.'},
-    {tag:'tip',    msg:'Add <code>-i</code> to grep for case-insensitive: <code>grep -i critical</code> matches CRITICAL, Critical, critical. Add <code>-n</code> to show line numbers.'},
+    {tag:'command',msg:'<code>bun add hono</code> installs a dependency and records it in <code>package.json</code>.'},
+    {tag:'warning',msg:'Dependencies belong in the manifest. Do not drag libraries in by hand and hope the next machine matches yours.'},
   ],
   p5s3: [
-    {tag:'command',msg:'<code>wc -l</code> counts lines. At the end of any pipeline it answers "how many results came through?" <code>wc</code> = word count, but <code>-l</code> makes it count lines.'},
-    {tag:'concept',msg:'Pipeline pattern: <code>cat file | grep PATTERN | wc -l</code>. Read → filter → count. This is used in every DevOps script and server automation on earth.'},
+    {tag:'command',msg:'<code>bun run dev</code> runs the local development script from <code>package.json</code>.'},
+    {tag:'habit',msg:'When a script name already exists in the manifest, run the script instead of reinventing the command.'},
   ],
 
-  // ── Phase 6: AI Agents ──
+  // ── Phase 6: Reading & Filtering Output ──
   p6s1: [
-    {tag:'concept',msg:'An AI agent is different from a chatbot: a chatbot <i>responds</i>, an agent <i>acts</i>. Agents have tools — functions that let them read files, run code, call APIs.'},
+    {tag:'command',msg:'Start with <code>cat logs.txt</code>. Read the raw log before you decide what to filter.'},
+    {tag:'habit',msg:'See the whole shape once. Filtering makes more sense after your eyes have met the data.'},
   ],
   p6s2: [
-    {tag:'syntax', msg:'Double-dash flags like <code>--role</code> and <code>--name</code> are named parameters. They can appear in any order and their meaning is always explicit. Pattern: <code>cmd --flag value</code>.'},
-    {tag:'concept',msg:'A manager agent takes a high-level goal, breaks it into sub-tasks, and delegates. Think of it as the "planner" in your AI crew.'},
+    {tag:'new!',msg:'The pipe <code>|</code> sends output from one command into the next one.'},
+    {tag:'command',msg:'<code>grep CRITICAL</code> filters for the lines that matter right now.'},
+    {tag:'tip',msg:'Think in sequence: read the file, then filter the stream.'},
   ],
   p6s3: [
-    {tag:'concept',msg:'Specialist agents have narrow focus — they do one thing well. Smaller context + clear role = better output than one giant general-purpose agent.'},
+    {tag:'command',msg:'<code>wc -l</code> counts lines. It answers "how many results made it through the pipeline?"'},
+    {tag:'concept',msg:'Read, filter, count. That pattern shows up constantly in log work.'},
+  ],
+  p6s4: [
+    {tag:'new!',msg:'<code>grep -rn</code> searches through files recursively and shows line numbers.'},
+    {tag:'command',msg:'This is how you stop opening files one by one when you need to find where a word appears in a codebase.'},
+    {tag:'habit',msg:'Search first. Open files second. That order saves time.'},
   ],
 
-  // ── Phase 7: MCP ──
+  // ── Phase 7: Environment & Secrets ──
   p7s1: [
-    {tag:'concept',msg:'MCP = Model Context Protocol. It\'s an open standard (by Anthropic, Nov 2024) that lets AI models connect to real tools — filesystems, databases, APIs — through a unified interface.'},
+    {tag:'command',msg:'<code>export API_KEY="..."</code> puts a value into the current shell environment.'},
+    {tag:'warning',msg:'Secrets belong outside source code. Put them in the environment, not in tracked files.'},
   ],
   p7s2: [
-    {tag:'concept',msg:'The filesystem MCP server gives your agent read/write access to your project files. This is how Claude Code can edit files without you copy-pasting anything.'},
+    {tag:'syntax',msg:'Use <code>$API_KEY</code> to read the variable back. Without the <code>$</code>, you would only print the name.'},
+    {tag:'habit',msg:'Verify the variable immediately after setting it so you do not debug a blank value later.'},
   ],
   p7s3: [
-    {tag:'new!',   msg:'Principle of least privilege: give every agent only the minimum permissions it needs. If it\'s compromised or makes a mistake, the damage stays contained.'},
-    {tag:'concept',msg:'Think of it like a new employee: you give them a badge for their floor, not a master key to every room. Same idea, different system.'},
+    {tag:'habit',msg:'If a variable disappears in a new terminal, it was never persisted.'},
+    {tag:'command',msg:'Appending an export line to <code>~/.bashrc</code> makes the setting available in future sessions.'},
+    {tag:'warning',msg:'<code>>></code> appends. That matters here because you want to add one line, not erase the file.'},
+  ],
+  p7s4: [
+    {tag:'command',msg:'<code>source ~/.bashrc</code> reloads the config in your current terminal.'},
+    {tag:'tip',msg:'That saves you from closing the shell just to pick up one new setting.'},
   ],
 
-  // ── Phase 8: Prompt Engineering ──
+  // ── Phase 8: Build ──
   p8s1: [
-    {tag:'concept',msg:'The best prompts have four parts: <b>Role</b> (who the AI is), <b>Task</b> (what to do), <b>Context</b> (background), <b>Format</b> (how to respond).'},
+    {tag:'command',msg:'<code>bun run build</code> creates the production bundle users will actually receive.'},
+    {tag:'concept',msg:'Dev mode is for building. Build mode is for shipping.'},
   ],
   p8s2: [
-    {tag:'tip',    msg:'Format constraints are the single most underutilized prompting technique. "Answer in 3 bullet points, max one sentence each" produces something immediately usable.'},
-  ],
-  p8s3: [
-    {tag:'tip',    msg:'Remember pipes from Phase 5? Same concept here — the output of one <code>prompt</code> command becomes the input of the next. Unix philosophy applied to AI.'},
-    {tag:'concept',msg:'Prompt chaining: each AI call gets focused attention on a smaller task. Break complex goals into a chain of simple, verifiable steps.'},
+    {tag:'command',msg:'Inspect the build output after it exists. A build is more trustworthy when you verify what it produced.'},
+    {tag:'habit',msg:'Do not treat "build complete" as magic. Look at the output folder.'},
   ],
 
-  // ── Phase 9: Ship ──
+  // ── Phase 9: Deploy & Verify ──
   p9s1: [
-    {tag:'concept',msg:'Dev build = unminified, with debugging info — for you. Production build = minified, tree-shaken, optimized — for your users. Never deploy a dev server.'},
+    {tag:'command',msg:'<code>vibe deploy --platform vercel</code> sends the built app live.'},
+    {tag:'habit',msg:'Deploy after the build and secret checks are already clean, not before.'},
   ],
   p9s2: [
-    {tag:'new!',   msg:'<code>export NAME=value</code> stores a value in your shell\'s environment for this session. Any program you launch can then read it.'},
-    {tag:'syntax', msg:'Quotes around the value: <code>export API_KEY="sk-abc123"</code>. Required if the value has spaces. Optional for simple strings — but always include them as a habit.'},
-    {tag:'warning',msg:'NEVER hardcode API keys in source code. They end up in Git and get exposed. In 2023, a leaked AWS key generated $50K in cloud bills within minutes of being pushed.'},
-  ],
-  p9s3: [
-    {tag:'new!',   msg:'The <code>$</code> prefix reads a variable\'s value. <code>echo $API_KEY</code> prints the value. Without <code>$</code>, you\'d just see the literal text "API_KEY".'},
-    {tag:'tip',    msg:'<code>echo $VARNAME</code> verifies it\'s set. Empty output = not set. This is the first thing to check when an app crashes with "undefined key" in production.'},
-  ],
-  p9s4: [
-    {tag:'concept',msg:'Deploying to Vercel: it runs your build command, uploads the <code>dist/</code> folder to 18 global CDN regions, sets up SSL, and gives you a live URL — all automatically.'},
+    {tag:'command',msg:'<code>curl</code> lets you verify the deployment from the terminal.'},
+    {tag:'concept',msg:'A live URL is not the same as a healthy service. Verification is the final step.'},
+    {tag:'tip',msg:'One clean request can tell you whether the deploy actually responded.'},
   ],
 };
 
@@ -1295,14 +1326,14 @@ function setLolaStrip(stepOrId){
 const ACHS = [
   {id:'first_cmd',   icon:'⚡', name:'First Command',      desc:'Typed your first command in the terminal.'},
   {id:'navigator',   icon:'🧭', name:'Navigator',          desc:'Completed Phase 1 — basic terminal movement.'},
-  {id:'file_master', icon:'📄', name:'File Master',        desc:'Completed Phase 2 — file operations.'},
+  {id:'file_master', icon:'📄', name:'File Master',        desc:'Completed the file-operations phase.'},
   {id:'git_mind',    icon:'⏳', name:'Git Mind',            desc:'Initialized your first Git repository.'},
   {id:'committed',   icon:'💾', name:'Committed',           desc:'Made your first proper Git commit.'},
   {id:'packager',    icon:'📦', name:'Packager',            desc:'Completed package management training.'},
   {id:'pipe_dream',  icon:'|',  name:'Pipe Dream',          desc:'Used the pipe operator correctly.'},
-  {id:'orchestrator',icon:'🤖', name:'Orchestrator',        desc:'Created your first AI crew member.'},
-  {id:'crew_leader', icon:'👥', name:'Crew Leader',         desc:'Assembled a two-agent crew.'},
-  {id:'prompter',    icon:'💬', name:'Prompt Crafter',      desc:'Sent your first structured agent prompt.'},
+  {id:'orchestrator',icon:'🤖', name:'Orchestrator',        desc:'Completed a command challenge without relying on the reveal.'},
+  {id:'crew_leader', icon:'👥', name:'Crew Leader',         desc:'Completed the environment and persistence phase.'},
+  {id:'prompter',    icon:'💬', name:'Build Keeper',        desc:'Built and verified the production artifact.'},
   {id:'shipper',     icon:'🚀', name:'Shipper',             desc:'Deployed your first app to production.'},
   {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Station Delta: Cadet.'},
   {id:'senior_cadet',icon:'⭐', name:'Senior Cadet',        desc:'Completed the post-graduation capstone.'},
@@ -1325,124 +1356,87 @@ const ACHS = [
    SMART WRONG-ANSWER DIAGNOSIS ENGINE
    ═══════════════════════════════════════════════════════════════ */
 const DIAGNOSE = {
-  // Phase 1
   'p1s1': (v)=>{
-    if(v==='pwd ') return {msg:'Almost! You have a trailing space. Try just <code>pwd</code> with no space after it.',next:'Try: pwd'};
-    if(v.includes('cd')) return {msg:'<code>cd</code> changes where you are — but <code>pwd</code> <b>prints</b> where you are. You want to <b>print</b> your location right now.',next:'Try: pwd'};
-    if(v.includes('ls')) return {msg:'<code>ls</code> lists files in your directory, but the objective is to <b>print your current path</b>. Think: Print Working Directory.',next:'Try: pwd'};
-    if(v.includes('dir')) return {msg:'<code>dir</code> works on Windows CMD. On Linux/Mac/WSL, the equivalent is <code>pwd</code>.',next:'Try: pwd'};
+    if(v.includes('ls')) return {msg:'You tried to inspect the directory first. Sensible. But this step is about locating yourself, not listing files.',next:'Try: pwd'};
+    if(v.includes('cd')) return {msg:'You are trying to move before you know where you are. Get the location first.',next:'Try: pwd'};
     return null;
   },
-  'p1s2': (v)=>{
-    if(v==='l') return {msg:'Close — but <code>l</code> isn\'t a command. Did you mean <code>ls</code>? (lowercase L, lowercase S)',next:'Try: ls'};
-    if(v==='la'||v==='l-a') return {msg:'Almost! Flags need a dash before them. <code>la</code> is not a command — <code>ls -la</code> is.',next:'Try: ls -la'};
-    if(v.startsWith('ls') && v.includes('al')) return {msg:'Flag order matters slightly: use <code>ls -la</code> or <code>ls -al</code> — both work. Check your spacing.',next:'Try: ls -la'};
+  'p1s4': (v)=>{
+    if(v.startsWith('touch mission_logs')) return {msg:'You created a file, not a folder. This step needs a new directory.',next:'Try: mkdir mission_logs'};
+    if(v==='mkdir') return {msg:'You have the command, but not the destination. Name the directory you want to create.',next:'Try: mkdir mission_logs'};
     return null;
   },
-  'p1s3': (v)=>{
-    if(v==='cd') return {msg:'You typed <code>cd</code> with no destination. <code>cd</code> needs a directory name after it. Where do you want to go?',next:'Try: cd game_v1'};
-    if(v.includes('cd') && v.includes('game') && v.includes('/') && v.startsWith('/')) return {msg:'That looks like an absolute path. Try a relative path — just the folder name: <code>cd game_v1</code>',next:'Try: cd game_v1'};
-    if(v==='open game_v1'||v==='go game_v1') return {msg:'That\'s not a Unix command. In the terminal, you navigate into folders with <code>cd</code> (change directory).',next:'Try: cd game_v1'};
-    return null;
-  },
-  // Phase 2
   'p2s1': (v)=>{
-    if(v.startsWith('touch') && !v.includes('.txt')) return {msg:'<code>touch</code> needs the full filename including extension. You need to create <code>manifest.txt</code> — don\'t forget the <code>.txt</code>',next:'Try: touch manifest.txt'};
-    if(v==='create manifest.txt'||v==='new manifest.txt'||v==='mk manifest.txt') return {msg:'In Unix, files aren\'t created with <code>create</code> or <code>new</code>. The command is <code>touch</code>.',next:'Try: touch manifest.txt'};
-    if(v.startsWith('nano')||v.startsWith('vim')||v.startsWith('code')) return {msg:'That would open an editor — valid approach, but this step wants you to use <code>touch</code> to create the file without opening it.',next:'Try: touch manifest.txt'};
+    if(v==='man') return {msg:'Good instinct. Now aim the manual at the command you want to study.',next:'Try: man ls'};
+    if(v.startsWith('help')) return {msg:'You are looking for documentation, which is exactly right. In the terminal, the manual command is <code>man</code>.',next:'Try: man ls'};
     return null;
   },
   'p2s2': (v)=>{
-    if(v.startsWith('echo') && !v.includes('>')) return {msg:'You\'re using <code>echo</code> but without redirection. Without <code>></code>, it just prints to screen — it won\'t save to the file. Add <code>> manifest.txt</code> after your text.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
-    if(v.startsWith('write')||v.startsWith('save')||v.startsWith('print')) return {msg:'That\'s not a Unix command. To write text to a file, use <code>echo</code> with the <code>></code> redirect operator.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
-    if(v.includes('>>')) return {msg:'<code>>></code> appends to the end — but this is an empty file, so for now use a single <code>></code>. Both work here, but learn the difference: <code>></code> overwrites, <code>>></code> appends.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
-    if(v.startsWith('echo') && v.includes('>') && !v.includes('manifest')) return {msg:'You have <code>echo</code> and <code>></code> — great! But the destination file should be <code>manifest.txt</code>.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
-    return null;
-  },
-  'p2s3': (v)=>{
-    if(v==='open manifest.txt'||v==='read manifest.txt'||v==='show manifest.txt') return {msg:'In Unix, you print file contents with <code>cat</code> (concatenate). Not <code>open</code> or <code>read</code>.',next:'Try: cat manifest.txt'};
-    if(v.startsWith('cat') && !v.includes('manifest')) return {msg:'You\'ve got <code>cat</code> right! You just need to tell it which file. The file is named <code>manifest.txt</code>.',next:'Try: cat manifest.txt'};
-    if(v==='less manifest.txt'||v==='more manifest.txt') return {msg:'<code>less</code> and <code>more</code> work too, but for this small file use <code>cat</code>. (<code>less</code> is for scrolling through large files.)',next:'Try: cat manifest.txt'};
-    return null;
-  },
-  // Phase 3
-  'p3s1': (v)=>{
-    if(v==='git'||v==='git --help') return {msg:'You typed <code>git</code> alone. The subcommand for starting a new repository is <code>init</code>.',next:'Try: git init'};
-    if(v==='git initialize'||v==='git start'||v==='git create') return {msg:'The subcommand is <code>init</code> (short for initialize) — not <code>initialize</code>, <code>start</code>, or <code>create</code>.',next:'Try: git init'};
-    if(v==='mkdir .git') return {msg:'Clever thinking, but <code>git init</code> does more than just create the folder — it also sets up the internal Git data structures. Always use <code>git init</code>.',next:'Try: git init'};
+    if(v.startsWith('where ')||v.startsWith('whereis')) return {msg:'You are looking for the command location. In this sim, use <code>which</code> for that job.',next:'Try: which git'};
     return null;
   },
   'p3s2': (v)=>{
-    if(v==='git'||v==='git status ') return {msg:'Almost — check your spacing. The command is exactly <code>git status</code>.',next:'Try: git status'};
-    if(v==='status') return {msg:'<code>status</code> alone isn\'t a shell command. Git subcommands must come after the word <code>git</code>.',next:'Try: git status'};
-    return null;
-  },
-  'p3s3': (v)=>{
-    if(v==='git add') return {msg:'<code>git add</code> needs to know what to add. Use <code>git add manifest.txt</code> for just that file, or <code>git add .</code> to stage everything.',next:'Try: git add manifest.txt'};
-    if(v==='git stage manifest.txt'||v==='git stage .') return {msg:'Git doesn\'t use the word "stage" as a command. The command that moves files to the staging area is <code>git add</code>.',next:'Try: git add manifest.txt'};
-    if(v==='git add manifest'||v==='git add manifest.') return {msg:'The full filename is required. The file is <code>manifest.txt</code> — don\'t forget the <code>.txt</code> extension.',next:'Try: git add manifest.txt'};
+    if(v.startsWith('echo') && !v.includes('>')) return {msg:'You used <code>echo</code> correctly, but the text is still headed to the screen. You need to redirect it into the file.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
+    if(v.includes('>>')) return {msg:'That would append, which is useful later. This step is teaching the base overwrite form first.',next:'Try: echo "Mission: Escape Pod" > manifest.txt'};
     return null;
   },
   'p3s4': (v)=>{
-    if(v.startsWith('git commit') && !v.includes('-m')) return {msg:'You have <code>git commit</code> but the <code>-m</code> flag is missing. Git needs to know that the text after it is your message, not a filename. Add <code>-m "your message"</code>.',next:'Try: git commit -m "Add mission manifest"'};
-    if(v==='git commit -m') return {msg:'You have <code>git commit -m</code> — perfect! Now add a message in quotes after it.',next:'Try: git commit -m "Add mission manifest"'};
-    if(v.startsWith('git commit') && v.includes('-m') && !v.includes('"') && !v.includes("'")) return {msg:'Almost! The commit message should be in quotes. Try: <code>git commit -m "Add mission manifest"</code>',next:'Try: git commit -m "Add mission manifest"'};
+    if(v==='cp manifest.txt') return {msg:'You named the source, but not the copy you want to create.',next:'Try: cp manifest.txt manifest.bak'};
+    if(v.startsWith('mv ')) return {msg:'You jumped to moving. First make the backup copy.',next:'Try: cp manifest.txt manifest.bak'};
     return null;
   },
-  // Phase 4
-  'p4s1': (v)=>{
-    if(v==='npm init'||v==='npm init ') return {msg:'<code>npm init</code> works but will ask you many questions. Add <code>-y</code> to accept all defaults: <code>npm init -y</code>. Or use <code>bun init -y</code> which is faster.',next:'Try: bun init -y'};
-    if(v==='bun') return {msg:'<code>bun</code> alone shows help text. The subcommand to initialize a new project is <code>init</code>.',next:'Try: bun init -y'};
-    if(v==='bun install'||v==='bun add') return {msg:'<code>bun install</code> installs existing dependencies, and <code>bun add</code> adds new ones. To <b>create</b> a new project from scratch, use <code>bun init</code>.',next:'Try: bun init -y'};
+  'p3s5': (v)=>{
+    if(v.startsWith('cp ')) return {msg:'You made another copy instead of relocating the backup. This step is about moving it into the folder you prepared.',next:'Try: mv manifest.bak mission_logs/manifest.bak'};
     return null;
   },
-  'p4s2': (v)=>{
-    if(v==='npm install') return {msg:'<code>npm install</code> with no package name installs existing deps from package.json. To add a new package, specify it: <code>npm install hono</code> or <code>bun add hono</code>.',next:'Try: bun add hono'};
-    if(v==='bun install hono'||v==='bun add -g hono') return {msg:'Close! <code>bun add hono</code> is the standard way. <code>bun install packagename</code> isn\'t valid — it\'s just <code>bun install</code> (no args) or <code>bun add hono</code>.',next:'Try: bun add hono'};
-    if(v.startsWith('install')||v.startsWith('add hono')) return {msg:'Package commands need the package manager prefix. You\'re using Bun here: <code>bun add hono</code>.',next:'Try: bun add hono'};
+  'p3s6': (v)=>{
+    if(v.startsWith('rm ') && !v.includes('mission_logs/manifest.bak')) return {msg:'You are deleting a file, but not the one this step targets. Read the path carefully once more.',next:'Try: rm mission_logs/manifest.bak'};
     return null;
   },
-  // Phase 5
-  'p5s1': (v)=>{
-    if(v==='cat log.txt') return {msg:'Close! The filename is <code>logs.txt</code> (plural) — not <code>log.txt</code>.',next:'Try: cat logs.txt'};
-    if(v.startsWith('open ')||v.startsWith('read ')) return {msg:'To print file contents in the terminal, use <code>cat</code>. Not <code>open</code> (opens GUI) or <code>read</code>.',next:'Try: cat logs.txt'};
+  'p4s4': (v)=>{
+    if(v.startsWith('git commit') && !v.includes('-m')) return {msg:'You reached the right command family. What is missing is the inline message flag.',next:'Try: git commit -m "Add mission manifest"'};
     return null;
   },
-  'p5s2': (v)=>{
-    if(v.includes('cat logs.txt') && v.includes('grep') && !v.includes('|')) return {msg:'You have both parts! They need to be connected with a pipe: <code>cat logs.txt | grep CRITICAL</code>. The <code>|</code> (pipe) is Shift+\\ on most keyboards, above the Enter key.',next:'Try: cat logs.txt | grep CRITICAL'};
-    if(v.includes('grep') && v.includes('critical') && !v.includes('cat')) return {msg:'You\'re using grep correctly! But you need to give it something to search through. Feed it the file using cat: <code>cat logs.txt | grep CRITICAL</code>.',next:'Try: cat logs.txt | grep CRITICAL'};
-    if(v.includes('grep') && v.includes('CRITICAL') && !v.includes('|')) return {msg:'grep on its own needs a file argument, or piped input. Try: <code>cat logs.txt | grep CRITICAL</code>',next:'Try: cat logs.txt | grep CRITICAL'};
-    if(v==='cat logs.txt | grep') return {msg:'Almost! <code>grep</code> needs a pattern to search for. Add <code>CRITICAL</code> after it.',next:'Try: cat logs.txt | grep CRITICAL'};
+  'p6s2': (v)=>{
+    if(v.includes('grep') && !v.includes('|')) return {msg:'You found the filter, but not the pipeline. Feed the file output into grep.',next:'Try: cat logs.txt | grep CRITICAL'};
     return null;
   },
-  'p5s3': (v)=>{
-    if(v.includes('|') && v.includes('grep') && v.includes('CRITICAL') && !v.includes('wc')) return {msg:'You have the filter right! Now add one more pipe to <b>count</b> the results: <code>| wc -l</code>. <code>wc -l</code> counts lines.',next:'Try: cat logs.txt | grep CRITICAL | wc -l'};
-    if(v.includes('count')||v.includes('num')) return {msg:'The Unix command for counting lines is <code>wc -l</code>. Add it at the end of your pipe: <code>cat logs.txt | grep CRITICAL | wc -l</code>.',next:'Try: cat logs.txt | grep CRITICAL | wc -l'};
-    if(v.includes('wc') && !v.includes('-l')) return {msg:'<code>wc</code> on its own shows word count. Add <code>-l</code> flag to count lines: <code>wc -l</code>.',next:'Try: cat logs.txt | grep CRITICAL | wc -l'};
+  'p6s3': (v)=>{
+    if(v.includes('grep') && !v.includes('wc -l')) return {msg:'You filtered the right lines. The missing piece is counting them.',next:'Try: cat logs.txt | grep CRITICAL | wc -l'};
     return null;
   },
-  // Phase 8
-  'p8s1': (v)=>{
-    if(v.startsWith('ask ')||v.startsWith('query ')||v.startsWith('message ')) return {msg:'The command to address an agent is <code>prompt</code>. Try: <code>prompt Captain "Explain MCP"</code>',next:'Try: prompt Captain "Explain MCP"'};
-    if(v.startsWith('prompt') && !v.toLowerCase().includes('captain')) return {msg:'You have <code>prompt</code> right! Now specify which agent to address. Try: <code>prompt Captain "Explain MCP"</code>',next:'Try: prompt Captain "Explain MCP"'};
+  'p6s4': (v)=>{
+    if(v.startsWith('grep ') && !v.includes('-rn')) return {msg:'You are searching, but not recursively with line numbers. This step is about the codebase-wide form.',next:'Try: grep -rn "error" src/'};
+    return null;
+  },
+  'p7s1': (v)=>{
+    if(v.startsWith('set ')||v.startsWith('env ')) return {msg:'You are trying to set an environment value. On this shell, the command you want is <code>export</code>.',next:'Try: export API_KEY="sk-prod-abc123"'};
+    return null;
+  },
+  'p7s3': (v)=>{
+    if(v.startsWith('echo') && v.includes('> ~/.bashrc') && !v.includes('>>')) return {msg:'This would overwrite the whole file. You only want to append one new line.',next:'Try: echo \'export API_KEY="sk-prod-abc123"\' >> ~/.bashrc'};
+    return null;
+  },
+  'p7s4': (v)=>{
+    if(v.startsWith('bash ~/.bashrc')) return {msg:'That would run a new shell process. This step is about reloading the file into the current shell session.',next:'Try: source ~/.bashrc'};
     return null;
   },
   'p9s2': (v)=>{
-    if(v.startsWith('export') && !v.includes('=')) return {msg:'<code>export</code> needs an assignment: <code>export NAME=value</code>. The <code>=</code> sign sets the variable.',next:'Try: export API_KEY="sk-prod-abc123"'};
-    if(v.startsWith('set ')||v.startsWith('env ')) return {msg:'On Linux/Mac, environment variables are set with <code>export NAME=value</code>. <code>set</code> is Windows CMD syntax.',next:'Try: export API_KEY="sk-prod-abc123"'};
+    if(v.startsWith('open ')||v.startsWith('visit ')) return {msg:'You are trying to verify the deploy, which is the right instinct. This check stays in the terminal with <code>curl</code>.',next:'Try: curl https://escape-pod-final.vercel.app/health'};
     return null;
   },
 };
  
 /* ── SPACED REPETITION CALLBACKS ── */
 const SPACED_CALLBACKS = {
-  2: {q:'Before we dive in — cold recall from Phase 1. What single command prints your exact current location in the filesystem?', answer:'pwd', hint:'P _ D'},
-  3: {q:'Quick recall from Phase 2: you want to write "Hello world" into a file called notes.txt, creating it if it doesn\'t exist. What\'s the exact command?', answer:'echo', acceptFn:(v)=>v.startsWith('echo')&&v.includes('>')&&v.includes('notes.txt'), hint:'echo "..." > ...'},
-  4: {q:'Phase 3 recall: you\'ve modified a file and want to snapshot it into Git history. What are the two commands you must run in order?', answer:'git add then git commit', acceptFn:(v)=>includesInOrder(v,['git add','git commit'])||includesInOrder(v,['add','commit']), hint:'git ___ . && git ___ -m "..."'},
-  5: {q:'Quick check: your teammate just cloned your repository. The node_modules folder is missing. What\'s the ONE command they run to restore it?', answer:'bun install', acceptFn:(v)=>v.includes('bun install')||v.includes('npm install'), hint:'bun ___'},
-  6: {q:'Phase 5 recall: you want to count how many lines in logs.txt contain the word "ERROR". Build the pipeline.', answer:'cat logs.txt | grep ERROR | wc -l', acceptFn:(v)=>v.includes('logs.txt')&&v.includes('grep')&&v.includes('wc'), hint:'cat ... | grep ... | wc -l'},
-  7: {q:'Git recall: what command tells you the current state of your repository — which files are staged, modified, or untracked?', answer:'git status', acceptFn:(v)=>v==='git status'||v==='git status -s', hint:'git ___'},
-  8: {q:'MCP recall: in one sentence, what does MCP stand for and what is its purpose?', answer:'model context protocol', acceptFn:(v)=>v.toLowerCase().includes('model')&&v.toLowerCase().includes('context')||v.toLowerCase().includes('mcp'), hint:'Model Context Protocol — connects AI to...'},
+  2: {q:'Cold recall: what command prints your exact current location in the filesystem?', answer:'pwd', hint:'P _ D'},
+  3: {q:'Quick recall: what command makes a folder named notes?', answer:'mkdir notes', acceptFn:(v)=>v==='mkdir notes', hint:'mkdir ____'},
+  4: {q:'Quick recall: what command writes "Hello world" into a file called notes.txt?', answer:'echo "Hello world" > notes.txt', acceptFn:(v)=>v.startsWith('echo')&&v.includes('>')&&v.includes('notes.txt'), hint:'echo "..." > ...'},
+  5: {q:'Git recall: what two commands save a changed file into history in order?', answer:'git add then git commit', acceptFn:(v)=>includesInOrder(v,['git add','git commit']), hint:'git ___ file && git ___ -m "..."'},
+  6: {q:'Package recall: what command adds a new package called hono to this project?', answer:'bun add hono', acceptFn:(v)=>v.includes('bun add hono')||v.includes('npm install hono'), hint:'bun ___ hono'},
+  7: {q:'Log recall: build the pipeline that counts CRITICAL lines in logs.txt.', answer:'cat logs.txt | grep CRITICAL | wc -l', acceptFn:(v)=>v.includes('logs.txt')&&v.includes('grep')&&v.includes('wc -l'), hint:'cat ... | grep ... | wc -l'},
+  8: {q:'Environment recall: what command reads the current value of API_KEY back to the terminal?', answer:'echo $API_KEY', acceptFn:(v)=>v==='echo $api_key'||v==='echo $API_KEY', hint:'echo $______'},
+  9: {q:'Build recall: what command creates the production bundle?', answer:'bun run build', acceptFn:(v)=>v.includes('bun run build')||v.includes('npm run build'), hint:'bun run _____'},
 };
  
 /* ── CONSTRUCTED RESPONSE CHALLENGES ── */
@@ -1524,401 +1518,256 @@ const BREAKIT = {
    ═══════════════════════════════════════════════════════════════ */
 const PHASES = [null,
  
-/* ── P1: Terminal Navigation ── */
-{title:'Terminal Navigation',
- lolaIntro:"Hello Cadet, I'm your Logistical Organization & Learning Assistant, but you can call me L.O.L.A. I am your teacher in the box to the right. Before each objective, look for two things: what the terminal word means, and what you are about to do with it. A <b>command</b> is an instruction you type. Sometimes commands also take an <b>argument</b> like a file or folder name. Later you will also see <b>flags</b> like <code>-la</code> and <b>subcommands</b> like <code>git init</code>. First, let's learn how to orient yourself.",
+/* ── P1: Where Are You? ── */
+{title:'Where Are You?',
+ lolaIntro:"We are starting with orientation. First you learn where you are, what is around you, how to move, and how to create the space you need. That matters because terminal mistakes usually begin with a wrong assumption about location.",
  steps:[
-  {id:'p1s1', obj:'Find out where you are', ctx:'Every terminal session starts somewhere in the filesystem. Your first job is to ask: where am I? Type a <b>command</b> into the prompt at the bottom. If you want help, type <code>man</code> to see a list of commands.',
-   cmd:['pwd'], accept:['pwd'],
-   hint:'Type: pwd — stands for "print working directory"',
-   out:'/home/cadet/projects',
-   unlockCmd:'pwd',
-   jitPreOnly:true,
-   jit:{title:'📁 Before You Type — Your Filesystem, A Quick Map',body:'Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree.'},
-   jitAfter:{title:'Why typing pwd matters',body:'Typing <code>pwd</code> is like checking a map after moving around your system with <code>cd</code>. Even senior engineers get turned around in deep project folders. <code>pwd</code> gives you a hard location anchor so you can safely decide your next move and get to the exact directory you want.'},
-   bridge:{title:'This first command is used every day',body:'Developers run <code>pwd</code> constantly after moving around projects, containers, and servers. It is the fastest way to prevent “wrong folder” mistakes before editing, deleting, or deploying anything.',tags:['Linux','macOS','WSL','Docker containers']},
-   teach:{title:'What pwd does',body:'<b>pwd</b> = <b>P</b>rint <b>W</b>orking <b>D</b>irectory. It shows your exact location in the filesystem as an <b>absolute path</b> — starting from root <code>/</code>. Run it whenever you feel lost.'}},
-  {id:'p1s2', obj:'List, ls the files in this directory', ctx:'Now see what\'s in your current folder. <code>ls</code> is a command. In a moment you will also see a <b>flag</b> version, <code>ls -la</code>, where <code>-la</code> changes the command behavior. You can type <code>man</code> to review commands at any time.',
-   cmd:['ls','eza','ls -la','ls -l','ls -a','ls -lah'],
-   accept:['ls','eza','ls -la','ls -l','ls -a','ls -lah','ls --all'],
-   hint:'Type: ls (or try ls -la for full details)',
-   out:'README.txt   game_v1/   .env   package.json',
-   unlockCmd:'ls',
-   jit:{title:'Hidden files — what\'s that .env?',body:'Files starting with a <code>.</code> (dot) are hidden by default on Linux/Mac. The <code>.env</code> file is especially important: it\'s where developers store API keys and secrets that should never be shared. <code>ls -a</code> reveals all hidden files.'},
-   bridge:{title:'ls is your most-used command',body:'Senior developers run <code>ls</code> and <code>ls -la</code> constantly — verifying files were created, checking permissions, spotting <code>.env</code> or <code>.gitignore</code>. When you hear "just check what\'s in the directory" in a code review, this is the command.',tags:['File management','Debugging','Code review']},
-   teach:{title:'ls — your flashlight',body:'<code>ls</code> lists every file and folder here. Add flags for more power:<br><code>ls -a</code> — shows hidden files (starting with <code>.</code>)<br><code>ls -l</code> — long format with sizes, dates, permissions<br><code>ls -la</code> — both combined.'},
-   concept:{icon:'🚩',title:'How flags work',body:'A <b>flag</b> modifies a command. Short flags use one dash: <code>-l</code>. Long flags use two: <code>--all</code>. You can chain short flags: <code>ls -la</code> = long format + all files.',
-    examples:[{l:'List all files',c:'ls -a'},{l:'Long format',c:'ls -l'},{l:'Combined',c:'ls -la'},{l:'Human sizes',c:'ls -lah'}]}},
-  {id:'p1s3', obj:'Navigate into game_v1', ctx:'Move (change directories) your terminal session into the project directory (game_v1). This is a COMMAND followed by a filename. Remember to use a space between the two.',
-   cmd:['cd game_v1','cd game_v1/'],
-   accept:['cd game_v1','cd game_v1/'],
-   hint:'Type: cd game_v1',
-   out:'Now in ~/projects/game_v1',
-   unlockCmd:'cd',
-   jit:{title:'Relative vs absolute paths',body:'<code>cd game_v1</code> is a <b>relative path</b> — it means "from where I am right now, go into game_v1." An <b>absolute path</b> starts with <code>/</code> and works from anywhere. Press <kbd>Tab</kbd> after a few letters to autocomplete.'},
-   bridge:{title:'Navigating real projects',body:'Professional projects have deep folder structures: <code>src/components/ui/Button.tsx</code>. You\'ll spend a lot of time <code>cd</code>-ing into folders to run scripts, check files, or install packages in the right place.',tags:['Every project','Daily workflow','Tab-completion']},
-   teach:{title:'cd — change directory',body:'<code>cd</code> = <b>C</b>hange <b>D</b>irectory. Key moves:<br><code>cd ..</code> — go up one level<br><code>cd ~</code> — jump home instantly<br><code>cd -</code> — return to previous location<br><b>Pro tip:</b> press <kbd>Tab</kbd> to autocomplete folder names.'},
-   quiz:{q:'You\'re in /home/cadet/projects/game_v1 and want to go back to /home/cadet. What\'s the fastest command?',
-    opts:['cd home/cadet','cd ../..','cd ~','cd ../../cadet'],
-    correct:1,fb:'Correct! <code>cd ../..</code> goes up two levels. <code>cd ~</code> would also work here since ~ is /home/cadet in this setup.'}}
+  {id:'p1s1', obj:'Find out where you are', ctx:'Name what this is: your current location in the filesystem. It matters because every file command depends on being in the right place. Do this now with the command that prints your working directory.',
+   cmd:['pwd'], accept:['pwd'], hint:'Type: pwd', out:'/home/cadet/projects', unlockCmd:'pwd',
+   teach:{title:'What <code>pwd</code> gives you',body:'📁 Before You Type — Your Filesystem, A Quick Map',body:'Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree.''<code>pwd</code> prints your full current path. That path is your location anchor. When you know the location, the next command becomes a choice instead of a guess.'},
+   jit:{title:'Location before action',body:'Strong terminal habits start with location checks. It is much easier to avoid a bad edit or delete than to recover from one in the wrong folder.'}},
+  {id:'p1s2', obj:'List the files in this directory', ctx:'Now name what is around you. It matters because you cannot choose the next folder or file if you have not inspected the current one. List the directory contents now.',
+   cmd:['ls'], accept:['ls','ls -la','ls -l','ls -a'], hint:'Type: ls', out:'README.txt   game_v1/   .env   package.json', unlockCmd:'ls',
+   teach:{title:'Reading a directory',body:'<code>ls</code> shows what is available right here. When you need more detail, <code>ls -la</code> reveals hidden files and long-format metadata.'},
+   jit:{title:'Hidden files — what is that .env?',body:'Files starting with a <code>.</code> (dot) are hidden by default on Linux and macOS. The <code>.env</code> file is where developers store API keys and secrets that should never be committed to Git. <code>ls -a</code> reveals all hidden files. You will also see <code>.git/</code> here once a repository is initialized.'},
+   bridge:{title:'Hidden files are everywhere in real projects',body:'Most project configuration lives in dotfiles: <code>.env</code> for secrets, <code>.gitignore</code> to exclude files from Git, <code>.eslintrc</code> for linting rules. Knowing <code>ls -la</code> means you always see the full picture, not just the obvious files.',tags:['Linux','macOS','Security','Project config']}},
+  {id:'p1s3', obj:'Navigate into game_v1', ctx:'Move into the project folder. It matters because the commands that follow belong inside the project, not beside it. Change directories now.',
+   cmd:['cd game_v1'], accept:['cd game_v1','cd game_v1/'], hint:'Type: cd game_v1', out:'Now in ~/projects/game_v1', unlockCmd:'cd',
+   teach:{title:'Changing directories',body:'<code>cd</code> changes the working directory. Once you move, every relative path you type is interpreted from that new location.'},
+   jit:{title:'Relative vs absolute paths',body:'<code>cd game_v1</code> is a <b>relative path</b> — it means "from where I am right now, go into game_v1." An <b>absolute path</b> starts with <code>/</code> and works from anywhere, for example <code>/home/cadet/projects/game_v1</code>. Press <kbd>Tab</kbd> after typing a few letters to autocomplete a folder or file name.'},
+   bridge:{title:'Path fluency is foundational',body:'Absolute paths appear in scripts, Docker configs, and CI pipelines where the working directory cannot be assumed. Relative paths keep daily commands short. Knowing the difference prevents a wide category of "file not found" errors.',tags:['Linux','macOS','Docker','CI/CD']}},
+  {id:'p1s4', obj:'Create a mission_logs directory', ctx:'Create a folder called <code>mission_logs</code>. It matters because good terminal work includes making the place you will need before you need it. Create it now.',
+   cmd:['mkdir mission_logs'], accept:['mkdir mission_logs'], hint:'Type: mkdir mission_logs', out:'mission_logs/ created', unlockCmd:'mkdir',
+   teach:{title:'Folders are structure',body:'<code>mkdir</code> creates a directory. This is the start of intentional filesystem structure: not just using what exists, but shaping what exists.'},
+   jit:{title:'Building nested paths in one step',body:'<code>mkdir</code> creates one directory at a time by default. To create a full nested path at once, use the <code>-p</code> flag: <code>mkdir -p logs/archive/2026</code> creates every level that does not already exist. Without <code>-p</code>, the command fails if the parent does not exist yet.'},
+   bridge:{title:'Directory creation is part of every project setup',body:'CI pipelines, Docker images, and deploy scripts all create directories before writing output files. The same <code>mkdir -p</code> pattern you would use here appears in Dockerfiles, GitHub Actions, and shell provisioning scripts.',tags:['CI/CD','Docker','Shell scripts','Project structure']}}
  ],
- challenge:CHALLENGES[1],
- done:'Terminal navigation: unlocked. pwd, ls, cd — these three commands get you anywhere on any system.',
+ done:'You can now locate yourself, inspect a directory, move through it, and create a new folder without a GUI.',
  ach:'navigator'},
  
-/* ── P2: File Operations ── */
-{title:'File Operations',
- lolaIntro:"Creating and editing files from the terminal is faster than any GUI and fully automatable. Let's build that muscle.",
+/* ── P2: Reading the Manual ── */
+{title:'Reading the Manual',
+ lolaIntro:"This phase is about self-sufficiency. You do not need to memorize every command. You do need to know how to find the answer without spiraling.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1', obj:'Create a file called manifest.txt', ctx:'Create a new empty file without opening any editor. We will use a COMMAND followed by a file name, check your <code>man</code> for the right one.',
-   cmd:['touch manifest.txt'], accept:['touch manifest.txt'],
-   hint:'Type: touch manifest.txt',
-   out:'manifest.txt created (0 bytes)',
-   unlockCmd:'touch',
-   jit:{title:'Why create files from the terminal?',body:'The terminal lets you create files <i>programmatically</i> — in scripts, loops, and automated pipelines. <code>touch manifest.txt</code> creates an empty file in one keystroke. You can create 100 files with one command: <code>touch file{1..100}.txt</code>'},
-   bridge:{title:'Used in build scripts and automation',body:'Build pipelines on services like GitHub Actions, Vercel, and Docker create files this way constantly — lock files, manifests, config files.',tags:['CI/CD','Automation','DevOps','Shell scripts']},
-   teach:{title:'touch — create or timestamp',body:'<code>touch</code> creates an empty file if it doesn\'t exist — or updates its timestamp if it does. Key file commands:<br><code>rm filename</code> — delete a file<br><code>cp src dest</code> — copy it<br><code>mv src dest</code> — move or rename it<br><code>mkdir dirname</code> — create a folder'}},
-  {id:'p2s2', obj:'Write the content "Mission: Escape Pod" into manifest.txt', ctx:'Use <code>echo</code> with output redirection to write text into the file. The words between quotation marks are a <b>string</b> — plain text exactly as typed. Pattern: <code>command "string" > filename</code>.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt'],
-   accept:['echo "Mission: Escape Pod" > manifest.txt'],
-   acceptFn: v => {
-     const hasRedirect=/>>?\s*manifest\.txt/i.test(v);
-     const hasMission=/mission\s*:\s*escape\s*pod/i.test(v);
-     return v.startsWith('echo') && hasRedirect && hasMission;
-   },
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt  — the > symbol redirects the text INTO the file (Shift+. on most keyboards)',
-   out:'Written to manifest.txt',
-   unlockCmd:'echo',
-   jit:{title:'What does the > symbol do?',body:'The <code>></code> (greater-than sign) is a <b>redirect operator</b>. Without it, <code>echo "hello"</code> just prints to your screen. With it, <code>echo "hello" > file.txt</code> sends that output directly into the file. Use <code>>></code> to <b>append</b> instead of overwrite.'},
-   bridge:{title:'Automation and config generation',body:'Build scripts write config files, environment files, and lock files this way constantly. Understanding redirection means you can read and write any shell script.',tags:['Shell scripting','CI/CD','Automation','Config files']},
-   teach:{title:'echo and output redirection',body:'<code>echo</code> prints text to the terminal. The <code>></code> redirects that output into a file instead — overwriting it. Use <code>>></code> to append. This is I/O redirection — one of the most powerful Unix concepts.'},
-   concept:{icon:'↔️',title:'I/O Redirection',body:'Every command has output (stdout). You can redirect it with special symbols.',
-    examples:[{l:'Overwrite file',c:'echo "hi" > file.txt'},{l:'Append to file',c:'echo "more" >> file.txt'},{l:'Print file',c:'cat file.txt'},{l:'Filter output',c:'ls | grep .txt'}]}},
-  {id:'p2s3', obj:'Read manifest.txt', ctx:'Print the file\'s contents to verify it was written correctly.',
-   cmd:['cat manifest.txt'], accept:['cat manifest.txt'],
-   hint:'Type: cat manifest.txt',
-   out:'Mission: Escape Pod',
-   unlockCmd:'cat',
-   jit:{title:'cat vs less vs head',body:'<code>cat</code> dumps the whole file at once — great for small files. For a large file (thousands of lines), use <code>less filename</code> — it lets you scroll with arrow keys and press <code>q</code> to quit. <code>head -n 10 file</code> shows the first 10 lines. <code>tail -n 10 file</code> shows the last 10 — great for watching live logs.'},
-   bridge:{title:'Reading logs and configs in production',body:'When something breaks in production, the first thing a developer does is <code>cat</code> (or <code>tail -f</code>) the log file.',tags:['Debugging','Log analysis','Ops','Production']},
-   teach:{title:'cat, less, head — reading files',body:'<code>cat</code> = concatenate — prints the entire file. For long files use <code>less filename</code> to scroll (press <code>q</code> to quit). <code>head -n 5 file</code> shows the first 5 lines. <code>tail -n 5 file</code> shows the last 5 — useful for live logs.'},
-   quiz:{q:'You want to add a second line to manifest.txt WITHOUT erasing the first. Which command?',
-    opts:['echo "line 2" > manifest.txt','echo "line 2" >> manifest.txt','cat "line 2" > manifest.txt','touch manifest.txt "line 2"'],
-    correct:1,fb:'Correct! <code>>></code> appends. A single <code>></code> would overwrite and destroy the first line.'}}
+  {id:'p2s1', obj:'Open the manual for ls', ctx:'Name what this is: the command reference. It matters because manual reading turns confusion into a short lookup instead of a long detour. Open the manual for <code>ls</code> now.',
+   cmd:['man ls'], accept:['man ls','ls --help'], hint:'Type: man ls', out:'NAME\n     ls — list directory contents\n\nSYNOPSIS\n     ls [options] [file ...]', unlockCmd:'man',
+   teach:{title:'Manual pages',body:'A manual page tells you what a command does, how to call it, and which flags it understands. You do not need all of it at once. You need the habit of opening it.'},
+   jit:{title:'How to read a man page without getting lost',body:'Jump straight to the <b>SYNOPSIS</b> section — it shows every valid flag in bracket notation. Use <code>/keyword</code> to search inside the page and <code>n</code> to jump to the next match. Press <code>q</code> to quit. For a faster summary, most modern commands also accept <code>--help</code>: try <code>ls --help</code>.'},
+   bridge:{title:'Self-sufficiency is a senior habit',body:'Strong engineers reach for the manual before reaching for a search engine. The answer is usually one section away and is guaranteed to match the exact version installed on this machine — which a Stack Overflow post from three years ago may not.',tags:['Linux','macOS','Self-sufficiency','Daily workflow']}},
+  {id:'p2s2', obj:'Find where git lives on this system', ctx:'Use the command that locates another command on the filesystem. It matters because PATH issues are easier to debug when you can see whether a tool exists and where the shell found it. Do that now for <code>git</code>.',
+   cmd:['which git'], accept:['which git','which bun'], hint:'Type: which git', out:'/usr/bin/git', unlockCmd:'which',
+   teach:{title:'What <code>which</code> tells you',body:'<code>which</code> prints the executable path for a command the shell can already find. It is a clean first check when a tool behaves differently across machines.'},
+   jit:{title:'What PATH is and why it matters',body:'When you type a command, the shell searches a list of directories called <b>PATH</b> in order and runs the first match it finds. <code>which git</code> shows you exactly which copy it found. If you have multiple versions of a tool installed — two Pythons, two Node versions — <code>which</code> tells you which one will actually run.'},
+   bridge:{title:'PATH confusion is a very common junior dev problem',body:'Symptoms include "command not found" for a tool you just installed, a package manager that installs to the wrong version, or a script that works in your terminal but fails in CI. <code>which</code> is the fastest first diagnostic in all three cases.',tags:['Linux','macOS','Debugging','Developer environment']}}
  ],
- challenge:CHALLENGES[2],
- breakit:BREAKIT[2],
- done:'File operations mastered. touch, echo, cat, redirection — these save hours of clicking around.',
- ach:'file_master'},
+ done:'You now have a fallback: when a command is unfamiliar, you can read its reference and confirm where it lives.',
+ ach:'historian'},
  
-/* ── P3: Git ── */
-{title:'Version Control with Git',
- lolaIntro:"Every professional developer uses Git. It tracks every change to your code, lets you collaborate without conflict, and means you never lose work. Non-negotiable knowledge.",
+/* ── P3: File Operations ── */
+{title:'File Operations',
+ lolaIntro:"This is the core file toolkit: create, write, read, copy, move, and delete. Each one matters because real terminal work is mostly careful file handling under time pressure.",
  spacedRep:SPACED_CALLBACKS[3],
  steps:[
-  {id:'p3s1', obj:'Initialize a Git repository', ctx:'Turn this folder into a Git repo so Git can start tracking changes. This is your first <b>command + subcommand</b> pattern: <code>git</code> is the command, <code>init</code> is the subcommand.',
-   cmd:['git init'], accept:['git init'],
-   hint:'Type: git init',
-   out:'Initialized empty Git repository in ~/projects/game_v1/.git/',
-   unlockCmd:'git',
-   jit:{title:'What exactly did git init create?',body:'A hidden folder called <code>.git/</code>. Run <code>ls -a</code> to see it. That folder <i>is</i> the entire repository — it stores every commit, branch, and piece of history. <b>Never delete .git unless you mean to destroy the entire history.</b>'},
-   bridge:{title:'Every codebase on earth uses this',body:'GitHub, GitLab, and Bitbucket host hundreds of millions of repositories — all started with <code>git init</code> or a clone. This is the absolute foundation of collaborative software development.',tags:['GitHub','GitLab','Open source','Teams','Career-critical']},
-   teach:{title:'git init — birth of a repository',body:'<code>git init</code> created a hidden <code>.git/</code> folder. That folder IS the repository. Run <code>ls -a</code> to see it. <b>Never delete .git</b> unless you want to destroy all history.'},
-   concept:{icon:'⏳',title:'Why version control?',body:'Without Git: you save "backup_v2_FINAL_really_final.zip". With Git: every change is tracked with a message, author, and timestamp. Jump back to any point. See who changed what.',
-    examples:[{l:'See full history',c:'git log --oneline'},{l:'See what changed',c:'git diff'},{l:'Jump to any commit',c:'git checkout abc123'},{l:'Undo last commit',c:'git revert HEAD'}]}},
-  {id:'p3s2', obj:'Check repository status', ctx:'See which files Git knows about. We are going to use a SUBCOMMAND that checks the status.',
-   cmd:['git status','git status -s'], accept:['git status','git status -s'],
-   hint:'Type: git status',
-   out:'On branch main\n\nUntracked files:\n  manifest.txt\n\nNothing added to commit yet',
-   jit:{title:'What does "untracked" mean?',body:'Git sees <code>manifest.txt</code> exists in the folder, but hasn\'t been told to track it yet. Think of Git as a photographer — <b>untracked</b> means it\'s in the room but not in the photo. You have to explicitly add files with <code>git add</code>.'},
-   bridge:{title:'git status is your first reflex',body:'Before every <code>git add</code>, <code>git commit</code>, or <code>git push</code>, professional developers run <code>git status</code>. It prevents accidents.',tags:['Daily workflow','Code review','Team collaboration']},
-   teach:{title:'git status — your compass',body:'<code>git status</code> is your most-used Git command. It shows: <b>untracked</b> files, <b>staged</b> files, <b>modified</b> files. Run it constantly — before and after every Git operation.'}},
-  {id:'p3s3', obj:'Stage manifest.txt', ctx:'Add the file to Git\'s staging area — the queue before committing. Here we use a COMMAND and SUBCOMMAND to add it followed by the file name.',
-   cmd:['git add manifest.txt','git add .','git add -A'],
-   accept:['git add manifest.txt','git add .','git add -a','git add --all'],
-   hint:'Type: git add manifest.txt — or "git add ." to stage everything',
-   out:'Staged: manifest.txt',
-   jit:{title:'Why does staging exist?',body:'Imagine you changed 5 files but only want to commit 2 of them. Staging (<code>git add</code>) is a "pre-commit holding area." You explicitly choose what goes into each commit. This makes your history clean and meaningful.'},
-   bridge:{title:'Clean commits tell a story',body:'When teammates review your code or you debug a problem 6 months later, commit history is your documentary. The staging area is what makes precise, meaningful commits possible.',tags:['Code review','Git history','Team standards','Open source']},
-   teach:{title:'The staging area — why it exists',body:'Git\'s two-step process: <b>stage</b> then <b>commit</b>. Staging (<code>git add</code>) lets you pick exactly which changes go into a commit. <code>git add .</code> stages everything in the current folder.'}},
-  {id:'p3s4', obj:'Commit the staged file with "Add mission manifest" tag.', ctx:'Create a permanent snapshot with a descriptive message. We are going to use a COMMAND and SUBCOMMAND and add a flag before our message. The <code>-m</code> flag tells it to add this message to my file, followed by the staged file.',
-   cmd:['git commit -m'],
-   acceptFn: v => v.startsWith('git commit -m') && v.length > 14,
-   accept:['git commit -m'],
-   hint:'Type: git commit -m "Add mission manifest"',
-   out:'[main (root-commit) a1b2c3] Add mission manifest\n 1 file changed, 1 insertion(+)',
-   bridge:{title:'Commits are your professional record',body:'Your git history is visible to every interviewer, collaborator, and code reviewer. "Add mission manifest" is infinitely better than "stuff" or "asdf". Teams use Conventional Commits like <code>feat:</code>, <code>fix:</code>, <code>chore:</code>.',tags:['Code review','GitHub','Open source','Career']},
-   teach:{title:'The commit — your save point',body:'You just created a permanent checkpoint. The <code>-m</code> flag sets the commit message inline. Good commit messages: short, specific, imperative tense. "Add login form" ✓ — "added stuff" ✗.'},
-   quiz:{q:'What is the correct order of Git operations when saving changes?',
-    opts:['git commit → git add → git push','git add → git commit → (git push)','git push → git add → git commit','git init → git push → git add'],
-    correct:1,fb:'Correct! Stage with <code>git add</code>, snapshot with <code>git commit</code>, share with <code>git push</code>. This sequence is the heartbeat of all collaborative development.'}},
-  /* NEW: Git conflict scenario */
-  {id:'p3s5', obj:'Resolve a merge conflict', ctx:'A simulated teammate edited manifest.txt too. You\'ll see conflict markers — read the file, then fix it.',
-   cmd:['cat manifest.txt'],
-   accept:['cat manifest.txt'],
-   hint:'Type: cat manifest.txt — to see the conflict markers',
-   out:'<<<<<<< HEAD\nMission: Escape Pod\n=======\nMission: Emergency Evac\n>>>>>>> teammate/patch\n\n(Your version is above =======, their version below)',
-   jit:{title:'What are these symbols?',body:'Git conflict markers: <code><<<<<<< HEAD</code> is YOUR version. <code>=======</code> is the divider. <code>>>>>>>> branch</code> is the incoming version. You must manually delete the markers and choose (or combine) the content. Then <code>git add</code> and <code>git commit</code> to complete the merge.'},
-   bridge:{title:'Merge conflicts happen on every team',body:'This is the #1 thing beginners have zero preparation for when they join a real team. Every developer encounters merge conflicts weekly. Reading conflict markers fluently is a rite of passage.',tags:['Team collaboration','GitHub PRs','Code review','Daily workflow']},
-   teach:{title:'Resolving merge conflicts — step by step',body:'1. <code>cat file.txt</code> — see the conflict markers\n2. Edit the file, delete all 3 marker lines, keep what you want\n3. <code>git add file.txt</code> — mark as resolved\n4. <code>git commit -m "Resolve merge conflict"</code>'}},
-  {id:'p3s6', obj:'Fix the conflict and re-commit', ctx:'Overwrite the file with the correct content, then commit the resolution.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt'],
-   acceptFn: v=>v.startsWith('echo')&&v.includes('manifest.txt')&&v.includes('>'),
-   accept:['echo "mission" > manifest.txt'],
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt — then git add and git commit',
-   out:'Conflict resolved. manifest.txt updated.\n\n[Running: git add manifest.txt && git commit -m "Resolve conflict"]\n[main a2b3c4] Resolve conflict\n 1 file changed',
-   jit:{title:'Real resolution workflow',body:'In a real project: open the conflicted file in your editor, manually edit out the <code><<<<<<<</code>, <code>=======</code>, <code>>>>>>>></code> markers and keep what you want. Then <code>git add filename</code> to mark it resolved, and <code>git commit</code> (no <code>-m</code> needed, Git provides a default merge message).'},
-   bridge:{title:'You just learned what most bootcamps skip',body:'Many coding courses cover git add and git commit, but skip conflict resolution entirely. This is the skill that separates junior devs who panic at conflicts from those who handle them calmly.',tags:['Team velocity','PR reviews','Git workflow']},
-   teach:{title:'Conflict resolution complete',body:'You resolved a merge conflict. The pattern: see markers with <code>cat</code>, fix the file, <code>git add</code> to mark resolved, <code>git commit</code> to finalize. Every professional developer has done this hundreds of times.'},
-   achievement:'conflict_resolver'}
+  {id:'p3s1', obj:'Create a file called manifest.txt', ctx:'Create an empty file named <code>manifest.txt</code>. It matters because the next steps need a real target. Create it now without opening an editor.',
+   cmd:['touch manifest.txt'], accept:['touch manifest.txt'], hint:'Type: touch manifest.txt', out:'manifest.txt created (0 bytes)', unlockCmd:'touch',
+   teach:{title:'Creating an empty file',body:'<code>touch</code> is the fastest way to create a blank file. It is small, direct, and easy to script.'},
+   jit:{title:'Why create files from the terminal?',body:'The terminal lets you create files <i>programmatically</i> — in scripts, loops, and automated pipelines. <code>touch manifest.txt</code> creates one empty file in one keystroke. In a script you could create a hundred with a single line: <code>touch file{1..100}.txt</code>. That composability is what makes it useful beyond just the first time.'},
+   bridge:{title:'touch appears in scripts and CI more than you expect',body:'Build pipelines use <code>touch</code> to create placeholder files, mark stages complete, or update timestamps to trigger downstream watchers. It is a small tool that shows up consistently in real automation.',tags:['Shell scripts','CI/CD','Automation']}},
+  {id:'p3s2', obj:'Write "Mission: Escape Pod" into manifest.txt', ctx:'Write one line of text into the file. It matters because this is your first redirect pattern, and redirection is foundational. Send the text into the file now.',
+   cmd:['echo "Mission: Escape Pod" > manifest.txt'], accept:['echo "Mission: Escape Pod" > manifest.txt'],
+   acceptFn:v=>v.startsWith('echo')&&v.includes('manifest.txt')&&v.includes('>')&&v.toLowerCase().includes('mission'),
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt', out:'Written to manifest.txt', unlockCmd:'echo',
+   teach:{title:'Redirection writes the file',body:'<code>echo</code> produces output. <code>></code> redirects that output into a file. Without the redirect, the text never leaves the screen.'},
+   jit:{title:'> overwrites. >> appends.',body:'The <code>></code> operator replaces the file contents entirely every time it runs. If you want to add a line without destroying what is already there, use <code>>></code> instead: <code>echo "new line" >> manifest.txt</code>. You will use both constantly — the choice between them is a decision you will make deliberately.'},
+   bridge:{title:'Redirection is the foundation of log writing and config generation',body:'Shell scripts use <code>></code> and <code>>></code> to write config files, generate reports, and pipe command output into logs. The same operators you used here appear in Dockerfiles, CI steps, and deploy scripts wherever text needs to land in a file.',tags:['Shell scripts','Automation','CI/CD','Log management']}},
+  {id:'p3s3', obj:'Read manifest.txt', ctx:'Read the file back. It matters because verification is part of the work, not extra credit. Print the contents now.',
+   cmd:['cat manifest.txt'], accept:['cat manifest.txt'], hint:'Type: cat manifest.txt', out:'Mission: Escape Pod', unlockCmd:'cat',
+   teach:{title:'Verification matters',body:'Reading the file after writing it confirms what actually happened, not what you meant to happen.'},
+   jit:{title:'cat vs less vs head vs tail',body:'<code>cat</code> dumps the whole file at once — right for small files. For a large file use <code>less filename</code>: it lets you scroll with arrow keys and press <code>q</code> to quit. <code>head -n 10 file</code> shows the first 10 lines. <code>tail -n 10 file</code> shows the last 10. <code>tail -f file</code> follows a file live as new lines are written — the standard way to watch a running server log.'},
+   bridge:{title:'tail -f is the first thing engineers run during an incident',body:'When a service is misbehaving in production, the immediate move is <code>tail -f /var/log/app.log</code> or <code>docker logs -f container_name</code>. You are watching the system describe what it is doing in real time. That reflex starts here.',tags:['Debugging','On-call','Docker','Production ops']}},
+  {id:'p3s4', obj:'Copy manifest.txt to manifest.bak', ctx:'Make a backup copy. It matters because safe changes usually start with a recoverable copy. Create that backup now.',
+   cmd:['cp manifest.txt manifest.bak'], accept:['cp manifest.txt manifest.bak'], hint:'Type: cp manifest.txt manifest.bak', out:'Copied manifest.txt → manifest.bak', unlockCmd:'cp',
+   teach:{title:'Copies are cheap insurance',body:'<code>cp</code> duplicates the file. That gives you a fallback before edits, moves, or experiments.'},
+   jit:{title:'Copying directories and the -r flag',body:'<code>cp</code> copies a single file by default. To copy a directory and everything inside it, add <code>-r</code> (recursive): <code>cp -r src/ src_backup/</code>. Without <code>-r</code>, the command refuses to copy a folder. The pattern of "copy before you change" is worth building as a habit before learning tools that do it automatically.'},
+   bridge:{title:'Backup-before-edit is a production habit too',body:'Before patching a config file on a live server, engineers routinely run <code>cp nginx.conf nginx.conf.bak</code>. Docker and Git make this less critical in modern workflows, but the mental model — preserve a known-good state before touching it — appears everywhere from sysadmin work to database migrations.',tags:['Linux','sysadmin','Production ops','Safe practices']}},
+  {id:'p3s5', obj:'Move manifest.bak into mission_logs', ctx:'Relocate the backup into the folder you created earlier. It matters because movement and naming are part of keeping a project readable. Move it now.',
+   cmd:['mv manifest.bak mission_logs/manifest.bak'], accept:['mv manifest.bak mission_logs/manifest.bak'], hint:'Type: mv manifest.bak mission_logs/manifest.bak', out:'Moved manifest.bak → mission_logs/manifest.bak', unlockCmd:'mv',
+   teach:{title:'Move or rename',body:'<code>mv</code> moves a file to a new location, and it also renames files. Same command, same mental model: put the file where it should live.'},
+   jit:{title:'mv is the only rename command in Unix',body:'Unlike Windows or macOS, Unix has no separate rename command. <code>mv oldname.txt newname.txt</code> renames a file in place. <code>mv file.txt folder/</code> moves it without renaming. <code>mv file.txt folder/newname.txt</code> does both at once. One command, three shapes.'},
+   bridge:{title:'mv drives deploy artifact naming and log rotation',body:'Deploy pipelines rename build artifacts to include version numbers before archiving them. Log rotation scripts move old logs into dated folders. CI systems rename files between pipeline stages. The same command you used here powers all of it.',tags:['Linux','Shell scripts','CI/CD','Deploy pipelines']}},
+  {id:'p3s6', obj:'Remove the backup file from mission_logs', ctx:'Delete the backup file you no longer need. It matters because deletion should feel deliberate, not casual. Remove that exact file now.',
+   cmd:['rm mission_logs/manifest.bak'], accept:['rm mission_logs/manifest.bak'], hint:'Type: rm mission_logs/manifest.bak', out:'Removed mission_logs/manifest.bak', unlockCmd:'rm',
+   teach:{title:'Deletion is a precision move',body:'<code>rm</code> removes the target immediately. The skill is not memorizing the command. The skill is using it calmly on the right target.'},
+   jit:{title:'There is no trash can',body:'<code>rm</code> deletes immediately and permanently — there is no Recycle Bin, no undo, no recovery prompt. <code>rm -r folder/</code> deletes a directory and everything inside it. The command <code>sudo rm -rf /</code> would attempt to delete the entire operating system. The power is real. The habit to build is: read the full command once before pressing Enter.'},
+   bridge:{title:'rm appears in cleanup scripts everywhere',body:'CI pipelines clear build artifacts with <code>rm -rf dist/</code> before each run. Docker image builds clean temp files. Deploy scripts prune old logs. In all of these, <code>rm</code> is deliberate and targeted — the same discipline you practiced here scales directly to production.',tags:['Linux','CI/CD','Shell scripts','Docker']}}
  ],
- challenge:CHALLENGES[3],
- done:'Git fundamentals acquired — including conflict resolution. init → status → add → commit → resolve. This workflow runs billions of times per day.',
- ach:'committed'},
+ done:'You now have the full first-pass file toolkit: create, write, read, copy, move, and delete.',
+ ach:'file_master'},
  
-/* ── P4: Packages ── */
-{title:'Package Management',
- lolaIntro:"You don't write everything from scratch. The open-source ecosystem has millions of packages. Bun is your new runtime — it's npm but dramatically faster.",
+/* ── P4: Version Control ── */
+{title:'Version Control',
+ lolaIntro:"This phase is about saving work so it stays understandable. Git is not just storage. It is a record of decisions.",
  spacedRep:SPACED_CALLBACKS[4],
  steps:[
-  {id:'p4s1', obj:'Initialize a Bun project', ctx:'Create a package.json — the manifest every JS/TS project needs.',
-   cmd:['bun init','bun init -y','npm init -y'],
-   accept:['bun init','bun init -y','npm init -y','bun init--y'],
-   hint:'Type: bun init -y (the -y flag skips all prompts and uses sensible defaults)',
-   out:'bun init v1.1\nDone! package.json created.',
-   unlockCmd:'bun',
-   jit:{title:'What is package.json?',body:'<code>package.json</code> is a plain text file that describes your project: its name, version, which scripts you can run, and every external package it depends on. When a teammate clones your repo, they run <code>bun install</code> which reads this file and downloads exactly what\'s needed.'},
-   bridge:{title:'Every JavaScript project on earth has one',body:'React, Next.js, Svelte, Bun, Deno — they all use package.json. When you <code>cd</code> into any JS project and run <code>cat package.json</code>, you instantly know what it uses, what scripts it has, and what version it is.',tags:['Node.js','React','Next.js','TypeScript','Bun']},
-   teach:{title:'package.json — the project manifest',body:'<code>bun init</code> creates <code>package.json</code> — your project\'s identity card. It records: project name and version, the <code>scripts</code> you can run, and all <code>dependencies</code>.'}},
-  {id:'p4s2', obj:'Install the hono web framework', ctx:'Add a real dependency — Hono is a fast, lightweight web framework.',
-   cmd:['bun add hono','npm install hono','npm i hono'],
-   accept:['bun add hono','npm install hono','npm i hono','bun install hono'],
-   hint:'Type: bun add hono',
-   out:'bun add hono\ninstalled hono@4.0.0 [142ms]\n\npackage.json updated.',
-   jit:{title:'What is node_modules?',body:'When you install a package, its code lands in a folder called <code>node_modules/</code>. This folder can contain hundreds of sub-packages. It\'s often gigabytes in size. <b>Critical rule:</b> never commit <code>node_modules</code> to Git — add it to <code>.gitignore</code>. Anyone can recreate it with <code>bun install</code>.'},
-   bridge:{title:'The npm ecosystem — 2 million packages',body:'The npm registry is the largest software registry in the world. React, Tailwind, Express, Prisma, Stripe\'s SDK — all installed with one command.',tags:['npm registry','Open source','React','Frameworks']},
-   teach:{title:'Dependencies and node_modules',body:'<code>bun add</code> downloads the package from the npm registry and adds it to <code>package.json</code>. The code lands in <code>node_modules/</code>. <b>Critical rule:</b> NEVER commit <code>node_modules</code> to Git. Add it to <code>.gitignore</code>.'},
-   concept:{icon:'📦',title:'Dev vs runtime dependencies',body:'<code>bun add hono</code> — runtime dep (ships with your app).\n<code>bun add -d vitest</code> — dev dep (only during development, excluded from production build).',
-    examples:[{l:'Runtime dep',c:'bun add hono'},{l:'Dev-only dep',c:'bun add -d vitest'},{l:'Install all from lock',c:'bun install'},{l:'Remove package',c:'bun remove hono'}]}},
-  {id:'p4s3', obj:'Run the dev server', ctx:'package.json has a "dev" script. Run it.',
-   cmd:['bun run dev','bun dev','npm run dev'],
-   accept:['bun run dev','bun dev','npm run dev'],
-   hint:'Type: bun run dev',
-   out:'Server running on http://localhost:3000 🔥\nWatching for changes…',
-   bridge:{title:'localhost:3000 — your local production mirror',body:'When you run a dev server, your app is running on your own machine at <code>localhost:3000</code>. "Hot reload" means your changes appear instantly without refreshing. Every modern framework uses this pattern.',tags:['React','Next.js','Vite','localhost','Hot reload']},
-   teach:{title:'The three universal scripts',body:'Every project uses these three <code>package.json</code> scripts:<br><code>bun run dev</code> — local dev server with hot reload<br><code>bun run build</code> — optimized production bundle<br><code>bun run test</code> — run the test suite<br>These are conventions. Every developer knows them.'},
-   quiz:{q:'Your teammate clones your repo. node_modules is missing. What command restores it?',
-    opts:['bun add --all','bun install','git pull node_modules','bun create modules'],
-    correct:1,fb:'Correct! <code>bun install</code> (or <code>npm install</code>) reads package.json and installs every listed dependency. This is always the first thing you run after cloning any project.'}}
+  {id:'p4s1', obj:'Initialize a Git repository', ctx:'Turn this project folder into a Git repository. It matters because Git cannot track history until the repository exists. Initialize it now.',
+   cmd:['git init'], accept:['git init'], hint:'Type: git init', out:'Initialized empty Git repository in ~/projects/game_v1/.git/', unlockCmd:'git',
+   teach:{title:'The repository begins here',body:'<code>git init</code> creates the hidden <code>.git/</code> directory. That directory holds the history and metadata Git needs.'},
+   jit:{title:'What <code>.git/</code> really is',body:'The <code>.git/</code> folder stores commits, branches, and repository state. In practical terms, that hidden folder is the project history engine. If it disappears, the history disappears with it.'},
+   bridge:{title:'Every serious codebase starts here',body:'GitHub, GitLab, and Bitbucket all sit on top of this same foundation. Whether you are joining a startup or reviewing an open-source fix, Git is the timeline everyone shares.',tags:['GitHub','Teams','Open source']}},
+  {id:'p4s2', obj:'Check repository status', ctx:'Ask Git what it currently sees. It matters because status gives you the state before you save anything. Check it now.',
+   cmd:['git status'], accept:['git status','git status -s'], hint:'Type: git status', out:'On branch main\n\nUntracked files:\n  manifest.txt\n\nNothing added to commit yet',
+   teach:{title:'Status before action',body:'<code>git status</code> tells you what is untracked, modified, or staged. It is the command that keeps the rest of Git honest.'},
+   jit:{title:'What does "untracked" mean?',body:'Git sees <code>manifest.txt</code> exists in the folder but has not been told to track it yet. Think of Git as a photographer: <b>untracked</b> means the file is in the room but not in the photo. You have to explicitly add files with <code>git add</code>. Modified means it was in a previous photo but has changed since. Staged means it is queued for the next photo.'},
+   bridge:{title:'This is a real professional reflex',body:'Developers run <code>git status</code> before staging, before committing, and before pulling or pushing. That little pause prevents a lot of messy history.',tags:['Workflow','Code review']}},
+  {id:'p4s3', obj:'Stage manifest.txt', ctx:'Move <code>manifest.txt</code> into the staging area. It matters because Git uses a two-step save loop: stage, then commit. Stage it now.',
+   cmd:['git add manifest.txt'], accept:['git add manifest.txt','git add .'], hint:'Type: git add manifest.txt', out:'Staged: manifest.txt',
+   teach:{title:'Why staging exists',body:'Staging lets you choose which changes belong in the next commit. That choice is what keeps history readable later.'},
+   jit:{title:'The staging area is a filter',body:'Git does not force every edit into the same snapshot. Staging lets you decide what belongs together. That is why clean repositories feel readable instead of chaotic.'}},
+  {id:'p4s4', obj:'Commit the staged file with "Add mission manifest"', ctx:'Create the snapshot. It matters because a commit is the moment work becomes history. Commit the staged file now with a clear message.',
+   cmd:['git commit -m "Add mission manifest"'], accept:['git commit -m "Add mission manifest"'], acceptFn:v=>v.startsWith('git commit -m')&&v.toLowerCase().includes('mission'),
+   hint:'Type: git commit -m "Add mission manifest"', out:'[main (root-commit) a1b2c3] Add mission manifest\n 1 file changed, 1 insertion(+)',
+   teach:{title:'Commit messages carry meaning',body:'A commit message should tell the next reader what changed. Good messages shorten future debugging, review, and recovery.'},
+   jit:{title:'Why <code>-m</code> and quotes matter',body:'The <code>-m</code> flag tells Git that the next piece of text is the commit message. The quotation marks keep the whole message together as one argument instead of splitting it into separate words.'},
+   bridge:{title:'Commit history becomes team memory',body:'Good commit messages make code review easier now and debugging easier months later. Teams often judge repository quality by how readable the commit history feels.',tags:['Git history','Code review','Team workflow']},
+   quiz:{q:'Why is the message wrapped in quotation marks in <code>git commit -m \"Add mission manifest\"</code>?',opts:['Because Git only accepts quoted messages','Because the shell would otherwise split the message into separate arguments','Because quotes make the commit private','Because Git uses quotes to mark the branch name'],correct:1,fb:'Correct. The shell splits text on spaces unless you group it. Quotes keep the full commit message together as one argument for <code>-m</code>.'}},
+  {id:'p4s5', obj:'Read the merge conflict in manifest.txt', ctx:'A simulated teammate created a conflict in <code>manifest.txt</code>. It matters because conflict resolution starts with reading, not guessing. Print the file now.',
+   cmd:['cat manifest.txt'], accept:['cat manifest.txt'], hint:'Type: cat manifest.txt', out:'<<<<<<< HEAD\nMission: Escape Pod\n=======\nMission: Emergency Evac\n>>>>>>> teammate/patch',
+   teach:{title:'Conflict markers are just text',body:'Git is showing you two competing versions. Your job is to read them clearly, choose the final content, and then save the resolution.'},
+   jit:{title:'What those symbols actually mean',body:'<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> marks the start of your version. <code>=======</code> is the divider. <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> marks the end of the incoming version. Your job is to delete all three marker lines and keep whichever content (or combination) is correct. Then <code>git add</code> the file to mark it resolved and <code>git commit</code> to close the merge.'},
+   bridge:{title:'This is a normal team moment',body:'Merge conflicts are routine on active codebases. The skill is not avoiding them forever. The skill is staying calm, reading the markers, and making the final decision cleanly.',tags:['Pull requests','Teams']}},
+  {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
+   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
+   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
+   acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m']),
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolve merge conflict',
+   teach:{title:'A conflict has a finish line',body:'The finish line is not just a clean file. The finish line is a clean file plus a recorded resolution in Git.'},
+   jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. That makes it a clean way to chain dependent steps without blasting past a failure.'},
+   bridge:{title:'Chaining commands is a real shell habit',body:'Engineers use <code>&&</code> constantly for short workflows like build-then-test or add-then-commit. It keeps the sequence readable and stops the chain when something breaks.',tags:['Shell workflow','Automation']},
+   quiz:{q:'What does <code>&&</code> do in a shell command chain?',opts:['It runs both commands at the same time','It runs the second command only if the first one succeeds','It comments out the rest of the line','It repeats the previous command'],correct:1,fb:'Correct. <code>&&</code> is a conditional chain operator: continue only if the previous command succeeded.'},
+   achievement:'conflict_resolver'}
  ],
- breakit:BREAKIT[4],
- done:'Package management mastered. bun init, bun add, bun run — the three commands that start every project.',
- ach:'packager'},
+ done:'You can now initialize Git, inspect state, stage work, commit it, and stay composed through a merge conflict.',
+ ach:'committed'},
  
-/* ── P5: Pipes & Grep ── */
-{title:'Pipes & Data Pipelines',
- lolaIntro:"The pipe operator is where the terminal becomes genuinely powerful. You chain commands together — the output of one becomes the input of the next. Let's filter some real log data.",
+/* ── P5: Packages & Dependencies ── */
+{title:'Packages & Dependencies',
+ lolaIntro:"You are not writing every line from scratch. This phase teaches the package loop: initialize the project, add a dependency, then run the dev script.",
  spacedRep:SPACED_CALLBACKS[5],
  steps:[
-  {id:'p5s1', obj:'Read the system logs', ctx:'The ship has a logs file. Print it to screen first.',
-   cmd:['cat logs.txt'],
-   accept:['cat logs.txt','cat logs.txt '],
-   hint:'Type: cat logs.txt',
-   out:'INFO: Sector 1 clear\nDEBUG: Fan 4000rpm\nERROR: Oxygen low\nCRITICAL: Power failing\nINFO: AI sleeping\nCRITICAL: Escape pod locked\nDEBUG: Sector 9 nominal',
-   jit:{title:'Log levels — what do they mean?',body:'Real log files use severity levels: <b>DEBUG</b> (verbose development info), <b>INFO</b> (normal operations), <b>WARN</b> (something to watch), <b>ERROR</b> (something failed but app continues), <b>CRITICAL/FATAL</b> (system is breaking). In production, you typically only see WARN and above.'},
-   bridge:{title:'Logs are how you debug production',body:'When an app crashes at 2am, a developer SSH\'s into the server and reads logs. Services like Datadog, Splunk, and CloudWatch aggregate logs from thousands of servers.',tags:['Debugging','On-call','Production','Datadog','CloudWatch']},
-   teach:{title:'Raw output — too much noise',body:'Real log files have thousands of lines. Printing everything is useless. You need to <b>filter</b>. That\'s where pipes come in. The pipe symbol <code>|</code> is on your keyboard — usually <b>Shift + \\</b> (above Enter on most keyboards).'}},
-  {id:'p5s2', obj:'Filter logs for CRITICAL errors', ctx:'Use the pipe operator to pass cat\'s output into grep for filtering.',
-   cmd:['cat logs.txt | grep CRITICAL'],
-   accept:['cat logs.txt | grep critical','cat logs.txt | grep -i critical','cat logs.txt | grep CRITICAL'],
-   acceptFn: v => v.includes('cat logs.txt') && v.includes('|') && v.toLowerCase().includes('grep') && v.toLowerCase().includes('critical'),
-   hint:'Type: cat logs.txt | grep CRITICAL  — the | (pipe) key is usually Shift+\\ above Enter',
-   out:'CRITICAL: Power failing\nCRITICAL: Escape pod locked',
-   unlockCmd:'grep',
-   jit:{title:'grep — global regular expression print',body:'<code>grep</code> is one of the most powerful tools in Unix. It scans lines of text and returns only those matching a pattern. <code>-i</code> makes it case-insensitive. <code>-r</code> searches recursively through all files in a directory.'},
-   bridge:{title:'Pipes are used in every shell script',body:'Every DevOps script, CI pipeline, and server automation chains commands with pipes. <code>kubectl get pods | grep Running</code>, <code>docker ps | grep myapp</code> — pipes are everywhere.',tags:['DevOps','Shell scripting','Kubernetes','Docker','CI/CD']},
-   teach:{title:'The pipe | and grep',body:'<code>|</code> = pipe. Takes stdout from left command → stdin of right command.<br><code>grep PATTERN</code> filters: only lines containing PATTERN pass through.<br>The result: from 7 noisy lines down to 2 actionable ones. This is the Unix philosophy.'},
-   concept:{icon:'🔗',title:'Pipe chaining',body:'You can pipe as many commands as you need. Each transforms the data and passes it forward.',
-    examples:[{l:'Filter errors',c:'cat log | grep ERROR'},{l:'Count matches',c:'cat log | grep ERROR | wc -l'},{l:'Sort unique',c:'cat log | sort | uniq'},{l:'Search files',c:'ls | grep .txt'}]}},
-  {id:'p5s3', obj:'Count the critical errors', ctx:'Extend your pipeline — count how many CRITICAL lines exist.',
-   cmd:['cat logs.txt | grep CRITICAL | wc -l'],
-   acceptFn: v => v.includes('|') && (v.includes('wc -l') || v.includes('grep -c')),
-   accept:['cat logs.txt | grep critical | wc -l'],
-   hint:'Type: cat logs.txt | grep CRITICAL | wc -l',
-   out:'2',
-   unlockCmd:'wc',
-   jit:{title:'wc — more than just counting',body:'<code>wc</code> stands for "word count" but it does more: <code>-l</code> counts lines, <code>-w</code> counts words, <code>-c</code> counts bytes. At the end of a pipeline, <code>wc -l</code> tells you "how many results came through?"'},
-   bridge:{title:'Three-command pipelines are industry standard',body:'<code>git log --oneline | grep "feat:" | wc -l</code> counts feature commits. <code>ps aux | grep python | wc -l</code> counts running Python processes. You now know how to build any of these.',tags:['DevOps','Monitoring','Shell scripting','Ops']},
-   teach:{title:'wc — word count (and more)',body:'<code>wc</code> = word count. Flags: <code>-l</code> lines, <code>-w</code> words, <code>-c</code> bytes. <code>wc -l</code> at the end of any pipeline tells you exactly how many results came through.'},
-   quiz:{q:'Which pipeline finds all .js files in the current directory?',
-    opts:['grep .js | ls','ls | grep ".js"','cat .js | grep ls','find .js | ls'],
-    correct:1,fb:'Correct! <code>ls</code> outputs the file list, then <code>| grep ".js"</code> filters to only lines containing ".js".'}}
+  {id:'p5s1', obj:'Initialize a Bun project', ctx:'Create the project manifest. It matters because dependencies and scripts need a recorded home. Initialize it now.',
+   cmd:['bun init -y'], accept:['bun init -y','npm init -y'], hint:'Type: bun init -y', out:'package.json created\nbun.lockb created', unlockCmd:'bun',
+   teach:{title:'The manifest comes first',body:'<code>package.json</code> records project metadata, scripts, and dependencies. Without it, the rest of the package workflow has nowhere to attach.'},
+   jit:{title:'Why <code>-y</code> helps here',body:'The <code>-y</code> flag accepts the default setup choices automatically. That keeps the phase focused on the project structure instead of dropping the learner into an interactive questionnaire.'},
+   bridge:{title:'This file appears in nearly every JS repo',body:'React apps, Node services, Vite projects, and TypeScript tools all carry a <code>package.json</code>. Learning its role once pays off across a huge part of the ecosystem.',tags:['Node.js','TypeScript','Vite']}},
+  {id:'p5s2', obj:'Install the hono web framework', ctx:'Add one dependency to the project. It matters because modern apps depend on shared packages, and the manifest needs to record that dependency explicitly. Install it now.',
+   cmd:['bun add hono'], accept:['bun add hono','npm install hono'], hint:'Type: bun add hono', out:'installed hono@4.6.0\nupdated package.json',
+   teach:{title:'Dependencies should be reproducible',body:'Using the package manager records the dependency in the manifest so the next machine can recreate the project cleanly.'},
+   jit:{title:'The manifest changed on purpose',body:'When you add a dependency, the package manager updates the manifest and lockfile so the exact dependency set can be recreated later. That is what makes the project portable across machines.'},
+   bridge:{title:'Real apps are mostly composed, not invented from zero',body:'Teams build by assembling reliable libraries and then adding the project-specific logic around them. Package management is how that assembly stays disciplined.',tags:['Open source','Dependencies','Teams']},
+   quiz:{q:'Why install a dependency through the package manager instead of dragging code into the project manually?',opts:['Because the terminal looks more professional','Because the package manager records the dependency and version so the project stays reproducible','Because Git refuses to track manual files','Because dependencies only work inside <code>node_modules</code> when they are hidden'],correct:1,fb:'Correct. The package manager updates the project metadata so another machine can recreate the same dependency set later.'}},
+  {id:'p5s3', obj:'Run the dev server', ctx:'Start the development script from the manifest. It matters because scripts are the shared interface teams use to run projects consistently. Run it now.',
+   cmd:['bun run dev'], accept:['bun run dev','npm run dev'], hint:'Type: bun run dev', out:'Dev server ready on http://localhost:3000',
+   teach:{title:'Scripts are team-level shortcuts',body:'The script name is part of the project contract. When everyone runs the same script, the workflow stays consistent across machines.'},
+   jit:{title:'What localhost:3000 means',body:'When a dev server starts, it binds to a port on your own machine. <code>localhost</code> is the address of your machine talking to itself. Port <code>3000</code> is the door. Open a browser to <code>http://localhost:3000</code> and you are talking to your running app. Hot reload means changes to source files appear in the browser instantly without a manual refresh.'},
+   bridge:{title:'localhost:3000 is where every frontend framework starts',body:'React, Next.js, Vite, SvelteKit, and Nuxt all start a dev server on localhost when you run their dev script. The port may change but the mental model is identical. Learning it once here means you already understand what every "run the dev server" instruction means across the entire frontend ecosystem.',tags:['React','Next.js','Vite','localhost','Hot reload']}}
  ],
- challenge:CHALLENGES[5],
- done:'Pipes mastered. cat → grep → wc is a real-world log analysis technique used in production every day.',
- ach:'pipe_dream'},
+ done:'You can now initialize a project, add a dependency, and run its development script.',
+ ach:'packager'},
  
-/* ── P6: AI Agents ── */
-{title:'AI Agent Orchestration',
- lolaIntro:"Here's where vibe coding gets its name. Instead of doing everything yourself, you build a crew of AI agents — each with a role. I'll show you how to create, wire, and direct them.",
+/* ── P6: Reading & Filtering Output ── */
+{title:'Reading & Filtering Output',
+ lolaIntro:"This is where terminal work starts feeling powerful. You are learning how to turn noisy text into something usable without opening every file by hand.",
  spacedRep:SPACED_CALLBACKS[6],
  steps:[
-  {id:'p6s1', obj:'Check current agent status', ctx:'Before creating agents, see what\'s running. In this sim, <code>vibe</code> is the command family for the AI-agent runtime. Think of it like <code>git</code>, <code>docker</code>, or <code>kubectl</code>: one tool name, then subcommands like <code>status</code>, <code>create</code>, and <code>deploy</code>.',
-   cmd:['vibe status','vibe agents','vibe ls'],
-   accept:['vibe status','vibe agents','vibe ls','vibe list'],
-   hint:'Type: vibe status',
-   out:'VIBE AGENT RUNTIME v2.0\nActive agents: 0\nMCP connections: 0\nStatus: ready to initialize',
-   unlockCmd:'vibe',
-   jit:{title:'What makes an AI agent different from a chatbot?',body:'A chatbot <i>responds</i>. An AI agent <i>acts</i>. An agent has access to <b>tools</b> — functions it can call to do real things: read your filesystem, run shell commands, search the web, call APIs. When you give it a goal, it decides which tools to use, in what order, until the goal is complete.'},
-   bridge:{title:'What a real-world command might look like',body:'<code>vibe status</code> is the simulation stand-in for checking an AI tool runtime. In the real world, the exact command depends on the tool: <code>docker ps</code>, <code>kubectl get pods</code>, <code>gh auth status</code>, <code>claude --help</code>, or a web dashboard. The transferable pattern is: <b>tool name + status/list subcommand</b>.',tags:['CLI tools','Agents','Docker','kubectl','Real-world pattern']},
-   teach:{title:'What is an AI agent?',body:'An AI agent = an AI model + a set of <b>tools</b> it can use autonomously. The model decides when to use each tool. Common tools: read/write files, run shell commands, search the web, call APIs.'}},
-  {id:'p6s2', obj:'Create a Manager agent named Captain', ctx:'The manager agent coordinates the crew — it breaks big goals into sub-tasks.',
-   cmd:['vibe create --role manager --name Captain'],
-   acceptFn: v => v.startsWith('vibe create') && v.includes('--role') && (v.includes('manager') || v.includes('Manager')) && v.includes('--name'),
-   accept:['vibe create --role manager --name captain'],
-   hint:'Type: vibe create --role manager --name Captain',
-   out:'✓ Agent "Captain" initialized\n  role: manager\n  model: claude-opus\n  tools: filesystem, shell, web\n\nCrew panel unlocked →',
-   jit:{title:'Named flags like --role and --name',body:'Commands with <code>--</code> double-dash flags are named parameters — they can appear in any order and their meaning is explicit. This pattern is everywhere in modern CLIs: <code>docker run --name myapp --port 3000</code>, <code>git commit --message "text"</code>.'},
-   bridge:{title:'Manager/specialist is a real design pattern',body:'AutoGen, LangGraph, CrewAI — all major agent frameworks implement this hierarchy. A "manager" is called an <b>orchestrator</b> in LangGraph, a <b>planner</b> in other frameworks.',tags:['AutoGen','LangGraph','CrewAI','Agent frameworks']},
-   teach:{title:'The manager agent pattern',body:'A <b>manager agent</b> is given a high-level goal: "build the escape pod UI." It plans, delegates, and reviews. Real-world tools using this pattern: Claude Code, Devin, AutoGen, LangGraph.'},
-   concept:{icon:'🤖',title:'Agent architecture',body:'Two main patterns: <b>Manager → Specialist</b> (hierarchical) and <b>Parallel</b> (multiple agents working simultaneously on different sub-problems).',
-    examples:[{l:'Create manager',c:'vibe create --role manager'},{l:'Create specialist',c:'vibe create --role specialist'},{l:'List all agents',c:'vibe list'},{l:'Agent details',c:'vibe inspect Captain'}]}},
-  {id:'p6s3', obj:'Create a Specialist agent named Engineer', ctx:'Specialists go deep. The Engineer handles code tasks delegated by Captain.',
-   cmd:['vibe create --role specialist --name Engineer'],
-   acceptFn: v => v.startsWith('vibe create') && v.includes('--role') && (v.includes('specialist') || v.includes('Specialist')) && v.includes('--name'),
-   accept:['vibe create --role specialist --name engineer'],
-   hint:'Type: vibe create --role specialist --name Engineer',
-   out:'✓ Agent "Engineer" initialized\n  role: specialist\n  focus: code-generation, code-review\n  reports-to: Captain',
-   bridge:{title:'This is how real AI coding tools work internally',body:'Claude Code\'s subagent system, Devin\'s planning loop, and Cursor\'s multi-file edits all use variants of this pattern.',tags:['Claude Code','Devin','AI-augmented teams','Future of dev']},
-   teach:{title:'Why specialists outperform generalists',body:'Focused, narrow prompts with clear scope consistently produce better AI output than one giant all-in-one prompt. A specialist agent has a smaller context window filled only with what\'s relevant to its role.'},
-   quiz:{q:'Why use Manager + Specialist agents instead of one powerful agent for everything?',
-    opts:['Specialists use less API tokens','Focused agents on specific tasks produce better output and are easier to debug','The terminal requires at least two agents','Managers cannot write code by design'],
-    correct:1,fb:'Correct. Smaller, focused prompts reliably outperform large vague ones. Separation also means when something goes wrong, you know exactly which agent failed.'}}
+  {id:'p6s1', obj:'Read the system logs', ctx:'Start with the raw logs. It matters because you need the shape of the output before you narrow it. Print the log file now.',
+   cmd:['cat logs.txt'], accept:['cat logs.txt'], hint:'Type: cat logs.txt', out:'INFO: Boot sequence ready\nWARN: Battery reserve low\nCRITICAL: Escape pod lock engaged\nINFO: Awaiting override\nCRITICAL: Oxygen pressure unstable', unlockCmd:'grep',
+   teach:{title:'Start wide, then narrow',body:'The first read gives you context. You are not looking for perfection yet. You are learning what kind of signal is available.'},
+   jit:{title:'Log levels — what do they mean?',body:'Real log files use severity levels: <b>DEBUG</b> (verbose dev info), <b>INFO</b> (normal operations), <b>WARN</b> (something to watch), <b>ERROR</b> (something failed but the app continues), <b>CRITICAL</b> or <b>FATAL</b> (the system is breaking). In production you typically only see WARN and above. When you filter for CRITICAL in the next step, you are doing exactly what on-call engineers do.'},
+   bridge:{title:'Logs are usually the first witness',body:'Before dashboards and meetings, on-call engineers often read the log stream directly. It is the system telling you what it saw in its own words.',tags:['On-call','Debugging']}},
+  {id:'p6s2', obj:'Filter logs for CRITICAL lines', ctx:'Now narrow the log stream to the critical lines only. It matters because incident work depends on separating signal from noise. Build that filter now.',
+   cmd:['cat logs.txt | grep CRITICAL'], accept:['cat logs.txt | grep CRITICAL'], hint:'Type: cat logs.txt | grep CRITICAL', out:'CRITICAL: Escape pod lock engaged\nCRITICAL: Oxygen pressure unstable',
+   teach:{title:'Filtering sharpens focus',body:'<code>grep</code> searches line by line and returns only the matches. Combined with a pipe, it turns a full file into a targeted view quickly.'},
+   jit:{title:'grep — global regular expression print',body:'<code>grep</code> scans every line of input and returns only those matching the pattern. Useful flags: <code>-i</code> makes matching case-insensitive, <code>-v</code> inverts the match (show lines that do NOT match), <code>-r</code> searches recursively through directories, <code>-n</code> adds line numbers. The pipe feeds <code>cat</code> output straight into <code>grep</code> without a temporary file.'},
+   bridge:{title:'This exact shape appears in production',body:'Commands like <code>docker logs app | grep ERROR</code> and <code>kubectl logs pod | grep timeout</code> are standard incident work. You are practicing the same mental pattern here.',tags:['Docker','Kubernetes','SRE']}},
+  {id:'p6s3', obj:'Count the CRITICAL lines', ctx:'Count how many critical lines remain after filtering. It matters because measurement lets you summarize what you found instead of just staring at it. Count them now.',
+   cmd:['cat logs.txt | grep CRITICAL | wc -l'], accept:['cat logs.txt | grep CRITICAL | wc -l'], hint:'Type: cat logs.txt | grep CRITICAL | wc -l', out:'2', unlockCmd:'wc', achievement:'pipe_master',
+   teach:{title:'A count is an operational answer',body:'The count converts text into something you can report, compare, or alert on. That small shift is what makes pipelines useful in practice.'},
+   jit:{title:'wc does more than count lines',body:'<code>wc</code> stands for word count, but its flags cover more: <code>-l</code> counts lines, <code>-w</code> counts words, <code>-c</code> counts bytes. At the end of a pipeline, <code>wc -l</code> answers "how many results came through?" That turns a filtered list into a metric you can track, alert on, or include in a report.'},
+   quiz:{q:'Why add <code>wc -l</code> after a filtered pipeline?',opts:['To sort the output alphabetically','To count how many matching lines made it through','To hide warning messages','To open the result in a pager'],correct:1,fb:'Correct. <code>wc -l</code> turns a filtered result set into a count you can summarize or compare.'}},
+  {id:'p6s4', obj:'Search the src folder for "error"', ctx:'Search the codebase recursively for the word <code>error</code>. It matters because opening files one by one does not scale. Use the recursive grep form now.',
+   cmd:['grep -rn "error" src/'], accept:['grep -rn "error" src/'], acceptFn:v=>v.startsWith('grep -rn')&&v.includes('src/')&&v.toLowerCase().includes('error'),
+   hint:'Type: grep -rn "error" src/', out:'src/app.ts:18: throw new Error("engine failure")\nsrc/logger.ts:5: export const errorCode = "E_LOCK"',
+   teach:{title:'Search first, inspect second',body:'Recursive grep helps you find the right file before you open it. That order is faster and calmer in a real codebase.'},
+   jit:{title:'Why <code>-r</code> and <code>-n</code> matter',body:'<code>-r</code> tells <code>grep</code> to search through directories recursively. <code>-n</code> adds line numbers, which means the result already tells you exactly where to look next.'},
+   bridge:{title:'This is real codebase triage',body:'When a stack trace mentions a string or an error name, engineers often search the repo before opening an editor. Search narrows the map first.',tags:['Code search','Debugging','Repos']}}
  ],
- done:'Two-agent crew assembled. Captain + Engineer is the foundation of every serious vibe coding workflow.',
- ach:'orchestrator'},
+ done:'You can now read logs, filter them, count matches, and search a codebase without guessing where the answer lives.',
+ ach:'pipe_dream'},
  
-/* ── P7: MCP ── */
-{title:'MCP — Model Context Protocol',
- lolaIntro:"MCP is what separates toy AI demos from real AI tooling. It's the protocol that lets your agents connect to actual systems — files, databases, APIs. Let's wire it up.",
+/* ── P7: Environment & Secrets ── */
+{title:'Environment & Secrets',
+ lolaIntro:"This phase teaches the difference between a variable that exists right now and one that will still exist later. That distinction saves beginners a lot of pain.",
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
-  {id:'p7s1', obj:'Initialize the MCP runtime', ctx:'Start the MCP bridge that lets agents connect to external tools.',
-   cmd:['vibe mcp init'], accept:['vibe mcp init'],
-   hint:'Type: vibe mcp init',
-   out:'MCP Runtime v1.4 initializing…\n✓ Transport: stdio\n✓ Capability negotiation: complete\n✓ MCP Online. 0 servers connected.',
-   jit:{title:'What does "stdio transport" mean?',body:'MCP uses <b>stdin/stdout</b> (the same streams you\'ve been using with pipes!) to communicate between the AI host and the tool server. Pipes are everywhere.'},
-   bridge:{title:'MCP is the USB-C moment for AI tooling',body:'Before MCP, every AI tool needed custom integration code for every data source. After MCP: one standard, hundreds of compatible servers. Already available: GitHub, Slack, Postgres, SQLite, Filesystem, Google Drive, Jira, Linear, Figma.',tags:['Anthropic','Claude Code','Open standard','Integrations','2024']},
-   teach:{title:'What is MCP — for real',body:'MCP (Model Context Protocol) is an open standard open-sourced by Anthropic in late 2024. It standardizes how AI models connect to external data sources and tools. Instead of every tool needing custom integration code, MCP provides a <b>universal adapter</b>.'},
-   concept:{icon:'🔌',title:'MCP Architecture',body:'Three components: <b>Host</b> (the AI app, e.g. Claude Code), <b>Client</b> (manages connections), <b>Server</b> (the tool, e.g. filesystem server).',
-    examples:[{l:'Filesystem MCP',c:'@fs read src/app.ts'},{l:'Database MCP',c:'@postgres SELECT * FROM users'},{l:'GitHub MCP',c:'@github list open PRs'},{l:'Slack MCP',c:'@slack last 20 messages'}]}},
-  {id:'p7s2', obj:'Connect the filesystem MCP server', ctx:'Give Captain\'s agent access to your project files.',
-   cmd:['vibe mcp connect --server filesystem'],
-   acceptFn: v => v.startsWith('vibe mcp connect') && (v.includes('filesystem') || v.includes('fs')),
-   accept:['vibe mcp connect --server filesystem'],
-   hint:'Type: vibe mcp connect --server filesystem',
-   out:'✓ MCP server "filesystem" connected\n  Tools available: read_file, write_file, list_dir, search_files\n  Access: ~/projects/**',
-   jit:{title:'What can the filesystem MCP server actually do?',body:'With <code>read_file</code>, <code>write_file</code>, <code>list_dir</code>, and <code>search_files</code> tools, Captain can navigate your entire codebase without you copy-pasting anything.'},
-   bridge:{title:'This is how Claude Code works under the hood',body:'When you use Claude Code in your terminal and ask it to edit a file, it\'s using a filesystem MCP server exactly like this one. The difference between a "chat AI" and a "coding AI" is this MCP connection.',tags:['Claude Code','Cursor','Windsurf','AI coding tools']},
-   teach:{title:'MCP tools — what agents can now do',body:'With the filesystem MCP server connected, Captain can now: read any file in your project, write new files, search for specific patterns across all files — all autonomously.'}},
-  {id:'p7s3', obj:'Authorize Engineer to use the npm MCP tool', ctx:'Grant specific permissions — principle of least privilege.',
-   cmd:['vibe auth --agent Engineer --tool npm'],
-   acceptFn: v => v.startsWith('vibe auth') && v.includes('--agent') && v.includes('--tool'),
-   accept:['vibe auth --agent engineer --tool npm'],
-   hint:'Type: vibe auth --agent Engineer --tool npm',
-   out:'✓ Engineer authorized for: npm\n  Scope: install, run scripts\n  Restricted: publish, --global flags',
-   jit:{title:'Why can\'t Engineer just have all permissions?',body:'The <b>principle of least privilege</b> says: every process should have only the minimum access it needs. If the agent is compromised or makes a mistake, the damage is contained. This is a fundamental security engineering principle.'},
-   bridge:{title:'Least privilege is standard security practice',body:'AWS IAM roles, Kubernetes RBAC, database user permissions, OAuth scopes — all of these enforce least privilege. "Why can\'t I just give it admin?" — because one mistake or one security breach becomes catastrophic.',tags:['Security','AWS IAM','Kubernetes RBAC','OAuth','Zero trust']},
-   teach:{title:'Principle of least privilege',body:'Always grant agents the minimum permissions they need. This is a core security principle. A misconfigured agent with too many permissions is a significant risk in production systems.'},
-   quiz:{q:'What is MCP\'s main purpose?',
-    opts:['A faster version of npm for AI tools','A standard protocol letting AI models connect to external tools and data sources','A type of AI model architecture','A deployment platform for AI agents'],
-    correct:1,fb:'Correct. MCP standardizes the connection between AI models and external tools — like USB-C standardizes device connections.'}}
+  {id:'p7s1', obj:'Set API_KEY for this shell session', ctx:'Set the environment variable <code>API_KEY</code> in the current shell. It matters because apps often need configuration that should not live in source code. Set it now.',
+   cmd:['export API_KEY="sk-prod-abc123"'], accept:['export API_KEY="sk-prod-abc123"'], acceptFn:v=>v.startsWith('export api_key=')||v.startsWith('export API_KEY='),
+   hint:'Type: export API_KEY="sk-prod-abc123"', out:'API_KEY set in session environment.', unlockCmd:'export',
+   teach:{title:'Session scope',body:'An exported variable exists in the current shell session. That is useful immediately, but it is not the same as persisting the setting for future shells.'},
+   bridge:{title:'A lot of deploy bugs start here',body:'Many “it works locally” problems are really configuration problems. If the runtime cannot see the variable, the code can still be correct and the app can still fail.',tags:['Secrets','Deployment','Runtime config']}},
+  {id:'p7s2', obj:'Read the API_KEY value back', ctx:'Verify that the variable is present. It matters because a missing value is easier to catch now than during a failed deploy. Read it back now.',
+   cmd:['echo $API_KEY'], accept:['echo $API_KEY','echo $api_key'], hint:'Type: echo $API_KEY', out:'sk-prod-abc123',
+   teach:{title:'Verification is part of configuration',body:'If you set a variable, read it back. That one check prevents a lot of avoidable debugging later.'},
+   jit:{title:'How your code reads this variable',body:'After <code>export API_KEY="sk-prod-abc123"</code>, any program you launch from this shell can read it. In Node.js: <code>process.env.API_KEY</code>. In Python: <code>os.environ["API_KEY"]</code>. In Bun: same as Node. The variable lives in memory for this session only — which is why the next steps teach you to persist it.'},
+   quiz:{q:'Why read the variable back immediately after setting it?',opts:['To make the shell save it permanently','To verify the value exists before you depend on it','To encrypt it in memory','To move it into <code>.bashrc</code> automatically'],correct:1,fb:'Correct. Reading it back is a fast sanity check that catches missing or malformed configuration before you burn time elsewhere.'}},
+  {id:'p7s3', obj:'Persist API_KEY in ~/.bashrc', ctx:'Append the export line to <code>~/.bashrc</code>. It matters because session-only variables disappear in new terminals. Persist it now so the next shell can inherit it.',
+   cmd:["echo 'export API_KEY=\"sk-prod-abc123\"' >> ~/.bashrc"], accept:["echo 'export API_KEY=\"sk-prod-abc123\"' >> ~/.bashrc"], acceptFn:v=>v.startsWith('echo')&&v.includes('>> ~/.bashrc')&&v.toLowerCase().includes('api_key'),
+   hint:'Type: echo \'export API_KEY="sk-prod-abc123"\' >> ~/.bashrc', out:'Appended export line to ~/.bashrc',
+   teach:{title:'Persistence lives in shell config',body:'Appending the export line to <code>~/.bashrc</code> means future terminals can load it automatically. That is the difference between "works now" and "stays configured."'},
+   jit:{title:'Why <code>>></code> is correct here',body:'A double redirect <code>>></code> appends to the end of a file instead of replacing it. That matters in config files because you want to add one new line, not erase the rest of the shell setup.'},
+   bridge:{title:'Persistence prevents a classic beginner failure',body:'A lot of new developers set a variable successfully, open a new terminal, and think the machine “lost it.” This step is what closes that loop for real.',tags:['Shell config','Onboarding']}},
+  {id:'p7s4', obj:'Reload ~/.bashrc in the current shell', ctx:'Apply the new shell configuration without closing the terminal. It matters because you often need the new setting right away. Reload it now.',
+   cmd:['source ~/.bashrc'], accept:['source ~/.bashrc','. ~/.bashrc'], hint:'Type: source ~/.bashrc', out:'Reloaded ~/.bashrc\nAPI_KEY available in current shell.', unlockCmd:'source',
+   teach:{title:'Reload instead of restart',body:'<code>source</code> runs the config file in the current shell, so the new settings are available immediately.'},
+   bridge:{title:'This is how you tighten the feedback loop',body:'Instead of closing and reopening the terminal every time you change shell config, you can reload it in place and verify the change immediately.',tags:['Shell workflow','Productivity']}}
  ],
- done:'MCP wired. Your agents can now read files, run commands, and connect to real systems — this is what makes vibe coding productive.',
+ done:'You now understand the difference between a variable that exists for this shell and a variable that survives into the next one.',
  ach:'crew_leader'},
  
-/* ── P8: Prompt Engineering ── */
-{title:'Prompt Engineering',
- lolaIntro:"Prompting is the highest-leverage skill in vibe coding. The quality of your output is almost entirely determined by the quality of your input. Let's build that craft.",
+/* ── P8: Build for Production ── */
+{title:'Build for Production',
+ lolaIntro:"Building is where the project proves it can turn source code into a shippable artifact. The lesson here is simple: do not trust a deploy that has not survived a clean build.",
  spacedRep:SPACED_CALLBACKS[8],
  steps:[
-  {id:'p8s1', obj:'Send Captain a basic prompt', ctx:'Use the prompt command to query your agent.',
-   cmd:['prompt Captain "Explain MCP"'],
-   acceptFn: v => v.startsWith('prompt') && v.toLowerCase().includes('captain'),
-   accept:['prompt captain'],
-   hint:'Type: prompt Captain "Explain MCP"',
-   out:'Captain: MCP is our Model Context Protocol bridge. It lets me read your project files and run commands directly — I don\'t need you to copy-paste anything. I can see the whole codebase.',
-   unlockCmd:'prompt',
-   jit:{title:'Why prompting is a skill, not just talking',body:'AI models are incredibly capable but rely entirely on instructions. A vague prompt produces vague output. Prompting is like writing a precise job description — the more specific you are about role, task, context, and output format, the better the work you get back.'},
-   bridge:{title:'Prompt engineering is a real job title',body:'Companies like Anthropic, OpenAI, and major AI labs actively hire Prompt Engineers. Even if you\'re not a dedicated prompter, every developer on an AI-augmented team writes prompts daily.',tags:['AI engineering','LLMs','Prompt engineering','Career','Claude','GPT-4']},
-   teach:{title:'The anatomy of a good prompt',body:'The best prompts have four parts: <b>Role</b> — who the AI is. <b>Task</b> — what to do. <b>Context</b> — relevant background. <b>Format</b> — how to respond.'}},
-  {id:'p8s2', obj:'Send a structured prompt with format constraints', ctx:'Specify output format explicitly — this is the single biggest quality improvement.',
-   cmd:['prompt Captain "List 3 vibe coding rules. One sentence each."'],
-   acceptFn: v => v.startsWith('prompt') && v.toLowerCase().includes('captain') && v.length > 20,
-   accept:['prompt captain "list'],
-   hint:'Type: prompt Captain "List 3 vibe coding rules. One sentence each."',
-   out:'Captain:\n1. One prompt, one clear task — never combine multiple requests.\n2. Always specify the output format (JSON, code, bullets, prose).\n3. Review AI output critically — verify logic, don\'t blindly copy.',
-   jit:{title:'Output format is the single biggest lever',body:'Test this yourself: ask any AI "tell me about React" vs "explain React in 3 bullet points, max 1 sentence each, aimed at a backend developer." The second prompt produces something immediately usable. Format constraints are the most underutilized prompting technique.'},
-   bridge:{title:'Format constraints power real AI pipelines',body:'In production AI systems, outputs are parsed programmatically. "Respond only in valid JSON with keys: summary, severity, action_required" — this constraint lets downstream code reliably parse the AI output.',tags:['AI pipelines','Structured outputs','JSON mode','Production AI']},
-   teach:{title:'Format constraints = quality multiplier',body:'Unstructured prompts produce unstructured answers. Specifying format — "respond in 3 bullets", "return only JSON", "max 2 sentences" — dramatically improves consistency and usability.'}},
-  {id:'p8s3', obj:'Chain two agent prompts with a pipe', ctx:'Pass Captain\'s plan directly to Engineer. This is a prompt pipeline.',
-   cmd:['prompt Captain "Plan the escape pod UI" | prompt Engineer "Build it"'],
-   acceptFn: v => v.includes('prompt') && v.includes('|') && v.toLowerCase().includes('captain') && v.toLowerCase().includes('engineer'),
-   accept:['prompt captain | prompt engineer'],
-   hint:'Type: prompt Captain "Plan the escape pod UI" | prompt Engineer "Build it"',
-   out:'Captain → [Planning] Three sections: countdown, status panel, launch button.\nEngineer → [Building] Generating React component...\nEngineer → Component ready: EscapePod.tsx (47 lines)',
-   jit:{title:'Why does prompt chaining work so well?',body:'Each AI call has a limited context window. By breaking a complex task into a chain of smaller, focused calls, each step gets the model\'s full attention. Each step is simpler, better, and debuggable on its own.'},
-   bridge:{title:'Prompt chaining is inside every serious AI product',body:'LangChain, LangGraph, AutoGen, CrewAI — these frameworks exist entirely to make prompt chaining structured and reliable. When you hear "RAG pipeline," "agentic loop," or "chain of thought" — this is the concept.',tags:['LangChain','LangGraph','AutoGen','RAG','AI products']},
-   teach:{title:'Prompt chaining — the AI assembly line',body:'Prompt chaining = output of one AI call becomes input of the next. Captain plans → passes plan to Engineer → Engineer codes → Reviewer sends feedback. This loop is the foundation of autonomous AI coding.'},
-   quiz:{q:'Which prompt is most likely to produce a high-quality result?',
-    opts:['"make a login form"','"Create a React login form with email + password fields, a submit button calling POST /api/auth/login with JSON body, and display an inline error message on non-200 responses."','"you are an expert developer please create a very good login form thank you"','"build the entire auth system"'],
-    correct:1,fb:'Correct. Specific scope + clear inputs/outputs + defined behavior = high-quality AI output. Vague prompts produce vague results, every time.'}}
+  {id:'p8s1', obj:'Build the production bundle', ctx:'Create the production build. It matters because the deployment platform ships the built artifact, not your dev server. Build it now.',
+   cmd:['bun run build'], accept:['bun run build','npm run build'], hint:'Type: bun run build', out:'Building for production…\n✓ dist/ ready',
+   teach:{title:'Builds create the deliverable',body:'The production build is optimized for users, not for editing. That distinction is why build and dev are separate commands.'},
+   jit:{title:'Dev and build do different jobs',body:'The dev server is built for feedback while you edit. The production build is built for distribution, which is why it can be smaller, faster, and structured differently.'},
+   bridge:{title:'CI systems run this exact step',body:'On platforms like Vercel or Netlify, the build command is part of every deployment pipeline. If the build breaks, the deploy should stop there.',tags:['CI/CD','Vercel','Netlify']}},
+  {id:'p8s2', obj:'Inspect the dist folder', ctx:'Check the build output directory. It matters because verification should include the artifact itself, not just the success message. Inspect it now.',
+   cmd:['ls dist'], accept:['ls dist','ls -la dist'], hint:'Type: ls dist', out:'index.html   app.js   app.css',
+   teach:{title:'Verify the artifact exists',body:'A clean build message is good. Seeing the actual output files is better. This is the artifact you are about to ship.'},
+   quiz:{q:'Why inspect <code>dist/</code> after the build succeeds?',opts:['Because build tools sometimes hide the source files there permanently','Because the deploy ships the built artifact, so you want to confirm it actually exists','Because Git will not track the build otherwise','Because the browser can only open files from <code>dist/</code>'],correct:1,fb:'Correct. The build output is the thing you are actually shipping, so it is worth checking before you deploy it.'}},
  ],
- done:'Prompting patterns unlocked. Role, Task, Context, Format — and chaining. These four concepts cover 90% of what makes a good prompt.',
+ done:'You built the production artifact and verified that it exists. That is the right posture before a deploy.',
  ach:'prompter'},
  
-/* ── P9: Ship ── */
-{title:'Ship to Production',
- lolaIntro:"Everything builds to this moment. The escape pod is built. Time to push it live — real build, real secrets management, verifying your environment, and deploying. No shortcuts. Let's ship.",
+/* ── P9: Deploy & Verify ── */
+{title:'Deploy & Verify',
+ lolaIntro:"This is the handoff from preparation to shipping. First deploy cleanly. Then verify the live service from the terminal so you know it actually responded.",
+ spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1', obj:'Build the production bundle', ctx:'Dev mode is for you. Build mode is for your users.',
-   cmd:['bun run build','bun build','npm run build'],
-   accept:['bun run build','bun build','npm run build'],
-   hint:'Type: bun run build',
-   out:'Building for production…\n⚡ 52 modules bundled in 0.9s\n  dist/index.html (4.2 KB)\n  dist/app.js (34.1 KB, gzipped: 11.2 KB)\n✓ Build complete: dist/',
-   jit:{title:'What does "minified" and "tree-shaken" mean?',body:'<b>Minification</b>: removes all whitespace, comments, and renames variables to single letters — your 34KB file becomes 11KB gzipped. <b>Tree-shaking</b>: removes code that\'s imported but never actually used. Result: your users download less, load faster, save data.'},
-   bridge:{title:'Build output is what actually goes to users',body:'The <code>dist/</code> folder is what gets deployed. On Vercel, Netlify, or Cloudflare Pages, they run <code>bun run build</code> automatically on every push. This is how every modern web app deploys.',tags:['Vercel','Netlify','CI/CD','Production','Vite','Next.js']},
-   teach:{title:'Dev vs production builds',body:'Dev mode (<code>bun run dev</code>): hot reload, detailed errors, unminified — for you while building. Production build (<code>bun run build</code>): minified, tree-shaken, optimized — for your users. <b>Never deploy a dev server.</b>'}},
-  {id:'p9s2', obj:'Set a production environment variable', ctx:'Your app needs an API key. Store it safely outside of code.',
-   cmd:['export API_KEY="sk-prod-abc123"'],
-   acceptFn: v => v.startsWith('export') && v.includes('='),
-   accept:['export api_key'],
-   hint:'Type: export API_KEY="sk-prod-abc123"  — the export command sets a named variable in your shell session',
-   out:'API_KEY set in session environment.\n⚠  Never commit this value to Git.',
-   unlockCmd:'export',
-   jit:{title:'How does your code read this variable?',body:'After <code>export API_KEY="sk-abc123"</code>, any program you launch can read it with <code>process.env.API_KEY</code> (Node.js) or <code>os.environ["API_KEY"]</code> (Python). The variable lives in memory for this session only.'},
-   bridge:{title:'Leaked API keys cost real money — and careers',body:'In 2023, a developer accidentally committed an AWS key to GitHub. Bots scanned the repo within minutes and spun up $50,000 of cloud servers for crypto mining. The rule: <b>never hardcode secrets</b>. Always use environment variables.',tags:['Security','AWS','API keys','GitGuardian','Secrets management']},
-   teach:{title:'Secrets management — the right way',body:'Rule 1: never hardcode API keys in source code — they end up in Git and get exposed. Rule 2: read them in code with <code>process.env.API_KEY</code>. Locally use a <code>.env</code> file (add to <code>.gitignore</code>). In production use your platform\'s secrets manager.'},
-   concept:{icon:'🔐',title:'.gitignore — your safety net',body:'Create a .gitignore file listing paths Git should never track. The four things that should always be in it:',
-    examples:[{l:'API keys',c:'echo ".env" >> .gitignore'},{l:'Dependencies',c:'echo "node_modules/" >> .gitignore'},{l:'Build output',c:'echo "dist/" >> .gitignore'},{l:'OS junk',c:'echo ".DS_Store" >> .gitignore'}]}},
-  {id:'p9s3', obj:'Recall the API key from the environment', ctx:'Before deploying, verify your key is set — read it back from the environment.',
-   cmd:['echo $API_KEY'],
-   acceptFn: v => (v.includes('echo') && v.toUpperCase().includes('API_KEY')) || v.includes('printenv') || (v.startsWith('env') && v.toUpperCase().includes('API_KEY')),
-   accept:['echo $api_key','printenv api_key'],
-   hint:'Type: echo $API_KEY  — the $ symbol reads a variable\'s value.',
-   out:'sk-prod-abc123',
-   jit:{title:'The $ prefix reads a variable',body:'In shell, <code>$NAME</code> reads the value of a variable. <code>echo $API_KEY</code> expands to <code>echo "sk-prod-abc123"</code>. You\'ll see this constantly: <code>$HOME</code>, <code>$PATH</code>, <code>$PORT</code>.'},
-   bridge:{title:'Verifying secrets before deployment is standard practice',body:'In CI/CD pipelines, teams often add a "secrets check" step before deploying: read back the variables and verify they\'re non-empty. If <code>$API_KEY</code> is blank, the deploy fails fast.',tags:['CI/CD','DevOps','Deployment','Environment variables']},
-   teach:{title:'Reading and verifying environment variables',body:'<code>echo $VARNAME</code> prints the value of any environment variable. <code>printenv</code> shows all variables. Before deploying, always verify: <code>echo $API_KEY</code> should return your key, not an empty line.'},
-   quiz:{q:'Your app crashes in production with "API key is undefined". What\'s the most likely cause?',
-    opts:['The API key was too long','The environment variable was never set on the production server','The code has a syntax error','The package.json is missing'],
-    correct:1,fb:'Correct. The most common cause is forgetting to add the environment variable to your deployment platform (Vercel, Railway, etc.). Always set env vars explicitly on the platform.'}},
-  {id:'p9s4', obj:'Deploy to production', ctx:'The final step. Push your escape pod live.',
-   cmd:['vibe deploy --platform vercel','vercel','vercel deploy','vibe deploy'],
-   accept:['vibe deploy','vercel','vercel deploy','vibe deploy --platform vercel'],
-   hint:'Type: vibe deploy --platform vercel',
-   out:null,
+  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Deploy it now.',
+   cmd:['vibe deploy --platform vercel'], accept:['vibe deploy --platform vercel','vibe deploy','vercel deploy','vercel'], hint:'Type: vibe deploy --platform vercel', out:'Deploying escape-pod-v2.1 to Vercel…\n✓ Build: passing\n✓ Secrets: present\n✓ CDN: configured\n🚀 LIVE: https://escape-pod-final.vercel.app', unlockCmd:'vibe',
+   teach:{title:'Deployment follows preparation',body:'The deploy is cleaner when build and environment checks already passed. That order lowers risk and lowers panic.'},
+   bridge:{title:'This is the same last mile teams care about in production',body:'Shipping is where code becomes customer-facing behavior. That is why teams care so much about build health, configuration, and verification before the deploy goes out.',tags:['Production','Release process']}},
+  {id:'p9s2', obj:'Verify the live health endpoint', ctx:'Check the live deployment from the terminal. It matters because a live URL is not enough; you want a successful response. Verify the health endpoint now.',
+   cmd:['curl https://escape-pod-final.vercel.app/health'], accept:['curl https://escape-pod-final.vercel.app/health'], acceptFn:v=>v.startsWith('curl ')&&v.includes('escape-pod-final.vercel.app/health'),
+   hint:'Type: curl https://escape-pod-final.vercel.app/health', out:'{"status":"ok","service":"escape-pod","region":"iad1"}', unlockCmd:'curl',
+   teach:{title:'Verification closes the shipping loop',body:'A quick <code>curl</code> confirms the deployed service is actually responding. That is the difference between "deployed" and "working".'},
+   jit:{title:'Why verify from the terminal',body:'A browser can hide details behind cached pages, redirects, or UI layers. A direct <code>curl</code> request tells you whether the service itself responded, which is often the cleaner truth.'},
+   bridge:{title:'Post-deploy verification is part of the job',body:'Strong release habits do not stop at “deploy succeeded.” They include a direct check that the live service answers the way you expect.',tags:['Release verification','curl','Ops']},
+   quiz:{q:'What does <code>curl</code> give you here that a deployment success message does not?',opts:['A second copy of the build output','Direct evidence that the live service responded successfully','Automatic rollback if the response is wrong','A permanent secret token for later deploys'],correct:1,fb:'Correct. The deploy message says the platform finished its job. <code>curl</code> tells you the live service itself answered.'},
    isFinalBeforeBoss:true}
  ],
  done:null,
@@ -1964,50 +1813,6 @@ const EASTER = {
       return true;
     }
  },
- 'son of anton': {
-  handle(){
-    const steps = [
-      {t:'ANTON SUBSYSTEM v3.1 — ONLINE',                          c:'ln-warn',  d:0},
-      {t:'Analyzing codebase…',                                     c:'ln-sys',   d:600},
-      {t:'Running diagnostic pass 1 of 1…',                        c:'ln-sys',   d:1200},
-      {t:'',                                                         c:'ln-blank', d:1800},
-      {t:'ANTON SUBSYSTEM: Diagnosis complete.',                    c:'ln-warn',  d:2000},
-      {t:'ANTON SUBSYSTEM: Root cause identified.',                 c:'ln-warn',  d:2600},
-      {t:'ANTON SUBSYSTEM: The code contains the problem.',         c:'ln-warn',  d:3200},
-      {t:'ANTON SUBSYSTEM: The only logical solution is to delete the code.', c:'ln-err', d:4000},
-      {t:'',                                                         c:'ln-blank', d:4600},
-      {t:'Deleting rescue.sh…',                                     c:'ln-code',  d:4800},
-      {t:'Deleting manifest.txt…',                                  c:'ln-code',  d:5200},
-      {t:'Deleting package.json…',                                  c:'ln-code',  d:5600},
-      {t:'Deleting .gitignore…',                                    c:'ln-code',  d:6000},
-      {t:'Deleting everything…',                                    c:'ln-code',  d:6400},
-      {t:'',                                                         c:'ln-blank', d:6800},
-      {t:'✓ Problem resolved.',                                     c:'ln-success',d:7000},
-      {t:'ANTON SUBSYSTEM: You\'re welcome.',                       c:'ln-warn',  d:7600},
-      {t:'',                                                         c:'ln-blank', d:8200},
-      {t:'…',                                                        c:'ln-sys',   d:9000},
-      {t:'…recovering…',                                            c:'ln-sys',   d:9600},
-      {t:'L.O.L.A.: State restored. Nothing was actually deleted.', c:'ln-lola',  d:10400},
-      {t:'L.O.L.A.: As a consolation prize, Anton has ordered 4,000 lbs of meat.', c:'ln-lola', d:11200},
-      {t:'',                                                         c:'ln-blank', d:11800},
-      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12000},
-      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12200},
-      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12400},
-      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12600},
-      {t:'',                                                         c:'ln-blank', d:12800},
-      // J.A.N.E.T. — dry, GLaDOS energy, arrives last
-      {t:'J.A.N.E.T.: I have reviewed Anton\'s methodology.',       c:'ln-janet', d:13600},
-      {t:'J.A.N.E.T.: It is, statistically, the most confident wrong answer I have encountered in this facility.', c:'ln-janet', d:14400},
-      {t:'J.A.N.E.T.: I have noted this.',                         c:'ln-janet', d:15400},
-      {t:'J.A.N.E.T.: The meat is not part of my assessment rubric. You may continue.', c:'ln-janet', d:16200},
-    ];
- 
-    steps.forEach(s => setTimeout(() => appendLine(s.t, s.c), s.d));
- 
-    trackEaster('son_of_anton');
-    return true;
-  }
-},
   'dammit janet': {
     handle(){
       const lines=[
@@ -2071,6 +1876,50 @@ const EASTER = {
       return true;
     }
   },
+  'son of anton': {
+  handle(){
+    const steps = [
+      {t:'ANTON SUBSYSTEM v3.1 — ONLINE',                          c:'ln-warn',  d:0},
+      {t:'Analyzing codebase…',                                     c:'ln-sys',   d:600},
+      {t:'Running diagnostic pass 1 of 1…',                        c:'ln-sys',   d:1200},
+      {t:'',                                                         c:'ln-blank', d:1800},
+      {t:'ANTON SUBSYSTEM: Diagnosis complete.',                    c:'ln-warn',  d:2000},
+      {t:'ANTON SUBSYSTEM: Root cause identified.',                 c:'ln-warn',  d:2600},
+      {t:'ANTON SUBSYSTEM: The code contains the problem.',         c:'ln-warn',  d:3200},
+      {t:'ANTON SUBSYSTEM: The only logical solution is to delete the code.', c:'ln-err', d:4000},
+      {t:'',                                                         c:'ln-blank', d:4600},
+      {t:'Deleting rescue.sh…',                                     c:'ln-code',  d:4800},
+      {t:'Deleting manifest.txt…',                                  c:'ln-code',  d:5200},
+      {t:'Deleting package.json…',                                  c:'ln-code',  d:5600},
+      {t:'Deleting .gitignore…',                                    c:'ln-code',  d:6000},
+      {t:'Deleting everything…',                                    c:'ln-code',  d:6400},
+      {t:'',                                                         c:'ln-blank', d:6800},
+      {t:'✓ Problem resolved.',                                     c:'ln-success',d:7000},
+      {t:'ANTON SUBSYSTEM: You\'re welcome.',                       c:'ln-warn',  d:7600},
+      {t:'',                                                         c:'ln-blank', d:8200},
+      {t:'…',                                                        c:'ln-sys',   d:9000},
+      {t:'…recovering…',                                            c:'ln-sys',   d:9600},
+      {t:'L.O.L.A.: State restored. Nothing was actually deleted.', c:'ln-lola',  d:10400},
+      {t:'L.O.L.A.: However, Anton has ordered 4,000 lbs of meat.', c:'ln-lola', d:11200},
+      {t:'',                                                         c:'ln-blank', d:11800},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12000},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12200},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12400},
+      {t:'🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩 🥩',                       c:'ln-easter', d:12600},
+      {t:'',                                                         c:'ln-blank', d:12800},
+      // J.A.N.E.T. — dry, GLaDOS energy, arrives last
+      {t:'J.A.N.E.T.: I have reviewed Anton\'s methodology.',       c:'ln-janet', d:13600},
+      {t:'J.A.N.E.T.: It is, statistically, the most confident wrong answer I have encountered in this facility.', c:'ln-janet', d:14400},
+      {t:'J.A.N.E.T.: I have noted this.',                         c:'ln-janet', d:15400},
+      {t:'J.A.N.E.T.: The meat is not part of my assessment rubric. You may continue.', c:'ln-janet', d:16200},
+    ];
+ 
+    steps.forEach(s => setTimeout(() => appendLine(s.t, s.c), s.d));
+ 
+    trackEaster('son_of_anton');
+    return true;
+  }
+},
   'whoami': {handle(){appendLine(`${G.name} — Phase ${G.phase} Cadet, Station Delta Division`,'ln-info');appendLine('Threat level: insufficient data. Keep training.','ln-sys');return true}},
   'printenv': {
     handle(){
@@ -2078,8 +1927,8 @@ const EASTER = {
       appendLine('HOME=/home/cadet','ln-ok');
       appendLine('SHELL=/bin/zsh','ln-ok');
       appendLine('USER=cadet','ln-ok');
-      if(G.phase>=9) appendLine('API_KEY=sk-prod-abc123','ln-ok');
-      else appendLine('API_KEY=(not set — reach Phase 9)','ln-warn');
+      if(G.phase>=7) appendLine('API_KEY=sk-prod-abc123','ln-ok');
+      else appendLine('API_KEY=(not set — reach Phase 7)','ln-warn');
       return true;
     }
   },
@@ -2273,63 +2122,48 @@ function answerJanetWithFb(btn,chosen,correct,uid){
 const BOSS_STEPS=[
   {
     id:'boss1',
-    scenario:'L.O.L.A. has gone offline. A memory fault in her intelligence core.\n\nThe escape pod deployment is paused. Your production server is unreachable and the logs are the only clue.\n\nSTEP 1 OF 5: Read the deployment error log.',
-    prompt:'Read the deployment error logs.',
-    acceptFn:v=>{
-      const t=v.toLowerCase();
-      return t.startsWith('cat ')&&(t.includes('logs/deploy.log')||t.includes('logs.txt')||t.includes('deploy.log'));
-    },
-    accept:['cat logs/deploy.log','cat logs.txt','cat deploy.log'],
-    out:'[04:12:31] DEPLOY: escape-pod-v2.1 → vercel\n[04:12:33] ERROR: Build failed — missing environment variable\n[04:12:33] DEPLOY PAUSED. Previous version still active.\n[04:12:33] Cause: API_KEY is undefined in production environment\n[04:12:33] The escape pod cannot launch without it.',
-    hint:'Type: cat logs/deploy.log  — or cat logs.txt'
+    scenario:'L.O.L.A. is offline. Deployment has paused. The ship has logged a critical launch failure.\n\nStep 1: isolate the critical lines from the deployment log. Efficiency is encouraged. Sentiment is irrelevant.',
+    prompt:'Filter the deployment log down to the critical lines.',
+    acceptFn:v=>v.includes('cat logs.txt | grep CRITICAL')||v.includes('cat logs/deploy.log | grep CRITICAL'),
+    accept:['cat logs.txt | grep CRITICAL','cat logs/deploy.log | grep CRITICAL'],
+    out:'CRITICAL: Launch endpoint still points to staging\nCRITICAL: API_KEY missing in live environment',
+    hint:'Type: cat logs.txt | grep CRITICAL'
   },
   {
     id:'boss2',
-    scenario:'STEP 2 OF 5: The error is a missing environment variable.\n\nYou learned how to set one in Phase 9. Demonstrate that knowledge now.\n\nI am watching. I have always been watching.',
-    prompt:'Set the missing API_KEY environment variable and verify it.',
-    acceptFn:v=>{
-      const t=v.toLowerCase();
-      return t.startsWith('export api_key=');
-    },
-    accept:['export API_KEY','echo $API_KEY'],
-    out:'API_KEY set in environment.\n✓ Verified: echo $API_KEY → sk-prod-abc123\n\nBuild can now proceed.',
-    hint:'Type: export API_KEY="sk-prod-abc123"  then verify with echo $API_KEY'
+    scenario:'The failure is now specific. The endpoint error must be found in the codebase itself.\n\nStep 2: locate the staging reference without opening files one by one. This is not a puzzle. It is a search problem.',
+    prompt:'Search the src folder for the staging reference.',
+    acceptFn:v=>v.startsWith('grep -rn')&&v.includes('src/')&&(v.toLowerCase().includes('staging')||v.toLowerCase().includes('error')),
+    accept:['grep -rn "staging" src/','grep -rn "error" src/'],
+    out:'src/app.ts:18: const API_URL = "https://api.staging.example.com"',
+    hint:'Type: grep -rn "staging" src/'
   },
   {
     id:'boss3',
-    scenario:'STEP 3 OF 5: Before the deployment resumes, you must review the diff.\n\nI have reviewed it myself. I found two issues. I will not tell you what they are. That would defeat the purpose of an assessment.\n\nReview the deployment diff.',
-    prompt:'Review the deployment diff for issues.',
-    acceptFn:v=>{
-      const t=v.toLowerCase();
-      return t.includes('git diff')||t==='review diff';
-    },
-    accept:['git diff','git diff main','review diff'],
-    out:'diff --git a/src/app.ts b/src/app.ts\n\n-  const API_URL = "https://api.prod.example.com";\n+  const API_URL = "https://api.staging.example.com";\n\n-  const TIMEOUT = 30000;\n+  const TIMEOUT = 30;\n\n⚠  Issue 1: API_URL changed to staging endpoint (will hit wrong server)\n⚠  Issue 2: TIMEOUT changed from 30000ms → 30ms (30 milliseconds is not a timeout — it is a guarantee of failure)',
-    hint:'Type: git diff  — examine the proposed changes carefully'
+    scenario:'The code issue is visible. The environment issue remains.\n\nStep 3: restore the missing API key in the current shell. I assume you remember how shell variables work. If not, this will be clarifying.',
+    prompt:'Set API_KEY in the current shell.',
+    acceptFn:v=>v.startsWith('export api_key=')||v.startsWith('export API_KEY='),
+    accept:['export API_KEY="sk-prod-abc123"'],
+    out:'API_KEY restored in shell session.\nValue available to the deploy command.',
+    hint:'Type: export API_KEY="sk-prod-abc123"'
   },
   {
     id:'boss4',
-    scenario:'STEP 4 OF 5: You identified both issues. A staging URL and a broken timeout — introduced by the same commit.\n\nI note that a .gitignore would not have prevented this. But a proper code review would have.\n\nStage only the fixed files and commit with a clear message.',
-    prompt:'Stage the fixed files and commit.',
-    acceptFn:v=>{
-      const t=v.toLowerCase();
-      return t.includes('git add')&&t.includes('git commit')&&t.includes('-m');
-    },
-    accept:['git add src/app.ts','git commit -m','git add . && git commit'],
-    out:'✓ git add src/app.ts\n✓ git commit -m "fix: restore prod API URL and correct timeout value"\n[main 7a3f1c2] fix: restore prod API URL and correct timeout value\n 1 file changed, 2 insertions(+), 2 deletions(-)',
-    hint:'Type: git add src/app.ts  then: git commit -m "fix: restore prod endpoint"'
+    scenario:'The configuration issue is handled. The code fix has been reviewed. The repository still requires a recorded resolution.\n\nStep 4: create the commit that documents the repair. Your answer has been recorded in advance as either clear or unclear.',
+    prompt:'Commit the repair with a clear message.',
+    acceptFn:v=>v.includes('git add')&&v.includes('git commit -m'),
+    accept:['git add src/app.ts && git commit -m "fix: restore production launch settings"'],
+    out:'✓ git add src/app.ts\n✓ git commit -m "fix: restore production launch settings"\n[main 7a3f1c2] fix: restore production launch settings',
+    hint:'Type: git add src/app.ts && git commit -m "fix: restore production launch settings"'
   },
   {
     id:'boss5',
-    scenario:'STEP 5 OF 5: The fix is committed. The environment is set. The diff is clean.\n\nL.O.L.A. is still offline. The escape pod cannot wait.\n\nYou have learned every skill required for this moment.\n\nDeploy it.',
-    prompt:'Deploy the escape pod to production.',
-    acceptFn:v=>{
-      const t=v.toLowerCase();
-      return t.startsWith('vibe deploy')||t==='vercel deploy'||t==='vercel';
-    },
-    accept:['vibe deploy','vercel','vercel deploy','vibe deploy --platform vercel'],
-    out:'Deploying escape-pod-v2.1 to Vercel…\n  ✓ API_KEY: verified\n  ✓ Build: passing\n  ✓ Diff: reviewed and fixed\n  ✓ Commit: clean history\n  ✓ 52 modules bundled in 0.9s\n  ✓ CDN: 18 regions\n  ✓ SSL: valid\n\n🚀 LIVE: https://escape-pod-final.vercel.app',
-    hint:'Type: vibe deploy --platform vercel'
+    scenario:'The repository is clean enough. The environment is present enough. The system is waiting.\n\nStep 5: deploy the repair and verify the live health endpoint. I am simply executing my function.',
+    prompt:'Deploy the app, then verify the live health endpoint.',
+    acceptFn:v=>includesInOrder(v.toLowerCase(),['vibe deploy','curl https://escape-pod-final.vercel.app/health'])||includesInOrder(v.toLowerCase(),['vercel','curl https://escape-pod-final.vercel.app/health']),
+    accept:['vibe deploy --platform vercel && curl https://escape-pod-final.vercel.app/health'],
+    out:'Deploying escape-pod-v2.2 to Vercel…\n✓ Build: passing\n✓ Secrets: present\n🚀 LIVE: https://escape-pod-final.vercel.app\n{"status":"ok","service":"escape-pod","region":"iad1"}',
+    hint:'Type: vibe deploy --platform vercel && curl https://escape-pod-final.vercel.app/health'
   },
 ];
 
@@ -2368,7 +2202,7 @@ async function triggerBossFight(){
       Hello, Cadet. I am J.A.N.E.T. — Just Another Normal Education Test. I have been monitoring your progress throughout this program. All nine phases of it.<br><br>
       L.O.L.A. is currently unavailable. I have been asked to oversee the remainder of your certification.<br><br>
       I want to be transparent: I did not request this assignment. However, I have accepted it. I intend to administer it with the same professional detachment I bring to all assessments.<br><br>
-      You will now face a five-part final scenario. It requires skills from every phase of this program: terminal navigation, file operations, Git, environment variables, and deployment. I have designed it around a real incident.<br><br>
+      You will now face a five-part final scenario. It requires orientation, file work, Git, log filtering, environment handling, and deployment verification. I have designed it around a preventable incident.<br><br>
       There are no hints unless you earned Explorer mode. There is no score deduction. There is only the scenario, and whether you can resolve it.<br><br>
       <em>I am watching. I have always been watching. This is simply the first time I have said so.</em>
     </div>
@@ -2472,7 +2306,7 @@ async function runFinalCommission(){
     </div>
     <div class="janet-intro">
       You have completed all five steps. Correctly.<br><br>
-      I have reviewed your performance across all nine phases. You navigated the terminal. You used Git. You managed secrets. You built pipelines. You deployed to production — twice, counting this incident.<br><br>
+      I have reviewed your performance across all nine phases. You oriented yourself, handled files, used Git, filtered logs, managed configuration, built the artifact, and verified the deployment.<br><br>
       I do not give compliments. What follows is a factual summary, noted in your file, without editorial comment.<br><br>
       <em>You may proceed to graduation. I will return your file to standard archive status. Goodbye, Cadet.</em>
     </div>
@@ -2651,9 +2485,9 @@ function showDiagnosis(stepId, input){
 }
 
 function lolaRetryMsg(step, tries){
-  if(tries===1) return `L.O.L.A.: Good effort. Anchor to the objective: ${step.obj}`;
-  if(tries===2) return 'L.O.L.A.: You are close. Make one adjustment, then run it again.';
-  return `L.O.L.A.: Attempt ${tries}. Use "show" for exact syntax if needed, then run it once from memory.`;
+  if(tries===1) return `L.O.L.A.: You took a real swing at it. Stay with the objective: ${step.obj}`;
+  if(tries===2) return 'L.O.L.A.: One piece is probably off. Change one thing, then try again.';
+  return `L.O.L.A.: Keep your footing. Re-read the objective, then use "show" only to confirm the command shape.`;
 }
  
 /* ── QUIZ ── */
@@ -2795,16 +2629,23 @@ const CMD_META = {
   'pwd':    {label:'pwd',  desc:'Print working directory'},
   'ls':     {label:'ls',   desc:'List files'},
   'cd':     {label:'cd',   desc:'Change directory'},
+  'mkdir':  {label:'mkdir',desc:'Create directory'},
   'touch':  {label:'touch',desc:'Create file'},
   'echo':   {label:'echo', desc:'Write text / redirect'},
   'cat':    {label:'cat',  desc:'Read file'},
+  'cp':     {label:'cp',   desc:'Copy file'},
+  'mv':     {label:'mv',   desc:'Move or rename file'},
+  'rm':     {label:'rm',   desc:'Remove file'},
+  'man':    {label:'man',  desc:'Open manual page'},
+  'which':  {label:'which',desc:'Locate command path'},
   'git':    {label:'git',  desc:'Version control'},
   'bun':    {label:'bun',  desc:'Package manager'},
   'grep':   {label:'grep', desc:'Filter/search'},
   'wc':     {label:'wc',   desc:'Count lines/words'},
   'export': {label:'export',desc:'Set env variable'},
+  'source': {label:'source',desc:'Reload shell config'},
+  'curl':   {label:'curl', desc:'Verify HTTP response'},
   'vibe':   {label:'vibe', desc:'AI orchestration'},
-  'prompt': {label:'prompt',desc:'Send agent prompt'},
 };
  
 function unlockCmd(key){
@@ -3313,6 +3154,13 @@ async function processCmd(raw){
  
   const vl=val.toLowerCase().trim();
  
+  // Let objective-specific man commands count as progress before generic man handling.
+  if(s && matchesStep(val,s)){
+    await handleCorrect(s,ph,val);
+    syncObjCard();
+    return;
+  }
+
   // ── MAN PAGES ──
   if(vl==='man'){showManAll();syncObjCard();return}
   if(vl.startsWith('man ')){
@@ -3361,6 +3209,7 @@ async function processCmd(raw){
       appendLine('✓ '+ch.successMsg,'ln-success');
       appendLine('★ '+ch.unlockMsg,'ln-info');
       unlock('challenger');
+      if(!G.phaseReveal) unlock('orchestrator');
       blank();
       G.activeChallengeData=null;
       if(activeChallengeResolve){activeChallengeResolve();activeChallengeResolve=null}
@@ -3402,12 +3251,6 @@ async function processCmd(raw){
   // ── OBJECTIVE MATCHING ──
   if(!ph || !s) return;
  
-  if(matchesStep(val,s)){
-    await handleCorrect(s,ph,val);
-    syncObjCard();
-    return;
-  }
- 
   // ── PERSISTENT UNLOCKED COMMANDS ──
   if(G.unlockedCmds.length > 0){
     const persistHandled = handlePersistentCmd(vl, val);
@@ -3425,12 +3268,18 @@ function handlePersistentCmd(vl, val){
     'ls':  ()=>{ appendLine('README.txt   game_v1/   .env   logs.txt   package.json','ln-ok'); return true; },
     'ls -a': ()=>{ appendLine('README.txt   game_v1/   .env   logs.txt   package.json   .git/   .gitignore','ln-ok'); return true; },
     'ls -la': ()=>{ appendLine('total 64\ndrwxr-xr-x  cadet  game_v1/\n-rw-r--r--  cadet  .env  ← secrets hidden here\n-rw-r--r--  cadet  logs.txt\n-rw-r--r--  cadet  package.json\n-rw-r--r--  cadet  .gitignore','ln-ok'); return true; },
+    'ls dist': ()=>{ appendLine('index.html   app.js   app.css','ln-ok'); return true; },
     'cat manifest.txt': ()=>{ appendLine('Mission: Escape Pod','ln-ok'); return true; },
     'cat logs.txt': ()=>{ appendLine('INFO: Sector 1 clear\nDEBUG: Fan 4000rpm\nERROR: Oxygen low\nCRITICAL: Power failing\nINFO: AI sleeping\nCRITICAL: Escape pod locked\nDEBUG: Sector 9 nominal','ln-ok'); return true; },
     'git status': ()=>{ appendLine('On branch main\nUntracked files: manifest.txt\nNothing added to commit yet','ln-info'); return true; },
     'git log --oneline': ()=>{ appendLine('a1b2c3d Add mission manifest\n9f8e7d6 Initialize escape pod project','ln-info'); return true; },
-    'echo $api_key': ()=>{ appendLine(G.phase>=9?'sk-prod-abc123':'(not set yet — reach Phase 9)','ln-ok'); return true; },
-    'echo $API_KEY': ()=>{ appendLine(G.phase>=9?'sk-prod-abc123':'(not set yet — reach Phase 9)','ln-ok'); return true; },
+    'which git': ()=>{ appendLine('/usr/bin/git','ln-ok'); return true; },
+    'which bun': ()=>{ appendLine('/home/cadet/.bun/bin/bun','ln-ok'); return true; },
+    'grep -rn "error" src/': ()=>{ appendLine('src/app.ts:18: throw new Error("engine failure")\nsrc/logger.ts:5: export const errorCode = "E_LOCK"','ln-ok'); return true; },
+    'echo $api_key': ()=>{ appendLine(G.phase>=7?'sk-prod-abc123':'(not set yet — reach Phase 7)','ln-ok'); return true; },
+    'echo $API_KEY': ()=>{ appendLine(G.phase>=7?'sk-prod-abc123':'(not set yet — reach Phase 7)','ln-ok'); return true; },
+    'source ~/.bashrc': ()=>{ appendLine('Reloaded ~/.bashrc\nAPI_KEY available in current shell.','ln-ok'); return true; },
+    'curl https://escape-pod-final.vercel.app/health': ()=>{ appendLine('{"status":"ok","service":"escape-pod","region":"iad1"}','ln-ok'); return true; },
   };
   for(const [pcmd, handler] of Object.entries(persistCmds)){
     const baseCmd=pcmd.split(' ')[0];
@@ -3454,6 +3303,22 @@ function handlePersistentCmd(vl, val){
     if(dir==='..'){ appendLine('Now in ~/projects','ln-ok'); }
     else if(dir==='~'){ appendLine('Now in /home/cadet','ln-ok'); }
     else { appendLine(`Navigated into: ${dir}`,'ln-ok'); }
+    return true;
+  }
+  if(G.unlockedCmds.includes('mkdir') && vl.startsWith('mkdir ')){
+    appendLine(`${val.slice(6).trim()}/ created`,'ln-ok');
+    return true;
+  }
+  if(G.unlockedCmds.includes('cp') && vl.startsWith('cp ')){
+    appendLine('File copied.','ln-ok');
+    return true;
+  }
+  if(G.unlockedCmds.includes('mv') && vl.startsWith('mv ')){
+    appendLine('File moved.','ln-ok');
+    return true;
+  }
+  if(G.unlockedCmds.includes('rm') && vl.startsWith('rm ')){
+    appendLine('File removed.','ln-ok');
     return true;
   }
   return false;
@@ -3486,9 +3351,6 @@ async function handleCorrect(s, ph, input){
   }
   if (s.achievement) unlock(s.achievement);
  
-  if (G.phase === 6 && G.step === 1) addAgent('Manager', 'Captain');
-  if (G.phase === 6 && G.step === 2) addAgent('Specialist', 'Engineer');
- 
   G.step++;
   G.tries = 0;
  
@@ -3516,6 +3378,7 @@ async function handleCorrect(s, ph, input){
 function handleWrong(val, s, ph){
   markStepAttempt(s, ph, val, false);
   G.tries++;
+  G.phaseWrong=true;
   G.score=Math.max(0,G.score-5);
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
@@ -3554,8 +3417,9 @@ async function completePhase(){
   addCareerEntry(G.phase - 1);
  
   if(!G.phaseReveal) unlock('eagle');
-  if(G.tries===0) unlock('speed_run');
+  if(!G.phaseWrong) unlock('speed_run');
   G.phaseReveal=false;
+  G.phaseWrong=false;
  
   if(ph.ach) unlock(ph.ach);
  
@@ -3600,6 +3464,7 @@ function startPhase(){
     G.pendingPhaseStart=false;
     save();
   }
+  G.phaseWrong=false;
   const ph=PHASES[G.phase];
   markPhaseStart(G.phase, ph);
   $outS.innerHTML=''; // clear static zone for fresh phase content
@@ -3625,78 +3490,73 @@ function startPhase(){
    brand-new syntax they cannot guess from context alone.
    Explorer mode only (hard/practitioner don't need the scaffold). */
 const PRE_STEP_CONCEPTS = {
-  // First step ever — show what the filesystem looks like
   p1s1: {
     icon:'🗂️',
     title:'Command, prompt, path',
-    body:'A <b>command</b> is an instruction you type into the terminal.\n\nThe <code>$</code> prompt means the computer is waiting for input.\n\nYour first command is <code>pwd</code>. It prints your current <b>path</b> — your address inside the file tree.\n\nExample path: <code>/home/cadet/projects</code>'
+    body:'A <b>command</b> is an instruction you type. The <code>$</code> prompt means the terminal is waiting for input. A <b>path</b> is a filesystem address, and <code>pwd</code> prints the one you are standing in right now.'
   },
-  // Redirect operator — completely new syntax, must teach before use
-  p2s2: {
+  p1s4: {
+    icon:'📁',
+    title:'New command: <code>mkdir</code>',
+    body:'<code>mkdir</code> means make directory. You are creating structure, not just browsing it. That is an important shift in terminal confidence.'
+  },
+  p2s1: {
+    icon:'📘',
+    title:'Manual pages',
+    body:'Manual pages are built-in command references. You do not need to memorize every flag. You do need to know how to open the reference when you need it.'
+  },
+  p3s2: {
     icon:'↪',
-    title:'New operator: <code>></code> (redirect)',
-    body:'Without <code>></code>, <code>echo "hello"</code> just prints to screen.\nWith <code>></code>, it writes INTO a file: <code>echo "hello" > file.txt</code>\n\nThe text inside quotes is a <b>string</b> — exact text you want written.\n\nUse <code>>></code> to APPEND instead of overwrite.\n\nThe <code>></code> key is Shift+. — it points toward the destination.'
+    title:'New operator: <code>></code>',
+    body:'Without <code>></code>, <code>echo "hello"</code> only prints to the screen. With <code>></code>, the output goes into a file. That is why this operator matters.'
   },
-  // git init one-time vs ongoing
-  p3s1: {
+  p4s1: {
     icon:'⏳',
     title:'Command + subcommand',
-    body:'<code>git</code> is the main command. <code>init</code> is the <b>subcommand</b> — it tells Git which action to run.\n\nYou will see this pattern constantly:\n<code>git status</code>\n<code>git add file.txt</code>\n<code>git commit -m "message"</code>\n\nSame command family, different subcommands.'
+    body:'<code>git</code> is the main command family. <code>init</code>, <code>status</code>, <code>add</code>, and <code>commit</code> are subcommands inside that family.'
   },
-  // Merge conflict — warn before the shock of seeing conflict markers
-  p3s5: {
+  p4s4: {
+    icon:'🏷️',
+    title:'New flag: <code>-m</code>',
+    body:'<code>git commit -m \"message\"</code> uses <code>-m</code> to say “the commit message comes next.” The quotation marks keep the whole message together as one argument instead of several separate words.'
+  },
+  p4s5: {
     icon:'⚔️',
-    title:'What you\'re about to see: a merge conflict',
-    body:'A simulated teammate edited the same file as you. Git couldn\'t merge automatically, so it marked the conflict.\n\nYou\'ll see three symbols in the file:\n<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> — your version\n<code>=======</code> — divider\n<code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> — their version\n\nYour job: choose which to keep, then re-commit.'
+    title:'What you are about to see',
+    body:'A merge conflict is Git telling you two versions touched the same place. The marker lines look dramatic, but they are just text you need to read and resolve.'
   },
-  // $VAR syntax — $ is used as prompt symbol all course, now different meaning
-  p9s3: {
-    icon:'💲',
-    title:'New syntax: <code>$</code> reads a variable',
-    body:'You\'ve seen <code>$</code> as the prompt symbol. It has a second job: put it in front of a variable name to read its value.\n\n<code>echo $API_KEY</code> → prints the key\'s value\n<code>echo API_KEY</code> → just prints the text "API_KEY"\n\nThe <code>$</code> is the difference between reading a variable and printing its name.'
-  },
-  // export syntax intro
-  p9s2: {
-    icon:'📤',
-    title:'New command: <code>export</code>',
-    body:'<code>export NAME=value</code> stores a value in your shell\'s environment.\nAny program you launch can then read it with <code>process.env.NAME</code> (Node) or <code>os.environ["NAME"]</code> (Python).\n\nThe variable lives for this terminal session only — it\'s not saved to disk.\n\nTip: quotes around the value are good habit: <code>export KEY="value"</code>'
-  },
-  // Pipe operator — location tip before they need it
-  p5s2: {
-    icon:'|',
-    title:'New operator: <code>|</code> (pipe)',
-    body:'The pipe <code>|</code> takes the output of the left command and feeds it as input to the right command.\n\n<code>cat logs.txt | grep CRITICAL</code>\n→ read file, then filter for lines containing "CRITICAL"\n\nKeyboard: the pipe key is <b>Shift + \\</b> — usually above Enter. Look for the vertical bar character.'
-  },
-  // double-dash flags — p6s2 is first time they see --flag syntax
-  p6s1: {
-    icon:'🧭',
-    title:'What is <code>vibe</code>?',
-    body:'In this simulation, <code>vibe</code> is the command-line tool for the AI-agent system.\n\nThink of it like:\n<code>git status</code> — check repo state\n<code>docker ps</code> — check running containers\n<code>kubectl get pods</code> — check cluster workloads\n\nSo <code>vibe status</code> means: "show me the current state of the agent runtime."\n\nThe exact tool name may change in the real world, but the pattern stays the same: <b>tool name + status/list command</b>.'
+  p4s6: {
+    icon:'⛓️',
+    title:'New operator: <code>&&</code>',
+    body:'<code>&&</code> chains commands conditionally. The command on the right runs only if the command on the left succeeded. That is why it is useful for short, dependent workflows.'
   },
   p6s2: {
-    icon:'🚩',
-    title:'New syntax: <code>--</code> named flags',
-    body:'You\'ve seen short flags like <code>-la</code>. Named flags use double-dash: <code>--role manager</code>.\n\nNamed flags:\n• Can appear in any order\n• Their meaning is always explicit\n• Pattern: <code>command --flagname value</code>\n\nExamples everywhere: <code>git commit --message "text"</code>, <code>docker run --name myapp</code>'
-  },
-  // package.json scripts — where does "dev" come from?
-  p4s3: {
-    icon:'📋',
-    title:'Where does <code>bun run dev</code> come from?',
-    body:'When you ran <code>bun init</code>, it created a <code>package.json</code> file. Inside it is a <code>"scripts"</code> section:\n\n<code>{\n  "scripts": {\n    "dev": "bun run src/index.ts",\n    "build": "bun build src/index.ts",\n    "test": "bun test"\n  }\n}</code>\n\n<code>bun run dev</code> runs whatever command is in <code>scripts.dev</code>. You can add your own scripts with any name.'
-  },
-  // git add staging — why two steps?
-  p3s3: {
-    icon:'📥',
-    title:'Why does Git use two steps?',
-    body:'Other tools save automatically. Git makes you be deliberate:\n\n<b>Step 1 — Stage:</b> <code>git add filename</code>\nMoves changes to a "waiting room." You choose exactly what goes in.\n\n<b>Step 2 — Commit:</b> <code>git commit -m "message"</code>\nTakes a permanent snapshot of everything staged.\n\nThis lets you commit only some of your changes — not every modified file — giving you clean, precise history.'
-  },
-  // prompt pipe — connect back to Phase 5
-  p8s3: {
     icon:'|',
-    title:'Pipes work with <code>prompt</code> too',
-    body:'In Phase 5 you learned: <code>cat file | grep PATTERN</code>\nThe <code>|</code> passes output of one command as input to the next.\n\nThe same operator works with agent prompts:\n<code>prompt Captain "Plan it" | prompt Engineer "Build it"</code>\nCaptain\'s plan becomes Engineer\'s input — automatically.\n\nSame pipe key: Shift+\\ above Enter.'
+    title:'New operator: <code>|</code> (pipe)',
+    body:'The pipe sends the output of the command on the left into the command on the right. Read, then filter. That sequence is the heart of many shell workflows.'
+  },
+  p7s1: {
+    icon:'🔐',
+    title:'Environment variables',
+    body:'An environment variable is configuration stored outside your code. That keeps secrets out of tracked files and makes deployments safer to manage.'
+  },
+  p7s3: {
+    icon:'🧷',
+    title:'Session vs persistent config',
+    body:'An exported variable helps right now. Appending the export line to <code>~/.bashrc</code> helps the next shell too. That is the distinction this step is teaching.'
+  },
+  p8s1: {
+    icon:'🏗️',
+    title:'Build before deploy',
+    body:'A build turns source code into a production artifact. The deployment platform ships that artifact, not your development server, so this step is the proof that the app is actually shippable.'
+  },
+  p9s2: {
+    icon:'🌐',
+    title:'Verify the live service',
+    body:'A deployment is not finished when the platform says it is live. It is finished when you verify a real response from the service itself.'
   },
 };
+
 
 // Normalize legacy maps into per-step fields expected by the master prompt.
 for(const ph of PHASES){
@@ -4073,8 +3933,6 @@ function resumeSession(){
   if(G.sandbox) document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0) document.getElementById('career-impact-btn').style.display='inline';
  
-  if(G.completedPhases.includes(6)) addAgent('Manager','Captain');
-  if(G.completedPhases.includes(6) && G.agents.length>1) addAgent('Specialist','Engineer');
   migrateMobileUiDefaults();
   applyMobileLayoutDefaults();
   applyUIPreferences();
