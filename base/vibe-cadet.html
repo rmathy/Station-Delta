@@ -614,12 +614,6 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── MODALS ── */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
 .modal.open{display:flex}
- .modal.open {
-  pointer-events: none;   /* backdrop doesn't capture clicks */
-}
-.modal.open .mbox {
-  pointer-events: all;    /* content box captures clicks normally */
-}
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
@@ -1530,7 +1524,7 @@ const PHASES = [null,
  steps:[
   {id:'p1s1', obj:'Find out where you are', ctx:'Name what this is: your current location in the filesystem. It matters because every file command depends on being in the right place. Do this now with the command that prints your working directory.',
    cmd:['pwd'], accept:['pwd'], hint:'Type: pwd', out:'/home/cadet/projects', unlockCmd:'pwd',
-   teach:{title:'What <code>pwd</code> gives you',body:'📁 Before You Type — Your Filesystem, A Quick Map',body:'Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree.''<code>pwd</code> prints your full current path. That path is your location anchor. When you know the location, the next command becomes a choice instead of a guess.'},
+   teach:{title:'What <code>pwd</code> gives you',body:'📁 Before You Type — Your Filesystem, A Quick Map<br><br>Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree. <code>pwd</code> prints your full current path. That path is your location anchor. When you know the location, the next command becomes a choice instead of a guess.'},
    jit:{title:'Location before action',body:'Strong terminal habits start with location checks. It is much easier to avoid a bad edit or delete than to recover from one in the wrong folder.'}},
   {id:'p1s2', obj:'List the files in this directory', ctx:'Now name what is around you. It matters because you cannot choose the next folder or file if you have not inspected the current one. List the directory contents now.',
    cmd:['ls'], accept:['ls','ls -la','ls -l','ls -a'], hint:'Type: ls', out:'README.txt   game_v1/   .env   package.json', unlockCmd:'ls',
@@ -4016,3 +4010,4 @@ applyUIPreferences();
 </script>
 </body>
 </html>
+
