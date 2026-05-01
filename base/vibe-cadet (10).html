@@ -135,6 +135,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 }
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#timer-pill{background:var(--blue-bg);border:1px solid var(--blue-d);color:var(--blue);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none;font-variant-numeric:tabular-nums}
 #career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
 #career-impact-btn:hover{background:var(--amber-bg)}
  
@@ -409,6 +410,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
 .challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
 .challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+.expert-callout{margin:12px 0;border:1px solid var(--purple);border-radius:var(--r8);background:var(--purple-bg);padding:12px 14px;animation:slideIn .3s ease}
+.expert-callout-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.expert-callout-badge{background:var(--purple);color:#05010d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.expert-callout-title{font-size:12px;font-weight:700;color:var(--purple)}
+.expert-callout-body{font-size:12px;line-height:1.7;color:var(--text)}
+.expert-callout-body code{color:var(--amber)}
  
 /* ── BREAK-IT MODE ── */
 .breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
@@ -623,6 +630,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
 .mbtn-p{background:var(--green);color:#000}.mbtn-p:hover{opacity:.85}
 .mbtn-s{background:transparent;border:1px solid var(--b2);color:var(--muted2);margin-left:8px}.mbtn-s:hover{color:var(--text);border-color:var(--muted2)}
+.modal-actions{display:flex;flex-direction:column;gap:10px;align-items:center}
+.modal-actions .mbtn{margin-left:0;min-width:260px}
  
 /* ── BOOT SCREEN ── (BUG FIX: proper scroll + input visibility) */
 #boot-modal .mbox{
@@ -749,6 +758,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="phase-track"></div>
     <div id="tb-right">
       <div id="hardmode-pill">HARD MODE</div>
+      <div id="timer-pill">00:00</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
@@ -858,8 +868,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <span>▸</span><b style="color:var(--green)">Just-in-time learning</b> — every command explained as you learn it<br>
       <span>▸</span>Real-world bridges — why pros use each skill daily<br>
       <span>▸</span>Spaced repetition — previous commands recalled before each phase<br>
-      <span>▸</span>Constructed-response challenges — build pipelines from scratch<br>
-      <span>▸</span>Break-It Mode — diagnose intentionally broken scenarios<br>
+      <span>▸</span>Constructed-response challenges — build pipelines from scratch <b style="color:var(--purple)">(Expert mode only)</b><br>
+      <span>▸</span>Break-It Mode — diagnose intentionally broken scenarios <b style="color:var(--purple)">(Expert mode only)</b><br>
       <span>▸</span>Career Impact Log — see how your skills map to real jobs<br>
       <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all knowledge checks. She is… particular.<br>
       <span>▸</span><b style="color:var(--red)">Boss Fight</b> — J.A.N.E.T. takes over for the final test. L.O.L.A. goes offline.<br>
@@ -882,7 +892,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="path-card" id="path-expert" onclick="selectPath('expert')">
         <div class="path-icon">🦅</div>
         <div class="path-name">Expert</div>
-        <div class="path-desc">No hints. No feedback detail. Timer on.</div>
+        <div class="path-desc">No hints. No feedback detail. Timer on. Includes Break-It and constructed-response trials.</div>
       </div>
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">BEGIN TRAINING</button>
@@ -904,21 +914,24 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <div class="skills-list">
       <span>✓</span>Terminal navigation &amp; file operations (pwd, ls, cd, cat, echo, touch)<br>
+      <span>✓</span>Manual pages, PATH checks, and command discovery (man, which)<br>
       <span>✓</span>Git versioning · add → commit → push · conflict resolution<br>
       <span>✓</span>Package management with Bun/npm<br>
       <span>✓</span>Pipes, grep, wc — real log analysis<br>
       <span>✓</span>AI agent orchestration patterns<br>
-      <span>✓</span>MCP (Model Context Protocol)<br>
       <span>✓</span>Prompt engineering · Role/Task/Context/Format<br>
       <span>✓</span>Environment variables, secrets &amp; echo $VAR<br>
-      <span>✓</span>Production build &amp; deploying to Vercel
+      <span>✓</span>Production builds, artifact inspection, deployment &amp; health-check verification
     </div>
-    <div style="text-align:center">
+    <div class="modal-actions">
       <button class="mbtn mbtn-p" onclick="openCapstone()">ATTEMPT CAPSTONE</button>
+      <button class="mbtn mbtn-p" onclick="goToEngineer()">NEXT LEVEL: ENGINEER</button>
+      <button class="mbtn mbtn-s" onclick="shareGradLinkedIn()">SHARE CERTIFICATE ON LINKEDIN</button>
       <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
+    <div id="final-time-row" style="display:none;margin-top:6px;text-align:center;font-size:11px;color:var(--muted)">Hard mode time: <span id="final-time" style="color:var(--blue)">—</span></div>
   </div>
 </div>
 
@@ -1040,6 +1053,8 @@ let G = {
   mobileUiVersion:2,
   analytics:null,
 };
+
+let hardTimerInterval=null;
 
 const COURSE_ID='Station_Delta_Cadet';
 const CADET_SAVE_KEY='Station_Delta_Cadet_v1.2';
@@ -1199,7 +1214,7 @@ const LOLA_STRIP = {
   ],
   p4s6: [
     {tag:'habit',msg:'The conflict is not finished when the file looks right. It is finished when you stage and commit the resolution.'},
-    {tag:'tip',msg:'Stay calm and follow the loop: fix the file, <code>git add</code>, then <code>git commit</code>.'},
+    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>Resolution Merge Conflict</code>.'},
   ],
 
   // ── Phase 5: Packages & Dependencies ──
@@ -1261,19 +1276,20 @@ const LOLA_STRIP = {
     {tag:'concept',msg:'Dev mode is for building. Build mode is for shipping.'},
   ],
   p8s2: [
-    {tag:'command',msg:'Inspect the build output after it exists. A build is more trustworthy when you verify what it produced.'},
+    {tag:'command',msg:'Inspect <code>dist/</code> after the build. That folder name is short for distribution — the production files you are about to ship.'},
     {tag:'habit',msg:'Do not treat "build complete" as magic. Look at the output folder.'},
   ],
 
   // ── Phase 9: Deploy & Verify ──
   p9s1: [
     {tag:'command',msg:'<code>vibe deploy --platform vercel</code> sends the built app live.'},
+    {tag:'concept',msg:'<code>vibe</code> is the course deployment CLI. <code>--platform vercel</code> is the long-flag form that tells it the target platform is Vercel.'},
     {tag:'habit',msg:'Deploy after the build and secret checks are already clean, not before.'},
   ],
   p9s2: [
     {tag:'command',msg:'<code>curl</code> lets you verify the deployment from the terminal.'},
-    {tag:'concept',msg:'A live URL is not the same as a healthy service. Verification is the final step.'},
-    {tag:'tip',msg:'One clean request can tell you whether the deploy actually responded.'},
+    {tag:'concept',msg:'The live app is <code>https://escape-pod-final.vercel.app</code>. Adding <code>/health</code> hits a lightweight health-check route instead of the full app UI.'},
+    {tag:'tip',msg:'One clean request to <code>https://escape-pod-final.vercel.app/health</code> can tell you whether the deploy actually responded.'},
   ],
 };
 
@@ -1542,6 +1558,7 @@ const PHASES = [null,
    bridge:{title:'Directory creation is part of every project setup',body:'CI pipelines, Docker images, and deploy scripts all create directories before writing output files. The same <code>mkdir -p</code> pattern you would use here appears in Dockerfiles, GitHub Actions, and shell provisioning scripts.',tags:['CI/CD','Docker','Shell scripts','Project structure']}}
  ],
  done:'You can now locate yourself, inspect a directory, move through it, and create a new folder without a GUI.',
+ challenge:CHALLENGES[1],
  ach:'navigator'},
  
 /* ── P2: Reading the Manual ── */
@@ -1602,6 +1619,8 @@ const PHASES = [null,
    bridge:{title:'rm appears in cleanup scripts everywhere',body:'CI pipelines clear build artifacts with <code>rm -rf dist/</code> before each run. Docker image builds clean temp files. Deploy scripts prune old logs. In all of these, <code>rm</code> is deliberate and targeted — the same discipline you practiced here scales directly to production.',tags:['Linux','CI/CD','Shell scripts','Docker']}}
  ],
  done:'You now have the full first-pass file toolkit: create, write, read, copy, move, and delete.',
+ challenge:CHALLENGES[2],
+ breakit:BREAKIT[2],
  ach:'file_master'},
  
 /* ── P4: Version Control ── */
@@ -1635,18 +1654,19 @@ const PHASES = [null,
    teach:{title:'Conflict markers are just text',body:'Git is showing you two competing versions. Your job is to read them clearly, choose the final content, and then save the resolution.'},
    jit:{title:'What those symbols actually mean',body:'<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> marks the start of your version. <code>=======</code> is the divider. <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> marks the end of the incoming version. Your job is to delete all three marker lines and keep whichever content (or combination) is correct. Then <code>git add</code> the file to mark it resolved and <code>git commit</code> to close the merge.'},
    bridge:{title:'This is a normal team moment',body:'Merge conflicts are routine on active codebases. The skill is not avoiding them forever. The skill is staying calm, reading the markers, and making the final decision cleanly.',tags:['Pull requests','Teams']}},
-  {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
-   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
-   acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m']),
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolve merge conflict',
+ {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
+   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m "resolution merge conflict"']),
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolution Merge Conflict',
    teach:{title:'A conflict has a finish line',body:'The finish line is not just a clean file. The finish line is a clean file plus a recorded resolution in Git.'},
-   jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. That makes it a clean way to chain dependent steps without blasting past a failure.'},
+   jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. In this step you are replacing the entire conflicted file with the final text <code>Mission: Escape Pod</code>, then staging it, then committing it with the exact message <code>Resolution Merge Conflict</code>.'},
    bridge:{title:'Chaining commands is a real shell habit',body:'Engineers use <code>&&</code> constantly for short workflows like build-then-test or add-then-commit. It keeps the sequence readable and stops the chain when something breaks.',tags:['Shell workflow','Automation']},
    quiz:{q:'What does <code>&&</code> do in a shell command chain?',opts:['It runs both commands at the same time','It runs the second command only if the first one succeeds','It comments out the rest of the line','It repeats the previous command'],correct:1,fb:'Correct. <code>&&</code> is a conditional chain operator: continue only if the previous command succeeded.'},
    achievement:'conflict_resolver'}
  ],
  done:'You can now initialize Git, inspect state, stage work, commit it, and stay composed through a merge conflict.',
+ challenge:CHALLENGES[3],
  ach:'committed'},
  
 /* ── P5: Packages & Dependencies ── */
@@ -1672,6 +1692,7 @@ const PHASES = [null,
    bridge:{title:'localhost:3000 is where every frontend framework starts',body:'React, Next.js, Vite, SvelteKit, and Nuxt all start a dev server on localhost when you run their dev script. The port may change but the mental model is identical. Learning it once here means you already understand what every "run the dev server" instruction means across the entire frontend ecosystem.',tags:['React','Next.js','Vite','localhost','Hot reload']}}
  ],
  done:'You can now initialize a project, add a dependency, and run its development script.',
+ breakit:BREAKIT[4],
  ach:'packager'},
  
 /* ── P6: Reading & Filtering Output ── */
@@ -1702,6 +1723,7 @@ const PHASES = [null,
    bridge:{title:'This is real codebase triage',body:'When a stack trace mentions a string or an error name, engineers often search the repo before opening an editor. Search narrows the map first.',tags:['Code search','Debugging','Repos']}}
  ],
  done:'You can now read logs, filter them, count matches, and search a codebase without guessing where the answer lives.',
+ challenge:CHALLENGES[5],
  ach:'pipe_dream'},
  
 /* ── P7: Environment & Secrets ── */
@@ -1743,9 +1765,10 @@ const PHASES = [null,
    teach:{title:'Builds create the deliverable',body:'The production build is optimized for users, not for editing. That distinction is why build and dev are separate commands.'},
    jit:{title:'Dev and build do different jobs',body:'The dev server is built for feedback while you edit. The production build is built for distribution, which is why it can be smaller, faster, and structured differently.'},
    bridge:{title:'CI systems run this exact step',body:'On platforms like Vercel or Netlify, the build command is part of every deployment pipeline. If the build breaks, the deploy should stop there.',tags:['CI/CD','Vercel','Netlify']}},
-  {id:'p8s2', obj:'Inspect the dist folder', ctx:'Check the build output directory. It matters because verification should include the artifact itself, not just the success message. Inspect it now.',
+  {id:'p8s2', obj:'Inspect the dist folder', ctx:'Check the build output directory. The folder name <code>dist</code> is short for distribution: it is the compiled production artifact created by the build. It matters because verification should include the artifact itself, not just the success message. Inspect it now.',
    cmd:['ls dist'], accept:['ls dist','ls -la dist'], hint:'Type: ls dist', out:'index.html   app.js   app.css',
-   teach:{title:'Verify the artifact exists',body:'A clean build message is good. Seeing the actual output files is better. This is the artifact you are about to ship.'},
+   teach:{title:'Verify the artifact exists',body:'A clean build message is good. Seeing the actual output files is better. <code>dist/</code> means distribution folder: this is the built artifact you are about to ship.'},
+   jit:{title:'What <code>dist/</code> is',body:'Most frontend build tools output compiled files into a folder named <code>dist/</code>, short for distribution. It usually contains the HTML, JavaScript, and CSS that the hosting platform will actually serve to users.'},
    quiz:{q:'Why inspect <code>dist/</code> after the build succeeds?',opts:['Because build tools sometimes hide the source files there permanently','Because the deploy ships the built artifact, so you want to confirm it actually exists','Because Git will not track the build otherwise','Because the browser can only open files from <code>dist/</code>'],correct:1,fb:'Correct. The build output is the thing you are actually shipping, so it is worth checking before you deploy it.'}},
  ],
  done:'You built the production artifact and verified that it exists. That is the right posture before a deploy.',
@@ -1756,15 +1779,16 @@ const PHASES = [null,
  lolaIntro:"This is the handoff from preparation to shipping. First deploy cleanly. Then verify the live service from the terminal so you know it actually responded.",
  spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Deploy it now. Use the long flag (--) to indicate platform and the name of the platform (Vercel)',
+  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Use <code>vibe</code> here because it is the course’s simulated deployment CLI, and <code>--platform vercel</code> tells it where to ship. Deploy it now.',
    cmd:['vibe deploy --platform vercel'], accept:['vibe deploy --platform vercel','vibe deploy','vercel deploy','vercel'], hint:'Type: vibe deploy --platform vercel', out:'Deploying escape-pod-v2.1 to Vercel…\n✓ Build: passing\n✓ Secrets: present\n✓ CDN: configured\n🚀 LIVE: https://escape-pod-final.vercel.app', unlockCmd:'vibe',
    teach:{title:'Deployment follows preparation',body:'The deploy is cleaner when build and environment checks already passed. That order lowers risk and lowers panic.'},
+   jit:{title:'Why the command starts with <code>vibe</code>',body:'In this course, <code>vibe</code> is the simulated deployment CLI that stands in for a real deploy tool. <code>deploy</code> is the action, and <code>--platform vercel</code> is the long-flag form that says the target platform is Vercel.'},
    bridge:{title:'This is the same last mile teams care about in production',body:'Shipping is where code becomes customer-facing behavior. That is why teams care so much about build health, configuration, and verification before the deploy goes out.',tags:['Production','Release process']}},
-  {id:'p9s2', obj:'Verify the live health endpoint', ctx:'Check the live deployment from the terminal. It matters because a live URL is not enough; you want a successful response. Verify the health endpoint now.',
+  {id:'p9s2', obj:'Verify the live health endpoint', ctx:'Check the live deployment from the terminal. Your deployed site lives at <code>https://escape-pod-final.vercel.app</code>. Adding <code>/health</code> calls a dedicated health-check route that returns a small status response, which is a fast way to confirm the service is alive. Verify that endpoint now.',
    cmd:['curl https://escape-pod-final.vercel.app/health'], accept:['curl https://escape-pod-final.vercel.app/health'], acceptFn:v=>v.startsWith('curl ')&&v.includes('escape-pod-final.vercel.app/health'),
    hint:'Type: curl https://escape-pod-final.vercel.app/health', out:'{"status":"ok","service":"escape-pod","region":"iad1"}', unlockCmd:'curl',
    teach:{title:'Verification closes the shipping loop',body:'A quick <code>curl</code> confirms the deployed service is actually responding. That is the difference between "deployed" and "working".'},
-   jit:{title:'Why verify from the terminal',body:'A browser can hide details behind cached pages, redirects, or UI layers. A direct <code>curl</code> request tells you whether the service itself responded, which is often the cleaner truth.'},
+   jit:{title:'What <code>/health</code> does',body:'The base URL <code>https://escape-pod-final.vercel.app</code> is the live app. Appending <code>/health</code> hits a lightweight endpoint meant for monitoring and verification. It usually returns a tiny machine-readable response like <code>{"status":"ok"}</code>, which makes it perfect for post-deploy checks.'},
    bridge:{title:'Post-deploy verification is part of the job',body:'Strong release habits do not stop at “deploy succeeded.” They include a direct check that the live service answers the way you expect.',tags:['Release verification','curl','Ops']},
    quiz:{q:'What does <code>curl</code> give you here that a deployment success message does not?',opts:['A second copy of the build output','Direct evidence that the live service responded successfully','Automatic rollback if the response is wrong','A permanent secret token for later deploys'],correct:1,fb:'Correct. The deploy message says the platform finished its job. <code>curl</code> tells you the live service itself answered.'},
    isFinalBeforeBoss:true}
@@ -2476,7 +2500,35 @@ function renderStaticStep(step){
 
   // JIT cards (including jitPreOnly) are handled ONLY in live output
   // by continuePhaseStart → showJIT()
+  showExpertPhaseCallout(step);
   if(!G.hard && !G.practitioner) showHint(step.hint); 
+}
+
+function showExpertPhaseCallout(step){
+  if(!G.expert || !step || G.step!==0) return;
+  const ph=PHASES[G.phase];
+  if(!ph) return;
+
+  const notices=[];
+  if(ph.challenge){
+    notices.push(`After this phase, Expert mode unlocks a constructed-response challenge: <code>${ph.challenge.title}</code>. You will need to build the command pattern yourself with no guided scaffold.`);
+  }
+  if(ph.breakit){
+    notices.push(`This phase also includes an Expert-only Break-It scenario: <code>${ph.breakit.title}</code>. You will diagnose a broken command and correct it from first principles.`);
+  }
+  if(!notices.length) return;
+
+  const w=document.createElement('div');
+  w.className='expert-callout';
+  w.innerHTML=`
+    <div class="expert-callout-hd">
+      <span class="expert-callout-badge">EXPERT</span>
+      <span class="expert-callout-title">Bonus assessment waiting in this phase</span>
+    </div>
+    <div class="expert-callout-body">${notices.join('<br><br>')}</div>
+  `;
+  $out.appendChild(w);
+  $out.scrollTop=$out.scrollHeight;
 }
  
 /* ── SMART DIAGNOSIS BLOCK ── */
@@ -2948,6 +3000,47 @@ function loadSave(){
   if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
   ensureAnalytics();
 }
+
+function getHardModeElapsedMs(){
+  return (G.totalTime||0) + (G.timerStart ? Math.max(0, Date.now()-G.timerStart) : 0);
+}
+
+function formatElapsed(ms){
+  const totalSeconds=Math.floor(ms/1000);
+  const hours=Math.floor(totalSeconds/3600);
+  const minutes=Math.floor((totalSeconds%3600)/60);
+  const seconds=totalSeconds%60;
+  if(hours>0) return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+
+function updateHardTimerDisplay(){
+  const pill=document.getElementById('timer-pill');
+  if(!pill) return;
+  pill.textContent=formatElapsed(getHardModeElapsedMs());
+}
+
+function startHardTimer(){
+  if(!G.hard) return;
+  const pill=document.getElementById('timer-pill');
+  if(pill) pill.style.display='inline';
+  if(!G.timerStart) G.timerStart=Date.now();
+  clearInterval(hardTimerInterval);
+  updateHardTimerDisplay();
+  hardTimerInterval=setInterval(updateHardTimerDisplay,1000);
+  save();
+}
+
+function stopHardTimer(){
+  if(G.timerStart){
+    G.totalTime=getHardModeElapsedMs();
+    G.timerStart=null;
+    save();
+  }
+  clearInterval(hardTimerInterval);
+  hardTimerInterval=null;
+  updateHardTimerDisplay();
+}
  
 /* ── CAREER LOG ── */
 function addCareerEntry(phaseIdx){
@@ -3111,10 +3204,13 @@ function restartFromMobileTools(){
 }
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
+  const expertExtras=[];
+  if(G.expert && nextPhase?.challenge) expertExtras.push(`constructed-response: ${nextPhase.challenge.title}`);
+  if(G.expert && nextPhase?.breakit) expertExtras.push(`Break-It: ${nextPhase.breakit.title}`);
   document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
   document.getElementById('phase-modal-title').textContent=`${completedPhase.title} complete`;
   document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is already saved, so you can pause here and come back when you are ready.';
-  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>`;
+  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>${expertExtras.length?`<br><span style="color:var(--purple)">Expert add-ons: ${expertExtras.join(' · ')}</span>`:''}`;
   openModal('phase-modal');
 }
 function setLolaStripGeneric(tag, msg){
@@ -3446,13 +3542,15 @@ async function completePhase(){
   // Challenge (constructed response)
   if(ph.challenge && G.expert){
     blank();
+    appendLine(`EXPERT MODE BONUS: Constructed response unlocked — ${ph.challenge.title}`,'ln-warn');
     await showChallenge(ph.challenge);
     blank();
   }
- 
+
   // Break-it scenario
   if(ph.breakit && G.expert){
     blank();
+    appendLine(`EXPERT MODE BONUS: Break-It unlocked — ${ph.breakit.title}`,'ln-warn');
     await showBreakIt(ph.breakit);
     blank();
   }
@@ -3477,6 +3575,22 @@ function startPhase(){
   const ph=PHASES[G.phase];
   markPhaseStart(G.phase, ph);
   $outS.innerHTML=''; // clear static zone for fresh phase content
+
+  // Resume should rehydrate the exact saved step instead of replaying
+  // the phase opener and desyncing the visible prompt from input checks.
+  if(G.step>0){
+    const savedStep=ph.steps[G.step];
+    if(savedStep){
+      markStepStart(savedStep, ph);
+      renderStaticStep(savedStep);
+      setLola(lolaMessageForStep(savedStep, ph));
+      setLolaStrip(savedStep);
+      syncObjCard();
+      syncDots();
+      telem(`Phase ${G.phase} resumed at step ${G.step+1}: ${savedStep.obj}`);
+      return;
+    }
+  }
  
   // Spaced repetition callback
   const sr = ph.spacedRep;
@@ -3599,6 +3713,7 @@ function continuePhaseStart(ph){
  
 /* ── GRADUATION ── */
 async function runGraduation(){
+  if(G.hard) stopHardTimer();
   blank();divline();
   appendLine('DEPLOYING TO VERCEL…','ln-sys');
   const steps2=[
@@ -3634,6 +3749,8 @@ async function runGraduation(){
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
   document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-time-row').style.display=G.hard ? 'block' : 'none';
+  document.getElementById('final-time').textContent=formatElapsed(G.totalTime||0);
   openModal('grad-modal');
 }
  
@@ -3859,6 +3976,39 @@ function shareGrad(){
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
   closeModal('grad-modal');
 }
+
+function showToastMessage(title, sub){
+  document.getElementById('toast-title').textContent=title;
+  document.getElementById('toast-sub').textContent=sub;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function goToEngineer(){
+  window.open('https://stationdelta.dev/engineer','_blank');
+}
+
+async function shareGradLinkedIn(){
+  const shareUrl='https://stationdelta.dev';
+  const message=`I just graduated Station Delta: Cadet and earned my certificate.\n\nI worked through hands-on terminal navigation, file operations, Git and conflict resolution, package management, log analysis with pipes and grep, AI agent workflows, MCP, prompt engineering, environment variables, and production deployment.\n\nIf you want practical reps instead of passive tutorials, check out StationDelta.dev.`;
+  let copied=false;
+
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(message);
+      copied=true;
+    }
+  }catch(e){}
+
+  window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(shareUrl),'_blank');
+  showToastMessage(
+    copied ? 'LinkedIn message copied' : 'LinkedIn share opened',
+    copied
+      ? 'Paste the copied certificate post into LinkedIn and share the Station Delta link.'
+      : 'LinkedIn opened in a new tab. Add your certificate note and mention what you learned at StationDelta.dev.'
+  );
+}
  
 function selectPath(p){
   ['explorer','practitioner','expert'].forEach(id=>{
@@ -3874,8 +4024,13 @@ function selectPath(p){
 function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();
   G.name=n||'Cadet';
+  if(G.phase===1 && G.step===0 && G.completedPhases.length===0 && !G.sandbox){
+    G.totalTime=0;
+    G.timerStart=null;
+  }
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  if(G.hard) startHardTimer();
   closeModal('boot-modal');
   applyMobileLayoutDefaults();
   applyUIPreferences();
@@ -3939,6 +4094,11 @@ function resumeSession(){
   closeModal('boot-modal');
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  if(G.hard){
+    document.getElementById('timer-pill').style.display='inline';
+    if(!G.sandbox) startHardTimer();
+    else updateHardTimerDisplay();
+  }
   if(G.sandbox) document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0) document.getElementById('career-impact-btn').style.display='inline';
  
@@ -3990,7 +4150,7 @@ if(window.matchMedia){
   else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
 }
  
-if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
+if(G.name!=='Cadet' && (G.phase>1 || G.step>0 || G.completedPhases.length>0 || G.pendingPhaseStart || G.bossActive || G.sandbox)){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
   bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
