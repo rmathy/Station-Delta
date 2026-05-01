@@ -777,7 +777,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">cadet@station — <span id="path-display">~/projects</span></div>
+      <div id="term-path">cadet@Station — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
     <div id="action-rail">
@@ -809,7 +809,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
-      <span id="prompt-pre">cadet@vibe:~$&nbsp;</span>
+      <span id="prompt-pre">cadet@Station:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
       <span id="input-hint"></span>
     </div>
@@ -979,7 +979,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="gloss-modal" class="modal">
   <div class="mbox">
     <div class="mtitle">📖 Glossary</div>
-    <div class="msub">Every term you'll encounter in the vibe coding world. Click any term to see its definition inline in the terminal.</div>
+    <div class="msub">Terms you'll encounter in the terminal coding world. Click any term to see its definition inline in the terminal.</div>
     <div id="gloss-list"></div>
     <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div>
   </div>
@@ -1041,8 +1041,8 @@ let G = {
   analytics:null,
 };
 
-const COURSE_ID='Station Delta Cadet';
-const CADET_SAVE_KEY='Cadet_v1';
+const COURSE_ID='Station_Delta_Cadet';
+const CADET_SAVE_KEY='Station_Delta_Cadet_v1.2';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -1709,7 +1709,7 @@ const PHASES = [null,
  lolaIntro:"This phase teaches the difference between a variable that exists right now and one that will still exist later. That distinction saves beginners a lot of pain.",
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
-  {id:'p7s1', obj:'Set API_KEY for this shell session', ctx:'Set the environment variable <code>API_KEY</code> in the current shell. It matters because apps often need configuration that should not live in source code. Set it now.',
+  {id:'p7s1', obj:'Set API_KEY for this shell session', ctx:'Set the environment variable <code>API_KEY</code> in the current shell. It matters because apps often need configuration that should not live in source code. Set it now. Our API KEY for this excercise is sk-prod-abc123.',
    cmd:['export API_KEY="sk-prod-abc123"'], accept:['export API_KEY="sk-prod-abc123"'], acceptFn:v=>v.startsWith('export api_key=')||v.startsWith('export API_KEY='),
    hint:'Type: export API_KEY="sk-prod-abc123"', out:'API_KEY set in session environment.', unlockCmd:'export',
    teach:{title:'Session scope',body:'An exported variable exists in the current shell session. That is useful immediately, but it is not the same as persisting the setting for future shells.'},
@@ -1756,7 +1756,7 @@ const PHASES = [null,
  lolaIntro:"This is the handoff from preparation to shipping. First deploy cleanly. Then verify the live service from the terminal so you know it actually responded.",
  spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Deploy it now.',
+  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Deploy it now. Use the long flag (--) to indicate platform and the name of the platform (Vercel)',
    cmd:['vibe deploy --platform vercel'], accept:['vibe deploy --platform vercel','vibe deploy','vercel deploy','vercel'], hint:'Type: vibe deploy --platform vercel', out:'Deploying escape-pod-v2.1 to Vercel…\n✓ Build: passing\n✓ Secrets: present\n✓ CDN: configured\n🚀 LIVE: https://escape-pod-final.vercel.app', unlockCmd:'vibe',
    teach:{title:'Deployment follows preparation',body:'The deploy is cleaner when build and environment checks already passed. That order lowers risk and lowers panic.'},
    bridge:{title:'This is the same last mile teams care about in production',body:'Shipping is where code becomes customer-facing behavior. That is why teams care so much about build health, configuration, and verification before the deploy goes out.',tags:['Production','Release process']}},
@@ -1841,11 +1841,11 @@ const EASTER = {
         '      ╚██████╔╝╚████╔╝ ██║██╔══██╗ ',
         '       ╚═════╝  ╚═══╝  ╚═╝╚═╝  ╚═╝',
         '',
-        '  VIBE_OS ELITE v4.0.0',
+        '  Cadet_OS ELITE v4.0.0',
         `  User: ${G.name}`,
         `  Path: ${G.learnerPath.toUpperCase()}`,
         `  Phase: ${G.phase}/9`,
-        `  Shell: vibe-sh 2.1`,
+        `  Shell: cadet-sh 2.1`,
         `  Agents: ${G.agents.length} active`,
         `  Uptime: ${Math.floor(Math.random()*12)}h ${Math.floor(Math.random()*60)}m`,
         '  CPU: L.O.L.A. @ 1337% (overclocked)',
@@ -1861,7 +1861,7 @@ const EASTER = {
     handle(){
       const log=[
         'commit a1b2c3d (HEAD -> main)',
-        'Author: '+G.name+' <cadet@station>',
+        'Author: '+G.name+' <cadet@Station>',
         'Date:   '+new Date().toDateString(),
         '    Add mission manifest',
         '',
@@ -2440,7 +2440,7 @@ function showTeach(tb){
   const w=document.createElement('div');
   w.className='teach';
   w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
  
 /* ── CONCEPT CARD ── */
@@ -2449,7 +2449,7 @@ function showConcept(cc){
   const w=document.createElement('div');
   w.className='concept';
   w.innerHTML=`<div class="concept-hd"><span>${cc.icon}</span><span>${cc.title}</span></div><div class="concept-bd">${cc.body}${ex}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
  
 /* ── HINT BLOCK ── */
@@ -2457,7 +2457,7 @@ function showHint(text){
   const w=document.createElement('div');
   w.className='hint-wrap';
   w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
 function toggleHint(btn){
   btn.classList.toggle('open');
@@ -3588,13 +3588,7 @@ function continuePhaseStart(ph){
   renderStaticStep(s);
   // JIT pre-answer cards belong in $outS (static zone) so they appear
   // above the divider before the learner types anything
-  if(s.jit && !G.hard){
-    const w=document.createElement('div');
-    w.className='jit';
-    w.innerHTML=`<div class="jit-hd">⚡ Just-in-Time: ${s.jit.title}</div><div class="jit-bd">${s.jit.body}</div>`;
-    $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
-  }
-  // Bridge is pre-shown here for step 0 — handleCorrect must not repeat it
+  if(s.jit && !G.hard) showJIT(s.jit);
   if(s.bridge && !G.hard) showBridge(s.bridge);
   setLola(lolaMessageForStep(s, ph, true));
   setLolaStrip(s);
@@ -3752,7 +3746,7 @@ function handleSandbox(val){
     'echo $api_key':'sk-prod-abc123',
     'echo $API_KEY':'sk-prod-abc123',
     'git status':'On branch main\nYour branch is up to date.\nWorking tree clean.',
-    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@station>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
+    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@Station>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
     'whoami':'certified-vibe-cadet',
     'cat manifest.txt':'Mission: Escape Pod',
     'cat logs.txt':'INFO: All systems nominal\nINFO: Escape pod deployed\nINFO: '+G.name+' has graduated',
