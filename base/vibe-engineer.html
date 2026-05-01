@@ -134,6 +134,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 }
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#expert-timer{background:var(--blue-bg);border:1px solid var(--blue-d);color:var(--blue);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
 #career-impact-btn:hover{background:var(--amber-bg)}
  
@@ -648,6 +649,22 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .grad-ct{font-family:var(--display);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
 .grad-name{font-family:var(--display);font-size:20px;font-weight:900;color:var(--green);margin-bottom:4px}
 .grad-sub{font-size:11px;color:var(--muted2)}
+.grad-summary{display:grid;gap:12px;margin:18px 0;text-align:left}
+.grad-panel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:14px}
+.grad-panel-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:10px;font-weight:700}
+.grad-phase-list,.grad-ach-list{display:grid;gap:8px}
+.grad-phase-row,.grad-ach-row{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--text)}
+.grad-phase-row span:last-child,.grad-ach-row span:last-child{color:var(--muted2);text-align:right}
+.grad-insight{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--muted2);line-height:1.7}
+.grad-next{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.grad-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r8);padding:16px;text-align:left}
+.grad-card-title{font-family:var(--display);font-size:14px;color:var(--text);margin-bottom:8px}
+.grad-card-copy{font-size:12px;color:var(--muted2);line-height:1.7;min-height:84px}
+.grad-card .mbtn{width:100%;margin-top:12px}
+.grad-secondary{margin-top:14px;text-align:center;font-size:11px;color:var(--muted2)}
+.grad-link{background:none;border:none;color:var(--blue);font:inherit;cursor:pointer;text-decoration:underline;padding:0}
+.grad-link:hover{color:var(--cyan)}
+.grad-meta{margin-top:12px;text-align:center;font-size:11px;color:var(--muted)}
 .checkpoint-box{background:var(--s2);border:1px solid var(--blue-d);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
 .checkpoint-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:700}
 .checkpoint-title{font-family:var(--display);font-size:18px;color:var(--text);margin-bottom:8px}
@@ -720,6 +737,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #shell.right-collapsed #right-collapse-btn{
     writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px;
   }
+  .grad-next{grid-template-columns:1fr}
+  .grad-card-copy{min-height:0}
   .path-cards{grid-template-columns:1fr;gap:10px}
 }
 </style>
@@ -736,6 +755,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="phase-track"></div>
     <div id="tb-right">
       <div id="hardmode-pill">HARD MODE</div>
+      <div id="expert-timer">TIMER 00:00</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
@@ -882,30 +902,35 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="grad-modal" class="modal">
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🎖️</div>
-    <div class="mtitle" style="text-align:center;color:var(--green)">Graduation Day</div>
+    <div class="mtitle" style="text-align:center;color:var(--green)">Commission Complete</div>
     <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Engineer.</div>
     <div class="grad-cert">
-      <div class="grad-ct">Certificate of Completion</div>
+      <div class="grad-ct">Session Summary</div>
       <div class="grad-name" id="grad-name">—</div>
       <div class="grad-sub">Engineer · Station Delta Commission</div>
     </div>
-    <div class="skills-list">
-      <span>✓</span>Shell scripting fundamentals (shebang, variables, guards, chmod, execution)<br>
-      <span>✓</span>SSH workflows (keygen, copy-id, remote execution, scp transfer)<br>
-      <span>✓</span>API operations with curl (GET/POST, headers, payloads, auth)<br>
-      <span>✓</span>Structured JSON pipelines with jq, tee, and chaining<br>
-      <span>✓</span>Docker fundamentals (ps, logs, build, run, exec)<br>
-      <span>✓</span>Advanced Git operations (stash, fetch, rebase, bisect, cherry-pick)<br>
-      <span>✓</span>Process control and incident triage (ps aux, kill signals)<br>
-      <span>✓</span>.env security and secret rotation workflows<br>
-      <span>✓</span>Full-stack rescue under timed operational pressure
+    <div class="grad-summary">
+      <div class="grad-panel">
+        <div class="grad-panel-title">Session Summary</div>
+        <div class="grad-phase-list" id="grad-phase-list"></div>
+        <div class="grad-ach-list" id="grad-ach-list" style="margin-top:12px"></div>
+        <div class="grad-insight" id="grad-insight"></div>
+      </div>
+      <div class="grad-next">
+        <div class="grad-card">
+          <div class="grad-card-title">Vibe Agent Architect</div>
+          <div class="grad-card-copy">Design, evaluate, and govern multi-agent systems in production. Includes Playbook Save and Whatif scenarios.</div>
+          <button class="mbtn mbtn-p" onclick="continueToLieutenant()">CONTINUE TO LIEUTENANT →</button>
+        </div>
+        <div class="grad-card">
+          <div class="grad-card-title">Sandbox</div>
+          <div class="grad-card-copy">Commission complete. The distress bay is yours. Free exploration mode with the full command surface unlocked.</div>
+          <button class="mbtn mbtn-s" onclick="stayAndExplore()">STAY AND EXPLORE</button>
+        </div>
+      </div>
     </div>
-    <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="openCapstone()">ATTEMPT CAPSTONE</button>
-      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
-      <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
-    </div>
-    <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
+    <div class="grad-secondary"><button class="grad-link" onclick="shareGrad()">Share on X</button></div>
+    <div class="grad-meta">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
   </div>
 </div>
 
@@ -1028,8 +1053,10 @@ let G = {
   analytics:null,
 };
 
-const COURSE_ID='vibe-engineer';
-const ENGINEER_SAVE_KEY='vibe_engineer_v1';
+let expertTimerInterval = null;
+
+const COURSE_ID='Station Delta Engineer';
+const ENGINEER_SAVE_KEY='engineer_v1.2';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -2987,6 +3014,99 @@ function markStepAttempt(stepObj, phaseObj, input, correct){
   }
 }
 
+function formatDurationCompact(ms){
+  if(!ms || ms < 0) return '0m';
+  const totalSeconds=Math.floor(ms/1000);
+  const minutes=Math.floor(totalSeconds/60);
+  const seconds=totalSeconds%60;
+  if(minutes>=60){
+    const hours=Math.floor(minutes/60);
+    const remMinutes=minutes%60;
+    return `${hours}h ${remMinutes}m`;
+  }
+  if(minutes>0) return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
+  return `${seconds}s`;
+}
+
+function formatClock(ms){
+  const totalSeconds=Math.max(0,Math.floor((ms||0)/1000));
+  const hours=Math.floor(totalSeconds/3600);
+  const minutes=Math.floor((totalSeconds%3600)/60);
+  const seconds=totalSeconds%60;
+  if(hours>0) return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+
+function updateExpertTimerUI(){
+  const el=document.getElementById('expert-timer');
+  if(!el) return;
+  if(!G.expert){
+    el.style.display='none';
+    return;
+  }
+  if(!G.timerStart) G.timerStart=Date.now();
+  el.style.display='inline';
+  el.textContent=`TIMER ${formatClock(Date.now()-G.timerStart)}`;
+}
+
+function syncExpertTimer(){
+  if(expertTimerInterval){
+    clearInterval(expertTimerInterval);
+    expertTimerInterval=null;
+  }
+  updateExpertTimerUI();
+  if(G.expert){
+    if(!G.timerStart) G.timerStart=Date.now();
+    expertTimerInterval=setInterval(updateExpertTimerUI,1000);
+  }
+}
+
+function getGraduationSummary(){
+  ensureAnalytics();
+  const phaseRows=Object.values(G.analytics.phases)
+    .sort((a,b)=>a.phase-b.phase)
+    .map(rec=>({
+      label:`Phase ${rec.phase} — ${rec.title}`,
+      duration:formatDurationCompact(rec.durationMs || ((rec.startedAt && rec.completedAt) ? (rec.completedAt-rec.startedAt) : 0)),
+    }));
+  const achievementRows=(G.achievements||[])
+    .map(id=>ACHS.find(a=>a.id===id))
+    .filter(Boolean)
+    .slice(-6)
+    .map(a=>({name:a.name,desc:a.desc}));
+  const stepRows=Object.values(G.analytics.steps);
+  const fastestPhase=Object.values(G.analytics.phases)
+    .filter(rec=>typeof rec.durationMs==='number' && rec.durationMs>0)
+    .sort((a,b)=>a.durationMs-b.durationMs)[0];
+  const mostRetried=stepRows
+    .filter(rec=>typeof rec.wrongAttempts==='number')
+    .sort((a,b)=>b.wrongAttempts-a.wrongAttempts)[0];
+
+  let insight='You completed the full commission and now have the distress bay unlocked for free exploration.';
+  if(fastestPhase && mostRetried){
+    insight=`Your fastest phase was ${fastestPhase.title}. Your most retried step was ${mostRetried.objective}.`;
+  } else if(fastestPhase){
+    insight=`Your fastest phase was ${fastestPhase.title}.`;
+  } else if(mostRetried){
+    insight=`Your most retried step was ${mostRetried.objective}.`;
+  }
+  return {phaseRows,achievementRows,insight};
+}
+
+function populateGraduationModal(){
+  const summary=getGraduationSummary();
+  const phaseList=document.getElementById('grad-phase-list');
+  const achList=document.getElementById('grad-ach-list');
+  const insight=document.getElementById('grad-insight');
+  if(phaseList){
+    phaseList.innerHTML=summary.phaseRows.map(row=>`<div class="grad-phase-row"><span>${row.label}</span><span>${row.duration}</span></div>`).join('');
+  }
+  if(achList){
+    achList.innerHTML=summary.achievementRows.map(row=>`<div class="grad-ach-row"><span>${row.name}</span><span>${row.desc}</span></div>`).join('');
+  }
+  if(insight) insight.textContent=summary.insight;
+}
+
 function getTTRReport(){
   ensureAnalytics();
   return Object.values(G.analytics.steps)
@@ -3584,14 +3704,14 @@ async function completePhase(){
   blank();
  
   // Challenge (constructed response)
-  if(ph.challenge && !G.expert){
+  if(ph.challenge && G.hard){
     blank();
     await showChallenge(ph.challenge);
     blank();
   }
  
   // Break-it scenario
-  if(ph.breakit && !G.expert){
+  if(ph.breakit && G.hard){
     blank();
     await showBreakIt(ph.breakit);
     blank();
@@ -3981,6 +4101,22 @@ function shareGrad(){
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
 }
+
+function continueToLieutenant(){
+  const next='/base/vibe-lieutenant.html';
+  const hasAccount=Boolean(window.user?.hasAccount || window.__stationDeltaUser?.hasAccount || localStorage.getItem('station_delta_has_account')==='1');
+  const interestBase=window.STATION_DELTA_INTEREST_URL || '/interest';
+  const interestUrl=`${interestBase}?next=${encodeURIComponent(next)}&ref=engineer_grad`;
+  window.location.href=hasAccount ? next : interestUrl;
+}
+
+function stayAndExplore(){
+  closeModal('grad-modal');
+  blank();
+  appendLine('L.O.L.A.: Commission complete. Sandbox mode remains active — explore freely.','ln-lola');
+  appendLine('TIP: Type "capstone" if you want the optional post-commission drill.','ln-info');
+  $cmd.focus();
+}
  
 function selectPath(p){
   ['explorer','practitioner','expert'].forEach(id=>{
@@ -3990,6 +4126,9 @@ function selectPath(p){
   G.hard = p==='practitioner'||p==='expert';
   G.practitioner = p==='practitioner';
   G.expert = p==='expert';
+  if(G.expert && !G.timerStart) G.timerStart=Date.now();
+  if(!G.expert) G.timerStart=null;
+  syncExpertTimer();
 }
  
 /* ── BOOT / RESUME ── */
@@ -3998,6 +4137,7 @@ function startAcademy(){
   G.name=n||'Engineer';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  syncExpertTimer();
   closeModal('boot-modal');
   applyMobileLayoutDefaults();
   applyUIPreferences();
@@ -4061,6 +4201,7 @@ function resumeSession(){
   closeModal('boot-modal');
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  syncExpertTimer();
   if(G.sandbox) document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0) document.getElementById('career-impact-btn').style.display='inline';
   migrateMobileUiDefaults();
@@ -4107,7 +4248,6 @@ const _bootTitle=document.querySelector('#boot-modal .mtitle'); if(_bootTitle) _
 const _bootSub=document.querySelector('#boot-modal .msub'); if(_bootSub) _bootSub.textContent='Rank 1.5 bridge sim: shell scripting, SSH, APIs, Docker, advanced Git, process control.';
 const _gradTitle=document.querySelector('#grad-modal .mtitle'); if(_gradTitle) _gradTitle.textContent='Commission Complete';
 const _gradSub=document.querySelector('#grad-modal .msub'); if(_gradSub) _gradSub.textContent='You completed all 9 phases of Station Delta: Engineer.';
-const _gradCapBtn=document.querySelector('#grad-modal .mbtn.mbtn-p'); if(_gradCapBtn) _gradCapBtn.textContent='ATTEMPT POST-COMMISSION DRILL';
 const _stripAvatar=document.getElementById('lola-strip-avatar'); if(_stripAvatar) _stripAvatar.textContent='⚙ L.O.L.A.';
 const _bootIcon=document.querySelector('#boot-modal .mbox > div'); if(_bootIcon) _bootIcon.textContent='🛠️';
 const _gradIcon=document.querySelector('#grad-modal .mbox > div'); if(_gradIcon) _gradIcon.textContent='🛡️';
@@ -4220,43 +4360,46 @@ const ENGINEER_PRE_STEP_CONCEPTS={
 
 const ENGINEER_LOLA_STRIP={
   p1s1:[{tag:'habit',msg:'Engineer starts with inventory, not intuition.'}],
-  p1s2:[{tag:'signal',msg:'Filter the log for Host, Service, and Battery before you do anything else.'}],
-  p1s3:[{tag:'timeline',msg:'Recent history is often the fastest route to the root cause.'}],
+  p1s2:[{tag:'concept',msg:'Filter the log for Host, Service, and Battery before you do anything else.'}],
+  p1s3:[{tag:'tip',msg:'Recent history is often the fastest route to the root cause.'}],
   p2s1:[{tag:'new!',msg:'Build the rescue path in <code>rescue.sh</code> so the fix is repeatable.'}],
   p2s2:[{tag:'syntax',msg:'The shebang belongs on line 1, before everything else.'}],
   p2s3:[{tag:'habit',msg:'Put changing values in variables once instead of hardcoding them everywhere.'}],
-  p2s4:[{tag:'edit',msg:'Use <code>sed -i</code> when the file needs a quick, precise replacement.'}],
+  p2s4:[{tag:'command',msg:'Use <code>sed -i</code> when the file needs a quick, precise replacement.'}],
   p2s5:[{tag:'warning',msg:'Run the script only after permission is correct, and keep errors visible with <code>2>&1</code>.'}],
-  p2s6:[{tag:'guard',msg:'Guard clauses make brittle scripts safer under pressure.'}],
+  p2s6:[{tag:'habit',msg:'A guard you never trigger is a guard you cannot trust. Make it fail on purpose, then restore the happy path.'}],
   p3s1:[{tag:'concept',msg:'SSH keys replace password repetition with a trust model.'}],
-  p3s2:[{tag:'target',msg:'Remote target remains <code>engineer@192.168.1.42</code> throughout this phase.'}],
-  p3s3:[{tag:'remote',msg:'After this command, you are operating on a different machine.'}],
+  p3s2:[{tag:'tip',msg:'Remote target remains <code>engineer@192.168.1.42</code> throughout this phase.'}],
+  p3s3:[{tag:'concept',msg:'After this command, you are operating on a different machine.'}],
   p3s4:[{tag:'command',msg:'Use <code>&&</code> when step two should only run if step one succeeds.'}],
   p3s5:[{tag:'warning',msg:'SCP requires the colon between host and remote path.'}],
   p4s1:[{tag:'command',msg:'Health endpoint for this phase: <code>http://192.168.1.42/health</code>.'}],
-  p4s2:[{tag:'payload',msg:'The restart body must name <code>pod-monitor</code> exactly.'}],
-  p4s3:[{tag:'auth',msg:'Bearer token format matters. Small header mistakes break real incident calls.'}],
+  p4s2:[{tag:'syntax',msg:'The restart body must name <code>pod-monitor</code> exactly.'}],
+  p4s3:[{tag:'warning',msg:'Bearer token format matters. Small header mistakes break real incident calls.'}],
   p4s4:[{tag:'habit',msg:'Save the raw response before you try to summarize it.'}],
-  p5s1:[{tag:'recall',msg:'Use text tools on text logs and JSON tools on JSON logs.'}],
-  p5s2:[{tag:'jq',msg:'Select the error objects first. Shape them later.'}],
-  p5s3:[{tag:'shape',msg:'Object construction turns telemetry into a reportable artifact.'}],
-  p5s4:[{tag:'stream',msg:'<code>tee</code> lets you watch and archive the same stream at once.'}],
-  p5s5:[{tag:'bridge',msg:'This is the find → xargs handoff pattern you will reuse everywhere.'}],
-  p6s1:[{tag:'runtime',msg:'Check runtime state before you create more moving parts.'}],
-  p6s2:[{tag:'role',msg:'Captain owns planning and delegation.'}],
-  p6s3:[{tag:'role',msg:'Engineer owns focused build and code tasks from Captain.'}],
-  p7s1:[{tag:'mcp',msg:'Initialize the protocol layer before connecting any tool servers.'}],
-  p7s2:[{tag:'filesystem',msg:'Filesystem access is what turns a chat AI into a coding agent.'}],
-  p7s3:[{tag:'security',msg:'Least privilege is part of reliability, not just security paperwork.'}],
-  p8s1:[{tag:'prompt',msg:'Prompting is now operational: clear input, clear output, clear next action.'}],
-  p8s2:[{tag:'format',msg:'Format constraints are one of the fastest quality upgrades in prompting.'}],
-  p8s3:[{tag:'chain',msg:'Captain plans. Engineer builds. The pipe makes the handoff explicit.'}],
-  p9s1:[{tag:'docker',msg:'Start with container state before you rebuild anything.'}],
-  p9s2:[{tag:'evidence',msg:'Logs before action. Always.'}],
-  p9s3:[{tag:'build',msg:'Image tag for this mission: <code>rescue-service:v1</code>.'}],
-  p9s4:[{tag:'run',msg:'Detached mode, explicit ports, stable name. No shortcuts.'}],
-  p9s5:[{tag:'ship',msg:'Build first, push second. The order is part of the discipline.'}],
-  p9s6:[{tag:'handoff',msg:'This deploy step hands the mission to the final assessment.'}]
+  p5s1:[{tag:'concept',msg:'Use text tools on text logs and JSON tools on JSON logs.'}],
+  p5s2:[{tag:'command',msg:'Select the error objects first. Shape them later.'}],
+  p5s3:[{tag:'concept',msg:'Object construction turns telemetry into a reportable artifact.'}],
+  p5s4:[{tag:'shortcut',msg:'<code>tee</code> lets you watch and archive the same stream at once.'}],
+  p5s5:[{tag:'habit',msg:'This is the find → xargs handoff pattern you will reuse everywhere.'}],
+  p6s1:[{tag:'habit',msg:'Check runtime state before you create more moving parts.'}],
+  p6s2:[{tag:'concept',msg:'Captain owns planning and delegation.'}],
+  p6s3:[{tag:'concept',msg:'Engineer owns focused build and code tasks from Captain.'}],
+  p6s4:[{tag:'warning',msg:'If you do not constrain the output shape, the model will happily return prose you cannot reliably use downstream.'}],
+  p7s1:[{tag:'concept',msg:'Initialize the protocol layer before connecting any tool servers.'}],
+  p7s2:[{tag:'concept',msg:'Filesystem access is what turns a chat AI into a coding agent.'}],
+  p7s3:[{tag:'warning',msg:'Least privilege is part of reliability, not just security paperwork.'}],
+  p7s4:[{tag:'habit',msg:'Do not trust an authorization status line until you prove it with a live tool call.'}],
+  p8s1:[{tag:'concept',msg:'Prompting is now operational: clear input, clear output, clear next action.'}],
+  p8s2:[{tag:'syntax',msg:'Format constraints are one of the fastest quality upgrades in prompting.'}],
+  p8s3:[{tag:'concept',msg:'Captain plans. Engineer builds. The pipe makes the handoff explicit.'}],
+  p8s4:[{tag:'tip',msg:'Read the raw output before blaming the model. Most prompt bugs are instruction bugs first.'}],
+  p9s1:[{tag:'habit',msg:'Start with container state before you rebuild anything.'}],
+  p9s2:[{tag:'habit',msg:'Logs before action. Always.'}],
+  p9s3:[{tag:'command',msg:'Image tag for this mission: <code>rescue-service:v1</code>.'}],
+  p9s4:[{tag:'syntax',msg:'Detached mode, explicit ports, stable name. No shortcuts.'}],
+  p9s5:[{tag:'habit',msg:'Build first, push second. The order is part of the discipline.'}],
+  p9s6:[{tag:'command',msg:'This deploy step hands the mission to the final assessment.'}]
 };
 
 const ENGINEER_PHASES=[
@@ -4279,7 +4422,7 @@ const ENGINEER_PHASES=[
     {id:'p2s3',obj:'Store the rescue target in a variable',ctx:'Append the server IP so the script has one source of truth.',cmd:['echo \'SERVER="192.168.1.42"\' >> rescue.sh','echo "SERVER=\\"192.168.1.42\\"" >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('SERVER=')&&v.includes('>> rescue.sh'),accept:['echo server >> rescue.sh'],hint:'Append the SERVER assignment using >>.',out:'SERVER variable appended to rescue.sh',unlockCmd:'>>'},
     {id:'p2s4',obj:'Update the IP with sed',ctx:'Mission control changed the rescue host. Replace 192.168.1.42 with 10.0.0.5 without opening an editor.',cmd:['sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh','sed -i "s/192.168.1.42/10.0.0.5/g" rescue.sh'],acceptFn:v=>v.startsWith('sed -i')&&v.includes('192.168.1.42')&&v.includes('10.0.0.5')&&v.includes('rescue.sh'),accept:['sed -i replace rescue.sh'],hint:'Use sed -i with a substitution pattern.',out:'rescue.sh updated in place',unlockCmd:'sed -i'},
     {id:'p2s5',obj:'Run the script and capture all output',ctx:'Make the script executable and run it while capturing both standard output and errors.',cmd:['chmod +x rescue.sh && ./rescue.sh 2>&1'],acceptFn:v=>includesInOrder(v,['chmod +x rescue.sh','./rescue.sh 2>&1']),accept:['chmod +x rescue.sh && ./rescue.sh 2>&1'],hint:'Use chmod +x first, then run ./rescue.sh 2>&1 in the same chain.',out:'Attempting rescue on 10.0.0.5...\nERROR: SERVER variable was not validated before use.\nConnection refused.',unlockCmd:['chmod +x','2>&1'],teach:{title:'Capture everything when a script fails',body:'<code>2>&1</code> sends stderr into the same stream as stdout so the failure evidence is visible in one place.'}},
-    {id:'p2s6',obj:'Add an empty-variable guard',ctx:'Append a guard so the script fails safely if SERVER is missing.',cmd:['echo \'if [ -z "$SERVER" ]; then echo "No server set"; fi\' >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('-z "$SERVER"')&&v.includes('>> rescue.sh'),accept:['if guard append'],hint:'Append the guard using if [ -z "$SERVER" ].',out:'Guard clause appended to rescue.sh',quiz:{q:'Why chain <code>chmod +x rescue.sh && ./rescue.sh 2>&1</code> instead of running parts in a random order?',opts:['Because && looks cleaner','Because the run should happen only if the permission change succeeded, and 2>&1 keeps all evidence together','Because scripts only work with stderr enabled','Because Linux requires chmod before any echo command'],correct:1,fb:'Correct. The chain enforces the right order, and <code>2>&1</code> keeps the full result visible for diagnosis.'}}
+    {id:'p2s6',obj:'Add and prove an empty-variable guard',ctx:'Append the guard, then deliberately unset SERVER and rerun the script so you can watch the defensive path fire before restoring the valid value.',cmd:['echo \'if [ -z "$SERVER" ]; then echo "No server set. Aborting."; exit 1; fi\' >> rescue.sh'],accept:['if guard append'],acceptFn:v=>v.startsWith('echo')&&v.includes('-z "$SERVER"')&&v.includes('>> rescue.sh'),hint:'Append the guard first, then prove it by unsetting SERVER and rerunning the script before restoring the valid value.',out:'Guard clause appended to rescue.sh\nSERVER guard test pending…',multi:{parts:[{label:'Guard appended',hint:'Append an if [ -z "$SERVER" ] guard into rescue.sh first.',test:(_,n)=>n.startsWith('echo')&&n.includes('-z "$SERVER"')&&n.includes('>> rescue.sh')},{label:'Guard proven',hint:'Now trigger the guard with unset SERVER && ./rescue.sh, then restore with export SERVER="10.0.0.5" && ./rescue.sh',test:(_,n)=>n.includes('unset SERVER')&&n.includes('./rescue.sh')&&n.includes('export SERVER="10.0.0.5"')&&n.includes('./rescue.sh')}],nextPrompts:['Good. Now prove the guard works: unset SERVER, rerun the script, then restore SERVER and rerun the happy path.']},teach:{title:'A guard is only trustworthy after you trigger it on purpose',body:'Defensive shell code should be tested on both paths. Force the missing-variable branch first so you can see the script abort cleanly with exit code 1, then restore the valid value and confirm the normal rescue path still runs. That is how operators validate safety checks instead of just admiring them.'},bridge:{title:'This is how teams validate defensive automation under pressure',body:'Reliable scripts are exercised on failure paths before they are trusted in production. Incident responders unset variables, break assumptions, and watch the guard rails activate so they know the automation will fail closed instead of making the outage worse.',tags:['Shell scripting','Incident response','Defensive coding']},quiz:{q:'Why chain <code>chmod +x rescue.sh && ./rescue.sh 2>&1</code> instead of running parts in a random order?',opts:['Because && looks cleaner','Because the run should happen only if the permission change succeeded, and 2>&1 keeps all evidence together','Because scripts only work with stderr enabled','Because Linux requires chmod before any echo command'],correct:1,fb:'Correct. The chain enforces the right order, and <code>2>&1</code> keeps the full result visible for diagnosis.'}}
    ],
    done:'Phase 2 complete. You wrote, edited, and ran a rescue script like an operator, not a spectator.',
    ach:'file_master'},
@@ -4327,7 +4470,8 @@ const ENGINEER_PHASES=[
    steps:[
     {id:'p6s1',obj:'Check current agent status',ctx:'Before you add more moving parts, inspect the current agent runtime state.',cmd:['vibe status','vibe agents','vibe ls'],accept:['vibe status','vibe agents','vibe ls','vibe list'],hint:'Type: vibe status',out:'VIBE AGENT RUNTIME v2.0\nActive agents: 0\nMCP connections: 0\nStatus: ready to initialize',unlockCmd:'vibe'},
     {id:'p6s2',obj:'Create a manager agent named Captain',ctx:'Captain will coordinate the rescue plan and delegate the right work.',cmd:['vibe create --role manager --name Captain'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('manager')&&v.includes('--name'),accept:['vibe create --role manager --name captain'],hint:'Type: vibe create --role manager --name Captain',out:'✓ Agent "Captain" initialized\n  role: manager\n  model: claude-opus\n  tools: filesystem, shell, web',teach:{title:'Why manager agents matter',body:'Operationally, the manager agent owns the plan so specialist agents can stay focused on execution.'}},
-    {id:'p6s3',obj:'Create a specialist agent named Engineer',ctx:'Engineer will own code and terminal-heavy rescue tasks delegated by Captain.',cmd:['vibe create --role specialist --name Engineer'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('specialist')&&v.includes('--name'),accept:['vibe create --role specialist --name engineer'],hint:'Type: vibe create --role specialist --name Engineer',out:'✓ Agent "Engineer" initialized\n  role: specialist\n  focus: code-generation, code-review\n  reports-to: Captain',quiz:{q:'Why split the crew into manager and specialist roles instead of one giant all-purpose agent?',opts:['Because the terminal requires two agents','Because focused agents are easier to direct and debug than one overloaded agent','Because specialists always use fewer tokens','Because manager agents are the only ones allowed to read files'],correct:1,fb:'Correct. Role separation improves focus, output quality, and operational debugging when something goes wrong.'}}
+    {id:'p6s3',obj:'Create a specialist agent named Engineer',ctx:'Engineer will own code and terminal-heavy rescue tasks delegated by Captain.',cmd:['vibe create --role specialist --name Engineer'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('specialist')&&v.includes('--name'),accept:['vibe create --role specialist --name engineer'],hint:'Type: vibe create --role specialist --name Engineer',out:'✓ Agent "Engineer" initialized\n  role: specialist\n  focus: code-generation, code-review\n  reports-to: Captain',quiz:{q:'Why split the crew into manager and specialist roles instead of one giant all-purpose agent?',opts:['Because the terminal requires two agents','Because focused agents are easier to direct and debug than one overloaded agent','Because specialists always use fewer tokens','Because manager agents are the only ones allowed to read files'],correct:1,fb:'Correct. Role separation improves focus, output quality, and operational debugging when something goes wrong.'}},
+    {id:'p6s4',obj:'Send a structured prompt and validate the output shape',ctx:'Have Captain answer in a strict JSON shape, then watch what happens when the first response ignores the contract and you resend with the format made explicit.',cmd:['vibe prompt Captain --format \'{"priorities":["string"],"confidence":float}\''],acceptFn:v=>v.startsWith('vibe prompt Captain --format')&&v.includes('priorities')&&v.includes('confidence'),accept:['vibe prompt captain --format'],hint:'Type: vibe prompt Captain --format \'{"priorities":["string"],"confidence":float}\'',out:'Attempt 1: Captain returned unstructured prose.\nFormat validator rejected response.\nRetrying with explicit JSON contract…\n{\n  "priorities":["restore visibility","stabilize pod-monitor","prepare deploy artifact"],\n  "confidence":0.91\n}',jit:{title:'Output shape is an operational contract, not decoration',body:'A structured response can move directly into downstream tooling, checks, and orchestration. Freeform prose may sound smart, but it breaks the moment another system needs to parse it reliably. Format constraints turn "helpful" AI into dependable AI.'},bridge:{title:'Structured outputs are the unlock for serious agent systems',body:'The fastest path from demo-grade prompting to production-grade automation is explicit output shape. JSON contracts let planners hand clean data to executors, reviewers, and dashboards without brittle text scraping or manual cleanup after every run.',tags:['Agents','Structured outputs','Reliability']},teach:{title:'Specify the format every time the result feeds another system',body:'If the next step depends on keys, arrays, or machine-readable values, say so in the prompt. Ask for the exact shape, validate the response, and resend if the contract is broken. That pattern is one of the highest-leverage habits in modern AI engineering.'}}
    ],
    done:'Phase 6 complete. Your rescue crew now has a planner and a builder with clear responsibilities.',
    ach:'orchestrator'},
@@ -4337,7 +4481,8 @@ const ENGINEER_PHASES=[
    steps:[
     {id:'p7s1',obj:'Initialize the MCP runtime',ctx:'Start the Model Context Protocol bridge so your agents can connect to external tools.',cmd:['vibe mcp init'],accept:['vibe mcp init'],hint:'Type: vibe mcp init',out:'MCP Runtime v1.4 initializing…\n✓ Transport: stdio\n✓ Capability negotiation: complete\n✓ MCP Online. 0 servers connected.'},
     {id:'p7s2',obj:'Connect the filesystem server',ctx:'Give the crew access to project files through the filesystem MCP server.',cmd:['vibe mcp connect --server filesystem'],acceptFn:v=>v.startsWith('vibe mcp connect')&&(v.includes('filesystem')||v.includes('fs')),accept:['vibe mcp connect --server filesystem'],hint:'Type: vibe mcp connect --server filesystem',out:'✓ MCP server "filesystem" connected\n  Tools available: read_file, write_file, list_dir, search_files\n  Access: ~/projects/**'},
-    {id:'p7s3',obj:'Authorize Engineer for the npm tool',ctx:'Grant the specialist only the npm permissions needed for rescue work.',cmd:['vibe auth --agent Engineer --tool npm'],acceptFn:v=>v.startsWith('vibe auth')&&v.includes('--agent')&&v.includes('--tool'),accept:['vibe auth --agent engineer --tool npm'],hint:'Type: vibe auth --agent Engineer --tool npm',out:'✓ Engineer authorized for: npm\n  Scope: install, run scripts\n  Restricted: publish, --global flags',quiz:{q:'Why grant only the npm tool instead of full access to everything?',opts:['Because npm is faster than other tools','Because least privilege limits blast radius if the agent or task goes wrong','Because MCP only allows one tool per agent','Because agents cannot understand more than one tool'],correct:1,fb:'Correct. Least privilege is a security and reliability practice, not just a configuration detail.'}}
+    {id:'p7s3',obj:'Authorize Engineer for the npm tool',ctx:'Grant the specialist only the npm permissions needed for rescue work.',cmd:['vibe auth --agent Engineer --tool npm'],acceptFn:v=>v.startsWith('vibe auth')&&v.includes('--agent')&&v.includes('--tool'),accept:['vibe auth --agent engineer --tool npm'],hint:'Type: vibe auth --agent Engineer --tool npm',out:'✓ Engineer authorized for: npm\n  Scope: install, run scripts\n  Restricted: publish, --global flags',quiz:{q:'Why grant only the npm tool instead of full access to everything?',opts:['Because npm is faster than other tools','Because least privilege limits blast radius if the agent or task goes wrong','Because MCP only allows one tool per agent','Because agents cannot understand more than one tool'],correct:1,fb:'Correct. Least privilege is a security and reliability practice, not just a configuration detail.'}},
+    {id:'p7s4',obj:'Verify authorization with a live tool call',ctx:'Do not trust the permission banner alone. Use the npm tool, see the scope fail, widen it deliberately, and prove the call now works.',cmd:['vibe exec Engineer --tool npm --action "list outdated packages"'],acceptFn:v=>v.startsWith('vibe exec Engineer --tool npm')&&v.includes('list outdated packages'),accept:['vibe exec engineer --tool npm --action "list outdated packages"'],hint:'Type: vibe exec Engineer --tool npm --action "list outdated packages"',out:'Attempt 1 blocked:\n  missing permission: npm:read\nRe-authorizing with scoped read access…\n$ vibe mcp auth Engineer --scope npm:read\nAuthorization updated.\nRe-running tool call…\nreact 18.2.0 → 18.3.1\nvite 5.4.2 → 5.4.8',jit:{title:'Authorization that is never exercised is still unproven',body:'A status line can tell you what should be true. A live call tells you what is true. Real systems often fail on missing sub-scopes, unexpected verbs, or stale policy state, so the only trustworthy permission check is the one that actually attempts the intended action.'},bridge:{title:'Production access reviews always end with a real task, not a screenshot',body:'Security and platform teams verify permissions by performing the least-privileged action the role is supposed to allow. That closes the gap between "configured correctly" and "actually usable" before an incident or deploy depends on it.',tags:['MCP','Security','Access control']},teach:{title:'Verify access with the exact action you plan to delegate',body:'Grant the smallest scope, run the real tool call, read the error carefully, and add only the missing permission. This keeps agent access tight while still proving the workflow is ready before a live task depends on it.'}}
    ],
    done:'Phase 7 complete. Your crew can now connect to real tools without getting reckless access by default.',
    ach:'crew_leader'},
@@ -4347,7 +4492,8 @@ const ENGINEER_PHASES=[
    steps:[
     {id:'p8s1',obj:'Ask Captain to explain MCP',ctx:'Send Captain a direct prompt so the crew can align on the protocol you just initialized.',cmd:['prompt Captain "Explain MCP"'],acceptFn:v=>v.startsWith('prompt')&&v.toLowerCase().includes('captain'),accept:['prompt captain'],hint:'Type: prompt Captain "Explain MCP"',out:'Captain: MCP is our Model Context Protocol bridge. It lets me read project files and use connected tools directly instead of relying on pasted context.',unlockCmd:'prompt'},
     {id:'p8s2',obj:'Ask Captain for three rescue priorities',ctx:'Constrain the output format so the plan comes back concise and usable.',cmd:['prompt Captain "List 3 rescue priorities. One sentence each."'],acceptFn:v=>v.startsWith('prompt')&&v.toLowerCase().includes('captain')&&v.toLowerCase().includes('rescue priorities'),accept:['prompt captain "list 3 rescue priorities. one sentence each."'],hint:'Type: prompt Captain "List 3 rescue priorities. One sentence each."',out:'Captain:\n1. Restore service visibility before making deep changes.\n2. Stabilize the failing monitor path before shipping anything new.\n3. Keep every step reversible and documented for mission control.'},
-    {id:'p8s3',obj:'Chain plan into build execution',ctx:'Pipe Captain’s rescue plan directly into Engineer so the builder can act on it.',cmd:['prompt Captain "Plan rescue" | prompt Engineer "Build it"'],acceptFn:v=>v.includes('prompt Captain "Plan rescue"')&&v.includes('|')&&v.includes('prompt Engineer "Build it"'),accept:['prompt captain "plan rescue" | prompt engineer "build it"'],hint:'Type: prompt Captain "Plan rescue" | prompt Engineer "Build it"',out:'Captain → [Planning] Stabilize logs, verify API status, then prepare deploy artifact.\nEngineer → [Building] Rescue implementation sequence prepared.'}
+    {id:'p8s3',obj:'Chain plan into build execution',ctx:'Pipe Captain’s rescue plan directly into Engineer so the builder can act on it.',cmd:['prompt Captain "Plan rescue" | prompt Engineer "Build it"'],acceptFn:v=>v.includes('prompt Captain "Plan rescue"')&&v.includes('|')&&v.includes('prompt Engineer "Build it"'),accept:['prompt captain "plan rescue" | prompt engineer "build it"'],hint:'Type: prompt Captain "Plan rescue" | prompt Engineer "Build it"',out:'Captain → [Planning] Stabilize logs, verify API status, then prepare deploy artifact.\nEngineer → [Building] Rescue implementation sequence prepared.'},
+    {id:'p8s4',obj:'Debug a prompt that returns the wrong format',ctx:'Read the raw response first, then tighten the instruction so Captain returns a numbered list instead of another vague paragraph.',cmd:['vibe prompt Captain --debug "Summarize the three rescue priorities"'],acceptFn:v=>v.startsWith('vibe prompt Captain --debug')&&v.includes('rescue priorities'),accept:['vibe prompt captain --debug "summarize the three rescue priorities"'],hint:'Type: vibe prompt Captain --debug "Summarize the three rescue priorities"',out:'Raw response:\nThe mission needs calm prioritization. First restore visibility, then stabilize the monitor, then prep the deploy path.\n\nConstraint added:\n"Summarize the three rescue priorities. Return a numbered list. No prose."\n\nCaptain:\n1. Restore service visibility.\n2. Stabilize pod-monitor.\n3. Prepare the deploy artifact.',jit:{title:'Most prompt failures are instruction failures before they are model failures',body:'The model often did something reasonable with an underspecified request. Debugging starts by reading the raw output, comparing it to the intended contract, and then tightening the prompt so the mismatch becomes impossible or at least much less likely.'},bridge:{title:'Prompt debugging is part of modern engineering review work',body:'Teams shipping AI features inspect the raw output, identify the exact mismatch, and iterate on role, format, and constraints before they reach for heavier fixes. That habit shortens feedback loops and makes prompt quality measurable instead of mystical.',tags:['Prompt engineering','AI review','Reliability']},teach:{title:'Pull the three strongest levers in order: role, format, constraint',body:'When a model returns the wrong shape, first clarify who it is acting as, then specify the exact output format, then add any hard limits like "numbered list" or "no prose." That sequence fixes a surprising amount of prompt drift without changing models.'}}
    ],
    challenge:ENGINEER_CHALLENGES[8],
    done:'Phase 8 complete. Your prompts now sound like operational instructions, not vague wishes.',
@@ -4499,7 +4645,7 @@ function applyEngineerReferenceContent(){
   if(achById.crew_leader){achById.crew_leader.name='MCP Operator';achById.crew_leader.desc='Connected tool access with deliberate permission boundaries.';}
   if(achById.prompter){achById.prompter.name='Prompt Pilot';achById.prompter.desc='Directed the rescue crew with clear, high-signal prompts.';}
   if(achById.shipper){achById.shipper.name='Rescue Shipper';achById.shipper.desc='Stabilized and shipped a live rescue service.';}
-  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed all 9 phases of Station Delta: Engineer.';}
+  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed the Vibe Engineer commission. Systems stabilized.';}
 }
 
 function ensureEngineerScaffold(){
@@ -4721,7 +4867,7 @@ if(G.currentPath==='/home/cadet/projects') G.currentPath='/home/engineer/distres
 
 // Engineer wording polish across shared metadata surfaces.
 const _achGrad=ACHS.find(a=>a.id==='graduate');
-if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed all 9 phases of Station Delta: Engineer.';}
+if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed the Vibe Engineer commission. Systems stabilized.';}
 const _achSenior=ACHS.find(a=>a.id==='senior_cadet');
 if(_achSenior){_achSenior.name='Senior Engineer';_achSenior.desc='Completed post-commission capstone objectives.';}
 const _achShip=ACHS.find(a=>a.id==='shipper');
@@ -4884,7 +5030,7 @@ function handleSandbox(val){
     'echo $API_KEY':'sk-prod-rotated',
     'git status':'On branch main\nYour branch is ahead of origin/main by 1 commit.\nWorking tree clean.',
     'git log':'commit 8f9a0b1\nAuthor: '+G.name+' <engineer@station-delta>\nDate: Just now\n    stabilize: dead server protocol',
-    'whoami':'certified-vibe-engineer',
+    'whoami':'certified-Station-Delta-engineer',
     'cat distress.log':'[RESOLVED] service restored\n[RESOLVED] battery stabilized\n[RESOLVED] api auth recovered',
     'kubectl get pods':'pod-monitor 0/1 CrashLoopBackOff\napi-gateway 1/1 Running',
     'jira create ticket':'JRA-4242 created: "Production is on fire (politely)"',
@@ -4953,6 +5099,13 @@ async function runGraduation(){
   appendLine('Remote battery normalized. Pod-monitor restored.','ln-info');
   unlock('graduate');
   if(!G.expert && !G.sandbox) unlock('senior_cadet');
+  G.sandbox=true;
+  if(!G.completedPhases.includes(G.phase)) G.completedPhases.push(G.phase);
+  document.getElementById('sandbox-pill').style.display='inline';
+  document.getElementById('grad-name').textContent=G.name||'Engineer';
+  document.getElementById('final-score').textContent=G.score+' / 1000';
+  populateGraduationModal();
+  save();
   openModal('grad-modal');
 }
 
@@ -4961,6 +5114,7 @@ function resumeSession(){
   document.getElementById('cadet-name-display').textContent=G.name||'Engineer';
   if(!G.currentPath||G.currentPath.includes('/home/cadet')) G.currentPath='/home/engineer/distress-bay';
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  syncExpertTimer();
   if(G.sandbox) document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0) document.getElementById('career-impact-btn').style.display='inline';
   applyUIPreferences();
