@@ -1214,7 +1214,7 @@ const LOLA_STRIP = {
   ],
   p4s6: [
     {tag:'habit',msg:'The conflict is not finished when the file looks right. It is finished when you stage and commit the resolution.'},
-    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>Resolution Merge Conflict</code>.'},
+    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>resolution merge conflict</code>.'},
   ],
 
   // ── Phase 5: Packages & Dependencies ──
@@ -1655,10 +1655,10 @@ const PHASES = [null,
    jit:{title:'What those symbols actually mean',body:'<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> marks the start of your version. <code>=======</code> is the divider. <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> marks the end of the incoming version. Your job is to delete all three marker lines and keep whichever content (or combination) is correct. Then <code>git add</code> the file to mark it resolved and <code>git commit</code> to close the merge.'},
    bridge:{title:'This is a normal team moment',body:'Merge conflicts are routine on active codebases. The skill is not avoiding them forever. The skill is staying calm, reading the markers, and making the final decision cleanly.',tags:['Pull requests','Teams']}},
  {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
-   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge conflict"'],
+   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge conflict"'],
    acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m "resolution merge conflict"']),
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolution Merge Conflict',
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] resolution merge conflict',
    teach:{title:'A conflict has a finish line',body:'The finish line is not just a clean file. The finish line is a clean file plus a recorded resolution in Git.'},
    jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. In this step you are replacing the entire conflicted file with the final text <code>Mission: Escape Pod</code>, then staging it, then committing it with the exact message <code>Resolution Merge Conflict</code>.'},
    bridge:{title:'Chaining commands is a real shell habit',body:'Engineers use <code>&&</code> constantly for short workflows like build-then-test or add-then-commit. It keeps the sequence readable and stops the chain when something breaks.',tags:['Shell workflow','Automation']},
