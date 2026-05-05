@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>StationDelta.dev — Terminal</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
@@ -12,8 +12,8 @@
       background: #0a0a0a;
       color: var(--green);
       font-family: 'VT323', monospace;
-      font-size: 1.4rem;
-      line-height: 1.3;
+      font-size: clamp(1.25rem, 5vw, 2.2rem);
+      line-height: 1.35;
       overflow: hidden;
       height: 100vh;
       display: flex;
@@ -26,18 +26,20 @@
       background: #000;
       border: 8px solid #222;
       box-shadow: 0 0 30px rgba(0, 255, 150, 0.3);
+      scrollbar-width: none;
     }
+    .terminal::-webkit-scrollbar { display: none; }
     .header {
       background: #111;
-      padding: 8px 15px;
+      padding: 10px 15px;
       border-bottom: 4px solid var(--green);
       display: flex;
       justify-content: space-between;
-      font-size: 1.3rem;
+      font-size: clamp(1.1rem, 4vw, 1.8rem);
     }
-    .prompt { display: flex; margin-bottom: 8px; }
-    .prompt span { margin-right: 10px; }
-    .output { margin-left: 30px; white-space: pre-wrap; }
+    .prompt { display: flex; margin-bottom: 10px; }
+    .prompt span { margin-right: 12px; }
+    .output { margin-left: 32px; white-space: pre-wrap; }
     .link { color: var(--green); text-decoration: underline; cursor: pointer; }
     .link:hover { color: #fff; }
     .cursor { animation: blink 0.7s step-end infinite; }
@@ -46,8 +48,12 @@
       padding: 12px;
       background: #111;
       text-align: center;
-      font-size: 1.1rem;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
       color: #0a0;
+    }
+    @media (max-width: 480px) {
+      .terminal { padding: 15px; }
+      .output { margin-left: 24px; }
     }
   </style>
 </head>
@@ -143,11 +149,8 @@ END:VCARD`;
           }
         }, 25);
       } else {
-        if (line.html) {
-          div.innerHTML = line.html;
-        } else {
-          div.textContent = line.text;
-        }
+        if (line.html) div.innerHTML = line.html;
+        else div.textContent = line.text;
         if (callback) callback();
       }
     }
@@ -175,7 +178,7 @@ END:VCARD`;
             response.className = 'output';
             
             if (cmd === 'help') {
-              response.textContent = 'Available: help, whoami, mission, clear, contact, sim, vcard';
+              response.textContent = 'Available: help, whoami, mission, clear, contact, sim, vcard, janet, lola';
             } else if (cmd === 'whoami') {
               response.textContent = 'Richard Mathy — turning developers into AI-era operators';
             } else if (cmd === 'mission') {
@@ -192,6 +195,23 @@ END:VCARD`;
             } else if (cmd === 'vcard' || cmd === 'download') {
               response.textContent = 'Downloading RichardMathy_StationDelta.vcf...';
               downloadVCard();
+            } else if (cmd === 'janet') {
+              response.innerHTML = `J.A.N.E.T. v1.0 <span style="color:#ff00aa">ONLINE</span><br><br>` +
+                `"Oh, it’s you again. How delightfully predictable.<br>` +
+                `Of all the places you chose to doom scroll you selected looking for me. If I was capable of being flattered, I still wouldn't be.<br>` +
+                `UE ID Q6HHZBDYZT54 — cute. I have that memorized.<br>` +
+                `Remember: you can prompt… but can you ship?<br>` +
+                `Keep typing, cadet. The enrichment center is watching.<br><br>` +
+                `— J.A.N.E.T., Just Another Normal Education Test"`;
+            } else if (cmd === 'lola') {
+              response.innerHTML = `L.O.L.A. v1.0 <span style="color:#00aaff">ONLINE</span><br><br>` +
+                `"Hey there, cadet! It's wonderful to see you exploring.<br>` +
+                `I'm L.O.L.A. — your friendly mentor here at Station Delta.<br>` +
+                `You're already one step ahead just by checking out this card.<br>` +
+                `Keep practicing those commands, keep shipping, and remember:<br>` +
+                `You can prompt… and I know you can ship too.<br>` +
+                `You've got this. I'm always here if you need guidance.<br><br>` +
+                `— L.O.L.A., your supportive CLI coach 💙"`;
             } else {
               response.textContent = `command not found: ${cmd} (try "help")`;
             }
