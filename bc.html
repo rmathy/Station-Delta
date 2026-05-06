@@ -22,14 +22,9 @@
   }
   .card { width: 100%; max-width: 560px; border: 1px solid var(--dim); background: var(--bg2); }
   .titlebar {
-    background: var(--bg3);
-    border-bottom: 1px solid var(--dim);
-    padding: 6px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(0.85rem, 3vw, 0.95rem);
-    color: var(--dim);
+    background: var(--bg3); border-bottom: 1px solid var(--dim);
+    padding: 6px 12px; display: flex; justify-content: space-between;
+    align-items: center; font-size: clamp(0.85rem, 3vw, 0.95rem); color: var(--dim);
   }
   .dots { display: flex; gap: 6px; }
   .dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -37,6 +32,37 @@
   .screen { padding: 20px 20px 8px; min-height: 260px; }
   .boot-line { opacity: 0; animation: fadein 0.15s forwards; }
   @keyframes fadein { to { opacity: 1; } }
+  .cta-bar {
+    border-top: 1px dashed #1a4433;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #060606;
+  }
+  .cta-label { color: #005533; font-size: clamp(0.8rem, 3vw, 0.9rem); white-space: nowrap; }
+  .cta-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--dim);
+    color: var(--g);
+    font-family: 'VT323', monospace;
+    font-size: clamp(1rem, 4vw, 1.15rem);
+    padding: 5px 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .cta-btn:hover, .cta-btn:active {
+    background: #001a0d;
+    border-color: var(--g);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(0,255,150,0.2);
+  }
+  .cta-btn .npm { color: var(--dim); }
+  .cta-btn .cmd { color: var(--g); }
+  .cta-btn:hover .cmd, .cta-btn:active .cmd { color: #fff; }
   .cmd-zone { background: var(--bg3); border-top: 1px solid #1a3322; padding: 10px 20px; }
   .cmd-label { color: var(--dim); font-size: clamp(0.8rem, 3vw, 0.9rem); margin-bottom: 8px; }
   .cmd-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
@@ -50,8 +76,7 @@
   .cmd-btn.secret:hover { border-color: #ffff00; color: #ffff00; background: #0d0d00; }
   .output-area {
     min-height: 36px; font-size: clamp(0.9rem, 3.5vw, 1.05rem);
-    padding: 4px 0; color: var(--gb); white-space: pre-wrap;
-    transition: color 0.3s;
+    padding: 4px 0; color: var(--gb); white-space: pre-wrap; transition: color 0.3s;
   }
   .output-area.janet-mode { color: #ff44cc; }
   .output-area.lola-mode { color: #44aaff; }
@@ -93,6 +118,13 @@
 
   <div class="screen" id="screen">
     <div id="boot"></div>
+  </div>
+
+  <div class="cta-bar">
+    <span class="cta-label">$</span>
+    <button class="cta-btn" onclick="window.open('https://stationdelta.dev','_blank')">
+      <span class="npm">npm run </span><span class="cmd">cadet</span>
+    </button>
   </div>
 
   <div class="cmd-zone">
@@ -203,10 +235,10 @@ function runCmd(cmd) {
 }
 
 const commands = {
-  help:     () => setOutput('commands: mission · tracks · skills · contact · save · clear · whoami\n[ hidden: try typing names you might recognize... ]', 'normal'),
-  whoami:   () => setOutput('Richard Mathy — turning developers into AI-era operators.\nM.Ed. | Builder | Educator', 'normal'),
-  mission:  () => setOutput('Narrative-driven terminal simulations.\nNo videos. No passive learning.\nYou type → You ship → You graduate.', 'normal'),
-  tracks:   () => setOutput(
+  help:           () => setOutput('commands: mission · tracks · skills · contact · save · clear · whoami\n[ hidden: try typing names you might recognize... ]', 'normal'),
+  whoami:         () => setOutput('Richard Mathy — turning developers into AI-era operators.\nM.Ed. | Builder | Educator', 'normal'),
+  mission:        () => setOutput('Narrative-driven terminal simulations.\nNo videos. No passive learning.\nYou type → You ship → You graduate.', 'normal'),
+  tracks:         () => setOutput(
     '🛡️  Security & Reliability  — secure, resilient, observable systems\n' +
     '🚀  Platform & Delivery     — CI/CD, infra, commit to production\n' +
     '🤖  AI Systems              — multi-agent, RAG, guardrails, cost gov\n' +
@@ -214,13 +246,14 @@ const commands = {
     'Cadet + Engineer are free entry sims on all 4 tracks.\nstationdelta.dev →',
     'normal'
   ),
-  skills:   () => setOutput('13 interactive CLI sims · 9 phases each\nL.O.L.A. coaching · J.A.N.E.T. boss fights\nFree: Cadet + Engineer · Paid: Officer → Captain', 'normal'),
-  contact:  () => setOutputHTML('DM: <a href="https://x.com/Richard_Mathy" target="_blank" style="color:var(--g)">@Richard_Mathy</a>  ·  Web: <a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">stationdelta.dev</a>', 'normal'),
-  save:     () => downloadVCard(),
-  vcard:    () => downloadVCard(),
-  download: () => downloadVCard(),
-  clear:    () => setOutput('Type a command or click above ↑', 'normal'),
-  sim:      () => setOutputHTML('Launching Cadet simulation...\n<a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">Open stationdelta.dev →</a>', 'normal'),
+  skills:         () => setOutput('13 interactive CLI sims · 9 phases each\nL.O.L.A. coaching · J.A.N.E.T. boss fights\nFree: Cadet + Engineer · Paid: Officer → Captain', 'normal'),
+  contact:        () => setOutputHTML('DM: <a href="https://x.com/Richard_Mathy" target="_blank" style="color:var(--g)">@Richard_Mathy</a>  ·  Web: <a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">stationdelta.dev</a>', 'normal'),
+  save:           () => downloadVCard(),
+  'save contact': () => downloadVCard(),
+  vcard:          () => downloadVCard(),
+  download:       () => downloadVCard(),
+  clear:          () => setOutput('Type a command or click above ↑', 'normal'),
+  sim:            () => setOutputHTML('Launching Cadet simulation...\n<a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">Open stationdelta.dev →</a>', 'normal'),
 
   janet: () => {
     flashCard('janet');
