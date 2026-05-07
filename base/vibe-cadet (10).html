@@ -1028,7 +1028,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 /* ── STATE ── */
 let G = {
-  name:'Cadet', phase:1, step:0, tries:0, score:1000,
+  name:'Cadet', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
   agents:[], achievements:[], completedPhases:[],
@@ -1214,7 +1214,7 @@ const LOLA_STRIP = {
   ],
   p4s6: [
     {tag:'habit',msg:'The conflict is not finished when the file looks right. It is finished when you stage and commit the resolution.'},
-    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>resolution merge conflict</code>.'},
+    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>Resolution Merge Conflict</code>.'},
   ],
 
   // ── Phase 5: Packages & Dependencies ──
@@ -1552,7 +1552,7 @@ const PHASES = [null,
    jit:{title:'Relative vs absolute paths',body:'<code>cd game_v1</code> is a <b>relative path</b> — it means "from where I am right now, go into game_v1." An <b>absolute path</b> starts with <code>/</code> and works from anywhere, for example <code>/home/cadet/projects/game_v1</code>. Press <kbd>Tab</kbd> after typing a few letters to autocomplete a folder or file name.'},
    bridge:{title:'Path fluency is foundational',body:'Absolute paths appear in scripts, Docker configs, and CI pipelines where the working directory cannot be assumed. Relative paths keep daily commands short. Knowing the difference prevents a wide category of "file not found" errors.',tags:['Linux','macOS','Docker','CI/CD']}},
   {id:'p1s4', obj:'Create a mission_logs directory', ctx:'Create a folder called <code>mission_logs</code>. It matters because good terminal work includes making the place you will need before you need it. Create it now.',
-   cmd:['mkdir mission_logs'], accept:['mkdir mission_logs'], hint:'Type: mkdir mission_logs', out:'mission_logs/ created', unlockCmd:'mkdir',
+   cmd:['mkdir mission_logs'], accept:['mkdir mission_logs'], hint:'Type: mkdir mission_logs', out:'Created directory: mission_logs', unlockCmd:'mkdir',
    teach:{title:'Folders are structure',body:'<code>mkdir</code> creates a directory. This is the start of intentional filesystem structure: not just using what exists, but shaping what exists.'},
    jit:{title:'Building nested paths in one step',body:'<code>mkdir</code> creates one directory at a time by default. To create a full nested path at once, use the <code>-p</code> flag: <code>mkdir -p logs/archive/2026</code> creates every level that does not already exist. Without <code>-p</code>, the command fails if the parent does not exist yet.'},
    bridge:{title:'Directory creation is part of every project setup',body:'CI pipelines, Docker images, and deploy scripts all create directories before writing output files. The same <code>mkdir -p</code> pattern you would use here appears in Dockerfiles, GitHub Actions, and shell provisioning scripts.',tags:['CI/CD','Docker','Shell scripts','Project structure']}}
@@ -1589,7 +1589,7 @@ const PHASES = [null,
    cmd:['touch manifest.txt'], accept:['touch manifest.txt'], hint:'Type: touch manifest.txt', out:'manifest.txt created (0 bytes)', unlockCmd:'touch',
    teach:{title:'Creating an empty file',body:'<code>touch</code> is the fastest way to create a blank file. It is small, direct, and easy to script.'},
    jit:{title:'Why create files from the terminal?',body:'The terminal lets you create files <i>programmatically</i> — in scripts, loops, and automated pipelines. <code>touch manifest.txt</code> creates one empty file in one keystroke. In a script you could create a hundred with a single line: <code>touch file{1..100}.txt</code>. That composability is what makes it useful beyond just the first time.'},
-   bridge:{title:'touch appears in scripts and CI more than you expect',body:'Use <code>touch</code> to create placeholder files, mark stages complete, or update timestamps to trigger downstream watchers. It is a small tool that shows up consistently in real automation.',tags:['Shell scripts','CI/CD','Automation']}},
+   bridge:{title:'touch appears in scripts and CI more than you expect',body:'Build pipelines use <code>touch</code> to create placeholder files, mark stages complete, or update timestamps to trigger downstream watchers. It is a small tool that shows up consistently in real automation.',tags:['Shell scripts','CI/CD','Automation']}},
   {id:'p3s2', obj:'Write "Mission: Escape Pod" into manifest.txt', ctx:'Write one line of text into the file. It matters because this is your first redirect pattern, and redirection is foundational. Send the text into the file now.',
    cmd:['echo "Mission: Escape Pod" > manifest.txt'], accept:['echo "Mission: Escape Pod" > manifest.txt'],
    acceptFn:v=>v.startsWith('echo')&&v.includes('manifest.txt')&&v.includes('>')&&v.toLowerCase().includes('mission'),
@@ -1655,10 +1655,10 @@ const PHASES = [null,
    jit:{title:'What those symbols actually mean',body:'<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> marks the start of your version. <code>=======</code> is the divider. <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> marks the end of the incoming version. Your job is to delete all three marker lines and keep whichever content (or combination) is correct. Then <code>git add</code> the file to mark it resolved and <code>git commit</code> to close the merge.'},
    bridge:{title:'This is a normal team moment',body:'Merge conflicts are routine on active codebases. The skill is not avoiding them forever. The skill is staying calm, reading the markers, and making the final decision cleanly.',tags:['Pull requests','Teams']}},
  {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge conflict"'],
-   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge conflict"'],
+   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
    acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m "resolution merge conflict"']),
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "resolution merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] resolution merge conflict',
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolution Merge Conflict',
    teach:{title:'A conflict has a finish line',body:'The finish line is not just a clean file. The finish line is a clean file plus a recorded resolution in Git.'},
    jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. In this step you are replacing the entire conflicted file with the final text <code>Mission: Escape Pod</code>, then staging it, then committing it with the exact message <code>Resolution Merge Conflict</code>.'},
    bridge:{title:'Chaining commands is a real shell habit',body:'Engineers use <code>&&</code> constantly for short workflows like build-then-test or add-then-commit. It keeps the sequence readable and stops the chain when something breaks.',tags:['Shell workflow','Automation']},
@@ -1803,7 +1803,7 @@ const PHASES = [null,
 const EASTER = {
   'sudo rm -rf': {
     handle(){
-      appendLine('CRITICAL: ROOT DELETION INITIATED…', 'ln-err');
+      appendLine('HACKER ALERT: ROOT DELETION INITIATED…', 'ln-err');
       let i=0;
       const dirs=['Wiping /usr…','Wiping /etc…','Wiping /home…','Wiping /var…','…system critical…'];
       const iv=setInterval(()=>{
@@ -2037,6 +2037,20 @@ function includesInOrder(value, parts){
     idx=found+part.length;
   }
   return true;
+}
+
+function pathDisplayFor(path){
+  if(path==='/home/cadet/projects') return '~/projects';
+  if(path.startsWith('/home/cadet/projects/')) return `~/projects/${path.slice('/home/cadet/projects/'.length)}`;
+  if(path==='/home/cadet') return '~';
+  if(path.startsWith('/home/cadet/')) return `~/${path.slice('/home/cadet/'.length)}`;
+  return path;
+}
+
+function setCurrentPath(path){
+  G.currentPath=path;
+  const el=document.getElementById('path-display');
+  if(el) el.textContent=pathDisplayFor(path);
 }
 
 function matchesStep(input, step){
@@ -3093,6 +3107,7 @@ function syncObjCard(){
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('obj-reveal').textContent='show';
+  document.getElementById('obj-reveal').style.display=G.expert?'none':'inline-block';
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
@@ -3266,7 +3281,7 @@ async function processCmd(raw){
   }
 
   // ── MAN PAGES ──
-  if(vl==='man'){showManAll();syncObjCard();return}
+  if(vl==='man'){renderManModal();openModal('man-modal');syncObjCard();return}
   if(vl.startsWith('man ')){
     const k=vl.slice(4).trim();
     if(!showManPage(k)) appendLine(`man: no entry for '${k}'. Type 'man' to list all.`,'ln-err');
@@ -3404,13 +3419,23 @@ function handlePersistentCmd(vl, val){
   }
   if(G.unlockedCmds.includes('cd') && vl.startsWith('cd ')){
     const dir=val.slice(3).trim();
-    if(dir==='..'){ appendLine('Now in ~/projects','ln-ok'); }
-    else if(dir==='~'){ appendLine('Now in /home/cadet','ln-ok'); }
+    if(dir==='..'){
+      setCurrentPath('/home/cadet/projects');
+      appendLine('Now in ~/projects','ln-ok');
+    }
+    else if(dir==='~'){
+      setCurrentPath('/home/cadet');
+      appendLine('Now in /home/cadet','ln-ok');
+    }
+    else if(dir==='game_v1' || dir==='game_v1/'){
+      setCurrentPath('/home/cadet/projects/game_v1');
+      appendLine('Now in ~/projects/game_v1','ln-ok');
+    }
     else { appendLine(`Navigated into: ${dir}`,'ln-ok'); }
     return true;
   }
   if(G.unlockedCmds.includes('mkdir') && vl.startsWith('mkdir ')){
-    appendLine(`${val.slice(6).trim()}/ created`,'ln-ok');
+    appendLine(`Created directory: ${val.slice(6).trim()}`,'ln-ok');
     return true;
   }
   if(G.unlockedCmds.includes('cp') && vl.startsWith('cp ')){
@@ -3432,6 +3457,8 @@ async function handleCorrect(s, ph, input){
   markStepAttempt(s, ph, input, true);
   G.tries = 0;
   G.score = Math.max(G.score, 0);
+
+  if(s.id==='p1s3') setCurrentPath('/home/cadet/projects/game_v1');
  
   if (s.out) s.out.split('\n').forEach(l => appendLine(l, 'ln-ok'));
   blank();
@@ -3487,16 +3514,14 @@ function handleWrong(val, s, ph){
   G.score=Math.max(0,G.score-5);
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
+  const diagnosed = showDiagnosis(s.id, val);
  
   if(G.expert){
     document.getElementById('term-panel').classList.add('glitch');
     setTimeout(()=>document.getElementById('term-panel').classList.remove('glitch'),300);
-    appendLine('✗ Incorrect.','ln-err');
+    if(!diagnosed) appendLine('✗ Incorrect.','ln-err');
     return;
   }
- 
-  // Always try smart diagnosis (even in hard/practitioner mode)
-  const diagnosed = showDiagnosis(s.id, val);
  
   if(G.hard){
     if(!diagnosed) appendLine('✗ Incorrect. No hints in hard mode.','ln-err');
@@ -3533,40 +3558,24 @@ async function completePhase(){
   $outS.innerHTML=''; // clear static for next phase
   if(ph.done){
     blank();
-    await typedLine('L.O.L.A.: '+ph.done,'ln-lola',200);
+    appendLine('L.O.L.A.: '+ph.done,'ln-lola');
   }
   blank();
   appendLine(`Overall score: ${G.score}`,'ln-info');
   blank();
  
-  // Challenge (constructed response)
-  if(ph.challenge && G.expert){
-    blank();
-    appendLine(`EXPERT MODE BONUS: Constructed response unlocked — ${ph.challenge.title}`,'ln-warn');
-    await showChallenge(ph.challenge);
-    blank();
-  }
-
-  // Break-it scenario
-  if(ph.breakit && G.expert){
-    blank();
-    appendLine(`EXPERT MODE BONUS: Break-It unlocked — ${ph.breakit.title}`,'ln-warn');
-    await showBreakIt(ph.breakit);
-    blank();
-  }
- 
   G.phase++;G.step=0;G.tries=0;
-  G.pendingPhaseStart=true;
+  G.pendingPhaseStart=false;
  
   if(G.phase<=PHASES.length-1){
-    const nextPh=PHASES[G.phase];
     save();
-    openPhaseCheckpoint(ph, nextPh);
+    startPhase();
   }
   syncDots();save();
 }
 
 function startPhase(){
+  closeModal('phase-modal');
   if(G.pendingPhaseStart){
     G.pendingPhaseStart=false;
     save();
@@ -3592,20 +3601,8 @@ function startPhase(){
     }
   }
  
-  // Spaced repetition callback
-  const sr = ph.spacedRep;
-  if(sr && !G.expert){
-    setLola(ph.lolaIntro);
-    delay(50).then(async()=>{
-      blank();
-      await showSpacedRep(sr);
-      blank();
-      continuePhaseStart(ph);
-    });
-  } else {
-    setLola(ph.lolaIntro);
-    continuePhaseStart(ph);
-  }
+  setLola(ph.lolaIntro);
+  continuePhaseStart(ph);
 }
  
 /* ── PRE-STEP CONCEPT CARDS ──
@@ -3986,7 +3983,7 @@ function showToastMessage(title, sub){
 }
 
 function goToEngineer(){
-  window.open('https://stationdelta.dev/base/vibe-engineer.html','_blank');
+  window.open('https://stationdelta.dev/engineer','_blank');
 }
 
 async function shareGradLinkedIn(){
@@ -4024,6 +4021,7 @@ function selectPath(p){
 function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();
   G.name=n||'Cadet';
+  setCurrentPath(G.currentPath||'/home/cadet/projects');
   if(G.phase===1 && G.step===0 && G.completedPhases.length===0 && !G.sandbox){
     G.totalTime=0;
     G.timerStart=null;
@@ -4093,6 +4091,7 @@ function bootTerminal(){
 function resumeSession(){
   closeModal('boot-modal');
   document.getElementById('cadet-name-display').textContent=G.name;
+  setCurrentPath(G.currentPath||'/home/cadet/projects');
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
   if(G.hard){
     document.getElementById('timer-pill').style.display='inline';
