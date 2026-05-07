@@ -544,6 +544,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #obj-reveal{background:none;border:1px solid var(--b2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .15s}
 #obj-reveal:hover{color:var(--amber);border-color:var(--amber-d)}
 #obj-reveal:disabled{opacity:.45;cursor:not-allowed;color:var(--muted2);border-color:var(--border)}
+body.expert-mode #obj-reveal{display:none!important}
 #obj-meta{margin-top:8px;display:flex;gap:10px;align-items:center}
 #obj-tries{font-size:11px;color:var(--muted)}
 #obj-tries span{color:var(--red)}
@@ -604,6 +605,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── MODALS ── */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);padding:20px}
 .modal.open{display:flex}
+#phase-modal{pointer-events:none}
+#phase-modal .mbox{pointer-events:auto}
 .mbox{background:var(--surface);border:1px solid var(--b2);border-radius:var(--r12);padding:28px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease}
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
@@ -1055,8 +1058,8 @@ let G = {
 
 let expertTimerInterval = null;
 
-const COURSE_ID='Station Delta Engineer';
-const ENGINEER_SAVE_KEY='engineer_v1.2';
+const COURSE_ID='vibe-engineer';
+const ENGINEER_SAVE_KEY='vibe_engineer_v1';
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -2411,7 +2414,7 @@ async function handleBossStep(val){
   // Easter eggs still work
   for(const [key,ee] of Object.entries(EASTER)){if(vl===key||vl.startsWith(key+' ')){ee.handle(val);return}}
 
-  const acceptedByList=step.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()+' '));
+  const acceptedByList=(step.accept||[]).some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()+' '));
   const matched=step.acceptFn(vl)||acceptedByList;
   if(matched){
     appendLine(val,'ln-cmd');blank();
@@ -3265,10 +3268,18 @@ function syncObjCard(){
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   const revealBtn=document.getElementById('obj-reveal');
-  const revealLocked=(G.tries<2)&&!G.phaseReveal;
-  revealBtn.disabled=revealLocked;
-  revealBtn.title=revealLocked?'Available after 2 attempts':'Reveal exact command';
-  revealBtn.textContent=G.phaseReveal?'✓':'show';
+  if(G.expert){
+    revealBtn.disabled=true;
+    revealBtn.hidden=true;
+    revealBtn.title='Unavailable in Expert mode';
+    revealBtn.textContent='show';
+  }else{
+    revealBtn.hidden=false;
+    const revealLocked=(G.tries<2)&&!G.phaseReveal;
+    revealBtn.disabled=revealLocked;
+    revealBtn.title=revealLocked?'Available after 2 attempts':'Reveal exact command';
+    revealBtn.textContent=G.phaseReveal?'✓':'show';
+  }
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
@@ -3401,6 +3412,10 @@ function continueFromCheckpoint(){
   G.pendingPhaseStart=false;
   save();
   startPhase();
+}
+
+function shouldResumeAtSavedStep(){
+  return !G.pendingPhaseStart || G.step > 0;
 }
  
 /* ═══════════════════════════════════════════════════════════════
@@ -4126,6 +4141,7 @@ function selectPath(p){
   G.hard = p==='practitioner'||p==='expert';
   G.practitioner = p==='practitioner';
   G.expert = p==='expert';
+  document.body.classList.toggle('expert-mode', G.expert);
   if(G.expert && !G.timerStart) G.timerStart=Date.now();
   if(!G.expert) G.timerStart=null;
   syncExpertTimer();
@@ -4135,6 +4151,7 @@ function selectPath(p){
 function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();
   G.name=n||'Engineer';
+  document.body.classList.toggle('expert-mode', G.expert);
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
   syncExpertTimer();
@@ -4199,6 +4216,7 @@ function bootTerminal(){
  
 function resumeSession(){
   closeModal('boot-modal');
+  document.body.classList.toggle('expert-mode', G.expert);
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
   syncExpertTimer();
@@ -4220,7 +4238,7 @@ function resumeSession(){
   } else if(G.bossActive){
     appendLineS('You were mid-assessment. J.A.N.E.T. is waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
-  } else if(G.pendingPhaseStart){
+  } else if(G.pendingPhaseStart && G.step===0){
     const ph=PHASES[G.phase];
     renderStaticStep(ph.steps[0]);
     setLola('Checkpoint reached. You finished a phase, and this is a good place to pause. When you are ready, start the next phase from the checkpoint dialog.');
@@ -4228,6 +4246,10 @@ function resumeSession(){
   } else {
     const ph=PHASES[G.phase];
     const s=ph.steps[G.step];
+    if(G.pendingPhaseStart && G.step>0){
+      G.pendingPhaseStart=false;
+      save();
+    }
     markPhaseStart(G.phase, ph);
     markStepStart(s, ph);
     renderStaticStep(s);
@@ -4524,9 +4546,9 @@ const ENGINEER_PHASES=[
 
 const ENGINEER_BOSS_STEPS=[
   {id:'boss1',scenario:'Battery at 3%. Server unstable. Start with container evidence, not assumptions.',prompt:'Read the active container logs.',acceptFn:v=>v.includes('docker logs')&&v.includes('--tail')&&v.includes('pod-monitor'),solution:'docker logs pod-monitor --tail 20'},
-  {id:'boss2',scenario:'J.A.N.E.T. wants a direct service proof, not a verbal summary. Query the secure endpoint correctly.',prompt:'Use curl with the proper bearer authorization header.',acceptFn:v=>v.startsWith('curl')&&v.includes('-H')&&v.includes('Authorization: Bearer')&&v.includes('/secure'),solution:'curl -H "Authorization: Bearer $API_KEY" http://192.168.1.42/secure'},
+  {id:'boss2',scenario:'J.A.N.E.T. wants a direct service proof, not a verbal summary. Query the secure endpoint correctly.',prompt:'Use curl with the proper bearer authorization header.',acceptFn:v=>v.startsWith('curl')&&v.includes('-h')&&v.includes('authorization: bearer')&&v.includes('/secure'),solution:'curl -H "Authorization: Bearer $API_KEY" http://192.168.1.42/secure'},
   {id:'boss3',scenario:'Mission control needs only the operational fields that matter. Shape the status response into one concise object.',prompt:'Use curl + jq to return battery and status together.',acceptFn:v=>v.includes('curl -s http://192.168.1.42/status')&&v.includes('jq')&&v.includes('battery')&&v.includes('status'),solution:'curl -s http://192.168.1.42/status | jq \'{battery: .battery, status: .status}\''},
-  {id:'boss4',scenario:'Captain has the plan. Engineer must execute it. Demonstrate the planner-to-builder handoff.',prompt:'Chain the rescue plan from Captain into Engineer.',acceptFn:v=>v.includes('prompt Captain "Plan rescue"')&&v.includes('|')&&v.includes('prompt Engineer "Build it"'),solution:'prompt Captain "Plan rescue" | prompt Engineer "Build it"'},
+  {id:'boss4',scenario:'Captain has the plan. Engineer must execute it. Demonstrate the planner-to-builder handoff.',prompt:'Chain the rescue plan from Captain into Engineer.',acceptFn:v=>v.includes('prompt captain "plan rescue"')&&v.includes('|')&&v.includes('prompt engineer "build it"'),solution:'prompt Captain "Plan rescue" | prompt Engineer "Build it"'},
   {id:'boss5',scenario:'Final command. Mission control will accept nothing except a direct production handoff.',prompt:'Deploy the stabilized rescue service.',acceptFn:v=>v.startsWith('vibe deploy')||v==='vercel deploy'||v==='vercel',solution:'vibe deploy --platform vercel'}
 ];
 
@@ -5030,7 +5052,7 @@ function handleSandbox(val){
     'echo $API_KEY':'sk-prod-rotated',
     'git status':'On branch main\nYour branch is ahead of origin/main by 1 commit.\nWorking tree clean.',
     'git log':'commit 8f9a0b1\nAuthor: '+G.name+' <engineer@station-delta>\nDate: Just now\n    stabilize: dead server protocol',
-    'whoami':'certified-Station-Delta-engineer',
+    'whoami':'certified-vibe-engineer',
     'cat distress.log':'[RESOLVED] service restored\n[RESOLVED] battery stabilized\n[RESOLVED] api auth recovered',
     'kubectl get pods':'pod-monitor 0/1 CrashLoopBackOff\napi-gateway 1/1 Running',
     'jira create ticket':'JRA-4242 created: "Production is on fire (politely)"',
@@ -5111,6 +5133,7 @@ async function runGraduation(){
 
 function resumeSession(){
   closeModal('boot-modal');
+  document.body.classList.toggle('expert-mode', G.expert);
   document.getElementById('cadet-name-display').textContent=G.name||'Engineer';
   if(!G.currentPath||G.currentPath.includes('/home/cadet')) G.currentPath='/home/engineer/distress-bay';
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
@@ -5128,7 +5151,7 @@ function resumeSession(){
   } else if(G.bossActive){
     appendLineS('Assessment in progress. J.A.N.E.T. is waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
-  } else if(G.pendingPhaseStart){
+  } else if(G.pendingPhaseStart && G.step===0){
     const ph=PHASES[G.phase];
     renderStaticStep(ph.steps[0]);
     setLola('Checkpoint reached. Good stopping point. Start next phase when ready.');
@@ -5136,6 +5159,12 @@ function resumeSession(){
   } else {
     const ph=PHASES[G.phase];
     const s=ph.steps[G.step];
+    if(G.pendingPhaseStart && G.step>0){
+      G.pendingPhaseStart=false;
+      save();
+    }
+    markPhaseStart(G.phase, ph);
+    markStepStart(s, ph);
     renderStaticStep(s);
     setLola(lolaMessageForStep(s, ph));
     setLolaStrip(s);
@@ -5190,3 +5219,4 @@ applyUIPreferences();
 <script src="analytics-client.js"></script>
 </body>
 </html>
+
