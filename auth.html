@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Station Delta Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#04070a;
+  --surface:#080d12;
+  --s2:#0c1520;
+  --s3:#111e2e;
+  --border:#152030;
+  --b2:#1e3045;
+  --b3:#27405e;
+  --text:#b8cdd8;
+  --text-bright:#deeaf0;
+  --muted:#3d5a6e;
+  --muted2:#5a7a8e;
+  --green:#00ff88;
+  --green-d:#003322;
+  --green-m:#00cc6a;
+  --green-bg:#030d18;
+  --blue:#4db8ff;
+  --blue-d:#0a2540;
+  --red:#ff3d3d;
+  --red-d:#3d0a0a;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Unbounded',sans-serif;
+  --janet:'Share Tech Mono',monospace;
+  --r:14px;
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--mono)}
+body{
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at top, rgba(0,255,136,.10), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(77,184,255,.08), transparent 24%),
+    linear-gradient(180deg, #061017 0%, #04070a 100%);
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(rgba(21,32,48,.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21,32,48,.35) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(circle at center, black 45%, transparent 100%);
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.05) 3px, rgba(0,0,0,.05) 4px);
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(0,255,136,0)}50%{box-shadow:0 0 28px rgba(0,255,136,.14)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+.shell{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:minmax(320px, 530px) minmax(320px, 580px);
+  gap:28px;
+  padding:32px;
+  align-items:center;
+  justify-content:center;
+}
+
+.panel{
+  background:rgba(8,13,18,.92);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:0 24px 80px rgba(0,0,0,.38);
+  backdrop-filter:blur(14px);
+}
+
+.auth-panel{padding:28px;animation:fadeUp .5s ease both}
+.intel-panel{padding:24px;animation:fadeUp .5s .08s ease both}
+
+.eyebrow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--janet);
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--green-m);
+  margin-bottom:16px;
+}
+.eyebrow::before{
+  content:'';
+  width:32px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--green-m));
+}
+
+.brand{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+}
+.brand-mark{
+  font-family:var(--display);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.14em;
+  color:var(--green);
+  text-transform:uppercase;
+  line-height:1.15;
+}
+.brand-mark span{
+  display:block;
+  font-family:var(--janet);
+  color:var(--muted2);
+  font-size:9px;
+  letter-spacing:.25em;
+  margin-top:4px;
+}
+.status-pill{
+  border:1px solid var(--green-d);
+  background:rgba(0,255,136,.05);
+  color:var(--green-m);
+  font-size:10px;
+  padding:8px 10px;
+  border-radius:999px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.title{
+  font-family:var(--display);
+  font-size:clamp(34px, 5vw, 54px);
+  line-height:.98;
+  letter-spacing:.02em;
+  color:var(--text-bright);
+  margin-bottom:14px;
+}
+.title .ghost{
+  display:block;
+  color:var(--green);
+  text-shadow:0 0 10px rgba(0,255,136,.18), 0 0 24px rgba(0,255,136,.08);
+}
+.lede{
+  color:var(--muted2);
+  font-size:14px;
+  line-height:1.8;
+  max-width:54ch;
+  margin-bottom:22px;
+}
+
+.status-card{
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(17,30,46,.68), rgba(8,13,18,.82));
+  padding:16px;
+  margin-bottom:20px;
+}
+.status-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.status-label{
+  font-family:var(--janet);
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted2);
+}
+.status-value{
+  font-family:var(--display);
+  font-size:24px;
+  color:var(--green);
+}
+.status-sub{
+  color:var(--muted2);
+  font-size:12px;
+  line-height:1.7;
+}
+.entitlement-list{
+  list-style:none;
+  display:grid;
+  gap:8px;
+  margin-top:14px;
+}
+.entitlement-list li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid var(--border);
+  background:rgba(4,7,10,.45);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:12px;
+  color:var(--text);
+}
+.dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  flex:0 0 9px;
+  background:var(--green);
+  box-shadow:0 0 10px rgba(0,255,136,.35);
+}
+.dot.free{background:var(--green-m);box-shadow:0 0 10px rgba(0,204,106,.35)}
+.dot.locked{background:var(--red);box-shadow:0 0 10px rgba(255,61,61,.3)}
+
+.form{display:grid;gap:14px}
+.field{display:grid;gap:8px}
+.field label{
+  font-family:var(--janet);
+  font-size:10px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted2);
+}
+.field input{
+  width:100%;
+  background:rgba(4,7,10,.92);
+  border:1px solid var(--border);
+  color:var(--text);
+  border-radius:10px;
+  padding:14px 14px;
+  font:inherit;
+  transition:border-color .15s, box-shadow .15s;
+}
+.field input:focus{
+  outline:none;
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(0,255,136,.08);
+}
+.password-wrap{
+  position:relative;
+}
+.password-wrap input{
+  padding-right:52px;
+}
+.field-action{
+  position:absolute;
+  top:50%;
+  right:10px;
+  transform:translateY(-50%);
+  background:transparent;
+  border:1px solid var(--b2);
+  color:var(--muted2);
+  border-radius:999px;
+  min-width:52px;
+  height:34px;
+  padding:0 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  line-height:1;
+}
+.field-action:hover{
+  border-color:var(--green-d);
+  color:var(--green);
+}
+.helper-row{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:-4px;
+}
+.text-link{
+  background:none;
+  border:none;
+  padding:0;
+  color:var(--blue);
+  font-size:12px;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+.text-link:hover{
+  color:var(--text-bright);
+}
+
+.button-row,.ghost-row{display:grid;gap:10px}
+.button-row{grid-template-columns:1fr 1fr}
+
+button{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  font:inherit;
+  transition:transform .15s, border-color .15s, background .15s, color .15s;
+}
+button:hover{transform:translateY(-1px)}
+
+.btn-primary{
+  background:var(--green-m);
+  color:#041109;
+  font-weight:700;
+  padding:14px 16px;
+  border-radius:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  animation:pulse 3s infinite;
+}
+.btn-secondary{
+  background:var(--s2);
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:14px 16px;
+  border-radius:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.btn-tertiary{
+  background:transparent;
+  color:var(--blue);
+  border:1px solid var(--blue-d);
+  padding:12px 16px;
+  border-radius:10px;
+  letter-spacing:.06em;
+}
+.btn-danger{
+  background:transparent;
+  color:var(--red);
+  border:1px solid var(--red-d);
+  padding:12px 16px;
+  border-radius:10px;
+  letter-spacing:.06em;
+}
+
+.message{
+  min-height:42px;
+  border:1px solid var(--border);
+  background:rgba(4,7,10,.55);
+  border-radius:10px;
+  padding:11px 12px;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--muted2);
+}
+.message.ok{border-color:var(--green-d);background:rgba(3,13,9,.5);color:#96d5af}
+.message.err{border-color:var(--red-d);background:rgba(20,4,4,.5);color:#e8abab}
+
+.intel-grid{display:grid;gap:14px}
+.intel-card{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  background:rgba(12,21,32,.75);
+}
+.intel-card h3{
+  font-family:var(--display);
+  font-size:20px;
+  line-height:1.1;
+  margin-bottom:8px;
+}
+.intel-card p{
+  color:var(--muted2);
+  font-size:12px;
+  line-height:1.75;
+}
+.intel-card ul{
+  list-style:none;
+  margin-top:12px;
+  display:grid;
+  gap:8px;
+}
+.intel-card li{
+  font-size:12px;
+  color:var(--text);
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+}
+.intel-card li::before{
+  content:'>';
+  color:var(--green-m);
+  font-family:var(--janet);
+}
+.tier-free h3,.tier-paid h3{color:var(--green)}
+
+.route-box{
+  margin-top:14px;
+  border:1px dashed var(--b2);
+  border-radius:10px;
+  padding:12px;
+  font-size:11px;
+  color:var(--muted2);
+  line-height:1.8;
+}
+
+.footer-note{
+  margin-top:16px;
+  font-family:var(--janet);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.footer-note::before{
+  content:'';
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  animation:blink 1.8s infinite;
+}
+
+@media (max-width: 980px){
+  .shell{grid-template-columns:1fr;padding:18px}
+  .button-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="panel auth-panel">
+    <div class="eyebrow">Station Delta Access</div>
+    <div class="brand">
+      <div class="brand-mark">Station Delta<span>Operational Readiness Training</span></div>
+      <div class="status-pill" id="sessionPill">Guest Session</div>
+    </div>
+
+    <h1 class="title">Start Free. <span class="ghost">Unlock Lieutenant With A Free Account. Advance To Officer When Ready.</span></h1>
+    <p class="lede">
+      Narrative-driven terminal simulations for the AI era, from first command to production incident response. Enter as a guest, create a free account to unlock Lieutenant, then move into the specialist tracks when you are ready.
+    </p>
+
+    <div class="status-card">
+      <div class="status-head">
+        <div>
+          <div class="status-label">Detected Access</div>
+          <div class="status-value" id="tierValue">Guest</div>
+        </div>
+        <div class="status-pill" id="accessPill">Free Sims Only</div>
+      </div>
+      <p class="status-sub" id="statusCopy">
+        Start with Cadet and Engineer as a guest. Create a free account to unlock Lieutenant, save progress, and build a clean path into the specialist tracks.
+      </p>
+      <ul class="entitlement-list" id="entitlementList"></ul>
+    </div>
+
+    <div class="form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="operator@stationdelta.dev">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password">
+          <button class="field-action" id="togglePasswordBtn" type="button" aria-label="Show password" aria-pressed="false" onclick="window.togglePasswordVisibility && window.togglePasswordVisibility()">Show</button>
+        </div>
+      </div>
+
+      <div class="helper-row">
+        <button class="text-link" id="forgotPasswordBtn" type="button" onclick="window.runForgotPassword && window.runForgotPassword()">Forgot password?</button>
+      </div>
+
+      <div class="button-row">
+        <button class="btn-primary" id="signInBtn" type="button" onclick="window.runSignIn && window.runSignIn()">Sign In</button>
+        <button class="btn-secondary" id="signUpBtn" type="button" onclick="window.runSignUp && window.runSignUp()">Create Account</button>
+      </div>
+
+      <div class="ghost-row">
+        <button class="btn-tertiary" id="guestBtn" type="button" onclick="window.runContinueAsGuest && window.runContinueAsGuest()">Start Free</button>
+        <button class="btn-danger" id="signOutBtn" type="button" onclick="window.runSignOut && window.runSignOut()">Sign Out</button>
+      </div>
+
+      <div class="message" id="messageBox">
+        Enter free with Cadet and Engineer. Create a free account to unlock Lieutenant, keep your progress, and continue into Security, Platform, AI Systems, and Data when you are ready.
+      </div>
+    </div>
+
+    <div class="footer-note">Guided by L.O.L.A. Tested by J.A.N.E.T.</div>
+  </section>
+
+  <aside class="panel intel-panel">
+    <div class="eyebrow">Why Join</div>
+    <div class="intel-grid">
+      <article class="intel-card tier-free">
+        <h3>Free Command Path</h3>
+        <p>
+          Start with the same foundation that anchors every career track. No credit card. No passive learning. Just live command-line reps with pressure built in.
+        </p>
+        <ul>
+          <li>Cadet and Engineer are open immediately with guest access.</li>
+          <li>A free account unlocks Lieutenant and keeps progress synced across devices.</li>
+          <li>Lieutenant is the bridge into the specialist and officer-track sims.</li>
+        </ul>
+      </article>
+
+      <article class="intel-card tier-paid">
+        <h3>Officer Access</h3>
+        <p>
+          Unlock the most differentiated part of Station Delta: structured progression across the tracks that matter most in real engineering work, from secure systems to production AI.
+        </p>
+        <ul>
+          <li>Security &amp; Reliability, Platform &amp; Delivery, AI Systems, and Data &amp; Intelligence.</li>
+          <li>Specialist sims like Agent Architect, Systems Integrity, Deployment Officer, FinOps Officer, and Captain.</li>
+          <li>Track-based progression instead of a menu of disconnected lessons.</li>
+          <li>Paid access unlocks premium Lieutenant tools, specialist simulations, and future mission drops.</li>
+        </ul>
+      </article>
+
+      <article class="intel-card">
+        <h3>Outcome</h3>
+        <p>
+          Members can move into the track that matches their actual role: security, platform, AI systems, or data, with simulations mapped to real production pressure instead of passive learning.
+        </p>
+        <div class="route-box">
+          Paid members move from Lieutenant into:
+          <br>
+          Security &amp; Reliability for incident response and resilience
+          <br>
+          Platform &amp; Delivery for release, infrastructure, and production ownership
+          <br>
+          AI Systems and Data &amp; Intelligence for agent design, observability, cost, and technical strategy
+        </div>
+      </article>
+    </div>
+  </aside>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const CONFIG = {
+  supabaseUrl: 'https://bcipkdtxcbwcwbinekng.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ',
+  upgradeUrl: 'https://buy.stripe.com/replace-with-your-station-delta-link'
+};
+
+const state = {
+  mode: 'guest',
+  session: null,
+  profile: null,
+  tier: 'guest'
+};
+
+const els = {
+  email: document.getElementById('email'),
+  password: document.getElementById('password'),
+  togglePasswordBtn: document.getElementById('togglePasswordBtn'),
+  forgotPasswordBtn: document.getElementById('forgotPasswordBtn'),
+  signInBtn: document.getElementById('signInBtn'),
+  signUpBtn: document.getElementById('signUpBtn'),
+  guestBtn: document.getElementById('guestBtn'),
+  signOutBtn: document.getElementById('signOutBtn'),
+  messageBox: document.getElementById('messageBox'),
+  tierValue: document.getElementById('tierValue'),
+  statusCopy: document.getElementById('statusCopy'),
+  accessPill: document.getElementById('accessPill'),
+  entitlementList: document.getElementById('entitlementList'),
+  sessionPill: document.getElementById('sessionPill')
+};
+
+const hasRealSupabaseConfig = Boolean(CONFIG.supabaseUrl && CONFIG.supabaseAnonKey);
+const LOCAL_AUTH_KEY = 'station_delta_local_auth';
+
+function isFileProtocol() {
+  return window.location.protocol === 'file:';
+}
+
+function createMemoryStorage() {
+  const store = {};
+  return {
+    getItem(key) {
+      return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
+    },
+    setItem(key, value) {
+      store[key] = String(value);
+    },
+    removeItem(key) {
+      delete store[key];
+    }
+  };
+}
+
+async function supabaseHttp(path, options = {}) {
+  const response = await fetch(CONFIG.supabaseUrl + path, {
+    method: options.method || 'GET',
+    headers: {
+      apikey: CONFIG.supabaseAnonKey,
+      'Content-Type': 'application/json',
+      ...(options.accessToken ? { Authorization: 'Bearer ' + options.accessToken } : {}),
+      ...(options.headers || {})
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch (error) {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(payload?.msg || payload?.message || `${response.status} ${response.statusText}`);
+  }
+
+  return payload;
+}
+
+function getSupabaseClient() {
+  if (!hasRealSupabaseConfig) return null;
+  if (isFileProtocol()) return null;
+  if (!window.supabase?.createClient) return null;
+  if (!window.__stationDeltaSupabaseClient) {
+    const hostedMode = !isFileProtocol();
+    const authStorage = canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+    window.__stationDeltaSupabaseClient = window.supabase.createClient(
+      CONFIG.supabaseUrl,
+      CONFIG.supabaseAnonKey,
+      {
+        auth: {
+          storage: authStorage,
+          persistSession: hostedMode,
+          autoRefreshToken: hostedMode,
+          detectSessionInUrl: hostedMode,
+          flowType: 'implicit'
+        }
+      }
+    );
+  }
+  return window.__stationDeltaSupabaseClient;
+}
+
+function canUseLocalStorage() {
+  try {
+    const probe = '__station_delta_auth_probe__';
+    window.localStorage.setItem(probe, '1');
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function writeLocalAuthSnapshot() {
+  if (!canUseLocalStorage()) return;
+  if (!state.session?.user?.id || !state.profile) return;
+  const snapshot = {
+    userId: state.session.user.id,
+    email: state.profile.email || state.session.user.email || '',
+    tier: state.profile.subscription_tier || 'free',
+    accessToken: state.session.access_token || '',
+    updatedAt: Date.now()
+  };
+  window.localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(snapshot));
+  window.localStorage.setItem('station_delta_has_account', '1');
+}
+
+function readLocalAuthSnapshot() {
+  if (!canUseLocalStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(LOCAL_AUTH_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function clearLocalAuthSnapshot() {
+  if (!canUseLocalStorage()) return;
+  window.localStorage.removeItem(LOCAL_AUTH_KEY);
+  window.localStorage.removeItem('station_delta_has_account');
+}
+
+function getRedirectTarget() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('redirect');
+}
+
+function getGuestRedirectTarget() {
+  const target = getRedirectTarget();
+  if (!target) return null;
+  if (target.includes('/base/vibe-lieutenant.html')) return '/base/vibe-cadet.html';
+  return target;
+}
+
+function maybeRedirectToTarget(targetOverride = null) {
+  const target = targetOverride || getRedirectTarget();
+  if (!target) return false;
+  window.location.href = target;
+  return true;
+}
+
+function setMessage(kind, html) {
+  els.messageBox.className = 'message' + (kind ? ' ' + kind : '');
+  els.messageBox.innerHTML = html;
+}
+
+function setButtonsDisabled(disabled) {
+  [
+    els.signInBtn,
+    els.signUpBtn,
+    els.guestBtn,
+    els.signOutBtn,
+    els.forgotPasswordBtn,
+    els.togglePasswordBtn
+  ].forEach((el) => {
+    if (el) el.disabled = disabled;
+  });
+}
+
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error(label + ' timed out. Please try again.')), ms);
+    })
+  ]);
+}
+
+function formatAuthError(error, fallback) {
+  const message = String(error?.message || '').trim();
+  if (!message) return fallback;
+  if (message.includes('429') || message.toLowerCase().includes('rate limit')) {
+    return 'Too many attempts were made too quickly. Wait a minute, then try again.';
+  }
+  if (message.toLowerCase().includes('invalid login credentials')) {
+    return 'That email and password do not match an active account yet. Try Sign In again, or use Forgot password if this should already exist.';
+  }
+  if (message.toLowerCase().includes('email not confirmed')) {
+    return 'This account still needs email confirmation before sign-in can finish. Check the inbox for the confirmation message.';
+  }
+  return message;
+}
+
+function getTierDetails(tier) {
+  if (tier === 'individual' || tier === 'fleet') {
+    return {
+      label: tier === 'fleet' ? 'Fleet' : 'Paid',
+      pill: tier === 'fleet' ? 'Fleet Access' : 'Officer Track Unlocked',
+      copy: 'Paid access detected. Officer-track simulations and premium modules are unlocked and ready.',
+      items: [
+        ['Cadet, Engineer, Lieutenant', 'free'],
+        ['Agent Architect, Systems Integrity, FinOps Officer, Captain', 'paid'],
+        ['Cloud saves and returning-member continuity', 'paid']
+      ]
+    };
+  }
+
+  if (tier === 'free') {
+    return {
+      label: 'Free Member',
+      pill: 'Free Sims Only',
+      copy: 'Free account detected. Progress can be saved and synced, while officer-track access stays reserved for paid members.',
+      items: [
+        ['Cadet, Engineer, Lieutenant', 'free'],
+        ['Cloud saves and profile tracking', 'paid'],
+        ['Officer track stays locked until upgrade', 'locked']
+      ]
+    };
+  }
+
+  return {
+    label: 'Guest',
+    pill: 'Free Sims Only',
+    copy: 'Guest access detected. Start free now, then sign in whenever you want progress sync or a path toward officer access.',
+    items: [
+      ['Cadet, Engineer, Lieutenant', 'free'],
+      ['No cloud saves until sign-in', 'locked'],
+      ['Officer track locked', 'locked']
+    ]
+  };
+}
+
+function renderState() {
+  const details = getTierDetails(state.tier);
+  els.tierValue.textContent = details.label;
+  els.accessPill.textContent = details.pill;
+  els.statusCopy.textContent = details.copy;
+  els.sessionPill.textContent = state.session ? 'Authenticated Session' : 'Guest Session';
+  els.entitlementList.innerHTML = details.items.map(([label, kind]) => {
+    const dotClass = kind === 'paid' ? 'dot' : kind === 'free' ? 'dot free' : 'dot locked';
+    return '<li><span class="' + dotClass + '"></span><span>' + label + '</span></li>';
+  }).join('');
+}
+
+function togglePasswordVisibility() {
+  const isHidden = els.password.type === 'password';
+  els.password.type = isHidden ? 'text' : 'password';
+  els.togglePasswordBtn.textContent = isHidden ? 'Hide' : 'Show';
+  els.togglePasswordBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+  els.togglePasswordBtn.setAttribute('aria-pressed', String(isHidden));
+}
+
+async function loadProfile(userId) {
+  if (isFileProtocol()) {
+    const snapshot = readLocalAuthSnapshot();
+    const accessToken = state.session?.access_token || snapshot?.accessToken;
+    if (!accessToken) throw new Error('No access token available for local profile lookup.');
+    const rows = await supabaseHttp(`/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=email,subscription_tier`, {
+      accessToken
+    });
+    const data = Array.isArray(rows) ? rows[0] : rows;
+    return data;
+  }
+  const supabase = getSupabaseClient();
+  if (!supabase) throw new Error('Supabase client unavailable.');
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('email, subscription_tier')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+async function refreshSession() {
+  if (isFileProtocol()) {
+    const snapshot = readLocalAuthSnapshot();
+    if (snapshot?.userId) {
+      state.mode = 'authenticated';
+      state.session = {
+        user: { id: snapshot.userId, email: snapshot.email || '' },
+        access_token: snapshot.accessToken || ''
+      };
+      state.profile = { email: snapshot.email || '', subscription_tier: snapshot.tier || 'free' };
+      state.tier = snapshot.tier || 'free';
+      renderState();
+      return;
+    }
+    state.mode = 'guest';
+    state.session = null;
+    state.profile = null;
+    state.tier = 'guest';
+    renderState();
+    return;
+  }
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    const snapshot = readLocalAuthSnapshot();
+    if (snapshot?.userId) {
+      state.mode = 'authenticated';
+      state.session = { user: { id: snapshot.userId, email: snapshot.email || '' } };
+      state.profile = { email: snapshot.email || '', subscription_tier: snapshot.tier || 'free' };
+      state.tier = snapshot.tier || 'free';
+      renderState();
+      return;
+    }
+    state.mode = 'guest';
+    state.session = null;
+    state.profile = null;
+    state.tier = 'guest';
+    renderState();
+    return;
+  }
+
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+
+  const session = data.session;
+  state.session = session;
+
+  if (!session) {
+    const snapshot = readLocalAuthSnapshot();
+    if (snapshot?.userId) {
+      state.mode = 'authenticated';
+      state.session = { user: { id: snapshot.userId, email: snapshot.email || '' } };
+      state.profile = { email: snapshot.email || '', subscription_tier: snapshot.tier || 'free' };
+      state.tier = snapshot.tier || 'free';
+      renderState();
+      return;
+    }
+    state.mode = 'guest';
+    state.profile = null;
+    state.tier = 'guest';
+    renderState();
+    return;
+  }
+
+  state.mode = 'authenticated';
+  state.profile = await loadProfile(session.user.id);
+  state.tier = state.profile?.subscription_tier || 'free';
+  writeLocalAuthSnapshot();
+  renderState();
+}
+
+async function signIn() {
+  const supabase = getSupabaseClient();
+  if (!isFileProtocol() && !supabase) {
+    setMessage('err', 'Auth service is still loading. Wait a second and try again.');
+    return;
+  }
+
+  const email = els.email.value.trim();
+  const password = els.password.value;
+  if (!email || !password) {
+    setMessage('err', 'Enter both email and password before signing in.');
+    return;
+  }
+  setButtonsDisabled(true);
+  setMessage('', 'Signing in...');
+  if (isFileProtocol()) {
+    const data = await withTimeout(
+      supabaseHttp('/auth/v1/token?grant_type=password', {
+        method: 'POST',
+        body: { email, password }
+      }),
+      15000,
+      'Sign-in request'
+    );
+    state.session = { user: data.user, access_token: data.access_token };
+  } else {
+    const { error } = await withTimeout(
+      supabase.auth.signInWithPassword({ email, password }),
+      15000,
+      'Sign-in request'
+    );
+    if (error) throw error;
+  }
+  setMessage('', 'Credentials accepted. Loading your Station Delta access...');
+  if (isFileProtocol()) {
+    state.mode = 'authenticated';
+    state.profile = await loadProfile(state.session.user.id);
+    state.tier = state.profile?.subscription_tier || 'free';
+    writeLocalAuthSnapshot();
+    renderState();
+    if (maybeRedirectToTarget()) return;
+    setMessage('ok', 'Welcome back. Your account is active and your access tier has been confirmed.');
+    return;
+  }
+  await refreshSession();
+  if (maybeRedirectToTarget()) return;
+  setMessage('ok', 'Welcome back. Your account is active and your access tier has been confirmed.');
+}
+
+async function signUp() {
+  const supabase = getSupabaseClient();
+  if (!isFileProtocol() && !supabase) {
+    setMessage('err', 'Auth service is still loading. Wait a second and try again.');
+    return;
+  }
+
+  const email = els.email.value.trim();
+  const password = els.password.value;
+  if (!email || !password) {
+    setMessage('err', 'Enter both email and password before creating an account.');
+    return;
+  }
+  setButtonsDisabled(true);
+  setMessage('', 'Creating account...');
+  if (isFileProtocol()) {
+    const data = await withTimeout(
+      supabaseHttp('/auth/v1/signup', {
+        method: 'POST',
+        body: { email, password }
+      }),
+      15000,
+      'Account creation request'
+    );
+    state.session = data.session ? { user: data.user, access_token: data.session.access_token } : null;
+  } else {
+    const { error } = await withTimeout(
+      supabase.auth.signUp({ email, password }),
+      15000,
+      'Account creation request'
+    );
+    if (error) throw error;
+  }
+  if (isFileProtocol() && state.session?.user?.id) {
+    state.mode = 'authenticated';
+    state.profile = await loadProfile(state.session.user.id);
+    state.tier = state.profile?.subscription_tier || 'free';
+    writeLocalAuthSnapshot();
+    renderState();
+    if (maybeRedirectToTarget()) return;
+    setMessage('ok', 'Account created. Your free access is ready.');
+    return;
+  }
+  await refreshSession();
+  if (maybeRedirectToTarget()) return;
+  setMessage('ok', 'Account created. If email confirmation is enabled, check your inbox to finish activation.');
+}
+
+async function forgotPassword() {
+  const supabase = getSupabaseClient();
+  if (!isFileProtocol() && !supabase) {
+    setMessage('err', 'Auth service is still loading. Wait a second and try again.');
+    return;
+  }
+
+  const email = els.email.value.trim();
+  if (!email) {
+    setMessage('err', 'Enter your email first, then use Forgot password.');
+    return;
+  }
+
+  setButtonsDisabled(true);
+  setMessage('', 'Sending reset email...');
+  if (isFileProtocol()) {
+    await withTimeout(
+      supabaseHttp('/auth/v1/recover', {
+        method: 'POST',
+        body: {
+          email,
+          redirect_to: 'https://stationdelta.dev/auth.html?mode=reset'
+        }
+      }),
+      15000,
+      'Password reset request'
+    );
+  } else {
+    const { error } = await withTimeout(
+      supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://stationdelta.dev/auth.html?mode=reset'
+      }),
+      15000,
+      'Password reset request'
+      );
+    if (error) throw error;
+  }
+  setMessage('ok', 'Password reset email sent if that address exists in the system. Check your inbox.');
+}
+
+async function signOut() {
+  const supabase = getSupabaseClient();
+  if (!isFileProtocol() && !supabase) {
+    state.mode = 'guest';
+    state.session = null;
+    state.profile = null;
+    state.tier = 'guest';
+    clearLocalAuthSnapshot();
+    renderState();
+    setMessage('ok', 'You are back in guest mode with access to the free simulations.');
+    return;
+  }
+
+  setButtonsDisabled(true);
+  setMessage('', 'Signing out...');
+  if (!isFileProtocol()) {
+    const { error } = await withTimeout(
+      supabase.auth.signOut(),
+      15000,
+      'Sign-out request'
+    );
+    if (error) throw error;
+  }
+  clearLocalAuthSnapshot();
+  await refreshSession();
+  setMessage('ok', 'Signed out. Free simulation access remains available in guest mode.');
+}
+
+function continueAsGuest() {
+  state.mode = 'guest';
+  state.session = null;
+  state.profile = null;
+  state.tier = 'guest';
+  clearLocalAuthSnapshot();
+  renderState();
+  const guestTarget = getGuestRedirectTarget();
+  if (guestTarget) {
+    setMessage('ok', guestTarget.includes('/base/vibe-cadet.html')
+      ? 'Guest access selected. Launching the free simulation path.'
+      : 'Guest access selected. Launching the free simulation.'
+    );
+    pushDebug('guest redirect: ' + guestTarget);
+    maybeRedirectToTarget(guestTarget);
+    return;
+  }
+  setMessage('ok', 'Guest access selected. Start free now and sign in later when you want saved progress.');
+}
+
+async function runSignIn() {
+  try {
+    await signIn();
+  } catch (error) {
+    setMessage('err', 'Sign-in failed. ' + formatAuthError(error, 'Please try again.'));
+  } finally {
+    setButtonsDisabled(false);
+  }
+}
+
+async function runSignUp() {
+  try {
+    await signUp();
+  } catch (error) {
+    setMessage('err', 'Account creation failed. ' + formatAuthError(error, 'Please try again.'));
+  } finally {
+    setButtonsDisabled(false);
+  }
+}
+
+async function runForgotPassword() {
+  try {
+    await forgotPassword();
+  } catch (error) {
+    setMessage('err', 'Password reset failed. ' + formatAuthError(error, 'Please try again.'));
+  } finally {
+    setButtonsDisabled(false);
+  }
+}
+
+async function runSignOut() {
+  try {
+    await signOut();
+  } catch (error) {
+    setMessage('err', 'Sign-out failed. ' + formatAuthError(error, 'Please try again.'));
+  } finally {
+    setButtonsDisabled(false);
+  }
+}
+
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.runSignIn = runSignIn;
+window.runSignUp = runSignUp;
+window.runForgotPassword = runForgotPassword;
+window.runSignOut = runSignOut;
+window.runContinueAsGuest = continueAsGuest;
+
+function bindAuthStateListener() {
+  if (isFileProtocol()) return;
+  const supabase = getSupabaseClient();
+  if (!supabase || window.__stationDeltaAuthListenerBound) return;
+  window.__stationDeltaAuthListenerBound = true;
+  supabase.auth.onAuthStateChange(async () => {
+    try {
+      await refreshSession();
+    } catch (error) {
+      setMessage('err', 'Session refresh failed. ' + error.message);
+    }
+  });
+}
+
+bindAuthStateListener();
+setTimeout(bindAuthStateListener, 250);
+setTimeout(bindAuthStateListener, 1000);
+
+refreshSession().catch((error) => {
+  setMessage('err', 'Initialization failed. ' + error.message);
+});
+</script>
+</body>
+</html>

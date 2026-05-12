@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Lieutenant</title>
+<title>Station Delta: Lieutenant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -70,7 +70,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:minmax(0,1fr) 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{
@@ -213,8 +213,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #expert-timer.urgent{color:var(--red);border-color:var(--red-d);background:var(--red-bg);animation:pulse 1s infinite}
 
 /* ── TERMINAL PANEL ── */
-#term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);height: 100%;           /* ← ADD THIS (explicit height) */
-  min-height: 0;          /* ← ADD THIS (important for nested flex) */}
+#main-col{display:flex;flex-direction:column;min-height:0;background:var(--bg);border-right:1px solid var(--border)}
+#term-panel{display:flex;flex-direction:column;background:var(--bg);height:100%;min-height:0;flex:1}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
@@ -501,7 +501,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #mobile-ctx-body{font-size:11px;color:var(--muted2);line-height:1.7}
 
 /* obj card */
-#obj-card{border-bottom:1px solid var(--border);padding:13px 14px;flex-shrink:0}
+#obj-card{border-bottom:1px solid var(--border);padding:13px 18px;flex-shrink:0;background:var(--surface)}
 #obj-phase-label{font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
 #obj-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3}
 #obj-context{font-size:12px;color:var(--muted2);line-height:1.65;margin-bottom:10px}
@@ -623,9 +623,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .glitch{animation:shake .2s ease}
 
 @media(max-width:820px){
-  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px minmax(0,1fr) 170px}
   #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
-  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px minmax(0,1fr) 52px}
   #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
   #topbar{padding:0 10px;gap:8px}
   #logo{font-size:10px;letter-spacing:.12em}
@@ -656,6 +656,56 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   }
   .path-cards{grid-template-columns:1fr;gap:10px}
 }
+
+/* ── PAID TIER GATE ── */
+.paid-gate{margin:14px 0 10px;padding:14px 16px;border:1.5px solid var(--amber);border-radius:var(--r8);background:linear-gradient(135deg,rgba(245,158,11,.07),rgba(167,139,250,.07));text-align:left}
+.paid-gate-hd{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.paid-gate-hd::before{content:'⭐';font-size:13px}
+.paid-gate-features{font-size:11px;color:var(--text);line-height:2;margin-bottom:10px}
+.paid-gate-features span{color:var(--purple);font-weight:600}
+.paid-toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.paid-toggle-label{font-size:11px;color:var(--muted2)}
+.paid-toggle{position:relative;display:inline-block;width:38px;height:20px;cursor:pointer}
+.paid-toggle input{opacity:0;width:0;height:0;position:absolute}
+.paid-slider{position:absolute;inset:0;background:var(--s3);border-radius:10px;border:1px solid var(--border);transition:.25s}
+.paid-slider::before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:var(--muted);border-radius:50%;transition:.25s}
+.paid-toggle input:checked~.paid-slider{background:rgba(167,139,250,.2);border-color:var(--purple)}
+.paid-toggle input:checked~.paid-slider::before{transform:translateX(18px);background:var(--purple)}
+.paid-active-pill{display:none;background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.08em}
+.paid-active-pill.on{display:inline}
+
+/* ── DEEP DIVE ── */
+.deep-dive-btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0;background:var(--purple-bg);border:1px solid var(--purple);border-radius:var(--r4);color:var(--purple);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.deep-dive-btn:hover{background:rgba(167,139,250,.12);box-shadow:0 0 10px rgba(167,139,250,.15)}
+.deep-dive-btn .dd-icon{font-size:13px}
+.deep-dive-card{margin:10px 0;border:2px solid var(--purple);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--purple-bg)}
+.deep-dive-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);border-bottom:1px solid rgba(167,139,250,.2);display:flex;align-items:center;gap:7px;font-weight:700}
+.deep-dive-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.06em;margin-left:auto}
+.deep-dive-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.deep-dive-bd code{background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--purple);font-size:11px}
+.deep-dive-bd b{color:var(--cyan)}
+
+/* ── WHATIF CARD ── */
+.whatif-card{margin:12px 0;border:2px dashed var(--amber-d);border-radius:var(--r8);overflow:hidden;animation:slideIn .3s ease;background:var(--amber-bg)}
+.whatif-hd{padding:9px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);border-bottom:1px dashed var(--amber-d);display:flex;align-items:center;gap:7px;font-weight:700}
+.whatif-bd{padding:13px 14px;font-size:12px;line-height:1.8;color:var(--text)}
+.whatif-outcome{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid var(--red-d);border-radius:var(--r4);color:var(--red);font-size:12px}
+.whatif-lesson{margin-top:8px;padding:8px 12px;background:rgba(30,185,84,.06);border:1px solid var(--green-d);border-radius:var(--r4);color:var(--green);font-size:12px}
+
+/* ── PLAYBOOK PANEL ── */
+#playbook-sec{border-top:1px solid var(--border);padding:0;flex-shrink:0;max-height:220px;display:flex;flex-direction:column;transition:max-height .3s ease}
+#playbook-hd{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+#playbook-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+#playbook-count{background:var(--purple);color:#fff;border-radius:3px;padding:0 5px;font-size:9px;font-weight:700;display:none}
+#playbook-body{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7}
+#playbook-body::-webkit-scrollbar{width:2px}
+#playbook-body::-webkit-scrollbar-thumb{background:var(--border)}
+.pb-entry{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.pb-phase{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);margin-bottom:3px}
+.pb-note{color:var(--text);font-size:11px}
+.pb-export-btn{width:100%;margin-top:8px;padding:5px;font-size:10px;background:var(--purple-bg);border:1px solid var(--purple);color:var(--purple);border-radius:var(--r4);cursor:pointer;font-family:var(--mono);letter-spacing:.04em}
+.pb-export-btn:hover{background:rgba(167,139,250,.15)}
+#playbook-locked{padding:10px 12px;font-size:11px;color:var(--muted);font-style:italic}
 </style>
 </head>
 <body>
@@ -664,7 +714,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
   <!-- TOPBAR -->
   <div id="topbar">
-    <div id="logo">Vibe Lieutenant<span id="logo-sub">ACADEMY</span></div>
+    <div id="logo">Station Delta:<span id="logo-sub">Lieutenant</span></div>
     <div id="cadet-tag">Lieutenant: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -695,19 +745,37 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 
   <!-- TERMINAL -->
-  <div id="term-panel">
-    <div id="term-titlebar">
-      <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">lt@vibe-ship — <span id="path-display">~/ops/escape-pod</span></div>
-      <div style="width:50px"></div>
+  <div id="main-col">
+    <div id="obj-card">
+      <div id="obj-phase-label">Phase 1 of 9</div>
+      <div id="obj-title">Read the codebase</div>
+      <div id="obj-context">Find out what you're working with.</div>
+      <div id="obj-cmd-label">Expected command</div>
+      <div id="obj-cmd-row">
+        <div id="obj-cmd-val" class="blurred">ls -la</div>
+        <button id="obj-reveal" onclick="revealCmd()">show</button>
+      </div>
+      <div id="obj-meta">
+        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+        <span id="obj-score">Score: <span id="score-n">100</span></span>
+      </div>
+      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
     </div>
-    <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
-    <div id="output-divider">Live Terminal — Ops Session</div>
-    <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
-    <div id="input-row">
-      <span id="prompt-pre">lt@vibe:~$&nbsp;</span>
-      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
-      <span id="input-hint"></span>
+
+    <div id="term-panel">
+      <div id="term-titlebar">
+        <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
+        <div id="term-path">lt@stationdelta — <span id="path-display">~/ops/escape-pod</span></div>
+        <div style="width:50px"></div>
+      </div>
+      <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
+      <div id="output-divider">Live Terminal — Ops Session</div>
+      <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
+      <div id="input-row">
+        <span id="prompt-pre">lt@stationdelta:~$&nbsp;</span>
+        <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+        <span id="input-hint"></span>
+      </div>
     </div>
   </div>
 
@@ -721,22 +789,6 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="mobile-ctx-title">Awaiting commission</div>
       <div id="mobile-ctx-body">The current objective and phase context will appear here on mobile.</div>
     </div>
-    <div id="obj-card">
-      <div id="obj-phase-label">Phase 1 of 9</div>
-      <div id="obj-title">Read the codebase</div>
-      <div id="obj-context">Find out what you're working with.</div>
-      <div id="obj-cmd-label">Expected command</div>
-      <div id="obj-cmd-row">
-        <div id="obj-cmd-val" class="blurred">ls -la</div>
-        <button id="obj-reveal" onclick="revealCmd()">show</button>
-      </div>
-      <div id="obj-meta">
-        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
-        <span id="obj-score">Score: <span id="score-n">1000</span></span>
-      </div>
-      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
-    </div>
-
     <div id="lola-sec">
       <div id="lola-hd">
         <div id="lola-avatar">L</div>
@@ -756,6 +808,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="crew-empty">No crew deployed yet</div>
     </div>
 
+    <div id="playbook-sec">
+      <div id="playbook-hd" onclick="togglePlaybook()">📓 My Playbook <span id="playbook-count"></span></div>
+      <div id="playbook-body"><div id="playbook-locked">Sign in with a paid account to unlock the Personal Playbook.</div></div>
+    </div>
+
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
       <div id="telem-log"></div>
@@ -770,7 +827,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">🎖️</div>
-    <div class="mtitle" style="color:var(--gold);font-size:19px">Vibe Lieutenant<span class="modal-sub-title">LIEUTENANT</span></div>
+    <div class="mtitle" style="color:var(--gold);font-size:19px">Station Delta:<span class="modal-sub-title">LIEUTENANT</span></div>
     <div class="msub">The senior-dev bridge in the series. You already know the terminal, Git, and how to ship. Now learn to <i>operate safely under pressure</i>: orient fast, make review calls, choose validation scope, govern AI-generated changes, and coordinate a crew through a production incident.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · AI-augmented development workflows<br>
@@ -785,6 +842,19 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <span>▸</span>L.O.L.A. coaching strip — hints &amp; real-world context visible at all times<br>
       <span>▸</span><b style="color:var(--red)">Final boss fight</b> — J.A.N.E.T. assessment protocol. She is ready.
     </div>
+
+    <div class="paid-gate" id="paid-gate-boot">
+      <div class="paid-gate-hd">Paid Tier <span class="paid-active-pill" id="paid-pill-boot">ACTIVE</span></div>
+      <div class="paid-gate-features">
+        <span>▸</span> <span>⚡ Deep Dive</span> after every phase — go to production depth<br>
+        <span>▸</span> <span>📓 Personal Playbook</span> — build your exportable Lieutenant reference<br>
+        <span>▸</span> <span>🔀 What-If Scenarios</span> — see the alternate timeline after each phase
+      </div>
+      <div class="paid-toggle-row">
+        <span class="paid-toggle-label" id="paid-tier-copy">Paid features unlock automatically for eligible accounts.</span>
+      </div>
+    </div>
+
     <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:left">Your callsign:</div>
     <input type="text" id="boot-name" placeholder="e.g. Alex" maxlength="20">
     <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;text-align:left">Choose your path:</div>
@@ -816,11 +886,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🌟</div>
     <div class="mtitle" style="text-align:center;color:var(--gold)">Commission Complete</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Lieutenant. You do not just ship code now. You make the call on whether it is safe to move.</div>
     <div class="grad-cert">
       <div class="grad-ct">Field Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Lieutenant · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Lieutenant · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Codebase navigation — reading real project structures cold<br>
@@ -925,6 +995,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    VIBE LIEUTENANT v2.0
@@ -935,7 +1006,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
    ═══════════════════════════════════════════════════════════════ */
 
 let G = {
-  name:'Lieutenant', phase:1, step:0, tries:0, score:1000,
+  name:'Lieutenant', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
   agents:[], achievements:[], completedPhases:[],
@@ -959,10 +1030,117 @@ let G = {
   mobilePresetApplied:false,
   mobileUiVersion:2,
   analytics:null,
+  userId:null,
+  userEmail:null,
+  isPaid:false,
+  paidTierChecked:false,
+  playbook:[],
+  deepDiveShown:{},
+  whatifShown:{},
+  _pendingWhatIf:null,
 };
 
 const COURSE_ID='vibe_lieutenant';
 const SAVE_KEY='vbl_v1';
+
+function isFileProtocol(){
+  return window.location.protocol==='file:';
+}
+
+function createMemoryStorage(){
+  const store={};
+  return {
+    getItem(key){ return Object.prototype.hasOwnProperty.call(store,key) ? store[key] : null; },
+    setItem(key,value){ store[key]=String(value); },
+    removeItem(key){ delete store[key]; },
+  };
+}
+
+let _storageAvailable=null;
+function canUseLocalStorage(){
+  if(_storageAvailable!=null) return _storageAvailable;
+  try{
+    const probe='__station_delta_storage_probe__';
+    window.localStorage.setItem(probe,'1');
+    window.localStorage.removeItem(probe);
+    _storageAvailable=true;
+  }catch(err){
+    _storageAvailable=false;
+  }
+  return _storageAvailable;
+}
+
+function readLocalAuthSnapshot(){
+  if(!canUseLocalStorage()) return null;
+  try{
+    const raw=window.localStorage.getItem('station_delta_local_auth');
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){
+    return null;
+  }
+}
+
+async function initSupabaseAuthClient(){
+  if(!window.supabase?.createClient){
+    console.warn('[Station Delta] Supabase client unavailable');
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+      console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+      save();
+    }
+    return;
+  }
+
+  const SUPABASE_URL='https://bcipkdtxcbwcwbinekng.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ';
+  const hostedMode=!isFileProtocol();
+  const authStorage=hostedMode && canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+
+  try{
+    window._sb=window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{
+      auth:{
+        storage:authStorage,
+        persistSession:hostedMode,
+        autoRefreshToken:hostedMode,
+        detectSessionInUrl:hostedMode,
+        flowType:'implicit',
+      },
+    });
+
+    const { data: { session } } = await window._sb.auth.getSession();
+    if(session){
+      G.userId=session.user.id;
+      G.userEmail=session.user.email;
+      console.log('[Station Delta] Session active:', G.userEmail);
+      save();
+    }else{
+      const snapshot=readLocalAuthSnapshot();
+      if(snapshot?.userId){
+        G.userId=snapshot.userId;
+        G.userEmail=snapshot.email || null;
+        G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+        console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+        save();
+      }else if(hostedMode){
+        window.location.href=`/auth.html?redirect=${encodeURIComponent('/base/vibe-lieutenant.html')}`;
+        return;
+      }
+    }
+  }catch(err){
+    console.error('[Station Delta] Supabase init failed', err);
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+      console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+      save();
+    }
+  }
+}
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
 const JANET_INTROS = [
@@ -1182,7 +1360,7 @@ const ACHS = [
   {id:'incident_cmd',  icon:'🚨', name:'Incident Commander',  desc:'Led a production incident response.'},
   {id:'ai_auditor',    icon:'🤖', name:'AI Auditor',          desc:'Caught an AI hallucination in a review.'},
   {id:'team_player',   icon:'👥', name:'Team Player',         desc:'Completed a full PR and deployment workflow.'},
-  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Vibe Lieutenant.'},
+  {id:'commissioned',  icon:'🌟', name:'Commissioned',        desc:'Completed all 9 phases of Station Delta: Lieutenant.'},
   {id:'boss_slayer',   icon:'💀', name:'Boss Slayer',          desc:'Defeated the J.A.N.E.T. Final Assessment. She updated your file. Without enthusiasm.'},
   {id:'janet_ace',     icon:'🧊', name:'J.A.N.E.T. Ace',       desc:'Answered a J.A.N.E.T. quiz correctly on first try. She noted it. Professionally.'},
   {id:'quiz_ace',      icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on first try.'},
@@ -1368,6 +1546,74 @@ const BREAKIT = {
 /* ═══════════════════════════════════════════════════════════════
    PHASE DATA
    ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   PAID TIER — DEEP DIVE DATA (Lieutenant)
+   ═══════════════════════════════════════════════════════════════ */
+const DEEP_DIVE_LT = [
+  null,
+  {title:'Reading Production Codebases at Speed',
+   body:'The 90-second rule: <b>ls -la</b> tells you the tech. <b>cat package.json</b> tells you the entry point and dependencies. <b>git log --oneline -10</b> tells you the team\'s recent decisions. <b>tsc --noEmit</b> tells you the stability. In that order, under four commands, you can form a credible first call on any unfamiliar production service. Senior engineers do not read everything — they triangulate from the right four files.'},
+  {title:'Container Debugging: Beyond docker ps',
+   body:'<b>docker ps</b> shows running containers. <b>docker logs &lt;name&gt;</b> shows what they\'re saying. <b>docker exec -it &lt;name&gt; /bin/sh</b> gives you a shell inside. <b>docker stats</b> shows CPU/memory live. The pattern that matters: if a container is restarting, check the logs for the exit reason before anything else — OOM kills look different from crash loops and require different fixes. Always check <code>docker inspect &lt;name&gt; | grep -i restart</code> to see restart policy and history.'},
+  {title:'Code Review at the Diff Layer',
+   body:'Lieutenant-level diff review follows a checklist, not intuition. (1) <b>Scope</b>: does this change one thing or three? (2) <b>Null safety</b>: every database query result must be null-checked before field access. (3) <b>API correctness</b>: verify every library method call against docs — AI hallucinates ORM methods constantly. (4) <b>Error codes</b>: 400 for validation, 404 for not found, 401/403 for auth — never return 500 for a recoverable client error. (5) <b>Test coverage</b>: does the change have a corresponding test? If not, is there a documented reason why?'},
+  {title:'Stack Trace Forensics',
+   body:'Three things to extract from any stack trace: (1) <b>The real error line</b> — skip past framework frames to find the first line in your code. (2) <b>The causal chain</b> — read up from the error line to understand what called what. (3) <b>The unsafe assumption</b> — every crash has one: a null that was assumed non-null, a missing key that was assumed present, an async result that was assumed resolved. Name the assumption before you name the fix.'},
+  {title:'TypeScript as a Live Triage Tool',
+   body:'<code>tsc --noEmit</code> is not just a build check — it is a triage tool. Run it first on an unfamiliar codebase to understand how much technical debt the team is carrying. Zero errors means high discipline. Suppressed errors with <code>// @ts-ignore</code> means hidden risk. <code>any</code> types everywhere means the compiler is not helping you. The compiler errors also point directly to the assumptions the original developer made — those assumptions are your first suspects when something breaks at runtime.'},
+  {title:'Advanced Git: Rebase, Bisect, Cherry-Pick',
+   body:'<b>git stash</b> → <b>git rebase origin/main</b> → <b>git stash pop</b> is the professional pattern for staying current without a merge commit. <b>git bisect</b> finds the exact commit that introduced a bug in O(log n) steps — essential when a regression appeared somewhere in the last 50 commits. <b>git cherry-pick &lt;sha&gt;</b> applies a single commit to the current branch — the right tool when a hotfix was merged to main and needs to go to a release branch without the rest of the work.'},
+  {title:'Process & Secrets Management in Production',
+   body:'<b>ps aux | grep node</b> finds stuck processes. <b>kill -9 &lt;pid&gt;</b> force-terminates a wedged one. <b>env | grep API</b> reveals what credentials are live in the current shell. The professional discipline: API keys must live in environment variables sourced from a secrets manager — never in code, never in .env files committed to git. Rotation is not optional: when a key is exposed, assume it is compromised and rotate it immediately. <code>export KEY=$(vault read -field=value secret/path)</code> is the production pattern.'},
+  {title:'AI Code Review: The Four Failure Patterns',
+   body:'AI-generated code fails in consistent, predictable ways. (1) <b>Wrong ORM methods</b>: Prisma\'s <code>findUnique</code> vs Mongoose\'s <code>findOne</code> — AI trains on both and mixes them. (2) <b>Missing null guards</b>: AI assumes the happy path. Database queries always need null checks before field access. (3) <b>Outdated APIs</b>: AI was trained on docs that predate breaking version changes. Always verify against the installed version. (4) <b>Wrong error codes</b>: AI returns 500 where 400 or 404 is correct. These are not random — they are the exact points where AI stops reasoning and starts pattern-matching from training examples.'},
+  {title:'Incident Response: The Professional Sequence',
+   body:'The sequence never changes: (1) <b>Identify</b> — read the logs, find the error, timestamp the start. (2) <b>Isolate</b> — is this one service or cascading? (3) <b>Mitigate</b> — restore service first; rollback beats a partial fix every time. (4) <b>Investigate</b> — once users are unblocked, find the real root cause on a branch. (5) <b>Fix</b> — implement, test, and deploy with a reviewer-ready commit message. (6) <b>Post-mortem</b> — blameless, documented, action-itemed. Teams that skip the post-mortem have the same incident again within six months.'},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   PAID TIER — WHAT-IF SCENARIOS (Lieutenant)
+   ═══════════════════════════════════════════════════════════════ */
+const WHATIF_LT = [
+  null,
+  {title:'What if you skipped reading the manifest?',
+   alt:'You jumped straight to editing code without reading package.json or the README.',
+   outcome:'Result: You refactored a file that was auto-generated and overwritten on every build. Your changes were silently discarded. The bug remained.',
+   learning:'The manifest tells you what is owned vs generated. Read it before you touch anything.'},
+  {title:'What if you restarted the container instead of reading its logs?',
+   alt:'The container kept crashing. You deleted and recreated it instead of inspecting the exit reason.',
+   outcome:'Result: The crash was caused by a missing DATABASE_URL env var. Recreating the container had the same missing var. It crashed again immediately — and you lost the original crash log.',
+   learning:'Restart loops are almost always caused by a missing config or failed dependency, not the container itself. Logs first, restart only if logs tell you to.'},
+  {title:'What if you approved the AI diff without checking the ORM methods?',
+   alt:'The diff looked reasonable. You approved it with a quick LGTM.',
+   outcome:'Result: prisma.pods.findOne() does not exist in Prisma. It threw a runtime TypeError the first time a pod reservation was attempted in production, at 11pm on a Friday.',
+   learning:'AI hallucinates library methods with high confidence. Verifying one method name per diff takes 30 seconds and prevents a 2am incident.'},
+  {title:'What if you fixed the bug in place instead of reading the trace?',
+   alt:'The error message mentioned a null value. You added a null check where you guessed it was needed.',
+   outcome:'Result: The null check silenced the symptom but not the cause. The real issue was an upstream async race condition that now manifested as silent data corruption instead of an exception.',
+   learning:'Guessing at the fix without reading the full stack trace moves the bug, it does not remove it. Name the unsafe assumption first.'},
+  {title:'What if you suppressed the TypeScript errors instead of fixing them?',
+   alt:'tsc --noEmit showed 12 errors. You added @ts-ignore to each one to unblock the build.',
+   outcome:'Result: Three of the suppressed errors were masking null access patterns on database results. Two weeks later they surfaced as 500 errors in production on edge cases the happy-path tests did not cover.',
+   learning:'@ts-ignore tells the compiler to stop protecting you. Every suppression is a bet that the error does not matter — and that bet loses more often than it wins.'},
+  {title:'What if you rebased without stashing first?',
+   alt:'You had uncommitted local changes and ran git rebase origin/main directly.',
+   outcome:'Result: The rebase conflicted with your local edits. Git aborted and left the repo in a detached HEAD state. You lost 45 minutes untangling it.',
+   learning:'git stash before any rebase or pull. It takes 2 seconds and prevents the most common rebase disaster.'},
+  {title:'What if you hardcoded the API key instead of rotating it into an env var?',
+   alt:'The rotation command was complex. You pasted the new key directly into the config file.',
+   outcome:'Result: The config file was committed to git 20 minutes later during a routine push. The key was exposed in the repository history. The secret manager flagged it 4 hours later. Emergency rotation required.',
+   learning:'Keys in code will eventually be committed to git. Environment variables are the minimum safe practice. Secrets managers are the professional standard.'},
+  {title:'What if you merged the AI diff after just running the tests?',
+   alt:'Tests passed. You merged without reviewing the actual diff against the Prisma docs.',
+   outcome:'Result: The tests mocked the database call, so the hallucinated findOne method was never actually called during testing. It made it to production and crashed on the first real pod reservation request.',
+   learning:'Tests verify behavior, not API correctness. A passing test suite does not mean the API calls are real. Read the diff AND run the tests — both gates, in that order.'},
+  {title:'What if you investigated root cause before rolling back?',
+   alt:'The incident was clearly deploy-correlated. You started debugging instead of reverting immediately.',
+   outcome:'Result: Debugging took 22 minutes. During that time 4,800 requests failed and three downstream services started throwing timeouts as they retried against the broken endpoint. The outage cascaded.',
+   learning:'Mitigation beats investigation every time during a live incident. Restore service first. Understand why second. Users cannot wait for your curiosity.'},
+];
+
 const PHASES = [null,
 
 /* ── P1: Recall Under Load ── */
@@ -1974,7 +2220,7 @@ async function runFinalCommission(){
   syncDots();save();
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 }
 
@@ -1988,8 +2234,8 @@ const EASTER = {
       trackEaster('sudo');unlock('hacker');return true;
     }
   },
-  'whoami':{handle(){appendLine('lt — Vibe Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
-  'neofetch':{handle(){appendLine('       lt@vibe-ship','ln-lola');appendLine('       ───────────────','ln-sys');appendLine('       OS: VibOS 2.0 (based on Ubuntu 24)','ln-sys');appendLine('       Shell: zsh + oh-my-zsh','ln-sys');appendLine('       Stack: Hono + Prisma + Bun + TypeScript','ln-sys');appendLine('       AI: L.O.L.A. v2.4 (Claude-powered)','ln-sys');appendLine('       Assessment: J.A.N.E.T. v?.? (origin unknown)','ln-sys');appendLine('       Mission: Escape Pod Ops · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
+  'whoami':{handle(){appendLine('lt — Station Delta: Lieutenant, Class of 2026','ln-ok');appendLine('Clearance: BRIDGE OFFICER','ln-info');trackEaster('whoami');return true;}},
+  'neofetch':{handle(){appendLine('       lt@stationdelta','ln-lola');appendLine('       ────────────────','ln-sys');appendLine('       OS: Station Delta Ops 2.0 (based on Ubuntu 24)','ln-sys');appendLine('       Shell: zsh + oh-my-zsh','ln-sys');appendLine('       Stack: Hono + Prisma + Bun + TypeScript','ln-sys');appendLine('       AI: L.O.L.A. v2.4 (Claude-powered)','ln-sys');appendLine('       Assessment: J.A.N.E.T. v?.? (origin unknown)','ln-sys');appendLine('       Mission: Escape Pod Ops · Phase '+G.phase+'/9','ln-sys');trackEaster('neofetch');return true;}},
   'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship until Phase 9.','ln-janet');trackEaster('janet');return true;}},
   'git log':{handle(){appendLine('a3b4c5d fix: correct findUnique call and add null guard','ln-info');appendLine('d4e5f6a fix: reduce pod reservation timeout','ln-info');appendLine('9f8e7d6 feat: add party size to reservations','ln-info');appendLine('c3d2e1f feat: initial pod booking API','ln-info');trackEaster('gitlog');return true;}},
   'uptime':{handle(){appendLine('up 9 days, 22:47, 3 users, load average: 0.12, 0.08, 0.06','ln-ok');return true;}},
@@ -2338,8 +2584,23 @@ function renderCareerModal(){
 }
 
 /* ── SAVE / LOAD ── */
-function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(G))}
-function loadSave(){const raw=localStorage.getItem(SAVE_KEY);if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}}
+function save(){
+  if(!canUseLocalStorage()) return;
+  try{
+    window.localStorage.setItem(SAVE_KEY,JSON.stringify(G));
+  }catch(err){
+    console.warn('[Station Delta] Failed to save progress', err);
+  }
+}
+function loadSave(){
+  if(!canUseLocalStorage()) return;
+  try{
+    const raw=window.localStorage.getItem(SAVE_KEY);
+    if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
+  }catch(err){
+    console.warn('[Station Delta] Failed to load progress', err);
+  }
+}
 
 /* ── ANALYTICS ── */
 function newSessionId(){return 'lt_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
@@ -2672,6 +2933,26 @@ async function processCmd(raw){
     return;
   }
 
+  // paid tier commands
+  if(vl==='whatif'||vl==='what-if'||vl==='what if'){
+    if(!G.isPaid){appendLine('What-If Scenarios are a paid tier feature. Sign in and upgrade to unlock them.','ln-info');syncObjCard();return}
+    if(G._pendingWhatIf!=null){showWhatIf(G._pendingWhatIf);syncObjCard();return}
+    appendLine('No what-if scenario available right now. Complete a phase to unlock the alternate timeline.','ln-info');syncObjCard();return;
+  }
+  if(vl==='playbook save'||vl==='save playbook'){savePlaybookEntry();syncObjCard();return}
+  if(vl==='playbook export'||vl==='export playbook'){exportPlaybook();syncObjCard();return}
+  if(vl==='playbook'||vl==='my playbook'){
+    if(!G.isPaid){appendLine('Personal Playbook is a paid tier feature. Sign in and upgrade to unlock it.','ln-info');syncObjCard();return}
+    togglePlaybook();syncObjCard();return;
+  }
+  if(vl==='deep dive'||vl==='deepdive'){
+    if(!G.isPaid){appendLine('Deep Dive is a paid tier feature. Sign in and upgrade to unlock it.','ln-info');syncObjCard();return}
+    const lastPhase=G.completedPhases[G.completedPhases.length-1];
+    if(lastPhase&&DEEP_DIVE_LT[lastPhase]&&!G.deepDiveShown['p'+lastPhase]){showDeepDive(lastPhase);G.deepDiveShown['p'+lastPhase]=true;save();}
+    else{appendLine('No new deep dive available. Complete a phase to unlock production depth.','ln-info');}
+    syncObjCard();return;
+  }
+
   // easter eggs
   for(const [key,ee] of Object.entries(EASTER)){
     if(vl===key||vl.startsWith(key+' ')){const caught=ee.handle(val);if(caught){syncObjCard();return}}
@@ -2764,7 +3045,7 @@ async function handleCorrect(s,ph){
 /* ── LOLA ENCOURAGEMENT LINES ── */
 const LOLA_ENCOURAGE = [
   "Not quite — but you're thinking in the right direction. Re-read the objective above.",
-  "Close. The objective card on the right tells you exactly what you're aiming for.",
+  "Close. The objective card above the terminal tells you exactly what you're aiming for.",
   "Not there yet, but that's normal. Read the context carefully — the answer is derivable from what's on screen.",
   "Good attempt. Think about what command would accomplish the stated objective.",
   "Keep going. Every wrong attempt is information. What did you try, and why didn't it work?",
@@ -2881,6 +3162,167 @@ function handleWrong(val,s){
   save();
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PAID TIER — FUNCTIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+function syncPaidTierBootState(){
+  const pill=document.getElementById('paid-pill-boot');
+  const copy=document.getElementById('paid-tier-copy');
+  if(pill)pill.classList.toggle('on',!!G.isPaid);
+  if(copy){
+    copy.textContent = G.isPaid
+      ? 'Paid account detected. Deep Dive, Playbook, and What-If Scenarios are active.'
+      : 'Premium features unlock automatically after sign-in on an Individual or Fleet account.';
+  }
+}
+
+async function checkPaidTier(){
+  G.paidTierChecked = true;
+  if(!window._sb || !G.userId){
+    const snapshot=readLocalAuthSnapshot();
+    G.isPaid = snapshot?.tier === 'individual' || snapshot?.tier === 'fleet';
+    syncPaidTierBootState();
+    renderPlaybook();
+    save();
+    return false;
+  }
+
+  try{
+    const { data, error } = await window._sb
+      .from('profiles')
+      .select('subscription_tier')
+      .eq('id', G.userId)
+      .single();
+
+    if(error) throw error;
+    G.isPaid = data?.subscription_tier === 'individual' || data?.subscription_tier === 'fleet';
+  }catch(err){
+    console.warn('checkPaidTier failed', err);
+    G.isPaid = false;
+  }
+
+  save();
+  syncPaidTierBootState();
+  renderPlaybook();
+  if(G.isPaid){
+    renderPlaybook();
+    setLola('Paid tier active. Deep Dive, Playbook, and What-If Scenarios are now enabled.');
+  }
+  return G.isPaid;
+}
+
+function showDeepDiveButton(phaseIdx){
+  if(!G.isPaid)return;
+  const dd=DEEP_DIVE_LT[phaseIdx];
+  if(!dd)return;
+  const key='p'+phaseIdx;
+  if(G.deepDiveShown[key])return;
+  const btn=document.createElement('button');
+  btn.className='deep-dive-btn';
+  btn.innerHTML='<span class="dd-icon">⚡</span> Deep Dive — go to production depth';
+  btn.onclick=()=>{
+    if(G.deepDiveShown[key])return;
+    G.deepDiveShown[key]=true;save();
+    btn.style.display='none';
+    showDeepDive(phaseIdx);
+  };
+  const $out=document.getElementById('output');
+  $out.appendChild(btn);$out.scrollTop=$out.scrollHeight;
+}
+
+function showDeepDive(phaseIdx){
+  const dd=DEEP_DIVE_LT[phaseIdx];if(!dd)return;
+  const $out=document.getElementById('output');
+  const w=document.createElement('div');w.className='deep-dive-card';
+  w.innerHTML=`<div class="deep-dive-hd"><span>⚡</span> Deep Dive: ${dd.title}<span class="deep-dive-badge">+DEPTH</span></div><div class="deep-dive-bd">${dd.body}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  setLola('That is the production-grade context. This is what separates Lieutenants who operate safely from those who improvise under pressure.');
+}
+
+function showWhatIfButton(phaseIdx){
+  if(!G.isPaid)return;
+  const wi=WHATIF_LT[phaseIdx];
+  if(!wi)return;
+  const key='wi'+phaseIdx;
+  if(G.whatifShown[key])return;
+  setLola('Want to see what would have happened if you chose a different path? Type: whatif');
+  G._pendingWhatIf=phaseIdx;
+}
+
+function showWhatIf(phaseIdx){
+  const wi=WHATIF_LT[phaseIdx];if(!wi)return;
+  const key='wi'+phaseIdx;
+  G.whatifShown[key]=true;G._pendingWhatIf=null;save();
+  const $out=document.getElementById('output');
+  const w=document.createElement('div');w.className='whatif-card';
+  w.innerHTML=`<div class="whatif-hd">🔀 What-If Scenario: ${wi.title}</div><div class="whatif-bd">${wi.alt}<div class="whatif-outcome"><b>⚠ Outcome:</b> ${wi.outcome}</div><div class="whatif-lesson"><b>💡 Key Lesson:</b> ${wi.learning}</div></div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+
+function togglePlaybook(){
+  if(!G.isPaid)return;
+  const sec=document.getElementById('playbook-sec');
+  if(sec.style.maxHeight==='36px'){sec.style.maxHeight='220px'}else{sec.style.maxHeight='36px'}
+}
+
+function getPlaybookPhaseTitle(phaseIdx){
+  const ph=PHASES[phaseIdx];return ph?ph.title:`Phase ${phaseIdx}`;
+}
+
+function savePlaybookEntry(){
+  if(!G.isPaid){appendLine('Playbook is a paid tier feature. Sign in and upgrade to unlock it.','ln-info');return;}
+  const phaseIdx=G.phase<=9?G.phase:(G.completedPhases[G.completedPhases.length-1]||9);
+  const phTitle=G.completedPhases.includes(phaseIdx-1)?getPlaybookPhaseTitle(phaseIdx-1):getPlaybookPhaseTitle(phaseIdx);
+  const phNotes={
+    1:'Orient fast: ls -la, read the manifest, map the types, check git log. Four commands before you touch anything.',
+    2:'Container debugging: logs before restart. docker logs reveals the exit reason — OOM kills and crash loops need different fixes.',
+    3:'Diff review checklist: scope, null safety, API correctness, error codes, test coverage. In that order.',
+    4:'Stack trace forensics: find the real error line, read the causal chain, name the unsafe assumption before naming the fix.',
+    5:'tsc --noEmit is a triage tool, not just a build check. Type errors point to the assumptions the original developer made.',
+    6:'git stash → rebase → stash pop. git bisect finds the commit. git cherry-pick applies one fix without the rest.',
+    7:'Secrets in env vars, never in code. ps aux for live processes. kill -9 for wedged ones. Rotate on exposure.',
+    8:'AI hallucination patterns: wrong ORM methods, missing null guards, outdated APIs, wrong error codes. Verify all four per diff.',
+    9:'Incident sequence: identify → isolate → mitigate → investigate → fix → post-mortem. Mitigation beats investigation during the live window.',
+  };
+  const note=phNotes[phaseIdx]||'Lieutenant operational discipline applied.';
+  const entry={phase:phTitle,note,ts:Date.now()};
+  G.playbook.push(entry);save();
+  renderPlaybook();
+  setLola('Saved to your playbook. Type: playbook export to get it as markdown.');
+}
+
+function renderPlaybook(){
+  const body=document.getElementById('playbook-body');
+  const count=document.getElementById('playbook-count');
+  if(!body)return;
+  if(!G.isPaid){
+    body.innerHTML='<div id="playbook-locked">Sign in with a paid account to unlock the Personal Playbook.</div>';
+    if(count)count.style.display='none';
+    return;
+  }
+  if(G.playbook.length===0){
+    body.innerHTML='<div id="playbook-empty" style="padding:8px;font-size:11px;color:var(--muted);font-style:italic">Type <code style="color:var(--purple)">playbook save</code> after any phase to capture your key takeaway.</div>';
+    if(count)count.style.display='none';
+    return;
+  }
+  if(count){count.style.display='inline';count.textContent=G.playbook.length;}
+  body.innerHTML=G.playbook.map(e=>`<div class="pb-entry"><div class="pb-phase">${e.phase}</div><div class="pb-note">${e.note}</div></div>`).join('')+
+    `<button class="pb-export-btn" onclick="exportPlaybook()">📋 Export as Markdown</button>`;
+  const sec=document.getElementById('playbook-sec');
+  if(sec)sec.style.maxHeight='220px';
+}
+
+function exportPlaybook(){
+  if(!G.isPaid)return;
+  const md=`# My Station Delta: Lieutenant Playbook\n*Station Delta: Lieutenant — ${new Date().toLocaleDateString()}*\n\n`+
+    G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
+  const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  setLola('Playbook copied to clipboard as markdown.');
+  appendLine('✓ Playbook markdown copied to clipboard.','ln-ok');
+}
+
 async function completePhase(){
   const completedPhase=G.phase;
   const ph=PHASES[G.phase];
@@ -2894,6 +3336,8 @@ async function completePhase(){
   blank();appendLine(`Score: ${G.score}`,'ln-info');blank();
   if(ph.challenge&&!G.expert){blank();await showChallenge(ph.challenge);blank()}
   if(ph.breakit&&!G.expert){blank();await showBreakIt(ph.breakit);blank()}
+  showDeepDiveButton(completedPhase);
+  showWhatIfButton(completedPhase);
   G.phase++;G.step=0;G.tries=0;
   if(G.expert)stopExpertTimer();
   if(G.phase<=PHASES.length-1){
@@ -2975,7 +3419,7 @@ async function runCommission(){
   document.getElementById('sandbox-pill').style.display='inline';
   syncDots();save();await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 }
 
@@ -3004,7 +3448,11 @@ document.getElementById('boot-name').addEventListener('keydown',e=>{if(e.key==='
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     const bi=document.getElementById('boot-name');
-    if(bi&&document.getElementById('boot-modal').classList.contains('open')){bi.focus();bi.style.color='var(--text)'}
+    if(bi&&document.getElementById('boot-modal').classList.contains('open')){
+      if(G.name && G.name!=='Lieutenant') bi.value=G.name;
+      bi.focus();
+      bi.style.color='var(--text)';
+    }
   },200);
 });
 
@@ -3106,9 +3554,15 @@ function resumeSession(){
 }
 
 function doRestart(){openModal('restart-modal')}
-function confirmRestart(){closeModal('restart-modal');localStorage.removeItem(SAVE_KEY);location.reload()}
+function confirmRestart(){
+  closeModal('restart-modal');
+  if(canUseLocalStorage()){
+    try{window.localStorage.removeItem(SAVE_KEY)}catch(err){}
+  }
+  location.reload();
+}
 function shareGrad(){
-  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
+  const txt=`Just completed Station Delta: Lieutenant 🎖️\n\nI can now: read codebases cold, review AI-generated diffs, debug stack traces, handle TypeScript errors, trace JSON through APIs, write tests, respond to production incidents, and catch AI hallucinations.\n\nOh — and I passed a final boss fight administered by a passive-aggressive AI named J.A.N.E.T.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');closeModal('grad-modal');
 }
 
@@ -3310,7 +3764,7 @@ const LT_PHASES = [
    steps:[
     {id:'p8s1',obj:'Review the AI-generated diff',ctx:'Read the proposed change before you bless it. You are the final gate, not the stenographer.',cmd:['review diff'],accept:['review diff'],hint:'Type: review diff',out:'AI Review Summary:\n- Replaced findUnique with findOne\n- Added timeoutMs = 60 * 1000 // 1 hour\n- No null guard for missing pod\n\n⚠ Multiple correctness and safety concerns found.',unlockCmd:'review'},
     {id:'p8s2',obj:'State the exact fix the diff needs',ctx:'Call out the hallucinated ORM method and the missing guard so the patch cannot merge half-corrected.',cmd:['fix findUnique'],accept:['fix findUnique','fix prisma','fix hallucination'],acceptFn:v=>{const t=v.toLowerCase();return t.startsWith('fix')&&(t.includes('findunique')||t.includes('prisma')||t.includes('hallucination'));},hint:'Type: fix findUnique',out:'Required fix recorded:\n- Use prisma.pods.findUnique(...)\n- Add explicit 404/null guard before reading pod.capacity\n- Correct timeout comment or constant to match real duration',unlockCmd:'fix'},
-    {id:'p8s3',obj:'Verify the live Anthropic API call shape',ctx:'Use the rotated key in a real messages API request shape so you can validate headers, payload, and request construction.',cmd:['curl https://api.anthropic.com/v1/messages -H "x-api-key: $API_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" -d \'{"model":"claude-sonnet-4-5","max_tokens":128,"messages":[{"role":"user","content":"Summarize incident status"}]}\''],acceptFn:v=>{const t=v.toLowerCase();return t.startsWith('curl https://api.anthropic.com/v1/messages')&&t.includes('x-api-key: $api_key')&&t.includes('anthropic-version: 2023-06-01')&&t.includes('content-type: application/json')&&t.includes('"model":"claude-sonnet-4-5"');},accept:['curl https://api.anthropic.com/v1/messages'],hint:'Use curl against /v1/messages with x-api-key, anthropic-version, content-type, and a JSON body.',out:'{"id":"msg_lt_8842","type":"message","role":"assistant","content":[{"type":"text","text":"Incident status: degraded due to missing DATABASE_URL and invalid Prisma method."}]}'},
+    {id:'p8s3',obj:'Verify the live Anthropic API call shape',ctx:'Use the rotated key in a real messages API request shape so you can validate headers, payload, and request construction.',cmd:['curl https://api.anthropic.com/v1/messages -H "x-api-key: $API_KEY" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" -d \'{"model":"claude-sonnet-4-6","max_tokens":128,"messages":[{"role":"user","content":"Summarize incident status"}]}\''],acceptFn:v=>{const t=v.toLowerCase();return t.startsWith('curl https://api.anthropic.com/v1/messages')&&t.includes('x-api-key: $api_key')&&t.includes('anthropic-version: 2023-06-01')&&t.includes('content-type: application/json')&&t.includes('"model":"claude-sonnet-4-6"');},accept:['curl https://api.anthropic.com/v1/messages'],hint:'Use curl against /v1/messages with x-api-key, anthropic-version, content-type, and a JSON body.',out:'{"id":"msg_lt_8842","type":"message","role":"assistant","content":[{"type":"text","text":"Incident status: degraded due to missing DATABASE_URL and invalid Prisma method."}]}'},
     {id:'p8s4',obj:'Run the test suite before approving',ctx:'The patch still has to survive automated verification before it gets a yes.',cmd:['bun run test'],accept:['bun run test'],hint:'Type: bun run test',out:'✓ auth.test.ts (4)\n✓ pods.test.ts (6)\n\nTest Files  2 passed\nTests       10 passed',unlockCmd:'bun'}
    ],
    challenge:LT_CHALLENGES[8],
@@ -3670,12 +4124,12 @@ runFinalCommission = async function(){
   syncDots();save();
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 };
 
 shareGrad = function(){
-  const txt=`Just completed Vibe Lieutenant 🎖️\n\nI can now: triage a repo cold, debug live containers, review risky diffs, follow stack traces, audit TypeScript + API behavior, use advanced Git, manage runtime secrets, and lead an incident fix into review.\n\nAlso passed a final J.A.N.E.T. assessment without L.O.L.A. backup.\n\nFree hands-on training →`;
+  const txt=`Just completed Station Delta: Lieutenant 🎖️\n\nI can now: triage a repo cold, debug live containers, review risky diffs, follow stack traces, audit TypeScript + API behavior, use advanced Git, manage runtime secrets, and lead an incident fix into review.\n\nAlso passed a final J.A.N.E.T. assessment without L.O.L.A. backup.\n\nFree hands-on training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent('https://station-delta-one.vercel.app/'),'_blank');
   closeModal('grad-modal');
 };
@@ -3683,6 +4137,9 @@ shareGrad = function(){
 /* ── STARTUP ── */
 loadSave();
 ensureAnalytics();
+initSupabaseAuthClient().then(checkPaidTier);
+syncPaidTierBootState();
+renderPlaybook();
 migrateMobileUiDefaults();
 applyMobileLayoutDefaults();
 if(window.matchMedia){

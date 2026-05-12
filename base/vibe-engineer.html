@@ -211,17 +211,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #term-path span{color:var(--blue)}
 
 #action-rail{
-  display:grid;
-  grid-template-columns:minmax(360px, 1.35fr) minmax(260px, .75fr);
-  gap:12px;
+  display:block;
   padding:12px 14px;
   background:var(--surface);
   border-bottom:1px solid var(--border);
   flex-shrink:0;
-  align-items:start;
 }
-#term-panel #obj-card,
-#term-panel #lola-sec{
+#term-panel #obj-card{
   border:1px solid var(--border);
   border-radius:var(--r8);
   background:var(--s2);
@@ -230,11 +226,6 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   max-height:none;
   padding:12px 14px;
   border-bottom:1px solid var(--border);
-}
-#term-panel #lola-sec{
-  padding:12px 14px;
-  max-height:208px;
-  overflow-y:auto;
 }
 
 /* ── FIX COLLAPSING JIT / REAL WORLD / HINT / DIAGNOSIS BLOCKS ── */
@@ -564,7 +555,9 @@ body.expert-mode #obj-reveal{display:none!important}
 .path-card.selected .path-name{color:var(--green)}
  
 /* lola section */
-#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-sec{padding:14px 14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;max-height:260px;overflow-y:auto}
+#lola-sec::-webkit-scrollbar{width:3px}
+#lola-sec::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 #lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
 #lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
 #lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
@@ -674,6 +667,19 @@ body.expert-mode #obj-reveal{display:none!important}
 .checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
 .checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
 .checkpoint-next b{color:var(--blue)}
+.checkpoint-nudge{margin:-2px 0 18px;border:1px solid var(--b2);border-radius:var(--r8);padding:16px;background:var(--surface);text-align:left}
+.checkpoint-nudge[data-tone="generic"]{border-color:var(--green-d);background:rgba(3,13,9,.45)}
+.checkpoint-nudge[data-tone="lola"]{border-color:var(--blue-d);background:rgba(3,13,24,.55)}
+.checkpoint-nudge[data-tone="janet"]{border-color:var(--silver-d);background:rgba(10,14,16,.78)}
+.checkpoint-nudge-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.checkpoint-nudge[data-tone="generic"] .checkpoint-nudge-kicker{color:var(--green)}
+.checkpoint-nudge[data-tone="lola"] .checkpoint-nudge-kicker{color:var(--blue)}
+.checkpoint-nudge[data-tone="janet"] .checkpoint-nudge-kicker{color:var(--silver)}
+.checkpoint-nudge-title{font-family:var(--display);font-size:15px;color:var(--text);margin-bottom:7px;line-height:1.35}
+.checkpoint-nudge-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-nudge-foot{margin-top:12px;display:grid;gap:10px}
+.checkpoint-nudge-note{font-size:11px;color:var(--muted);line-height:1.6}
+.checkpoint-nudge-btn{margin:0;width:100%}
 .skills-list{text-align:left;font-size:12px;color:var(--muted2);line-height:2;margin-bottom:16px}
 .skills-list span{color:var(--green);margin-right:6px}
  
@@ -719,13 +725,12 @@ body.expert-mode #obj-reveal{display:none!important}
   #career-impact-btn{padding:3px 8px;font-size:10px}
   #mobile-tools-btn{display:inline-flex}
   #mobile-strip-toggle-btn{display:inline-flex}
-  #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
+  #action-rail{padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
-  #term-panel #lola-sec{display:none;max-height:118px}
   #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
-  #crew-sec,#telem-sec{display:none}
+  #lola-sec,#crew-sec,#telem-sec{display:none}
   #mobile-ctx-section{display:none}
-  #shell:not(.right-collapsed) #term-panel #lola-sec{display:block}
+  #shell:not(.right-collapsed) #lola-sec,
   #shell:not(.right-collapsed) #crew-sec,
   #shell:not(.right-collapsed) #telem-sec,
   #shell:not(.right-collapsed) #mobile-ctx-section{display:block}
@@ -806,14 +811,6 @@ body.expert-mode #obj-reveal{display:none!important}
         </div>
         <div id="obj-progress"><div id="obj-prog-fill"></div></div>
       </div>
-      <div id="lola-sec">
-        <div id="lola-hd">
-          <div id="lola-avatar">L</div>
-          <div id="lola-name">L.O.L.A.</div>
-          <div id="lola-online">ready</div>
-        </div>
-        <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
-      </div>
     </div>
     <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Live terminal — distress-bay session active</div>
@@ -834,6 +831,14 @@ body.expert-mode #obj-reveal{display:none!important}
       <div id="mobile-ctx-label">📍 Current Objective</div>
       <div id="mobile-ctx-title"></div>
       <div id="mobile-ctx-body"></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
     </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
@@ -948,6 +953,15 @@ body.expert-mode #obj-reveal{display:none!important}
       <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is saved automatically.</div>
       <div class="checkpoint-next" id="phase-modal-next">Next up: <b>File Operations</b></div>
     </div>
+    <div id="checkpoint-signup-nudge" class="checkpoint-nudge" data-tone="generic" hidden>
+      <div class="checkpoint-nudge-kicker" id="checkpoint-signup-kicker">Save this checkpoint</div>
+      <div class="checkpoint-nudge-title" id="checkpoint-signup-title">Create your free account before you step away.</div>
+      <div class="checkpoint-nudge-copy" id="checkpoint-signup-copy">Free members can return later and keep their place across devices.</div>
+      <div class="checkpoint-nudge-foot">
+        <button class="mbtn mbtn-p checkpoint-nudge-btn" onclick="routeToCheckpointSignup()">SIGN UP FREE &amp; SAVE MY SPOT</button>
+        <div class="checkpoint-nudge-note" id="checkpoint-signup-note">We will bring you right back to this sim after sign-in.</div>
+      </div>
+    </div>
     <div style="text-align:center">
       <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
       <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
@@ -1020,6 +1034,7 @@ body.expert-mode #obj-reveal{display:none!important}
   </div>
 </div>
  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    Station Delta: Engineer — DISTRESS-BAY EDITION v1.0
@@ -1030,9 +1045,11 @@ body.expert-mode #obj-reveal{display:none!important}
  
 /* ── STATE ── */
 let G = {
-  name:'Cadet', phase:1, step:0, tries:0, score:1000,
+  name:'Cadet', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
+  userId:null,
+  userEmail:null,
   agents:[], achievements:[], completedPhases:[],
   cmdHistory:[], histIdx:-1,
   currentPath:'/home/cadet/projects',
@@ -1060,6 +1077,83 @@ let expertTimerInterval = null;
 
 const COURSE_ID='vibe-engineer';
 const ENGINEER_SAVE_KEY='vibe_engineer_v1';
+
+function isFileProtocol(){
+  return window.location.protocol==='file:';
+}
+
+function createMemoryStorage(){
+  const store={};
+  return {
+    getItem(key){ return Object.prototype.hasOwnProperty.call(store,key) ? store[key] : null; },
+    setItem(key,value){ store[key]=String(value); },
+    removeItem(key){ delete store[key]; },
+  };
+}
+
+function readLocalAuthSnapshot(){
+  if(!canUseLocalStorage()) return null;
+  try{
+    const raw=window.localStorage.getItem('station_delta_local_auth');
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){
+    return null;
+  }
+}
+
+async function initSupabaseAuthClient(){
+  if(!window.supabase?.createClient){
+    console.warn('[Station Delta] Supabase client unavailable');
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+    }
+    return;
+  }
+
+  const SUPABASE_URL='https://bcipkdtxcbwcwbinekng.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ';
+  const hostedMode=!isFileProtocol();
+  const authStorage=hostedMode && canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+
+  try{
+    window._sb=window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{
+      auth:{
+        storage:authStorage,
+        persistSession:hostedMode,
+        autoRefreshToken:hostedMode,
+        detectSessionInUrl:hostedMode,
+        flowType:'implicit',
+      },
+    });
+    const { data: { session } } = await window._sb.auth.getSession();
+
+    if(session){
+      G.userId=session.user.id;
+      G.userEmail=session.user.email;
+      console.log('[Station Delta] Session active:', G.userEmail);
+    }else{
+      const snapshot=readLocalAuthSnapshot();
+      if(snapshot?.userId){
+        G.userId=snapshot.userId;
+        G.userEmail=snapshot.email || null;
+        console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+      }else if(hostedMode){
+        console.log('[Station Delta] Guest mode — no session');
+      }
+    }
+  }catch(err){
+    console.error('[Station Delta] Supabase init failed', err);
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+    }
+  }
+}
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -1268,13 +1362,22 @@ const LOLA_STRIP = {
 let _stripRotateInterval = null;
 
 function setLolaStrip(stepOrId){
-  const msgs = typeof stepOrId === 'object'
-    ? (stepOrId.lola_strip || LOLA_STRIP[stepOrId.id])
-    : LOLA_STRIP[stepOrId];
+  const step = typeof stepOrId === 'object' ? stepOrId : null;
+  let msgs = step ? (step.lola_strip || LOLA_STRIP[step.id]) : LOLA_STRIP[stepOrId];
   const inner = document.getElementById('lola-strip-inner');
   if(!inner) return;
 
   clearInterval(_stripRotateInterval);
+
+  if((!msgs || msgs.length===0) && step){
+    const fallbackMsgs=[];
+    const teach=sidebarTeachForStep(step);
+    const bridge=sidebarBridgeForStep(step);
+    if(step.ctx) fallbackMsgs.push({tag:'mission', msg:step.ctx});
+    if(teach?.body) fallbackMsgs.push({tag:'teach', msg:`<b>${teach.title || 'Field note'}:</b> ${teach.body}`});
+    if(bridge?.body) fallbackMsgs.push({tag:'why', msg:bridge.body});
+    msgs=fallbackMsgs;
+  }
 
   if(!msgs || msgs.length === 0){
     inner.className = 'no-scroll';
@@ -3196,17 +3299,51 @@ window.vibeAnalytics={
 
 function save(){
   ensureAnalytics();
-  localStorage.setItem(ENGINEER_SAVE_KEY,JSON.stringify(G));
+  if(!canUseLocalStorage()) return;
+  try{
+    window.localStorage.setItem(ENGINEER_SAVE_KEY,JSON.stringify(G));
+  }catch(err){
+    console.warn('[Station Delta] Failed to save progress', err);
+  }
 }
 function loadSave(){
-  try{
-    const raw=localStorage.getItem(ENGINEER_SAVE_KEY);
-    if(raw){
-      const d=JSON.parse(raw);
-      G={...G,...d};
-    }
-  }catch(_){}
+  if(canUseLocalStorage()){
+    try{
+      const raw=window.localStorage.getItem(ENGINEER_SAVE_KEY);
+      if(raw){
+        const d=JSON.parse(raw);
+        G={...G,...d};
+      }
+    }catch(_){}
+  }
   ensureAnalytics();
+}
+
+let _storageAvailable=null;
+function canUseLocalStorage(){
+  if(_storageAvailable!=null) return _storageAvailable;
+  if(isFileProtocol()){
+    _storageAvailable=false;
+    return _storageAvailable;
+  }
+  try{
+    const probe='__station_delta_storage_probe__';
+    window.localStorage.setItem(probe,'1');
+    window.localStorage.removeItem(probe);
+    _storageAvailable=true;
+  }catch(err){
+    _storageAvailable=false;
+  }
+  return _storageAvailable;
+}
+
+function clearLocalSave(){
+  if(!canUseLocalStorage()) return;
+  try{
+    window.localStorage.removeItem(ENGINEER_SAVE_KEY);
+  }catch(err){
+    console.warn('[Station Delta] Failed to clear progress', err);
+  }
 }
  
 /* ── CAREER LOG ── */
@@ -3230,6 +3367,11 @@ function sidebarTeachForStep(step){
   };
 }
 
+function sidebarBridgeForStep(step){
+  if(step?.bridge) return step.bridge;
+  return null;
+}
+
 function hintForStep(step, exact=false){
   if(!step) return '';
   if(exact) return step.hint || 'Use the objective "show" control for exact syntax.';
@@ -3239,9 +3381,13 @@ function hintForStep(step, exact=false){
 
 function lolaMessageForStep(step, phase){
   if(step?.lola_guidance) return step.lola_guidance;
-  if(step.ctx) return step.ctx;
   const teach=sidebarTeachForStep(step);
-  if(teach?.body) return teach.body;
+  const bridge=sidebarBridgeForStep(step);
+  const parts=[];
+  if(step?.ctx) parts.push(`<b>Current move:</b> ${step.ctx}`);
+  if(teach?.body) parts.push(`<b>${teach.title || 'Field note'}:</b> ${teach.body}`);
+  if(bridge?.body) parts.push(`<b>Why this matters:</b> ${bridge.body}`);
+  if(parts.length) return parts.slice(0,2).join('<br><br>');
   return phase?.lolaIntro || '';
 }
 
@@ -3378,12 +3524,74 @@ function restartFromMobileTools(){
   closeModal('mobile-tools-modal');
   doRestart();
 }
+function hasStationDeltaAccount(){
+  return Boolean(
+    G.userId ||
+    window.user?.hasAccount ||
+    window.__stationDeltaUser?.hasAccount ||
+    (canUseLocalStorage() && window.localStorage.getItem('station_delta_has_account')==='1')
+  );
+}
+function getCheckpointSignupNudge(completedIndex){
+  if(completedIndex===2){
+    return {
+      tone:'generic',
+      kicker:'Save this checkpoint',
+      title:'Create your free Station Delta account before you step away.',
+      copy:'You are past the warm-up now. Sign up free to keep this checkpoint attached to your account and return to Engineer from the same place later.',
+      note:'We will send you to sign up, then bring you right back to this exact sim.'
+    };
+  }
+  if(completedIndex===4){
+    return {
+      tone:'lola',
+      kicker:'L.O.L.A. recommendation',
+      title:'You have done enough real work here that your place is worth keeping.',
+      copy:'Create a free account and I will keep this checkpoint tied to you, so you can pause now and return to Engineer without losing your rhythm.',
+      note:'Free account, same sim, same checkpoint when you return.'
+    };
+  }
+  if(completedIndex===6){
+    return {
+      tone:'janet',
+      kicker:'J.A.N.E.T. notice',
+      title:'Allowing this progress to drift into ambiguity would be inefficient.',
+      copy:'Create a free account so this checkpoint is preserved and your return path remains exact. You may treat this as a recommendation if that helps you cope.',
+      note:'Authentication now. Resume from this checkpoint immediately after.'
+    };
+  }
+  return null;
+}
+function getCheckpointSignupUrl(){
+  const redirectTarget=isFileProtocol()
+    ? window.location.href
+    : `${window.location.pathname}${window.location.search||''}`;
+  const authBase=isFileProtocol()
+    ? `file://${window.location.pathname.replace(/\/base\/[^/]+$/, '/auth.html')}`
+    : '/auth.html';
+  return `${authBase}?redirect=${encodeURIComponent(redirectTarget)}`;
+}
+function routeToCheckpointSignup(){
+  window.location.href=getCheckpointSignupUrl();
+}
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
   document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
   document.getElementById('phase-modal-title').textContent=`${completedPhase.title} complete`;
   document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is already saved, so you can pause here and come back when you are ready.';
   document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>`;
+  const nudge=getCheckpointSignupNudge(completedIndex);
+  const nudgeEl=document.getElementById('checkpoint-signup-nudge');
+  if(nudge && !hasStationDeltaAccount()){
+    nudgeEl.hidden=false;
+    nudgeEl.dataset.tone=nudge.tone;
+    document.getElementById('checkpoint-signup-kicker').textContent=nudge.kicker;
+    document.getElementById('checkpoint-signup-title').textContent=nudge.title;
+    document.getElementById('checkpoint-signup-copy').textContent=nudge.copy;
+    document.getElementById('checkpoint-signup-note').textContent=nudge.note;
+  }else{
+    nudgeEl.hidden=true;
+  }
   openModal('phase-modal');
 }
 function setLolaStripGeneric(tag, msg){
@@ -3912,7 +4120,7 @@ async function runGraduation(){
  
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 }
  
@@ -4106,23 +4314,27 @@ function doRestart(){
 
 function confirmRestart(){
   closeModal('restart-modal');
-  localStorage.removeItem(ENGINEER_SAVE_KEY);
+  clearLocalSave();
   location.reload();
 }
  
 function shareGrad(){
   const txt=`Just graduated Station Delta: Engineer ⚙️\n\nI now know: SSH workflows, shell scripting, API diagnostics, Docker operations, advanced Git recovery, and incident-response command flow.\n\nFree hands-on terminal training →`;
-  const launchUrl = `${window.location.origin}/base/vibe-engineer.html`;
+  const launchUrl = isFileProtocol() ? 'https://stationdelta.dev/base/vibe-engineer.html' : `${window.location.origin}/base/vibe-engineer.html`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt)+'&url='+encodeURIComponent(launchUrl),'_blank');
   closeModal('grad-modal');
 }
 
 function continueToLieutenant(){
   const next='/base/vibe-lieutenant.html';
-  const hasAccount=Boolean(window.user?.hasAccount || window.__stationDeltaUser?.hasAccount || localStorage.getItem('station_delta_has_account')==='1');
-  const interestBase=window.STATION_DELTA_INTEREST_URL || '/interest';
-  const interestUrl=`${interestBase}?next=${encodeURIComponent(next)}&ref=engineer_grad`;
-  window.location.href=hasAccount ? next : interestUrl;
+  const hasAccount=Boolean(
+    G.userId ||
+    window.user?.hasAccount ||
+    window.__stationDeltaUser?.hasAccount ||
+    (canUseLocalStorage() && window.localStorage.getItem('station_delta_has_account')==='1')
+  );
+  const authUrl=`/auth.html?redirect=${encodeURIComponent(next)}`;
+  window.location.href=hasAccount ? next : authUrl;
 }
 
 function stayAndExplore(){
@@ -4309,13 +4521,13 @@ _engineerPolish.textContent=`
 .grad-name{color:var(--engineer-accent)}
 #career-impact-btn{color:var(--engineer-accent);border-color:var(--engineer-primary-deep)}
 #career-impact-btn:hover{border-color:var(--engineer-primary)}
-#action-rail{grid-template-columns:minmax(380px,1.3fr) minmax(280px,.7fr)}
-#term-panel #lola-sec{max-height:236px}
+#action-rail{padding:12px 14px}
+#lola-sec{max-height:236px}
 #output-static{max-height:146px}
 #lola-msg{font-size:13.5px;line-height:1.78}
 #input-row{height:50px}
 #telem-sec{height:122px}
-@media(max-width:1320px){#action-rail{grid-template-columns:minmax(340px,1.18fr) minmax(260px,.82fr)}}
+@media(max-width:1320px){#action-rail{padding:10px 12px}}
 `;
 document.head.appendChild(_engineerPolish);
 
@@ -4428,9 +4640,9 @@ const ENGINEER_PHASES=[
   {title:'Rapid Orientation',
    lolaIntro:'You already know the basics. Engineer starts with pressure: orient fast, extract signal, then inspect recent history before you touch anything.',
    steps:[
-    {id:'p1s1',obj:'Inventory the distress bay',ctx:'Run a full directory inventory that includes hidden artifacts. Under pressure, hidden files often matter.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls',bridge:{title:'Pressure changes the framing, not the command',body:'Cadet taught you how to list files. Engineer teaches you why you do it immediately during an incident: inventory first, assumptions second.',tags:['Incident response','Operational discipline']}},
-    {id:'p1s2',obj:'Extract host, service, and battery signal',ctx:'From distress.log, pull only the Host, Service, and Battery lines in one pipeline.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('distress.log')&&v.includes('|')&&v.includes('grep')&&v.includes('Host')&&v.includes('Service')&&v.includes('Battery'),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipe from cat into grep for the three beacon terms.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],teach:{title:'Fast signal extraction',body:'Incident responders rarely read every line first. They filter for the highest-value indicators and build outward from there.'}},
-    {id:'p1s3',obj:'Inspect recent commit history',ctx:'Look at the recent commit timeline before you change the service. History often points at the cause.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',out:'a1b2c3d restart monitor check\n7f8e9d0 add battery reporter\n2c3d4e5 initial distress server',unlockCmd:'git log --oneline',jit:{title:'Why compact history matters',body:'<code>--oneline</code> turns commit history into a fast triage tool. You are scanning for likely change points, not writing a postmortem yet.'}}
+    {id:'p1s1',obj:'Inventory the distress bay',ctx:'Run a full directory inventory that includes hidden artifacts. Under pressure, hidden files often matter.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls',jit:{title:'Engineer mode starts with hidden risk surfaces',body:'In incident work, <code>ls -la</code> is not trivia. It exposes hidden directories like <code>.ssh</code>, permission posture, and the artifacts that tell you whether this machine is safe to touch or already misconfigured.'},bridge:{title:'Pressure changes the framing, not the command',body:'Cadet taught you how to list files. Engineer teaches you why you do it immediately during an incident: inventory first, assumptions second.',tags:['Incident response','Operational discipline']},teach:{title:'Inventory before intervention',body:'Do not open random files yet. First get the full surface area: hidden folders, rescue scripts, Docker hints, and anything that changes your mental model of the machine you are on.'}},
+    {id:'p1s2',obj:'Extract host, service, and battery signal',ctx:'From distress.log, pull only the Host, Service, and Battery lines in one pipeline.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('distress.log')&&v.includes('|')&&v.includes('grep')&&v.includes('Host')&&v.includes('Service')&&v.includes('Battery'),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipe from cat into grep for the three beacon terms.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],jit:{title:'This is triage, not reading practice',body:'The goal is not to memorize the whole log. The goal is to pull the three facts that decide your next move: where the host is, what service is down, and how much time you have left.'},teach:{title:'Fast signal extraction',body:'Incident responders rarely read every line first. They filter for the highest-value indicators and build outward from there.'},bridge:{title:'Every noisy system needs a first-pass filter',body:'Production logs, CI output, and agent traces all become usable only after you reduce them to the few lines that actually change the decision in front of you.',tags:['Incident triage','Logs','Operational focus']}},
+    {id:'p1s3',obj:'Inspect recent commit history',ctx:'Look at the recent commit timeline before you change the service. History often points at the cause.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',out:'a1b2c3d restart monitor check\n7f8e9d0 add battery reporter\n2c3d4e5 initial distress server',unlockCmd:'git log --oneline',jit:{title:'Why compact history matters',body:'<code>--oneline</code> turns commit history into a fast triage tool. You are scanning for likely change points, not writing a postmortem yet.'},teach:{title:'History narrows blame without guesswork',body:'Recent commits tell you where the system changed last. In real outage work, history often gives you the shortest path from symptom to likely cause.'}},
    ],
    challenge:ENGINEER_CHALLENGES[1],
    done:'Phase 1 complete. You oriented quickly and pulled signal instead of noise.',
@@ -4443,7 +4655,7 @@ const ENGINEER_PHASES=[
     {id:'p2s2',obj:'Write the shebang line',ctx:'Set the script interpreter explicitly so the runtime is unambiguous.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('rescue.sh')&&v.includes('>')&&(v.includes('#!/bin/bash')||v.includes('#!/usr/bin/env bash')),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'Shebang written to rescue.sh',unlockCmd:'echo >'},
     {id:'p2s3',obj:'Store the rescue target in a variable',ctx:'Append the server IP so the script has one source of truth.',cmd:['echo \'SERVER="192.168.1.42"\' >> rescue.sh','echo "SERVER=\\"192.168.1.42\\"" >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('SERVER=')&&v.includes('>> rescue.sh'),accept:['echo server >> rescue.sh'],hint:'Append the SERVER assignment using >>.',out:'SERVER variable appended to rescue.sh',unlockCmd:'>>'},
     {id:'p2s4',obj:'Update the IP with sed',ctx:'Mission control changed the rescue host. Replace 192.168.1.42 with 10.0.0.5 without opening an editor.',cmd:['sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh','sed -i "s/192.168.1.42/10.0.0.5/g" rescue.sh'],acceptFn:v=>v.startsWith('sed -i')&&v.includes('192.168.1.42')&&v.includes('10.0.0.5')&&v.includes('rescue.sh'),accept:['sed -i replace rescue.sh'],hint:'Use sed -i with a substitution pattern.',out:'rescue.sh updated in place',unlockCmd:'sed -i'},
-    {id:'p2s5',obj:'Run the script and capture all output',ctx:'Make the script executable and run it while capturing both standard output and errors.',cmd:['chmod +x rescue.sh && ./rescue.sh 2>&1'],acceptFn:v=>includesInOrder(v,['chmod +x rescue.sh','./rescue.sh 2>&1']),accept:['chmod +x rescue.sh && ./rescue.sh 2>&1'],hint:'Use chmod +x first, then run ./rescue.sh 2>&1 in the same chain.',out:'Attempting rescue on 10.0.0.5...\nERROR: SERVER variable was not validated before use.\nConnection refused.',unlockCmd:['chmod +x','2>&1'],teach:{title:'Capture everything when a script fails',body:'<code>2>&1</code> sends stderr into the same stream as stdout so the failure evidence is visible in one place.'}},
+    {id:'p2s5',obj:'Run the script and capture all output',ctx:'Make the script executable and run it while capturing both standard output and errors.',cmd:['chmod +x rescue.sh && ./rescue.sh 2>&1'],acceptFn:v=>includesInOrder(v,['chmod +x rescue.sh','./rescue.sh 2>&1']),accept:['chmod +x rescue.sh && ./rescue.sh 2>&1'],hint:'Use chmod +x first, then run ./rescue.sh 2>&1 in the same chain.',out:'Attempting rescue on 10.0.0.5...\nERROR: SERVER variable was not validated before use.\nConnection refused.',unlockCmd:['chmod +x','2>&1'],jit:{title:'Failure evidence splits across two streams by default',body:'Shell scripts write normal output to stdout and failures to stderr. If you only capture one, you get an incomplete story and often debug the wrong thing.'},teach:{title:'Capture everything when a script fails',body:'<code>2>&1</code> sends stderr into the same stream as stdout so the failure evidence is visible in one place.'},bridge:{title:'Operators optimize for evidence, not elegance',body:'When a recovery script fails, you want one clean transcript you can read, paste, and reason from. Joining both streams is a basic but critical troubleshooting habit.',tags:['Shell scripting','Debugging','Incident response']}},
     {id:'p2s6',obj:'Add and prove an empty-variable guard',ctx:'Append the guard, then deliberately unset SERVER and rerun the script so you can watch the defensive path fire before restoring the valid value.',cmd:['echo \'if [ -z "$SERVER" ]; then echo "No server set. Aborting."; exit 1; fi\' >> rescue.sh'],accept:['if guard append'],acceptFn:v=>v.startsWith('echo')&&v.includes('-z "$SERVER"')&&v.includes('>> rescue.sh'),hint:'Append the guard first, then prove it by unsetting SERVER and rerunning the script before restoring the valid value.',out:'Guard clause appended to rescue.sh\nSERVER guard test pending…',multi:{parts:[{label:'Guard appended',hint:'Append an if [ -z "$SERVER" ] guard into rescue.sh first.',test:(_,n)=>n.startsWith('echo')&&n.includes('-z "$SERVER"')&&n.includes('>> rescue.sh')},{label:'Guard proven',hint:'Now trigger the guard with unset SERVER && ./rescue.sh, then restore with export SERVER="10.0.0.5" && ./rescue.sh',test:(_,n)=>n.includes('unset SERVER')&&n.includes('./rescue.sh')&&n.includes('export SERVER="10.0.0.5"')&&n.includes('./rescue.sh')}],nextPrompts:['Good. Now prove the guard works: unset SERVER, rerun the script, then restore SERVER and rerun the happy path.']},teach:{title:'A guard is only trustworthy after you trigger it on purpose',body:'Defensive shell code should be tested on both paths. Force the missing-variable branch first so you can see the script abort cleanly with exit code 1, then restore the valid value and confirm the normal rescue path still runs. That is how operators validate safety checks instead of just admiring them.'},bridge:{title:'This is how teams validate defensive automation under pressure',body:'Reliable scripts are exercised on failure paths before they are trusted in production. Incident responders unset variables, break assumptions, and watch the guard rails activate so they know the automation will fail closed instead of making the outage worse.',tags:['Shell scripting','Incident response','Defensive coding']},quiz:{q:'Why chain <code>chmod +x rescue.sh && ./rescue.sh 2>&1</code> instead of running parts in a random order?',opts:['Because && looks cleaner','Because the run should happen only if the permission change succeeded, and 2>&1 keeps all evidence together','Because scripts only work with stderr enabled','Because Linux requires chmod before any echo command'],correct:1,fb:'Correct. The chain enforces the right order, and <code>2>&1</code> keeps the full result visible for diagnosis.'}}
    ],
    done:'Phase 2 complete. You wrote, edited, and ran a rescue script like an operator, not a spectator.',
@@ -4481,7 +4693,7 @@ const ENGINEER_PHASES=[
     {id:'p5s2',obj:'Filter JSON error events with jq',ctx:'Use jq to keep only the objects whose level is ERROR.',cmd:['cat events.json | jq \'.[] | select(.level == "ERROR")\'','cat events.json | jq ".[] | select(.level == \\\"ERROR\\\")"'],acceptFn:v=>v.includes('cat events.json')&&v.includes('jq')&&v.includes('select')&&v.includes('ERROR'),accept:['jq select error'],hint:'Use .[] | select(.level == "ERROR")',out:'{"level":"ERROR","timestamp":"11:42","message":"battery below threshold"}',unlockCmd:'jq select'},
     {id:'p5s3',obj:'Reshape the event payload',ctx:'Construct a smaller object with only the time and message fields.',cmd:['cat events.json | jq \'.[] | {time: .timestamp, msg: .message}\'','cat events.json | jq ".[] | {time: .timestamp, msg: .message}"'],acceptFn:v=>v.includes('cat events.json')&&v.includes('jq')&&v.includes('{time: .timestamp, msg: .message}'),accept:['jq object construction'],hint:'Use jq object construction: {time: .timestamp, msg: .message}',out:'{"time":"11:42","msg":"battery below threshold"}',unlockCmd:'jq object'},
     {id:'p5s4',obj:'Split a live stream while watching battery',ctx:'Archive the stream to monitor.log while still piping the battery value to jq.',cmd:['curl http://192.168.1.42/stream | tee monitor.log | jq \'.battery\'','curl http://192.168.1.42/stream | tee monitor.log | jq ".battery"'],acceptFn:v=>v.includes('curl')&&v.includes('/stream')&&v.includes('| tee monitor.log |')&&v.includes('jq')&&v.includes('.battery'),accept:['curl stream | tee | jq battery'],hint:'Use curl | tee monitor.log | jq .battery',out:'41\n40\n39',unlockCmd:'tee'},
-    {id:'p5s5',obj:'Find every log file containing ERROR',ctx:'Use find with xargs to locate every .log file in this workspace that contains the word ERROR.',cmd:['find . -name "*.log" | xargs grep -l "ERROR"','find . -name "*.log" | xargs grep -l ERROR'],acceptFn:v=>v.includes('find . -name "*.log"')&&v.includes('|')&&v.includes('xargs grep -l')&&v.includes('ERROR'),accept:['find . -name "*.log" | xargs grep -l "ERROR"'],hint:'Start with find . -name "*.log", then pipe into xargs grep -l "ERROR".',out:'./events.log\n./monitor.log',unlockCmd:'xargs',bridge:{title:'Search output can become the next command’s input',body:'<code>xargs</code> is the connective tissue between discovery and action. It turns a list of matching files into the next exact operation.',tags:['Pipelines','Search','Automation']}}
+    {id:'p5s5',obj:'Find every log file containing ERROR',ctx:'Use find with xargs to locate every .log file in this workspace that contains the word ERROR.',cmd:['find . -name "*.log" | xargs grep -l "ERROR"','find . -name "*.log" | xargs grep -l ERROR'],acceptFn:v=>v.includes('find . -name "*.log"')&&v.includes('|')&&v.includes('xargs grep -l')&&v.includes('ERROR'),accept:['find . -name "*.log" | xargs grep -l "ERROR"'],hint:'Start with find . -name "*.log", then pipe into xargs grep -l "ERROR".',out:'./events.log\n./monitor.log',unlockCmd:'xargs',jit:{title:'This is where pipelines stop being toy examples',body:'You are no longer filtering one file. You are discovering matching files, then turning that discovered list directly into the next command. That is the shell behaving like a composable system.'},teach:{title:'xargs turns a list into action',body:'<code>xargs</code> takes input items from the pipe and appends them to the command on the right, so each matching file becomes an argument to <code>grep -l</code> automatically.'},bridge:{title:'Search output can become the next command’s input',body:'<code>xargs</code> is the connective tissue between discovery and action. It turns a list of matching files into the next exact operation.',tags:['Pipelines','Search','Automation']}}
    ],
    challenge:ENGINEER_CHALLENGES[5],
    done:'Phase 5 complete. You can filter text, shape JSON, archive streams, and turn search results into action.',
@@ -4491,7 +4703,7 @@ const ENGINEER_PHASES=[
    lolaIntro:'Cadet introduced the agent runtime. Engineer gives it operational context: you are building a crew to help stabilize a live rescue mission.',
    steps:[
     {id:'p6s1',obj:'Check current agent status',ctx:'Before you add more moving parts, inspect the current agent runtime state.',cmd:['vibe status','vibe agents','vibe ls'],accept:['vibe status','vibe agents','vibe ls','vibe list'],hint:'Type: vibe status',out:'VIBE AGENT RUNTIME v2.0\nActive agents: 0\nMCP connections: 0\nStatus: ready to initialize',unlockCmd:'vibe'},
-    {id:'p6s2',obj:'Create a manager agent named Captain',ctx:'Captain will coordinate the rescue plan and delegate the right work.',cmd:['vibe create --role manager --name Captain'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('manager')&&v.includes('--name'),accept:['vibe create --role manager --name captain'],hint:'Type: vibe create --role manager --name Captain',out:'✓ Agent "Captain" initialized\n  role: manager\n  model: claude-opus\n  tools: filesystem, shell, web',teach:{title:'Why manager agents matter',body:'Operationally, the manager agent owns the plan so specialist agents can stay focused on execution.'}},
+    {id:'p6s2',obj:'Create a manager agent named Captain',ctx:'Captain will coordinate the rescue plan and delegate the right work.',cmd:['vibe create --role manager --name Captain'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('manager')&&v.includes('--name'),accept:['vibe create --role manager --name captain'],hint:'Type: vibe create --role manager --name Captain',out:'✓ Agent "Captain" initialized\n  role: manager\n  model: claude-opus\n  tools: filesystem, shell, web',jit:{title:'You are defining command structure, not just a name',body:'The role flag controls how the agent will reason and what kind of work it should own. In good agent systems, that role choice changes downstream behavior in a meaningful way.'},teach:{title:'Why manager agents matter',body:'Operationally, the manager agent owns the plan so specialist agents can stay focused on execution.'},bridge:{title:'Planning and execution should not compete for the same context window',body:'Giving one agent the plan and another the implementation keeps responsibilities clean and makes it easier to review where a workflow actually went wrong.',tags:['Agents','Delegation','Operational design']}},
     {id:'p6s3',obj:'Create a specialist agent named Engineer',ctx:'Engineer will own code and terminal-heavy rescue tasks delegated by Captain.',cmd:['vibe create --role specialist --name Engineer'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('specialist')&&v.includes('--name'),accept:['vibe create --role specialist --name engineer'],hint:'Type: vibe create --role specialist --name Engineer',out:'✓ Agent "Engineer" initialized\n  role: specialist\n  focus: code-generation, code-review\n  reports-to: Captain',quiz:{q:'Why split the crew into manager and specialist roles instead of one giant all-purpose agent?',opts:['Because the terminal requires two agents','Because focused agents are easier to direct and debug than one overloaded agent','Because specialists always use fewer tokens','Because manager agents are the only ones allowed to read files'],correct:1,fb:'Correct. Role separation improves focus, output quality, and operational debugging when something goes wrong.'}},
     {id:'p6s4',obj:'Send a structured prompt and validate the output shape',ctx:'Have Captain answer in a strict JSON shape, then watch what happens when the first response ignores the contract and you resend with the format made explicit.',cmd:['vibe prompt Captain --format \'{"priorities":["string"],"confidence":float}\''],acceptFn:v=>v.startsWith('vibe prompt Captain --format')&&v.includes('priorities')&&v.includes('confidence'),accept:['vibe prompt captain --format'],hint:'Type: vibe prompt Captain --format \'{"priorities":["string"],"confidence":float}\'',out:'Attempt 1: Captain returned unstructured prose.\nFormat validator rejected response.\nRetrying with explicit JSON contract…\n{\n  "priorities":["restore visibility","stabilize pod-monitor","prepare deploy artifact"],\n  "confidence":0.91\n}',jit:{title:'Output shape is an operational contract, not decoration',body:'A structured response can move directly into downstream tooling, checks, and orchestration. Freeform prose may sound smart, but it breaks the moment another system needs to parse it reliably. Format constraints turn "helpful" AI into dependable AI.'},bridge:{title:'Structured outputs are the unlock for serious agent systems',body:'The fastest path from demo-grade prompting to production-grade automation is explicit output shape. JSON contracts let planners hand clean data to executors, reviewers, and dashboards without brittle text scraping or manual cleanup after every run.',tags:['Agents','Structured outputs','Reliability']},teach:{title:'Specify the format every time the result feeds another system',body:'If the next step depends on keys, arrays, or machine-readable values, say so in the prompt. Ask for the exact shape, validate the response, and resend if the contract is broken. That pattern is one of the highest-leverage habits in modern AI engineering.'}}
    ],
@@ -5125,7 +5337,7 @@ async function runGraduation(){
   if(!G.completedPhases.includes(G.phase)) G.completedPhases.push(G.phase);
   document.getElementById('sandbox-pill').style.display='inline';
   document.getElementById('grad-name').textContent=G.name||'Engineer';
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   populateGraduationModal();
   save();
   openModal('grad-modal');
@@ -5182,6 +5394,7 @@ function shareGrad(){
 
 /* ── STARTUP DECISION ── */
 loadSave();
+initSupabaseAuthClient();
 migrateMobileUiDefaults();
 applyMobileLayoutDefaults();
 if(window.matchMedia){
@@ -5219,4 +5432,3 @@ applyUIPreferences();
 <script src="analytics-client.js"></script>
 </body>
 </html>
-

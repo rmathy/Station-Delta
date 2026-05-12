@@ -135,6 +135,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 }
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
+#timer-pill{background:var(--blue-bg);border:1px solid var(--blue-d);color:var(--blue);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none;font-variant-numeric:tabular-nums}
 #career-impact-btn{background:var(--s2);border:1px solid var(--amber-d);color:var(--amber);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
 #career-impact-btn:hover{background:var(--amber-bg)}
  
@@ -211,17 +212,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #term-path span{color:var(--blue)}
 
 #action-rail{
-  display:grid;
-  grid-template-columns:minmax(360px, 1.35fr) minmax(260px, .75fr);
-  gap:12px;
+  display:block;
   padding:12px 14px;
   background:var(--surface);
   border-bottom:1px solid var(--border);
   flex-shrink:0;
-  align-items:start;
 }
 #term-panel #obj-card,
-#term-panel #lola-sec{
+#right #lola-sec{
   border:1px solid var(--border);
   border-radius:var(--r8);
   background:var(--s2);
@@ -231,10 +229,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   padding:12px 14px;
   border-bottom:1px solid var(--border);
 }
-#term-panel #lola-sec{
+#right #lola-sec{
   padding:12px 14px;
-  max-height:208px;
+  max-height:260px;
   overflow-y:auto;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
 
 /* ── FIX COLLAPSING JIT / REAL WORLD / HINT / DIAGNOSIS BLOCKS ── */
@@ -409,6 +409,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
 .challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
 .challenge-note{font-size:11px;color:var(--amber);margin-top:6px;font-style:italic}
+.expert-callout{margin:12px 0;border:1px solid var(--purple);border-radius:var(--r8);background:var(--purple-bg);padding:12px 14px;animation:slideIn .3s ease}
+.expert-callout-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.expert-callout-badge{background:var(--purple);color:#05010d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.expert-callout-title{font-size:12px;font-weight:700;color:var(--purple)}
+.expert-callout-body{font-size:12px;line-height:1.7;color:var(--text)}
+.expert-callout-body code{color:var(--amber)}
  
 /* ── BREAK-IT MODE ── */
 .breakit{margin:12px 0;border:2px solid var(--red);border-radius:var(--r8);background:var(--red-bg);padding:14px;animation:slideIn .3s ease}
@@ -623,6 +629,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbtn{display:inline-block;padding:10px 22px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;border:none;font-weight:500}
 .mbtn-p{background:var(--green);color:#000}.mbtn-p:hover{opacity:.85}
 .mbtn-s{background:transparent;border:1px solid var(--b2);color:var(--muted2);margin-left:8px}.mbtn-s:hover{color:var(--text);border-color:var(--muted2)}
+.modal-actions{display:flex;flex-direction:column;gap:10px;align-items:center}
+.modal-actions .mbtn{margin-left:0;min-width:260px}
  
 /* ── BOOT SCREEN ── (BUG FIX: proper scroll + input visibility) */
 #boot-modal .mbox{
@@ -665,6 +673,19 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.75}
 .checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
 .checkpoint-next b{color:var(--blue)}
+.checkpoint-nudge{margin:-2px 0 18px;border:1px solid var(--b2);border-radius:var(--r8);padding:16px;background:var(--surface);text-align:left}
+.checkpoint-nudge[data-tone="generic"]{border-color:var(--green-d);background:rgba(3,13,9,.45)}
+.checkpoint-nudge[data-tone="lola"]{border-color:var(--blue-d);background:rgba(3,13,24,.55)}
+.checkpoint-nudge[data-tone="janet"]{border-color:var(--silver-d);background:rgba(10,14,16,.78)}
+.checkpoint-nudge-kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.checkpoint-nudge[data-tone="generic"] .checkpoint-nudge-kicker{color:var(--green)}
+.checkpoint-nudge[data-tone="lola"] .checkpoint-nudge-kicker{color:var(--blue)}
+.checkpoint-nudge[data-tone="janet"] .checkpoint-nudge-kicker{color:var(--silver)}
+.checkpoint-nudge-title{font-family:var(--display);font-size:15px;color:var(--text);margin-bottom:7px;line-height:1.35}
+.checkpoint-nudge-copy{font-size:12px;color:var(--muted2);line-height:1.75}
+.checkpoint-nudge-foot{margin-top:12px;display:grid;gap:10px}
+.checkpoint-nudge-note{font-size:11px;color:var(--muted);line-height:1.6}
+.checkpoint-nudge-btn{margin:0;width:100%}
 .skills-list{text-align:left;font-size:12px;color:var(--muted2);line-height:2;margin-bottom:16px}
 .skills-list span{color:var(--green);margin-right:6px}
  
@@ -712,13 +733,13 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #career-impact-btn{padding:3px 8px;font-size:10px}
   #mobile-tools-btn{display:inline-flex}
   #mobile-strip-toggle-btn{display:inline-flex}
-  #action-rail{grid-template-columns:1fr;gap:8px;padding:8px 10px}
+  #action-rail{padding:8px 10px}
   #term-panel #obj-card{padding:10px 11px}
-  #term-panel #lola-sec{display:none;max-height:118px}
+  #right #lola-sec{display:none;max-height:160px}
   #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
   #crew-sec,#telem-sec{display:none}
   #mobile-ctx-section{display:none}
-  #shell:not(.right-collapsed) #term-panel #lola-sec{display:block}
+  #shell:not(.right-collapsed) #right #lola-sec{display:block}
   #shell:not(.right-collapsed) #crew-sec,
   #shell:not(.right-collapsed) #telem-sec,
   #shell:not(.right-collapsed) #mobile-ctx-section{display:block}
@@ -749,6 +770,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="phase-track"></div>
     <div id="tb-right">
       <div id="hardmode-pill">HARD MODE</div>
+      <div id="timer-pill">00:00</div>
       <div id="sandbox-pill">SANDBOX</div>
       <button id="career-impact-btn" onclick="openModal('career-modal')">📈 CAREER LOG</button>
       <button id="mobile-tools-btn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ TOOLS</button>
@@ -777,7 +799,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">cadet@vibe-ship — <span id="path-display">~/projects</span></div>
+      <div id="term-path">cadet@Station — <span id="path-display">~/projects</span></div>
       <div style="width:50px"></div>
     </div>
     <div id="action-rail">
@@ -796,20 +818,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         </div>
         <div id="obj-progress"><div id="obj-prog-fill"></div></div>
       </div>
-      <div id="lola-sec">
-        <div id="lola-hd">
-          <div id="lola-avatar">L</div>
-          <div id="lola-name">L.O.L.A.</div>
-          <div id="lola-online">ready</div>
-        </div>
-        <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
-      </div>
     </div>
     <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
-      <span id="prompt-pre">cadet@vibe:~$&nbsp;</span>
+      <span id="prompt-pre">cadet@Station:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
       <span id="input-hint"></span>
     </div>
@@ -825,6 +839,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="mobile-ctx-label">📍 Current Objective</div>
       <div id="mobile-ctx-title"></div>
       <div id="mobile-ctx-body"></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Welcome aboard. Let's get you certified.</div>
     </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
@@ -858,8 +880,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <span>▸</span><b style="color:var(--green)">Just-in-time learning</b> — every command explained as you learn it<br>
       <span>▸</span>Real-world bridges — why pros use each skill daily<br>
       <span>▸</span>Spaced repetition — previous commands recalled before each phase<br>
-      <span>▸</span>Constructed-response challenges — build pipelines from scratch<br>
-      <span>▸</span>Break-It Mode — diagnose intentionally broken scenarios<br>
+      <span>▸</span>Constructed-response challenges — build pipelines from scratch <b style="color:var(--purple)">(Expert mode only)</b><br>
+      <span>▸</span>Break-It Mode — diagnose intentionally broken scenarios <b style="color:var(--purple)">(Expert mode only)</b><br>
       <span>▸</span>Career Impact Log — see how your skills map to real jobs<br>
       <span>▸</span><b style="color:var(--silver)">J.A.N.E.T.</b> — administers all knowledge checks. She is… particular.<br>
       <span>▸</span><b style="color:var(--red)">Boss Fight</b> — J.A.N.E.T. takes over for the final test. L.O.L.A. goes offline.<br>
@@ -882,7 +904,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="path-card" id="path-expert" onclick="selectPath('expert')">
         <div class="path-icon">🦅</div>
         <div class="path-name">Expert</div>
-        <div class="path-desc">No hints. No feedback detail. Timer on.</div>
+        <div class="path-desc">No hints. No feedback detail. Timer on. Includes Break-It and constructed-response trials.</div>
       </div>
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">BEGIN TRAINING</button>
@@ -904,21 +926,24 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <div class="skills-list">
       <span>✓</span>Terminal navigation &amp; file operations (pwd, ls, cd, cat, echo, touch)<br>
+      <span>✓</span>Manual pages, PATH checks, and command discovery (man, which)<br>
       <span>✓</span>Git versioning · add → commit → push · conflict resolution<br>
       <span>✓</span>Package management with Bun/npm<br>
       <span>✓</span>Pipes, grep, wc — real log analysis<br>
       <span>✓</span>AI agent orchestration patterns<br>
-      <span>✓</span>MCP (Model Context Protocol)<br>
       <span>✓</span>Prompt engineering · Role/Task/Context/Format<br>
       <span>✓</span>Environment variables, secrets &amp; echo $VAR<br>
-      <span>✓</span>Production build &amp; deploying to Vercel
+      <span>✓</span>Production builds, artifact inspection, deployment &amp; health-check verification
     </div>
-    <div style="text-align:center">
+    <div class="modal-actions">
       <button class="mbtn mbtn-p" onclick="openCapstone()">ATTEMPT CAPSTONE</button>
+      <button class="mbtn mbtn-p" onclick="goToEngineer()">NEXT LEVEL: ENGINEER</button>
+      <button class="mbtn mbtn-s" onclick="shareGradLinkedIn()">SHARE CERTIFICATE ON LINKEDIN</button>
       <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
+    <div id="final-time-row" style="display:none;margin-top:6px;text-align:center;font-size:11px;color:var(--muted)">Hard mode time: <span id="final-time" style="color:var(--blue)">—</span></div>
   </div>
 </div>
 
@@ -932,6 +957,15 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div class="checkpoint-title" id="phase-modal-title">Terminal Navigation complete</div>
       <div class="checkpoint-copy" id="phase-modal-copy">Good place to pause. Your progress is saved automatically.</div>
       <div class="checkpoint-next" id="phase-modal-next">Next up: <b>File Operations</b></div>
+    </div>
+    <div id="checkpoint-signup-nudge" class="checkpoint-nudge" data-tone="generic" hidden>
+      <div class="checkpoint-nudge-kicker" id="checkpoint-signup-kicker">Save this checkpoint</div>
+      <div class="checkpoint-nudge-title" id="checkpoint-signup-title">Create your free account before you step away.</div>
+      <div class="checkpoint-nudge-copy" id="checkpoint-signup-copy">Free members can return to Lieutenant later and keep their place across devices.</div>
+      <div class="checkpoint-nudge-foot">
+        <button class="mbtn mbtn-p checkpoint-nudge-btn" onclick="routeToCheckpointSignup()">SIGN UP FREE &amp; SAVE MY SPOT</button>
+        <div class="checkpoint-nudge-note" id="checkpoint-signup-note">We will bring you right back to this sim after sign-in.</div>
+      </div>
     </div>
     <div style="text-align:center">
       <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
@@ -979,7 +1013,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="gloss-modal" class="modal">
   <div class="mbox">
     <div class="mtitle">📖 Glossary</div>
-    <div class="msub">Every term you'll encounter in the vibe coding world. Click any term to see its definition inline in the terminal.</div>
+    <div class="msub">Terms you'll encounter in the terminal coding world. Click any term to see its definition inline in the terminal.</div>
     <div id="gloss-list"></div>
     <div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div>
   </div>
@@ -1005,6 +1039,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    Station Delta: Cadet
@@ -1015,9 +1050,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
  
 /* ── STATE ── */
 let G = {
-  name:'Cadet', phase:1, step:0, tries:0, score:1000,
+  name:'Cadet', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
+  userId:null,
+  userEmail:null,
   agents:[], achievements:[], completedPhases:[],
   cmdHistory:[], histIdx:-1,
   currentPath:'/home/cadet/projects',
@@ -1041,8 +1078,87 @@ let G = {
   analytics:null,
 };
 
-const COURSE_ID='vibe-cadet-gold';
-const CADET_SAVE_KEY='vibe_cadet_gold_v1';
+let hardTimerInterval=null;
+
+const COURSE_ID='Station_Delta_Cadet';
+const CADET_SAVE_KEY='Station_Delta_Cadet_v1.2';
+
+function isFileProtocol(){
+  return window.location.protocol==='file:';
+}
+
+function createMemoryStorage(){
+  const store={};
+  return {
+    getItem(key){ return Object.prototype.hasOwnProperty.call(store,key) ? store[key] : null; },
+    setItem(key,value){ store[key]=String(value); },
+    removeItem(key){ delete store[key]; },
+  };
+}
+
+function readLocalAuthSnapshot(){
+  if(!canUseLocalStorage()) return null;
+  try{
+    const raw=window.localStorage.getItem('station_delta_local_auth');
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){
+    return null;
+  }
+}
+
+async function initSupabaseAuthClient(){
+  if(!window.supabase?.createClient){
+    console.warn('[Station Delta] Supabase client unavailable');
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+    }
+    return;
+  }
+
+  const SUPABASE_URL='https://bcipkdtxcbwcwbinekng.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ';
+  const hostedMode=!isFileProtocol();
+  const authStorage=hostedMode && canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+
+  try{
+    window._sb=window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{
+      auth:{
+        storage:authStorage,
+        persistSession:hostedMode,
+        autoRefreshToken:hostedMode,
+        detectSessionInUrl:hostedMode,
+        flowType:'implicit',
+      },
+    });
+    const { data: { session } } = await window._sb.auth.getSession();
+
+    if(session){
+      G.userId=session.user.id;
+      G.userEmail=session.user.email;
+      console.log('[Station Delta] Session active:', G.userEmail);
+    }else{
+      const snapshot=readLocalAuthSnapshot();
+      if(snapshot?.userId){
+        G.userId=snapshot.userId;
+        G.userEmail=snapshot.email || null;
+        console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+      }else if(hostedMode){
+        console.log('[Station Delta] Guest mode — no session');
+      }
+    }
+  }catch(err){
+    console.error('[Station Delta] Supabase init failed', err);
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){
+      G.userId=snapshot.userId;
+      G.userEmail=snapshot.email || null;
+      console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+    }
+  }
+}
  
 /* ── CAREER IMPACT DATA ── */
 const CAREER_LOG_DATA = [
@@ -1199,7 +1315,7 @@ const LOLA_STRIP = {
   ],
   p4s6: [
     {tag:'habit',msg:'The conflict is not finished when the file looks right. It is finished when you stage and commit the resolution.'},
-    {tag:'tip',msg:'Stay calm and follow the loop: fix the file, <code>git add</code>, then <code>git commit</code>.'},
+    {tag:'tip',msg:'Replace the conflicted file with <code>Mission: Escape Pod</code>, then <code>git add</code>, then commit with the exact message <code>Resolution Merge Conflict</code>.'},
   ],
 
   // ── Phase 5: Packages & Dependencies ──
@@ -1261,19 +1377,20 @@ const LOLA_STRIP = {
     {tag:'concept',msg:'Dev mode is for building. Build mode is for shipping.'},
   ],
   p8s2: [
-    {tag:'command',msg:'Inspect the build output after it exists. A build is more trustworthy when you verify what it produced.'},
+    {tag:'command',msg:'Inspect <code>dist/</code> after the build. That folder name is short for distribution — the production files you are about to ship.'},
     {tag:'habit',msg:'Do not treat "build complete" as magic. Look at the output folder.'},
   ],
 
   // ── Phase 9: Deploy & Verify ──
   p9s1: [
     {tag:'command',msg:'<code>vibe deploy --platform vercel</code> sends the built app live.'},
+    {tag:'concept',msg:'<code>vibe</code> is the course deployment CLI. <code>--platform vercel</code> is the long-flag form that tells it the target platform is Vercel.'},
     {tag:'habit',msg:'Deploy after the build and secret checks are already clean, not before.'},
   ],
   p9s2: [
     {tag:'command',msg:'<code>curl</code> lets you verify the deployment from the terminal.'},
-    {tag:'concept',msg:'A live URL is not the same as a healthy service. Verification is the final step.'},
-    {tag:'tip',msg:'One clean request can tell you whether the deploy actually responded.'},
+    {tag:'concept',msg:'The live app is <code>https://escape-pod-final.vercel.app</code>. Adding <code>/health</code> hits a lightweight health-check route instead of the full app UI.'},
+    {tag:'tip',msg:'One clean request to <code>https://escape-pod-final.vercel.app/health</code> can tell you whether the deploy actually responded.'},
   ],
 };
 
@@ -1524,7 +1641,6 @@ const PHASES = [null,
  steps:[
   {id:'p1s1', obj:'Find out where you are', ctx:'Name what this is: your current location in the filesystem. It matters because every file command depends on being in the right place. Do this now with the command that prints your working directory.',
    cmd:['pwd'], accept:['pwd'], hint:'Type: pwd', out:'/home/cadet/projects', unlockCmd:'pwd',
-   teach:{title:'What <code>pwd</code> gives you',body:'📁 Before You Type — Your Filesystem, A Quick Map<br><br>Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree. <code>pwd</code> prints your full current path. That path is your location anchor. When you know the location, the next command becomes a choice instead of a guess.'},
    jit:{title:'Location before action',body:'Strong terminal habits start with location checks. It is much easier to avoid a bad edit or delete than to recover from one in the wrong folder.'}},
   {id:'p1s2', obj:'List the files in this directory', ctx:'Now name what is around you. It matters because you cannot choose the next folder or file if you have not inspected the current one. List the directory contents now.',
    cmd:['ls'], accept:['ls','ls -la','ls -l','ls -a'], hint:'Type: ls', out:'README.txt   game_v1/   .env   package.json', unlockCmd:'ls',
@@ -1537,12 +1653,13 @@ const PHASES = [null,
    jit:{title:'Relative vs absolute paths',body:'<code>cd game_v1</code> is a <b>relative path</b> — it means "from where I am right now, go into game_v1." An <b>absolute path</b> starts with <code>/</code> and works from anywhere, for example <code>/home/cadet/projects/game_v1</code>. Press <kbd>Tab</kbd> after typing a few letters to autocomplete a folder or file name.'},
    bridge:{title:'Path fluency is foundational',body:'Absolute paths appear in scripts, Docker configs, and CI pipelines where the working directory cannot be assumed. Relative paths keep daily commands short. Knowing the difference prevents a wide category of "file not found" errors.',tags:['Linux','macOS','Docker','CI/CD']}},
   {id:'p1s4', obj:'Create a mission_logs directory', ctx:'Create a folder called <code>mission_logs</code>. It matters because good terminal work includes making the place you will need before you need it. Create it now.',
-   cmd:['mkdir mission_logs'], accept:['mkdir mission_logs'], hint:'Type: mkdir mission_logs', out:'mission_logs/ created', unlockCmd:'mkdir',
+   cmd:['mkdir mission_logs'], accept:['mkdir mission_logs'], hint:'Type: mkdir mission_logs', out:'Created directory: mission_logs', unlockCmd:'mkdir',
    teach:{title:'Folders are structure',body:'<code>mkdir</code> creates a directory. This is the start of intentional filesystem structure: not just using what exists, but shaping what exists.'},
    jit:{title:'Building nested paths in one step',body:'<code>mkdir</code> creates one directory at a time by default. To create a full nested path at once, use the <code>-p</code> flag: <code>mkdir -p logs/archive/2026</code> creates every level that does not already exist. Without <code>-p</code>, the command fails if the parent does not exist yet.'},
    bridge:{title:'Directory creation is part of every project setup',body:'CI pipelines, Docker images, and deploy scripts all create directories before writing output files. The same <code>mkdir -p</code> pattern you would use here appears in Dockerfiles, GitHub Actions, and shell provisioning scripts.',tags:['CI/CD','Docker','Shell scripts','Project structure']}}
  ],
  done:'You can now locate yourself, inspect a directory, move through it, and create a new folder without a GUI.',
+ challenge:CHALLENGES[1],
  ach:'navigator'},
  
 /* ── P2: Reading the Manual ── */
@@ -1603,6 +1720,8 @@ const PHASES = [null,
    bridge:{title:'rm appears in cleanup scripts everywhere',body:'CI pipelines clear build artifacts with <code>rm -rf dist/</code> before each run. Docker image builds clean temp files. Deploy scripts prune old logs. In all of these, <code>rm</code> is deliberate and targeted — the same discipline you practiced here scales directly to production.',tags:['Linux','CI/CD','Shell scripts','Docker']}}
  ],
  done:'You now have the full first-pass file toolkit: create, write, read, copy, move, and delete.',
+ challenge:CHALLENGES[2],
+ breakit:BREAKIT[2],
  ach:'file_master'},
  
 /* ── P4: Version Control ── */
@@ -1620,7 +1739,7 @@ const PHASES = [null,
    teach:{title:'Status before action',body:'<code>git status</code> tells you what is untracked, modified, or staged. It is the command that keeps the rest of Git honest.'},
    jit:{title:'What does "untracked" mean?',body:'Git sees <code>manifest.txt</code> exists in the folder but has not been told to track it yet. Think of Git as a photographer: <b>untracked</b> means the file is in the room but not in the photo. You have to explicitly add files with <code>git add</code>. Modified means it was in a previous photo but has changed since. Staged means it is queued for the next photo.'},
    bridge:{title:'This is a real professional reflex',body:'Developers run <code>git status</code> before staging, before committing, and before pulling or pushing. That little pause prevents a lot of messy history.',tags:['Workflow','Code review']}},
-  {id:'p4s3', obj:'Stage manifest.txt', ctx:'Move <code>manifest.txt</code> into the staging area. It matters because Git uses a two-step save loop: stage, then commit. Stage it now.',
+  {id:'p4s3', obj:'Stage manifest.txt', ctx:'Move <code>manifest.txt</code> into the staging area. It matters because Git uses a two-step save loop: stage, then commit. Stage it now by using add.',
    cmd:['git add manifest.txt'], accept:['git add manifest.txt','git add .'], hint:'Type: git add manifest.txt', out:'Staged: manifest.txt',
    teach:{title:'Why staging exists',body:'Staging lets you choose which changes belong in the next commit. That choice is what keeps history readable later.'},
    jit:{title:'The staging area is a filter',body:'Git does not force every edit into the same snapshot. Staging lets you decide what belongs together. That is why clean repositories feel readable instead of chaotic.'}},
@@ -1636,18 +1755,19 @@ const PHASES = [null,
    teach:{title:'Conflict markers are just text',body:'Git is showing you two competing versions. Your job is to read them clearly, choose the final content, and then save the resolution.'},
    jit:{title:'What those symbols actually mean',body:'<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> marks the start of your version. <code>=======</code> is the divider. <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</code> marks the end of the incoming version. Your job is to delete all three marker lines and keep whichever content (or combination) is correct. Then <code>git add</code> the file to mark it resolved and <code>git commit</code> to close the merge.'},
    bridge:{title:'This is a normal team moment',body:'Merge conflicts are routine on active codebases. The skill is not avoiding them forever. The skill is staying calm, reading the markers, and making the final decision cleanly.',tags:['Pull requests','Teams']}},
-  {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
-   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
-   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"'],
-   acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m']),
-   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolve merge conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolve merge conflict',
+ {id:'p4s6', obj:'Resolve the conflict and commit the fix', ctx:'Replace the conflicted file with the final content, then save that resolution into Git history. It matters because the resolution is not complete until Git records it. Do that now.',
+   cmd:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   accept:['echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"'],
+   acceptFn:v=>includesInOrder(v.toLowerCase(),['echo "mission: escape pod" > manifest.txt','git add manifest.txt','git commit -m "resolution merge conflict"']),
+   hint:'Type: echo "Mission: Escape Pod" > manifest.txt && git add manifest.txt && git commit -m "Resolution Merge Conflict"', out:'Conflict resolved.\n[main 4d5e6f] Resolution Merge Conflict',
    teach:{title:'A conflict has a finish line',body:'The finish line is not just a clean file. The finish line is a clean file plus a recorded resolution in Git.'},
-   jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. That makes it a clean way to chain dependent steps without blasting past a failure.'},
+   jit:{title:'What <code>&&</code> means',body:'<code>&&</code> runs the command on the right only if the command on the left succeeded. In this step you are replacing the entire conflicted file with the final text <code>Mission: Escape Pod</code>, then staging it, then committing it with the exact message <code>Resolution Merge Conflict</code>.'},
    bridge:{title:'Chaining commands is a real shell habit',body:'Engineers use <code>&&</code> constantly for short workflows like build-then-test or add-then-commit. It keeps the sequence readable and stops the chain when something breaks.',tags:['Shell workflow','Automation']},
    quiz:{q:'What does <code>&&</code> do in a shell command chain?',opts:['It runs both commands at the same time','It runs the second command only if the first one succeeds','It comments out the rest of the line','It repeats the previous command'],correct:1,fb:'Correct. <code>&&</code> is a conditional chain operator: continue only if the previous command succeeded.'},
    achievement:'conflict_resolver'}
  ],
  done:'You can now initialize Git, inspect state, stage work, commit it, and stay composed through a merge conflict.',
+ challenge:CHALLENGES[3],
  ach:'committed'},
  
 /* ── P5: Packages & Dependencies ── */
@@ -1673,6 +1793,7 @@ const PHASES = [null,
    bridge:{title:'localhost:3000 is where every frontend framework starts',body:'React, Next.js, Vite, SvelteKit, and Nuxt all start a dev server on localhost when you run their dev script. The port may change but the mental model is identical. Learning it once here means you already understand what every "run the dev server" instruction means across the entire frontend ecosystem.',tags:['React','Next.js','Vite','localhost','Hot reload']}}
  ],
  done:'You can now initialize a project, add a dependency, and run its development script.',
+ breakit:BREAKIT[4],
  ach:'packager'},
  
 /* ── P6: Reading & Filtering Output ── */
@@ -1703,6 +1824,7 @@ const PHASES = [null,
    bridge:{title:'This is real codebase triage',body:'When a stack trace mentions a string or an error name, engineers often search the repo before opening an editor. Search narrows the map first.',tags:['Code search','Debugging','Repos']}}
  ],
  done:'You can now read logs, filter them, count matches, and search a codebase without guessing where the answer lives.',
+ challenge:CHALLENGES[5],
  ach:'pipe_dream'},
  
 /* ── P7: Environment & Secrets ── */
@@ -1710,7 +1832,7 @@ const PHASES = [null,
  lolaIntro:"This phase teaches the difference between a variable that exists right now and one that will still exist later. That distinction saves beginners a lot of pain.",
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
-  {id:'p7s1', obj:'Set API_KEY for this shell session', ctx:'Set the environment variable <code>API_KEY</code> in the current shell. It matters because apps often need configuration that should not live in source code. Set it now.',
+  {id:'p7s1', obj:'Set API_KEY for this shell session', ctx:'Set the environment variable <code>API_KEY</code> in the current shell. It matters because apps often need configuration that should not live in source code. Set it now. Our API KEY for this excercise is sk-prod-abc123.',
    cmd:['export API_KEY="sk-prod-abc123"'], accept:['export API_KEY="sk-prod-abc123"'], acceptFn:v=>v.startsWith('export api_key=')||v.startsWith('export API_KEY='),
    hint:'Type: export API_KEY="sk-prod-abc123"', out:'API_KEY set in session environment.', unlockCmd:'export',
    teach:{title:'Session scope',body:'An exported variable exists in the current shell session. That is useful immediately, but it is not the same as persisting the setting for future shells.'},
@@ -1744,9 +1866,10 @@ const PHASES = [null,
    teach:{title:'Builds create the deliverable',body:'The production build is optimized for users, not for editing. That distinction is why build and dev are separate commands.'},
    jit:{title:'Dev and build do different jobs',body:'The dev server is built for feedback while you edit. The production build is built for distribution, which is why it can be smaller, faster, and structured differently.'},
    bridge:{title:'CI systems run this exact step',body:'On platforms like Vercel or Netlify, the build command is part of every deployment pipeline. If the build breaks, the deploy should stop there.',tags:['CI/CD','Vercel','Netlify']}},
-  {id:'p8s2', obj:'Inspect the dist folder', ctx:'Check the build output directory. It matters because verification should include the artifact itself, not just the success message. Inspect it now.',
+  {id:'p8s2', obj:'Inspect the dist folder', ctx:'Check the build output directory. The folder name <code>dist</code> is short for distribution: it is the compiled production artifact created by the build. It matters because verification should include the artifact itself, not just the success message. Inspect it now.',
    cmd:['ls dist'], accept:['ls dist','ls -la dist'], hint:'Type: ls dist', out:'index.html   app.js   app.css',
-   teach:{title:'Verify the artifact exists',body:'A clean build message is good. Seeing the actual output files is better. This is the artifact you are about to ship.'},
+   teach:{title:'Verify the artifact exists',body:'A clean build message is good. Seeing the actual output files is better. <code>dist/</code> means distribution folder: this is the built artifact you are about to ship.'},
+   jit:{title:'What <code>dist/</code> is',body:'Most frontend build tools output compiled files into a folder named <code>dist/</code>, short for distribution. It usually contains the HTML, JavaScript, and CSS that the hosting platform will actually serve to users.'},
    quiz:{q:'Why inspect <code>dist/</code> after the build succeeds?',opts:['Because build tools sometimes hide the source files there permanently','Because the deploy ships the built artifact, so you want to confirm it actually exists','Because Git will not track the build otherwise','Because the browser can only open files from <code>dist/</code>'],correct:1,fb:'Correct. The build output is the thing you are actually shipping, so it is worth checking before you deploy it.'}},
  ],
  done:'You built the production artifact and verified that it exists. That is the right posture before a deploy.',
@@ -1757,15 +1880,16 @@ const PHASES = [null,
  lolaIntro:"This is the handoff from preparation to shipping. First deploy cleanly. Then verify the live service from the terminal so you know it actually responded.",
  spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Deploy it now.',
+  {id:'p9s1', obj:'Deploy the app to Vercel', ctx:'Deploy the prepared build. It matters because shipping is the point of the whole loop, but it should happen after the checks are already calm. Use <code>vibe</code> here because it is the course’s simulated deployment CLI, and <code>--platform vercel</code> tells it where to ship. Deploy it now.',
    cmd:['vibe deploy --platform vercel'], accept:['vibe deploy --platform vercel','vibe deploy','vercel deploy','vercel'], hint:'Type: vibe deploy --platform vercel', out:'Deploying escape-pod-v2.1 to Vercel…\n✓ Build: passing\n✓ Secrets: present\n✓ CDN: configured\n🚀 LIVE: https://escape-pod-final.vercel.app', unlockCmd:'vibe',
    teach:{title:'Deployment follows preparation',body:'The deploy is cleaner when build and environment checks already passed. That order lowers risk and lowers panic.'},
+   jit:{title:'Why the command starts with <code>vibe</code>',body:'In this course, <code>vibe</code> is the simulated deployment CLI that stands in for a real deploy tool. <code>deploy</code> is the action, and <code>--platform vercel</code> is the long-flag form that says the target platform is Vercel.'},
    bridge:{title:'This is the same last mile teams care about in production',body:'Shipping is where code becomes customer-facing behavior. That is why teams care so much about build health, configuration, and verification before the deploy goes out.',tags:['Production','Release process']}},
-  {id:'p9s2', obj:'Verify the live health endpoint', ctx:'Check the live deployment from the terminal. It matters because a live URL is not enough; you want a successful response. Verify the health endpoint now.',
+  {id:'p9s2', obj:'Verify the live health endpoint', ctx:'Check the live deployment from the terminal. Your deployed site lives at <code>https://escape-pod-final.vercel.app</code>. Adding <code>/health</code> calls a dedicated health-check route that returns a small status response, which is a fast way to confirm the service is alive. Verify that endpoint now.',
    cmd:['curl https://escape-pod-final.vercel.app/health'], accept:['curl https://escape-pod-final.vercel.app/health'], acceptFn:v=>v.startsWith('curl ')&&v.includes('escape-pod-final.vercel.app/health'),
    hint:'Type: curl https://escape-pod-final.vercel.app/health', out:'{"status":"ok","service":"escape-pod","region":"iad1"}', unlockCmd:'curl',
    teach:{title:'Verification closes the shipping loop',body:'A quick <code>curl</code> confirms the deployed service is actually responding. That is the difference between "deployed" and "working".'},
-   jit:{title:'Why verify from the terminal',body:'A browser can hide details behind cached pages, redirects, or UI layers. A direct <code>curl</code> request tells you whether the service itself responded, which is often the cleaner truth.'},
+   jit:{title:'What <code>/health</code> does',body:'The base URL <code>https://escape-pod-final.vercel.app</code> is the live app. Appending <code>/health</code> hits a lightweight endpoint meant for monitoring and verification. It usually returns a tiny machine-readable response like <code>{"status":"ok"}</code>, which makes it perfect for post-deploy checks.'},
    bridge:{title:'Post-deploy verification is part of the job',body:'Strong release habits do not stop at “deploy succeeded.” They include a direct check that the live service answers the way you expect.',tags:['Release verification','curl','Ops']},
    quiz:{q:'What does <code>curl</code> give you here that a deployment success message does not?',opts:['A second copy of the build output','Direct evidence that the live service responded successfully','Automatic rollback if the response is wrong','A permanent secret token for later deploys'],correct:1,fb:'Correct. The deploy message says the platform finished its job. <code>curl</code> tells you the live service itself answered.'},
    isFinalBeforeBoss:true}
@@ -1780,7 +1904,7 @@ const PHASES = [null,
 const EASTER = {
   'sudo rm -rf': {
     handle(){
-      appendLine('CRITICAL: ROOT DELETION INITIATED…', 'ln-err');
+      appendLine('HACKER ALERT: ROOT DELETION INITIATED…', 'ln-err');
       let i=0;
       const dirs=['Wiping /usr…','Wiping /etc…','Wiping /home…','Wiping /var…','…system critical…'];
       const iv=setInterval(()=>{
@@ -1842,11 +1966,11 @@ const EASTER = {
         '      ╚██████╔╝╚████╔╝ ██║██╔══██╗ ',
         '       ╚═════╝  ╚═══╝  ╚═╝╚═╝  ╚═╝',
         '',
-        '  VIBE_OS ELITE v4.0.0',
+        '  Cadet_OS ELITE v4.0.0',
         `  User: ${G.name}`,
         `  Path: ${G.learnerPath.toUpperCase()}`,
         `  Phase: ${G.phase}/9`,
-        `  Shell: vibe-sh 2.1`,
+        `  Shell: cadet-sh 2.1`,
         `  Agents: ${G.agents.length} active`,
         `  Uptime: ${Math.floor(Math.random()*12)}h ${Math.floor(Math.random()*60)}m`,
         '  CPU: L.O.L.A. @ 1337% (overclocked)',
@@ -1862,7 +1986,7 @@ const EASTER = {
     handle(){
       const log=[
         'commit a1b2c3d (HEAD -> main)',
-        'Author: '+G.name+' <cadet@vibe-ship>',
+        'Author: '+G.name+' <cadet@Station>',
         'Date:   '+new Date().toDateString(),
         '    Add mission manifest',
         '',
@@ -2014,6 +2138,20 @@ function includesInOrder(value, parts){
     idx=found+part.length;
   }
   return true;
+}
+
+function pathDisplayFor(path){
+  if(path==='/home/cadet/projects') return '~/projects';
+  if(path.startsWith('/home/cadet/projects/')) return `~/projects/${path.slice('/home/cadet/projects/'.length)}`;
+  if(path==='/home/cadet') return '~';
+  if(path.startsWith('/home/cadet/')) return `~/${path.slice('/home/cadet/'.length)}`;
+  return path;
+}
+
+function setCurrentPath(path){
+  G.currentPath=path;
+  const el=document.getElementById('path-display');
+  if(el) el.textContent=pathDisplayFor(path);
 }
 
 function matchesStep(input, step){
@@ -2441,7 +2579,7 @@ function showTeach(tb){
   const w=document.createElement('div');
   w.className='teach';
   w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
  
 /* ── CONCEPT CARD ── */
@@ -2450,7 +2588,7 @@ function showConcept(cc){
   const w=document.createElement('div');
   w.className='concept';
   w.innerHTML=`<div class="concept-hd"><span>${cc.icon}</span><span>${cc.title}</span></div><div class="concept-bd">${cc.body}${ex}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
  
 /* ── HINT BLOCK ── */
@@ -2458,17 +2596,54 @@ function showHint(text){
   const w=document.createElement('div');
   w.className='hint-wrap';
   w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
-  $outS.appendChild(w);$outS.scrollTop=$outS.scrollHeight;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
 function toggleHint(btn){
   btn.classList.toggle('open');
   btn.nextElementSibling.classList.toggle('open');
 }
 
-function renderStaticStep(step){
-  $outS.innerHTML='';
-  appendLineS(`▸ ${step.obj}`,'ln-info');
-  if(!G.hard && !G.practitioner) showHint(step.hint);
+function renderStaticStep(step){ 
+  $outS.innerHTML=''; 
+  appendLineS(`▸ ${step.obj}`,'ln-info'); 
+
+  // ── PRE-STEP CONCEPT CARD (stays in static top panel) ──
+  const pre = step.pre_step_concept || PRE_STEP_CONCEPTS[step.id];
+  if (pre && !G.hard) {
+    showConcept(pre);
+  }
+
+  // JIT cards (including jitPreOnly) are handled ONLY in live output
+  // by continuePhaseStart → showJIT()
+  showExpertPhaseCallout(step);
+  if(!G.hard && !G.practitioner) showHint(step.hint); 
+}
+
+function showExpertPhaseCallout(step){
+  if(!G.expert || !step || G.step!==0) return;
+  const ph=PHASES[G.phase];
+  if(!ph) return;
+
+  const notices=[];
+  if(ph.challenge){
+    notices.push(`After this phase, Expert mode unlocks a constructed-response challenge: <code>${ph.challenge.title}</code>. You will need to build the command pattern yourself with no guided scaffold.`);
+  }
+  if(ph.breakit){
+    notices.push(`This phase also includes an Expert-only Break-It scenario: <code>${ph.breakit.title}</code>. You will diagnose a broken command and correct it from first principles.`);
+  }
+  if(!notices.length) return;
+
+  const w=document.createElement('div');
+  w.className='expert-callout';
+  w.innerHTML=`
+    <div class="expert-callout-hd">
+      <span class="expert-callout-badge">EXPERT</span>
+      <span class="expert-callout-title">Bonus assessment waiting in this phase</span>
+    </div>
+    <div class="expert-callout-body">${notices.join('<br><br>')}</div>
+  `;
+  $out.appendChild(w);
+  $out.scrollTop=$out.scrollHeight;
 }
  
 /* ── SMART DIAGNOSIS BLOCK ── */
@@ -2931,14 +3106,89 @@ window.vibeAnalytics={
   exportJSON:()=>JSON.stringify(getAnalyticsSnapshot(),null,2),
 };
 
+let _storageAvailable=null;
+function canUseLocalStorage(){
+  if(_storageAvailable!=null) return _storageAvailable;
+  if(isFileProtocol()){
+    _storageAvailable=false;
+    return _storageAvailable;
+  }
+  try{
+    const probe='__station_delta_storage_probe__';
+    window.localStorage.setItem(probe,'1');
+    window.localStorage.removeItem(probe);
+    _storageAvailable=true;
+  }catch(err){
+    _storageAvailable=false;
+  }
+  return _storageAvailable;
+}
+
 function save(){
   ensureAnalytics();
-  localStorage.setItem(CADET_SAVE_KEY,JSON.stringify(G));
+  if(!canUseLocalStorage()) return;
+  try{
+    window.localStorage.setItem(CADET_SAVE_KEY,JSON.stringify(G));
+  }catch(err){
+    console.warn('[Station Delta] Failed to save progress', err);
+  }
 }
 function loadSave(){
-  const raw=localStorage.getItem(CADET_SAVE_KEY);
-  if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
+  if(canUseLocalStorage()){
+    try{
+      const raw=window.localStorage.getItem(CADET_SAVE_KEY);
+      if(raw){
+        try{
+          const d=JSON.parse(raw);
+          G={...G,...d};
+        }catch(e){}
+      }
+    }catch(err){
+      console.warn('[Station Delta] Failed to load saved progress', err);
+    }
+  }
   ensureAnalytics();
+}
+
+function getHardModeElapsedMs(){
+  return (G.totalTime||0) + (G.timerStart ? Math.max(0, Date.now()-G.timerStart) : 0);
+}
+
+function formatElapsed(ms){
+  const totalSeconds=Math.floor(ms/1000);
+  const hours=Math.floor(totalSeconds/3600);
+  const minutes=Math.floor((totalSeconds%3600)/60);
+  const seconds=totalSeconds%60;
+  if(hours>0) return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+
+function updateHardTimerDisplay(){
+  const pill=document.getElementById('timer-pill');
+  if(!pill) return;
+  pill.textContent=formatElapsed(getHardModeElapsedMs());
+}
+
+function startHardTimer(){
+  if(!G.hard) return;
+  const pill=document.getElementById('timer-pill');
+  if(pill) pill.style.display='inline';
+  if(!G.timerStart) G.timerStart=Date.now();
+  clearInterval(hardTimerInterval);
+  updateHardTimerDisplay();
+  hardTimerInterval=setInterval(updateHardTimerDisplay,1000);
+  save();
+}
+
+function stopHardTimer(){
+  if(G.timerStart){
+    G.totalTime=getHardModeElapsedMs();
+    G.timerStart=null;
+    save();
+  }
+  clearInterval(hardTimerInterval);
+  hardTimerInterval=null;
+  updateHardTimerDisplay();
 }
  
 /* ── CAREER LOG ── */
@@ -2992,6 +3242,7 @@ function syncObjCard(){
   document.getElementById('obj-cmd-val').textContent=s.cmd?s.cmd[0]:'—';
   document.getElementById('obj-cmd-val').classList.add('blurred');
   document.getElementById('obj-reveal').textContent='show';
+  document.getElementById('obj-reveal').style.display=G.expert?'none':'inline-block';
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
@@ -3101,12 +3352,77 @@ function restartFromMobileTools(){
   closeModal('mobile-tools-modal');
   doRestart();
 }
+function hasStationDeltaAccount(){
+  return Boolean(
+    G.userId ||
+    window.user?.hasAccount ||
+    window.__stationDeltaUser?.hasAccount ||
+    (canUseLocalStorage() && window.localStorage.getItem('station_delta_has_account')==='1')
+  );
+}
+function getCheckpointSignupNudge(completedIndex){
+  if(completedIndex===2){
+    return {
+      tone:'generic',
+      kicker:'Save this checkpoint',
+      title:'Create your free Station Delta account before you step away.',
+      copy:'You have real momentum now. Sign up free to keep this checkpoint attached to your account and return to Cadet without losing the thread.',
+      note:'We will send you to sign up, then bring you right back to this exact sim.'
+    };
+  }
+  if(completedIndex===4){
+    return {
+      tone:'lola',
+      kicker:'L.O.L.A. recommendation',
+      title:'You are building real command fluency. Let me keep your place ready.',
+      copy:'Create a free account and I will keep this checkpoint tied to you, so you can step away now and resume from the same place when you come back.',
+      note:'Free account, same sim, same checkpoint when you return.'
+    };
+  }
+  if(completedIndex===6){
+    return {
+      tone:'janet',
+      kicker:'J.A.N.E.T. notice',
+      title:'Progress of this quality should not be left to chance.',
+      copy:'Create a free account so this checkpoint is preserved and your return path remains efficient. I prefer fewer avoidable mistakes.',
+      note:'Authentication now. Resume from this checkpoint immediately after.'
+    };
+  }
+  return null;
+}
+function getCheckpointSignupUrl(){
+  const redirectTarget=isFileProtocol()
+    ? window.location.href
+    : `${window.location.pathname}${window.location.search||''}`;
+  const authBase=isFileProtocol()
+    ? `file://${window.location.pathname.replace(/\/base\/[^/]+$/, '/auth.html')}`
+    : '/auth.html';
+  return `${authBase}?redirect=${encodeURIComponent(redirectTarget)}`;
+}
+function routeToCheckpointSignup(){
+  window.location.href=getCheckpointSignupUrl();
+}
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
+  const expertExtras=[];
+  if(G.expert && nextPhase?.challenge) expertExtras.push(`constructed-response: ${nextPhase.challenge.title}`);
+  if(G.expert && nextPhase?.breakit) expertExtras.push(`Break-It: ${nextPhase.breakit.title}`);
   document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIndex} complete`;
   document.getElementById('phase-modal-title').textContent=`${completedPhase.title} complete`;
   document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is already saved, so you can pause here and come back when you are ready.';
-  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>`;
+  document.getElementById('phase-modal-next').innerHTML=`Next up: <b>Phase ${G.phase} — ${nextPhase.title}</b>${expertExtras.length?`<br><span style="color:var(--purple)">Expert add-ons: ${expertExtras.join(' · ')}</span>`:''}`;
+  const nudge=getCheckpointSignupNudge(completedIndex);
+  const nudgeEl=document.getElementById('checkpoint-signup-nudge');
+  if(nudge && !hasStationDeltaAccount()){
+    nudgeEl.hidden=false;
+    nudgeEl.dataset.tone=nudge.tone;
+    document.getElementById('checkpoint-signup-kicker').textContent=nudge.kicker;
+    document.getElementById('checkpoint-signup-title').textContent=nudge.title;
+    document.getElementById('checkpoint-signup-copy').textContent=nudge.copy;
+    document.getElementById('checkpoint-signup-note').textContent=nudge.note;
+  }else{
+    nudgeEl.hidden=true;
+  }
   openModal('phase-modal');
 }
 function setLolaStripGeneric(tag, msg){
@@ -3162,7 +3478,7 @@ async function processCmd(raw){
   }
 
   // ── MAN PAGES ──
-  if(vl==='man'){showManAll();syncObjCard();return}
+  if(vl==='man'){renderManModal();openModal('man-modal');syncObjCard();return}
   if(vl.startsWith('man ')){
     const k=vl.slice(4).trim();
     if(!showManPage(k)) appendLine(`man: no entry for '${k}'. Type 'man' to list all.`,'ln-err');
@@ -3300,13 +3616,23 @@ function handlePersistentCmd(vl, val){
   }
   if(G.unlockedCmds.includes('cd') && vl.startsWith('cd ')){
     const dir=val.slice(3).trim();
-    if(dir==='..'){ appendLine('Now in ~/projects','ln-ok'); }
-    else if(dir==='~'){ appendLine('Now in /home/cadet','ln-ok'); }
+    if(dir==='..'){
+      setCurrentPath('/home/cadet/projects');
+      appendLine('Now in ~/projects','ln-ok');
+    }
+    else if(dir==='~'){
+      setCurrentPath('/home/cadet');
+      appendLine('Now in /home/cadet','ln-ok');
+    }
+    else if(dir==='game_v1' || dir==='game_v1/'){
+      setCurrentPath('/home/cadet/projects/game_v1');
+      appendLine('Now in ~/projects/game_v1','ln-ok');
+    }
     else { appendLine(`Navigated into: ${dir}`,'ln-ok'); }
     return true;
   }
   if(G.unlockedCmds.includes('mkdir') && vl.startsWith('mkdir ')){
-    appendLine(`${val.slice(6).trim()}/ created`,'ln-ok');
+    appendLine(`Created directory: ${val.slice(6).trim()}`,'ln-ok');
     return true;
   }
   if(G.unlockedCmds.includes('cp') && vl.startsWith('cp ')){
@@ -3328,6 +3654,8 @@ async function handleCorrect(s, ph, input){
   markStepAttempt(s, ph, input, true);
   G.tries = 0;
   G.score = Math.max(G.score, 0);
+
+  if(s.id==='p1s3') setCurrentPath('/home/cadet/projects/game_v1');
  
   if (s.out) s.out.split('\n').forEach(l => appendLine(l, 'ln-ok'));
   blank();
@@ -3335,8 +3663,9 @@ async function handleCorrect(s, ph, input){
   if (s.teach) showTeach(s.teach);
   if (s.concept) showConcept(s.concept);
   if (s.jitAfter) showJIT(s.jitAfter);
-  else if (s.jit && !s.jitPreOnly) showJIT(s.jit);
-  if (s.bridge) showBridge(s.bridge);
+  
+  // Skip bridge for step 0: continuePhaseStart already pre-showed it before the answer
+  if (s.bridge && G.step > 0) showBridge(s.bridge);
   if (s.unlockCmd) {
     const cmds = Array.isArray(s.unlockCmd) ? s.unlockCmd : [s.unlockCmd];
     cmds.forEach(c => unlockCmd(c));
@@ -3382,16 +3711,14 @@ function handleWrong(val, s, ph){
   G.score=Math.max(0,G.score-5);
   document.getElementById('tries-n').textContent=G.tries;
   document.getElementById('score-n').textContent=G.score;
+  const diagnosed = showDiagnosis(s.id, val);
  
   if(G.expert){
     document.getElementById('term-panel').classList.add('glitch');
     setTimeout(()=>document.getElementById('term-panel').classList.remove('glitch'),300);
-    appendLine('✗ Incorrect.','ln-err');
+    if(!diagnosed) appendLine('✗ Incorrect.','ln-err');
     return;
   }
- 
-  // Always try smart diagnosis (even in hard/practitioner mode)
-  const diagnosed = showDiagnosis(s.id, val);
  
   if(G.hard){
     if(!diagnosed) appendLine('✗ Incorrect. No hints in hard mode.','ln-err');
@@ -3428,25 +3755,11 @@ async function completePhase(){
   $outS.innerHTML=''; // clear static for next phase
   if(ph.done){
     blank();
-    await typedLine('L.O.L.A.: '+ph.done,'ln-lola',200);
+    appendLine('L.O.L.A.: '+ph.done,'ln-lola');
   }
   blank();
   appendLine(`Overall score: ${G.score}`,'ln-info');
   blank();
- 
-  // Challenge (constructed response)
-  if(ph.challenge && !G.expert){
-    blank();
-    await showChallenge(ph.challenge);
-    blank();
-  }
- 
-  // Break-it scenario
-  if(ph.breakit && !G.expert){
-    blank();
-    await showBreakIt(ph.breakit);
-    blank();
-  }
  
   G.phase++;G.step=0;G.tries=0;
   G.pendingPhaseStart=true;
@@ -3460,6 +3773,7 @@ async function completePhase(){
 }
 
 function startPhase(){
+  closeModal('phase-modal');
   if(G.pendingPhaseStart){
     G.pendingPhaseStart=false;
     save();
@@ -3468,21 +3782,25 @@ function startPhase(){
   const ph=PHASES[G.phase];
   markPhaseStart(G.phase, ph);
   $outS.innerHTML=''; // clear static zone for fresh phase content
- 
-  // Spaced repetition callback
-  const sr = ph.spacedRep;
-  if(sr && !G.expert){
-    setLola(ph.lolaIntro);
-    delay(50).then(async()=>{
-      blank();
-      await showSpacedRep(sr);
-      blank();
-      continuePhaseStart(ph);
-    });
-  } else {
-    setLola(ph.lolaIntro);
-    continuePhaseStart(ph);
+
+  // Resume should rehydrate the exact saved step instead of replaying
+  // the phase opener and desyncing the visible prompt from input checks.
+  if(G.step>0){
+    const savedStep=ph.steps[G.step];
+    if(savedStep){
+      markStepStart(savedStep, ph);
+      renderStaticStep(savedStep);
+      setLola(lolaMessageForStep(savedStep, ph));
+      setLolaStrip(savedStep);
+      syncObjCard();
+      syncDots();
+      telem(`Phase ${G.phase} resumed at step ${G.step+1}: ${savedStep.obj}`);
+      return;
+    }
   }
+ 
+  setLola(ph.lolaIntro);
+  continuePhaseStart(ph);
 }
  
 /* ── PRE-STEP CONCEPT CARDS ──
@@ -3491,9 +3809,9 @@ function startPhase(){
    Explorer mode only (hard/practitioner don't need the scaffold). */
 const PRE_STEP_CONCEPTS = {
   p1s1: {
-    icon:'🗂️',
-    title:'Command, prompt, path',
-    body:'A <b>command</b> is an instruction you type. The <code>$</code> prompt means the terminal is waiting for input. A <b>path</b> is a filesystem address, and <code>pwd</code> prints the one you are standing in right now.'
+    icon:'📁',
+    title:'Before You Type — Your Filesystem, A Quick Map',
+    body:'Files live in a tree of folders. Here is where you are:<br><br><code>/</code> (root — top of everything)<br>└── <code>home/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;└── <code>cadet/</code> ← your home<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>projects/</code> ← you are HERE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>game_v1/</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <code>README.txt</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <code>.env</code> (hidden file)<br><br>A path like <code>/home/cadet/projects</code> is your address in this tree.'
   },
   p1s4: {
     icon:'📁',
@@ -3568,19 +3886,19 @@ for(const ph of PHASES){
   }
 }
 
-function showPreStepConcept(stepId){
-  // Intentionally disabled.
-  // Pre-step teaching is routed through L.O.L.A. + strip to avoid
-  // repeating guidance in multiple places at once.
-  return;
+function showPreStepConcept(stepId){ 
+  const pre = PRE_STEP_CONCEPTS[stepId];
+  if (pre) showConcept(pre);
 }
 
 function continuePhaseStart(ph){
   const s=ph.steps[0];
   markStepStart(s, ph);
   renderStaticStep(s);
+  // JIT pre-answer cards belong in $outS (static zone) so they appear
+  // above the divider before the learner types anything
   if(s.jit && !G.hard) showJIT(s.jit);
-  if(s.bridge && !s.jitPreOnly && !G.hard) showBridge(s.bridge);
+  if(s.bridge && !G.hard) showBridge(s.bridge);
   setLola(lolaMessageForStep(s, ph, true));
   setLolaStrip(s);
   syncObjCard();
@@ -3590,6 +3908,7 @@ function continuePhaseStart(ph){
  
 /* ── GRADUATION ── */
 async function runGraduation(){
+  if(G.hard) stopHardTimer();
   blank();divline();
   appendLine('DEPLOYING TO VERCEL…','ln-sys');
   const steps2=[
@@ -3624,7 +3943,9 @@ async function runGraduation(){
  
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
+  document.getElementById('final-time-row').style.display=G.hard ? 'block' : 'none';
+  document.getElementById('final-time').textContent=formatElapsed(G.totalTime||0);
   openModal('grad-modal');
 }
  
@@ -3737,7 +4058,7 @@ function handleSandbox(val){
     'echo $api_key':'sk-prod-abc123',
     'echo $API_KEY':'sk-prod-abc123',
     'git status':'On branch main\nYour branch is up to date.\nWorking tree clean.',
-    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@vibe-ship>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
+    'git log':'commit d4e5f6a (HEAD -> main)\nAuthor: '+G.name+' <cadet@Station>\nDate: Just now\n    Deploy escape pod to production\n\ncommit a1b2c3d\n    Add mission manifest',
     'whoami':'certified-vibe-cadet',
     'cat manifest.txt':'Mission: Escape Pod',
     'cat logs.txt':'INFO: All systems nominal\nINFO: Escape pod deployed\nINFO: '+G.name+' has graduated',
@@ -3841,7 +4162,9 @@ function doRestart(){
 
 function confirmRestart(){
   closeModal('restart-modal');
-  localStorage.removeItem(CADET_SAVE_KEY);
+  if(canUseLocalStorage()){
+    try{ window.localStorage.removeItem(CADET_SAVE_KEY); }catch(err){}
+  }
   location.reload();
 }
  
@@ -3849,6 +4172,39 @@ function shareGrad(){
   const txt=`Just graduated Station Delta: Cadet 🎖️\n\nI now know: CLI navigation, Git (including conflict resolution), package management, pipes & grep, AI agents, MCP, prompt engineering, and deploying to production.\n\nFree hands-on terminal training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
   closeModal('grad-modal');
+}
+
+function showToastMessage(title, sub){
+  document.getElementById('toast-title').textContent=title;
+  document.getElementById('toast-sub').textContent=sub;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function goToEngineer(){
+  window.open('https://stationdelta.dev/base/vibe-engineer.html','_blank');
+}
+
+async function shareGradLinkedIn(){
+  const shareUrl='https://stationdelta.dev';
+  const message=`I just graduated Station Delta: Cadet and earned my certificate.\n\nI worked through hands-on terminal navigation, file operations, Git and conflict resolution, package management, log analysis with pipes and grep, AI agent workflows, MCP, prompt engineering, environment variables, and production deployment.\n\nIf you want practical reps instead of passive tutorials, check out StationDelta.dev.`;
+  let copied=false;
+
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(message);
+      copied=true;
+    }
+  }catch(e){}
+
+  window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(shareUrl),'_blank');
+  showToastMessage(
+    copied ? 'LinkedIn message copied' : 'LinkedIn share opened',
+    copied
+      ? 'Paste the copied certificate post into LinkedIn and share the Station Delta link.'
+      : 'LinkedIn opened in a new tab. Add your certificate note and mention what you learned at StationDelta.dev.'
+  );
 }
  
 function selectPath(p){
@@ -3865,8 +4221,14 @@ function selectPath(p){
 function startAcademy(){
   const n=document.getElementById('boot-name').value.trim();
   G.name=n||'Cadet';
+  setCurrentPath(G.currentPath||'/home/cadet/projects');
+  if(G.phase===1 && G.step===0 && G.completedPhases.length===0 && !G.sandbox){
+    G.totalTime=0;
+    G.timerStart=null;
+  }
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  if(G.hard) startHardTimer();
   closeModal('boot-modal');
   applyMobileLayoutDefaults();
   applyUIPreferences();
@@ -3929,7 +4291,13 @@ function bootTerminal(){
 function resumeSession(){
   closeModal('boot-modal');
   document.getElementById('cadet-name-display').textContent=G.name;
+  setCurrentPath(G.currentPath||'/home/cadet/projects');
   if(G.hard) document.getElementById('hardmode-pill').style.display='inline';
+  if(G.hard){
+    document.getElementById('timer-pill').style.display='inline';
+    if(!G.sandbox) startHardTimer();
+    else updateHardTimerDisplay();
+  }
   if(G.sandbox) document.getElementById('sandbox-pill').style.display='inline';
   if(G.careerLog.length>0) document.getElementById('career-impact-btn').style.display='inline';
  
@@ -3981,7 +4349,7 @@ if(window.matchMedia){
   else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
 }
  
-if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
+if(G.name!=='Cadet' && (G.phase>1 || G.step>0 || G.completedPhases.length>0 || G.pendingPhaseStart || G.bossActive || G.sandbox)){
   const bm=document.getElementById('boot-modal');
   bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
   bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
@@ -3998,10 +4366,14 @@ if(G.name!=='Cadet' && (G.phase>1||G.completedPhases.length>0)){
     document.getElementById('boot-name').focus();
   }, 300);
 }
+initSupabaseAuthClient();
 applyUIPreferences();
 </script>
 <script>
   (function(){
+    if(isFileProtocol()){
+      return;
+    }
     var s=document.createElement('script');
     s.src='analytics-client.js';
     s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
@@ -4010,4 +4382,3 @@ applyUIPreferences();
 </script>
 </body>
 </html>
-
