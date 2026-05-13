@@ -154,9 +154,9 @@ section{position:relative;z-index:1}
 /* ═══ CAREER TRACKS ═══ */
 .tracks-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .tracks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-.track-card{background:var(--surface);padding:28px 24px;transition:background .2s;cursor:pointer;text-decoration:none;display:block;position:relative;overflow:hidden;}
+.track-card{background:var(--surface);padding:28px 24px;transition:background .2s,transform .2s ease,box-shadow .2s ease,border-color .2s ease;cursor:pointer;text-decoration:none;display:block;position:relative;overflow:hidden;transform-origin:center center;}
 .track-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s;}
-.track-card:hover{background:var(--s2)}
+.track-card:hover{background:var(--s2);transform:scale(1.028);box-shadow:0 18px 48px rgba(0,0,0,.36);z-index:2}
 .track-card:hover::before{opacity:1}
 .track-card.track-security::before{background:linear-gradient(90deg,transparent,var(--red),transparent)}
 .track-card.track-platform::before{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
@@ -536,10 +536,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">Security · SRE · Platform · DevSecOps</div>
         <div class="track-desc">Keep systems secure, observable, and resilient. The most enterprise-relevant track for regulated industries — fintech, healthcare, regulated cloud.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Station Delta: Cadet + Station Delta: Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Station Delta: Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--red)"></div>Security Officer → Systems Integrity → Chaos Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Station Delta: Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Design secure, chaos-tested, fully observable systems and lead incident response.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -552,10 +552,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">DevOps · Platform eng · Backend · Full-stack</div>
         <div class="track-desc">Own the CI/CD pipeline, infrastructure, and the path from commit to production. The track engineering managers most frequently want their teams to complete.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Station Delta: Cadet + Station Delta: Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Station Delta: Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Deployment Officer → Comms Officer → Performance Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Station Delta: Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Ship reliably, debug production cold, and own a platform org. Most likely to unlock Fleet contracts.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -568,10 +568,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">AI engineers · ML platform · Applied AI · Founding engineers</div>
         <div class="track-desc">Build and operate AI-native products. The most differentiated track in the series — no competitor covers multi-agent coordination, guardrails, and cost governance at this depth.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Station Delta: Cadet + Station Delta: Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Station Delta: Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--purple)"></div>Agent Architect → Systems Integrity → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Station Delta: Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Design, deploy, govern, and cost-manage multi-agent AI systems in production.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -584,10 +584,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="track-audience">Data engineers · Analytics eng · ML infra · Backend with data ownership</div>
         <div class="track-desc">Own data pipelines, vector infrastructure, and the analytical layer. Increasingly relevant as every product becomes data-and-AI-driven. Includes FinOps for data teams watching burn.</div>
         <div class="track-path-preview">
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Vibe Cadet + Vibe Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Vibe Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--green-m)"></div>Station Delta: Cadet + Station Delta: Engineer<span class="tpp-badge badge-free-sm">Free</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--blue)"></div>Station Delta: Lieutenant<span class="tpp-badge badge-free-sm">Free Account</span></div>
           <div class="tpp-step"><div class="tpp-dot" style="background:var(--amber)"></div>Data Officer → Performance Officer → FinOps Officer<span class="tpp-badge badge-paid-sm">Officer</span></div>
-          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Vibe Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
+          <div class="tpp-step"><div class="tpp-dot" style="background:var(--gold)"></div>Station Delta: Captain<span class="tpp-badge badge-cap-sm">Captain</span></div>
         </div>
         <div class="track-outcome-mini">Outcome → Own data quality, vector pipelines, query performance, and present ROI to leadership.</div>
         <div class="track-cta-line">Start this track →</div>
@@ -611,7 +611,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- CADET -->
       <div class="sim-card free">
         <div class="sim-card-header">
-          <div class="sim-title">Vibe Cadet</div>
+          <div class="sim-title">Station Delta: Cadet</div>
           <div class="sim-rank-badge badge-free">● Free</div>
         </div>
         <p class="sim-desc">Your first mission: deploy an escape pod before oxygen runs out. Learn the terminal from scratch — navigation, files, Git, environment variables, AI agents, MCP, and your first production deployment.</p>
@@ -633,7 +633,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- VIBE ENGINEER -->
       <div class="sim-card free">
         <div class="sim-card-header">
-          <div class="sim-title">Vibe Engineer</div>
+          <div class="sim-title">Station Delta: Engineer</div>
           <div class="sim-rank-badge badge-free">● Free</div>
         </div>
         <p class="sim-desc">The second rung. Shell scripting, SSH, curl, jq, Docker, advanced Git, and .env — bridging Cadet to Lieutenant and the specialist track. Phase 4 includes a live Anthropic API call: real proof the training is real.</p>
@@ -655,7 +655,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- LIEUTENANT -->
       <div class="sim-card officer">
         <div class="sim-card-header">
-          <div class="sim-title">Vibe Lieutenant</div>
+          <div class="sim-title">Station Delta: Lieutenant</div>
           <div class="sim-rank-badge badge-free">Free Account</div>
         </div>
         <p class="sim-desc">You can deploy. Now prove you can operate. Read real codebases cold, review AI-generated diffs, debug stack traces, respond to production incidents, and catch what AI gets confidently wrong.</p>
@@ -875,7 +875,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
       <!-- CAPTAIN -->
       <div class="sim-card captain">
         <div class="sim-card-header">
-          <div class="sim-title">Vibe Captain</div>
+          <div class="sim-title">Station Delta: Captain</div>
           <div class="sim-rank-badge badge-captain">Captain</div>
         </div>
         <p class="sim-desc">You commanded Lieutenant. Now you command the ship. Architecture decisions, scalability, observability, advanced AI orchestration, mentoring, stakeholder management, and technical strategy at staff level.</p>
@@ -1039,7 +1039,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div class="section-hd">
       <div class="section-eyebrow">Pricing</div>
       <div class="section-title">Start free. Scale when ready.</div>
-      <div class="section-sub">Vibe Cadet and Vibe Engineer are free with no account. Create a free account to unlock Vibe Lieutenant, save progress, and return across devices. Officer unlocks the specialist sims and the rest of the track.</div>
+      <div class="section-sub">Station Delta: Cadet and Station Delta: Engineer are free with no account. Create a free account to unlock Station Delta: Lieutenant, save progress, and return across devices. Officer unlocks the specialist sims and the rest of the track.</div>
     </div>
     <div class="pricing-grid">
 
@@ -1048,7 +1048,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="price-name">Recruit</div>
         <div class="price-amount">$0 <span>/ forever</span></div>
         <div class="price-annual" style="color:var(--muted2)">No credit card · Free account unlocks Lieutenant</div>
-        <div class="price-sims"><strong>Free path included:</strong><br>Vibe Cadet · Vibe Engineer · Vibe Lieutenant</div>
+        <div class="price-sims"><strong>Free path included:</strong><br>Station Delta: Cadet · Station Delta: Engineer · Station Delta: Lieutenant</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All 9 phases per sim</li>
@@ -1089,11 +1089,11 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="price-name">Captain</div>
         <div class="price-amount">$39 <span>/ month</span></div>
         <div class="price-annual">Annual: $349/yr · save $119</div>
-        <div class="price-sims"><strong>All 13 simulations:</strong><br>Everything in Officer + Vibe Captain — staff-level engineering judgment + all 4 career tracks</div>
+        <div class="price-sims"><strong>All 13 simulations:</strong><br>Everything in Officer + Station Delta: Captain — staff-level engineering judgment + all 4 career tracks</div>
         <div class="price-divider"></div>
         <ul class="price-features">
           <li>All Officer features</li>
-          <li>Vibe Captain sim — architecture &amp; leadership</li>
+          <li>Station Delta: Captain sim — architecture &amp; leadership</li>
           <li>All 4 career tracks — complete the full suite</li>
           <li>Expert mode leaderboard</li>
           <li>Full AI coaching reports</li>
@@ -1133,7 +1133,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
         <div class="bundle-label">New · One-time purchase</div>
         <div class="bundle-title">Career Track Bundle</div>
       </div>
-      <div class="bundle-desc">Pay once, own your chosen track forever — Lieutenant + 3 specialist sims + Vibe Captain. Best for developers who want a fixed curriculum they can finish on their own timeline. Ongoing mission drops, member briefings, and future subscriber-only platform features stay with Officer and Captain.</div>
+      <div class="bundle-desc">Pay once, own your chosen track forever — Lieutenant + 3 specialist sims + Station Delta: Captain. Best for developers who want a fixed curriculum they can finish on their own timeline. Ongoing mission drops, member briefings, and future subscriber-only platform features stay with Officer and Captain.</div>
       <div>
         <div class="bundle-price">$149 <sub>one-time</sub></div>
       </div>
@@ -1224,10 +1224,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:40px
     <div>
       <div class="footer-col-title">Simulations</div>
       <div class="footer-links">
-        <a href="base/vibe-cadet.html">Vibe Cadet — Free</a>
-        <a href="base/vibe-engineer.html">Vibe Engineer — Free</a>
+        <a href="base/vibe-cadet.html">Station Delta: Cadet — Free</a>
+        <a href="base/vibe-engineer.html">Station Delta: Engineer — Free</a>
         <a href="#pricing">Officer Suite</a>
-        <a href="#pricing">Vibe Captain</a>
+        <a href="#pricing">Station Delta: Captain</a>
         <a href="#pricing">Fleet / Teams</a>
       </div>
     </div>
