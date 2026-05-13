@@ -1134,12 +1134,18 @@ async function initSupabaseAuthClient(){
       G.userId=session.user.id;
       G.userEmail=session.user.email;
       console.log('[Station Delta] Session active:', G.userEmail);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
     }else{
       const snapshot=readLocalAuthSnapshot();
       if(snapshot?.userId){
         G.userId=snapshot.userId;
         G.userEmail=snapshot.email || null;
         console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+        const restored = await loadCloudProgress();
+        if(restored) save();
+        syncBootModalState();
       }else if(hostedMode){
         console.log('[Station Delta] Guest mode — no session');
       }
@@ -1151,6 +1157,9 @@ async function initSupabaseAuthClient(){
       G.userId=snapshot.userId;
       G.userEmail=snapshot.email || null;
       console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
     }
   }
 }
@@ -3305,6 +3314,7 @@ function save(){
   }catch(err){
     console.warn('[Station Delta] Failed to save progress', err);
   }
+  queueCloudProgressSave();
 }
 function loadSave(){
   if(canUseLocalStorage()){
@@ -3317,6 +3327,61 @@ function loadSave(){
     }catch(_){}
   }
   ensureAnalytics();
+}
+
+let _cloudSaveTimer=null;
+function queueCloudProgressSave(){
+  if(!window._sb || !G.userId) return;
+  if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer=setTimeout(()=>{ saveCloudProgress(); },150);
+}
+
+async function saveCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb.from('progress').upsert({
+      user_id:G.userId,
+      sim_id:ENGINEER_SAVE_KEY,
+      phase_id:String(G.phase||1),
+      step_id:JSON.stringify(G),
+      completed_at:new Date().toISOString()
+    }, { onConflict:'user_id,sim_id' });
+  }catch(err){
+    console.warn('[Station Delta] Failed to save cloud progress', err);
+  }
+}
+
+async function loadCloudProgress(){
+  if(!window._sb || !G.userId) return false;
+  try{
+    const { data, error } = await window._sb
+      .from('progress')
+      .select('phase_id, step_id')
+      .eq('user_id', G.userId)
+      .eq('sim_id', ENGINEER_SAVE_KEY)
+      .maybeSingle();
+    if(error || !data) return false;
+    if(data.step_id){
+      try{
+        const parsed=JSON.parse(data.step_id);
+        G={...G,...parsed};
+        return true;
+      }catch(parseErr){
+        console.warn('[Station Delta] Failed to parse cloud progress snapshot', parseErr);
+      }
+    }
+    const phase=Number(data.phase_id);
+    if(Number.isFinite(phase) && phase>=1){
+      G.phase=phase;
+      G.step=0;
+      G.pendingPhaseStart=phase>1;
+      G.completedPhases=Array.from({length:Math.max(0,phase-1)},(_,i)=>i+1);
+      return true;
+    }
+  }catch(err){
+    console.warn('[Station Delta] Failed to load cloud progress', err);
+  }
+  return false;
 }
 
 let _storageAvailable=null;
@@ -4472,6 +4537,33 @@ function resumeSession(){
   $cmd.focus();
 }
 
+function syncBootModalState(){
+  const bm=document.getElementById('boot-modal');
+  if(!bm) return;
+  const shouldResume = G.phase>1 || G.completedPhases.length>0 || G.pendingPhaseStart || G.bossActive || G.sandbox || G.step>0;
+  const pb=bm.querySelector('.mbtn-p');
+  let rb=bm.querySelector('[data-resume-secondary="1"]');
+  if(shouldResume){
+    bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
+    bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
+    pb.textContent='RESUME';
+    pb.onclick=resumeSession;
+    if(!rb){
+      rb=document.createElement('button');
+      rb.className='mbtn mbtn-s';
+      rb.textContent='Start Over';
+      rb.dataset.resumeSecondary='1';
+      rb.onclick=doRestart;
+      pb.after(rb);
+    }
+    return;
+  }
+  if(rb) rb.remove();
+  setTimeout(()=>{
+    document.getElementById('boot-name')?.focus();
+  }, 300);
+}
+
 /* ── ENGINEER OVERRIDE LAYER ── */
 document.title='Station Delta: Engineer';
 const _logo=document.getElementById('logo'); if(_logo) _logo.innerHTML='Station Delta<span id="logo-sub">Engineer</span>';
@@ -4578,9 +4670,11 @@ const ENGINEER_BREAKIT={
 };
 
 const ENGINEER_PRE_STEP_CONCEPTS={
-  p2s2:{icon:'📜',title:'Shebang line',body:'<code>#!/bin/bash</code> tells the OS which interpreter should run this script file.'},
-  p2s4:{icon:'✏️',title:'In-place edit with sed',body:'<code>sed -i</code> replaces matching text inside a file without opening an editor.'},
-  p2s5:{icon:'🧯',title:'stderr redirect',body:'<code>2>&1</code> sends errors into the same stream as normal output so you can review everything together.'},
+  p1s2:{icon:'🧲',title:'Alternation with grep -E',body:'<code>grep -E</code> enables extended pattern matching. In <code>"Host|Service|Battery"</code>, the <code>|</code> means "match any one of these terms." That lets you pull several signal types in one pass instead of running three separate greps.'},
+  p2s2:{icon:'📜',title:'Shebang line',body:'<code>#!/bin/bash</code> is the interpreter hint the OS reads when you run a script directly with <code>./rescue.sh</code>. It makes the runtime explicit, which matters when teammates, CI jobs, or recovery playbooks need the script to behave the same way every time.'},
+  p2s3:{icon:'📦',title:'Variables as a single source of truth',body:'A shell variable lets you name a value once and reuse it everywhere. If the target host changes later, you update <code>SERVER</code> in one place instead of hunting through the whole script for hardcoded copies.'},
+  p2s4:{icon:'✏️',title:'In-place edit with sed',body:'<code>sed -i</code> edits the file without opening an editor. In <code>s/old/new/g</code>, <code>s</code> means substitute, the first value is what to find, the second is what to replace it with, and <code>g</code> means "do it everywhere on that line."'},
+  p2s5:{icon:'🧯',title:'stderr redirect',body:'Shell commands speak on two channels: stdout for normal output and stderr for problems. <code>2>&1</code> merges stderr into stdout so you can read one complete transcript instead of guessing what happened from half the evidence.'},
   p3s1:{icon:'🔑',title:'SSH key pair model',body:'Your private key stays local. Your public key is copied to the remote host so it can trust your machine.'},
   p4s1:{icon:'🌐',title:'curl basics',body:'<code>curl URL</code> performs a direct request from the terminal so you can inspect service behavior without a browser.'},
   p4s2:{icon:'📦',title:'POST with JSON',body:'<code>-X POST</code> changes the HTTP method and <code>-d</code> sends a request body payload.'},
@@ -4594,13 +4688,13 @@ const ENGINEER_PRE_STEP_CONCEPTS={
 
 const ENGINEER_LOLA_STRIP={
   p1s1:[{tag:'habit',msg:'Engineer starts with inventory, not intuition.'}],
-  p1s2:[{tag:'concept',msg:'Filter the log for Host, Service, and Battery before you do anything else.'}],
+  p1s2:[{tag:'concept',msg:'Use <code>grep -E</code> so one pattern can match <code>Host</code>, <code>Service</code>, or <code>Battery</code> in a single sweep.'}],
   p1s3:[{tag:'tip',msg:'Recent history is often the fastest route to the root cause.'}],
   p2s1:[{tag:'new!',msg:'Build the rescue path in <code>rescue.sh</code> so the fix is repeatable.'}],
-  p2s2:[{tag:'syntax',msg:'The shebang belongs on line 1, before everything else.'}],
-  p2s3:[{tag:'habit',msg:'Put changing values in variables once instead of hardcoding them everywhere.'}],
-  p2s4:[{tag:'command',msg:'Use <code>sed -i</code> when the file needs a quick, precise replacement.'}],
-  p2s5:[{tag:'warning',msg:'Run the script only after permission is correct, and keep errors visible with <code>2>&1</code>.'}],
+  p2s2:[{tag:'syntax',msg:'The shebang must be line 1 because the OS reads it before the rest of the script.'}],
+  p2s3:[{tag:'habit',msg:'Store the host once in <code>SERVER</code> so later changes happen in one place, not five.'}],
+  p2s4:[{tag:'command',msg:'Think of <code>sed -i</code> as surgical replacement: find one string, swap it cleanly, leave the rest alone.'}],
+  p2s5:[{tag:'warning',msg:'Permission first, then execution, then merge stderr with stdout so the failure story stays intact.'}],
   p2s6:[{tag:'habit',msg:'A guard you never trigger is a guard you cannot trust. Make it fail on purpose, then restore the happy path.'}],
   p3s1:[{tag:'concept',msg:'SSH keys replace password repetition with a trust model.'}],
   p3s2:[{tag:'tip',msg:'Remote target remains <code>engineer@192.168.1.42</code> throughout this phase.'}],
@@ -4615,7 +4709,7 @@ const ENGINEER_LOLA_STRIP={
   p5s2:[{tag:'command',msg:'Select the error objects first. Shape them later.'}],
   p5s3:[{tag:'concept',msg:'Object construction turns telemetry into a reportable artifact.'}],
   p5s4:[{tag:'shortcut',msg:'<code>tee</code> lets you watch and archive the same stream at once.'}],
-  p5s5:[{tag:'habit',msg:'This is the find → xargs handoff pattern you will reuse everywhere.'}],
+  p5s5:[{tag:'habit',msg:'<code>find</code> discovers the files, then <code>xargs</code> turns that list into a real grep command.'}],
   p6s1:[{tag:'habit',msg:'Check runtime state before you create more moving parts.'}],
   p6s2:[{tag:'concept',msg:'Captain owns planning and delegation.'}],
   p6s3:[{tag:'concept',msg:'Engineer owns focused build and code tasks from Captain.'}],
@@ -4641,7 +4735,7 @@ const ENGINEER_PHASES=[
    lolaIntro:'You already know the basics. Engineer starts with pressure: orient fast, extract signal, then inspect recent history before you touch anything.',
    steps:[
     {id:'p1s1',obj:'Inventory the distress bay',ctx:'Run a full directory inventory that includes hidden artifacts. Under pressure, hidden files often matter.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls',jit:{title:'Engineer mode starts with hidden risk surfaces',body:'In incident work, <code>ls -la</code> is not trivia. It exposes hidden directories like <code>.ssh</code>, permission posture, and the artifacts that tell you whether this machine is safe to touch or already misconfigured.'},bridge:{title:'Pressure changes the framing, not the command',body:'Cadet taught you how to list files. Engineer teaches you why you do it immediately during an incident: inventory first, assumptions second.',tags:['Incident response','Operational discipline']},teach:{title:'Inventory before intervention',body:'Do not open random files yet. First get the full surface area: hidden folders, rescue scripts, Docker hints, and anything that changes your mental model of the machine you are on.'}},
-    {id:'p1s2',obj:'Extract host, service, and battery signal',ctx:'From distress.log, pull only the Host, Service, and Battery lines in one pipeline.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('distress.log')&&v.includes('|')&&v.includes('grep')&&v.includes('Host')&&v.includes('Service')&&v.includes('Battery'),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipe from cat into grep for the three beacon terms.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],jit:{title:'This is triage, not reading practice',body:'The goal is not to memorize the whole log. The goal is to pull the three facts that decide your next move: where the host is, what service is down, and how much time you have left.'},teach:{title:'Fast signal extraction',body:'Incident responders rarely read every line first. They filter for the highest-value indicators and build outward from there.'},bridge:{title:'Every noisy system needs a first-pass filter',body:'Production logs, CI output, and agent traces all become usable only after you reduce them to the few lines that actually change the decision in front of you.',tags:['Incident triage','Logs','Operational focus']}},
+    {id:'p1s2',obj:'Extract host, service, and battery signal',ctx:'From distress.log, pull only the Host, Service, and Battery lines in one pipeline.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('distress.log')&&v.includes('|')&&v.includes('grep')&&v.includes('Host')&&v.includes('Service')&&v.includes('Battery'),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipe from cat into grep for the three beacon terms.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],jit:{title:'This is triage, not reading practice',body:'The goal is not to memorize the whole log. The goal is to pull the three facts that decide your next move: where the host is, what service is down, and how much time you have left.'},teach:{title:'Fast signal extraction',body:'<code>grep -E</code> lets one search pattern act like a short checklist. The <code>|</code> operator means "or," so <code>Host|Service|Battery</code> matches any of those labels and collapses noisy output into the few facts you actually need.'},bridge:{title:'Every noisy system needs a first-pass filter',body:'Production logs, CI output, and agent traces all become usable only after you reduce them to the few lines that actually change the decision in front of you. This is the same pattern you will use later with test failures, deploy logs, and agent traces: search for several high-value indicators in one pass, then zoom in from there.',tags:['Incident triage','Logs','Operational focus']}},
     {id:'p1s3',obj:'Inspect recent commit history',ctx:'Look at the recent commit timeline before you change the service. History often points at the cause.',cmd:['git log --oneline'],accept:['git log --oneline'],hint:'Type: git log --oneline',out:'a1b2c3d restart monitor check\n7f8e9d0 add battery reporter\n2c3d4e5 initial distress server',unlockCmd:'git log --oneline',jit:{title:'Why compact history matters',body:'<code>--oneline</code> turns commit history into a fast triage tool. You are scanning for likely change points, not writing a postmortem yet.'},teach:{title:'History narrows blame without guesswork',body:'Recent commits tell you where the system changed last. In real outage work, history often gives you the shortest path from symptom to likely cause.'}},
    ],
    challenge:ENGINEER_CHALLENGES[1],
@@ -4652,9 +4746,9 @@ const ENGINEER_PHASES=[
    lolaIntro:'Now we automate the rescue path. Engineer scripting is not about syntax trivia; it is about writing, editing, and safely running repeatable fixes.',
    steps:[
     {id:'p2s1',obj:'Create the rescue script file',ctx:'Start the script that will carry the rescue workflow.',cmd:['touch rescue.sh'],accept:['touch rescue.sh'],hint:'Type: touch rescue.sh',out:'rescue.sh created',unlockCmd:'touch'},
-    {id:'p2s2',obj:'Write the shebang line',ctx:'Set the script interpreter explicitly so the runtime is unambiguous.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('rescue.sh')&&v.includes('>')&&(v.includes('#!/bin/bash')||v.includes('#!/usr/bin/env bash')),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'Shebang written to rescue.sh',unlockCmd:'echo >'},
-    {id:'p2s3',obj:'Store the rescue target in a variable',ctx:'Append the server IP so the script has one source of truth.',cmd:['echo \'SERVER="192.168.1.42"\' >> rescue.sh','echo "SERVER=\\"192.168.1.42\\"" >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('SERVER=')&&v.includes('>> rescue.sh'),accept:['echo server >> rescue.sh'],hint:'Append the SERVER assignment using >>.',out:'SERVER variable appended to rescue.sh',unlockCmd:'>>'},
-    {id:'p2s4',obj:'Update the IP with sed',ctx:'Mission control changed the rescue host. Replace 192.168.1.42 with 10.0.0.5 without opening an editor.',cmd:['sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh','sed -i "s/192.168.1.42/10.0.0.5/g" rescue.sh'],acceptFn:v=>v.startsWith('sed -i')&&v.includes('192.168.1.42')&&v.includes('10.0.0.5')&&v.includes('rescue.sh'),accept:['sed -i replace rescue.sh'],hint:'Use sed -i with a substitution pattern.',out:'rescue.sh updated in place',unlockCmd:'sed -i'},
+    {id:'p2s2',obj:'Write the shebang line',ctx:'Set the script interpreter explicitly so the runtime is unambiguous.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('rescue.sh')&&v.includes('>')&&(v.includes('#!/bin/bash')||v.includes('#!/usr/bin/env bash')),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'Shebang written to rescue.sh',unlockCmd:'echo >',jit:{title:'A script file needs an interpreter contract',body:'Without a shebang, the shell may guess how to run the file based on how it was invoked. That works until the environment changes. A one-line interpreter hint removes the ambiguity before the script ever starts.'},teach:{title:'Why line 1 matters',body:'When you execute <code>./rescue.sh</code>, the operating system reads the first line before anything else. A shebang like <code>#!/bin/bash</code> says "run this file with Bash," which makes the script predictable for teammates, automation, and future you.'},bridge:{title:'Engineer turns terminal steps into reusable artifacts',body:'Cadet had you type commands directly. Engineer starts teaching the next layer up: package the command logic into a script so it can be rerun, reviewed, and trusted during a real response.',tags:['Shell scripting','Automation','Operational discipline']}},
+    {id:'p2s3',obj:'Store the rescue target in a variable',ctx:'Append the server IP so the script has one source of truth.',cmd:['echo \'SERVER="192.168.1.42"\' >> rescue.sh','echo "SERVER=\\"192.168.1.42\\"" >> rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('SERVER=')&&v.includes('>> rescue.sh'),accept:['echo server >> rescue.sh'],hint:'Append the SERVER assignment using >>.',out:'SERVER variable appended to rescue.sh',unlockCmd:'>>',jit:{title:'Hardcoded values become maintenance debt fast',body:'The moment a host changes, every duplicated copy becomes a chance to miss one. Variables let you separate the value that changes from the script logic that stays stable.'},teach:{title:'One source of truth beats scattered literals',body:'By storing the host in <code>SERVER</code>, later lines can reuse <code>$SERVER</code> instead of repeating the raw IP address. That makes the script easier to update, review, and debug because the important value lives in one obvious place.'},bridge:{title:'This is the first step from command literacy to automation literacy',body:'The shell stops being just a place where you type commands once. It becomes a tiny programming environment where you name values, reuse them, and make future changes safer.',tags:['Shell scripting','Maintainability','Automation']}},
+    {id:'p2s4',obj:'Update the IP with sed',ctx:'Mission control changed the rescue host. Replace 192.168.1.42 with 10.0.0.5 without opening an editor.',cmd:['sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh','sed -i "s/192.168.1.42/10.0.0.5/g" rescue.sh'],acceptFn:v=>v.startsWith('sed -i')&&v.includes('192.168.1.42')&&v.includes('10.0.0.5')&&v.includes('rescue.sh'),accept:['sed -i replace rescue.sh'],hint:'Use sed -i with a substitution pattern.',out:'rescue.sh updated in place',unlockCmd:'sed -i',jit:{title:'This is a text surgery pattern you will reuse everywhere',body:'You already stored the host once, which is good engineering. Now the requirement changes, and you need to patch the file quickly without opening an editor or risking a manual typo.'},teach:{title:'Read the substitution from left to right',body:'In <code>sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh</code>, the <code>s</code> means substitute, the first address is what you are finding, the second is what replaces it, and <code>g</code> means apply that replacement everywhere it appears on the line.'},bridge:{title:'Small incident edits often happen in-place',body:'During recovery work, operators constantly patch config files, env files, and scripts in place. <code>sed</code> is valuable because it is fast, precise, and easy to chain into larger shell workflows.',tags:['Shell scripting','Text processing','Incident response']}},
     {id:'p2s5',obj:'Run the script and capture all output',ctx:'Make the script executable and run it while capturing both standard output and errors.',cmd:['chmod +x rescue.sh && ./rescue.sh 2>&1'],acceptFn:v=>includesInOrder(v,['chmod +x rescue.sh','./rescue.sh 2>&1']),accept:['chmod +x rescue.sh && ./rescue.sh 2>&1'],hint:'Use chmod +x first, then run ./rescue.sh 2>&1 in the same chain.',out:'Attempting rescue on 10.0.0.5...\nERROR: SERVER variable was not validated before use.\nConnection refused.',unlockCmd:['chmod +x','2>&1'],jit:{title:'Failure evidence splits across two streams by default',body:'Shell scripts write normal output to stdout and failures to stderr. If you only capture one, you get an incomplete story and often debug the wrong thing.'},teach:{title:'Capture everything when a script fails',body:'<code>2>&1</code> sends stderr into the same stream as stdout so the failure evidence is visible in one place.'},bridge:{title:'Operators optimize for evidence, not elegance',body:'When a recovery script fails, you want one clean transcript you can read, paste, and reason from. Joining both streams is a basic but critical troubleshooting habit.',tags:['Shell scripting','Debugging','Incident response']}},
     {id:'p2s6',obj:'Add and prove an empty-variable guard',ctx:'Append the guard, then deliberately unset SERVER and rerun the script so you can watch the defensive path fire before restoring the valid value.',cmd:['echo \'if [ -z "$SERVER" ]; then echo "No server set. Aborting."; exit 1; fi\' >> rescue.sh'],accept:['if guard append'],acceptFn:v=>v.startsWith('echo')&&v.includes('-z "$SERVER"')&&v.includes('>> rescue.sh'),hint:'Append the guard first, then prove it by unsetting SERVER and rerunning the script before restoring the valid value.',out:'Guard clause appended to rescue.sh\nSERVER guard test pending…',multi:{parts:[{label:'Guard appended',hint:'Append an if [ -z "$SERVER" ] guard into rescue.sh first.',test:(_,n)=>n.startsWith('echo')&&n.includes('-z "$SERVER"')&&n.includes('>> rescue.sh')},{label:'Guard proven',hint:'Now trigger the guard with unset SERVER && ./rescue.sh, then restore with export SERVER="10.0.0.5" && ./rescue.sh',test:(_,n)=>n.includes('unset SERVER')&&n.includes('./rescue.sh')&&n.includes('export SERVER="10.0.0.5"')&&n.includes('./rescue.sh')}],nextPrompts:['Good. Now prove the guard works: unset SERVER, rerun the script, then restore SERVER and rerun the happy path.']},teach:{title:'A guard is only trustworthy after you trigger it on purpose',body:'Defensive shell code should be tested on both paths. Force the missing-variable branch first so you can see the script abort cleanly with exit code 1, then restore the valid value and confirm the normal rescue path still runs. That is how operators validate safety checks instead of just admiring them.'},bridge:{title:'This is how teams validate defensive automation under pressure',body:'Reliable scripts are exercised on failure paths before they are trusted in production. Incident responders unset variables, break assumptions, and watch the guard rails activate so they know the automation will fail closed instead of making the outage worse.',tags:['Shell scripting','Incident response','Defensive coding']},quiz:{q:'Why chain <code>chmod +x rescue.sh && ./rescue.sh 2>&1</code> instead of running parts in a random order?',opts:['Because && looks cleaner','Because the run should happen only if the permission change succeeded, and 2>&1 keeps all evidence together','Because scripts only work with stderr enabled','Because Linux requires chmod before any echo command'],correct:1,fb:'Correct. The chain enforces the right order, and <code>2>&1</code> keeps the full result visible for diagnosis.'}}
    ],
@@ -4693,7 +4787,7 @@ const ENGINEER_PHASES=[
     {id:'p5s2',obj:'Filter JSON error events with jq',ctx:'Use jq to keep only the objects whose level is ERROR.',cmd:['cat events.json | jq \'.[] | select(.level == "ERROR")\'','cat events.json | jq ".[] | select(.level == \\\"ERROR\\\")"'],acceptFn:v=>v.includes('cat events.json')&&v.includes('jq')&&v.includes('select')&&v.includes('ERROR'),accept:['jq select error'],hint:'Use .[] | select(.level == "ERROR")',out:'{"level":"ERROR","timestamp":"11:42","message":"battery below threshold"}',unlockCmd:'jq select'},
     {id:'p5s3',obj:'Reshape the event payload',ctx:'Construct a smaller object with only the time and message fields.',cmd:['cat events.json | jq \'.[] | {time: .timestamp, msg: .message}\'','cat events.json | jq ".[] | {time: .timestamp, msg: .message}"'],acceptFn:v=>v.includes('cat events.json')&&v.includes('jq')&&v.includes('{time: .timestamp, msg: .message}'),accept:['jq object construction'],hint:'Use jq object construction: {time: .timestamp, msg: .message}',out:'{"time":"11:42","msg":"battery below threshold"}',unlockCmd:'jq object'},
     {id:'p5s4',obj:'Split a live stream while watching battery',ctx:'Archive the stream to monitor.log while still piping the battery value to jq.',cmd:['curl http://192.168.1.42/stream | tee monitor.log | jq \'.battery\'','curl http://192.168.1.42/stream | tee monitor.log | jq ".battery"'],acceptFn:v=>v.includes('curl')&&v.includes('/stream')&&v.includes('| tee monitor.log |')&&v.includes('jq')&&v.includes('.battery'),accept:['curl stream | tee | jq battery'],hint:'Use curl | tee monitor.log | jq .battery',out:'41\n40\n39',unlockCmd:'tee'},
-    {id:'p5s5',obj:'Find every log file containing ERROR',ctx:'Use find with xargs to locate every .log file in this workspace that contains the word ERROR.',cmd:['find . -name "*.log" | xargs grep -l "ERROR"','find . -name "*.log" | xargs grep -l ERROR'],acceptFn:v=>v.includes('find . -name "*.log"')&&v.includes('|')&&v.includes('xargs grep -l')&&v.includes('ERROR'),accept:['find . -name "*.log" | xargs grep -l "ERROR"'],hint:'Start with find . -name "*.log", then pipe into xargs grep -l "ERROR".',out:'./events.log\n./monitor.log',unlockCmd:'xargs',jit:{title:'This is where pipelines stop being toy examples',body:'You are no longer filtering one file. You are discovering matching files, then turning that discovered list directly into the next command. That is the shell behaving like a composable system.'},teach:{title:'xargs turns a list into action',body:'<code>xargs</code> takes input items from the pipe and appends them to the command on the right, so each matching file becomes an argument to <code>grep -l</code> automatically.'},bridge:{title:'Search output can become the next command’s input',body:'<code>xargs</code> is the connective tissue between discovery and action. It turns a list of matching files into the next exact operation.',tags:['Pipelines','Search','Automation']}}
+    {id:'p5s5',obj:'Find every log file containing ERROR',ctx:'Use find with xargs to locate every .log file in this workspace that contains the word ERROR.',cmd:['find . -name "*.log" | xargs grep -l "ERROR"','find . -name "*.log" | xargs grep -l ERROR'],acceptFn:v=>v.includes('find . -name "*.log"')&&v.includes('|')&&v.includes('xargs grep -l')&&v.includes('ERROR'),accept:['find . -name "*.log" | xargs grep -l "ERROR"'],hint:'Start with find . -name "*.log", then pipe into xargs grep -l "ERROR".',out:'./events.log\n./monitor.log',unlockCmd:'xargs',jit:{title:'This is where pipelines stop being toy examples',body:'You are no longer filtering one file. You are discovering matching files, then turning that discovered list directly into the next command. That is the shell behaving like a composable system.'},teach:{title:'xargs turns discovery into execution',body:'<code>find</code> emits filenames as plain text. <code>xargs</code> reads that text and appends each result to the next command, so <code>grep -l</code> can operate on every discovered log file without you typing the list by hand.'},bridge:{title:'Search output can become the next command’s input',body:'<code>xargs</code> is the connective tissue between discovery and action. This is the mental model to keep: command one finds the work, command two performs the work. The pipe plus <code>xargs</code> is what glues those stages together.',tags:['Pipelines','Search','Automation']}}
    ],
    challenge:ENGINEER_CHALLENGES[5],
    done:'Phase 5 complete. You can filter text, shape JSON, archive streams, and turn search results into action.',
@@ -5410,23 +5504,7 @@ if(window.matchMedia){
   else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
 }
 
-if(G.phase>1||G.completedPhases.length>0){
-  const bm=document.getElementById('boot-modal');
-  bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
-  bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
-  const pb=bm.querySelector('.mbtn-p');
-  pb.textContent='RESUME';
-  pb.onclick=resumeSession;
-  const rb=document.createElement('button');
-  rb.className='mbtn mbtn-s';rb.textContent='Start Over';
-  rb.onclick=doRestart;
-  pb.after(rb);
-} else {
-  // First time — focus the name input after a short delay
-  setTimeout(()=>{
-    document.getElementById('boot-name').focus();
-  }, 300);
-}
+syncBootModalState();
 applyUIPreferences();
 </script>
 <script src="analytics-client.js"></script>
