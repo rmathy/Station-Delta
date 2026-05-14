@@ -3073,14 +3073,14 @@ async function processCmd(raw){
     syncObjCard();return;
   }
 
+  // objective matching should win over generic easter handlers
+  const ph=PHASES[G.phase];const s=ph.steps[G.step];
+  if(matchesStep(val,s)){markStepAttempt(G.phase,s,true);await handleCorrect(s,ph);syncObjCard();return}
+
   // easter eggs
   for(const [key,ee] of Object.entries(EASTER)){
     if(vl===key||vl.startsWith(key+' ')){const caught=ee.handle(val);if(caught){syncObjCard();return}}
   }
-
-  // objective matching
-  const ph=PHASES[G.phase];const s=ph.steps[G.step];
-  if(matchesStep(val,s)){markStepAttempt(G.phase,s,true);await handleCorrect(s,ph);syncObjCard();return}
 
   // persistent unlocked cmds
   if(G.unlockedCmds.length>0){const handled=handlePersistentCmd(vl,val);if(handled){syncObjCard();return}}
