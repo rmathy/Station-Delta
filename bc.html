@@ -33,33 +33,16 @@
   .boot-line { opacity: 0; animation: fadein 0.15s forwards; }
   @keyframes fadein { to { opacity: 1; } }
   .cta-bar {
-    border-top: 1px dashed #1a4433;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #060606;
+    border-top: 1px dashed #1a4433; padding: 10px 20px;
+    display: flex; align-items: center; gap: 10px; background: #060606;
   }
   .cta-label { color: #005533; font-size: clamp(0.8rem, 3vw, 0.9rem); white-space: nowrap; }
   .cta-btn {
-    flex: 1;
-    background: none;
-    border: 1px solid var(--dim);
-    color: var(--g);
-    font-family: 'VT323', monospace;
-    font-size: clamp(1rem, 4vw, 1.15rem);
-    padding: 5px 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.15s;
-    text-align: left;
+    flex: 1; background: none; border: 1px solid var(--dim); color: var(--g);
+    font-family: 'VT323', monospace; font-size: clamp(1rem, 4vw, 1.15rem);
+    padding: 5px 14px; cursor: pointer; letter-spacing: 1px; transition: all 0.15s; text-align: left;
   }
-  .cta-btn:hover, .cta-btn:active {
-    background: #001a0d;
-    border-color: var(--g);
-    color: #fff;
-    box-shadow: 0 0 8px rgba(0,255,150,0.2);
-  }
+  .cta-btn:hover, .cta-btn:active { background: #001a0d; border-color: var(--g); color: #fff; box-shadow: 0 0 8px rgba(0,255,150,0.2); }
   .cta-btn .npm { color: var(--dim); }
   .cta-btn .cmd { color: var(--g); }
   .cta-btn:hover .cmd, .cta-btn:active .cmd { color: #fff; }
@@ -96,10 +79,11 @@
   .status-bar {
     background: var(--bg3); border-top: 1px solid var(--dim);
     padding: 5px 20px; display: flex; justify-content: space-between;
-    font-size: clamp(0.75rem, 2.8vw, 0.85rem); color: var(--dim); flex-wrap: wrap; gap: 4px;
+    font-size: clamp(0.65rem, 2.5vw, 0.78rem); color: var(--dim); flex-wrap: wrap; gap: 4px;
   }
   .live { color: var(--gb); }
   .highlight { color: #fff; }
+  .sam { color: #00cc7a; font-size: clamp(0.6rem, 2.2vw, 0.72rem); }
   .janet-flash { animation: janetpulse 2s ease-in-out; }
   @keyframes janetpulse { 0%,100%{background:var(--bg2)} 30%{background:#1a0015} 60%{background:#0d0010} }
   .lola-flash { animation: lolapulse 2s ease-in-out; }
@@ -149,13 +133,26 @@
 
   <div class="status-bar">
     <span>UE-ID: <span class="highlight">Q6HHZBDYZT54</span></span>
-    <span>13 sims · 4 tracks</span>
+    <span class="sam">✓ SAM.gov · CAGE: 207P4</span>
     <span class="live">● AI Era Training</span>
   </div>
 </div>
 
 <script>
-const vCardData = `BEGIN:VCARD\nVERSION:3.0\nFN:Richard Mathy, M.Ed.\nN:Mathy;Richard;;;\nORG:Station Delta\nTITLE:Founder\nNOTE:UE ID: Q6HHZBDYZT54 - CLI Training for the AI Era - You can prompt. Can you ship?\nURL:https://stationdelta.dev\nX-SOCIALPROFILE;type=twitter:https://x.com/Richard_Mathy\nEND:VCARD`;
+const vCardData = [
+  'BEGIN:VCARD',
+  'VERSION:3.0',
+  'FN:Richard Mathy\\, M.Ed.',
+  'N:Mathy;Richard;;;',
+  'ORG:Station Delta LLC',
+  'TITLE:Founder',
+  'TEL;TYPE=CELL:607-725-1324',
+  'EMAIL:stationdeltallc@gmail.com',
+  'URL:https://stationdelta.dev',
+  'NOTE:UE ID: Q6HHZBDYZT54 | CAGE: 207P4 | SAM.gov Registered | CLI Training for the AI Era | You can prompt. Can you ship?',
+  'X-SOCIALPROFILE;type=twitter:https://x.com/Richard_Mathy',
+  'END:VCARD'
+].join('\n');
 
 function downloadVCard() {
   const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
@@ -175,7 +172,7 @@ const bootLines = [
   { d: 430, t: '╚══════════════════════════════════════╝', c: '#005533' },
   { d: 500, t: '' },
   { d: 560, t: 'Richard Mathy, M.Ed.' },
-  { d: 620, t: 'Founder' },
+  { d: 620, t: 'Founder · Station Delta LLC' },
   { d: 680, t: '' },
   { d: 740, t: '» You can prompt. Can you ship? «', c: '#fff', big: true },
   { d: 840, t: '' },
@@ -236,7 +233,7 @@ function runCmd(cmd) {
 
 const commands = {
   help:           () => setOutput('commands: mission · tracks · skills · contact · save · clear · whoami\n[ hidden: try typing names you might recognize... ]', 'normal'),
-  whoami:         () => setOutput('Richard Mathy — turning developers into AI-era operators.\nM.Ed. | Builder | Educator', 'normal'),
+  whoami:         () => setOutput('Richard Mathy, M.Ed. — turning developers into AI-era operators.\nFounder · Station Delta LLC · SAM.gov Registered', 'normal'),
   mission:        () => setOutput('Narrative-driven terminal simulations.\nNo videos. No passive learning.\nYou type → You ship → You graduate.', 'normal'),
   tracks:         () => setOutput(
     '🛡️  Security & Reliability  — secure, resilient, observable systems\n' +
@@ -247,13 +244,20 @@ const commands = {
     'normal'
   ),
   skills:         () => setOutput('13 interactive CLI sims · 9 phases each\nL.O.L.A. coaching · J.A.N.E.T. boss fights\nFree: Cadet + Engineer · Paid: Officer → Captain', 'normal'),
-  contact:        () => setOutputHTML('DM: <a href="https://x.com/Richard_Mathy" target="_blank" style="color:var(--g)">@Richard_Mathy</a>  ·  Web: <a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">stationdelta.dev</a>', 'normal'),
+  contact:        () => setOutputHTML(
+    '📧 stationdeltallc@gmail.com\n' +
+    '📞 607-725-1324\n' +
+    '𝕏  <a href="https://x.com/Richard_Mathy" target="_blank" style="color:var(--g)">@Richard_Mathy</a>\n' +
+    '🌐 <a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">stationdelta.dev</a>',
+    'normal'
+  ),
   save:           () => downloadVCard(),
   'save contact': () => downloadVCard(),
   vcard:          () => downloadVCard(),
   download:       () => downloadVCard(),
   clear:          () => setOutput('Type a command or click above ↑', 'normal'),
   sim:            () => setOutputHTML('Launching Cadet simulation...\n<a href="https://stationdelta.dev" target="_blank" style="color:var(--g)">Open stationdelta.dev →</a>', 'normal'),
+  sam:            () => setOutput('✓ Station Delta LLC\n  Registered: SAM.gov\n  UE ID: Q6HHZBDYZT54\n  CAGE Code: 207P4\n  Status: ACTIVE\n  Eligible for U.S. federal government contracts.', 'normal'),
 
   janet: () => {
     flashCard('janet');
