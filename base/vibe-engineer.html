@@ -964,7 +964,7 @@ body.expert-mode #obj-reveal{display:none!important}
     </div>
     <div style="text-align:center">
       <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
-      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
+      <button class="mbtn mbtn-s" onclick="leaveCheckpointToHome()">TAKE A BREAK</button>
     </div>
   </div>
 </div>
@@ -3638,6 +3638,12 @@ function getCheckpointSignupUrl(){
 }
 function routeToCheckpointSignup(){
   window.location.href=getCheckpointSignupUrl();
+}
+function leaveCheckpointToHome(){
+  const homeUrl=isFileProtocol()
+    ? `file://${window.location.pathname.replace(/\/base\/[^/]+$/, '/index.html')}`
+    : '/index.html';
+  window.location.href=homeUrl;
 }
 function openPhaseCheckpoint(completedPhase, nextPhase){
   const completedIndex=PHASES.findIndex(p=>p===completedPhase);
