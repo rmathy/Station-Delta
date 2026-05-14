@@ -5,24 +5,45 @@ const {
   stripeApi,
   getPlanConfig,
   getBaseUrl,
+  findProfileByEmail,
 } = require("./_stripe-billing");
+
+function getBodyFromRequest(req) {
+  if (req.method === "GET") {
+    const url = new URL(req.url, "https://stationdelta.dev");
+    return {
+      plan: url.searchParams.get("plan") || "",
+      userId: url.searchParams.get("userId") || "",
+      email: url.searchParams.get("email") || "",
+      successUrl: url.searchParams.get("successUrl") || "",
+      cancelUrl: url.searchParams.get("cancelUrl") || "",
+      redirect: url.searchParams.get("redirect") === "1",
+    };
+  }
+  return readJsonBody(req);
+}
 
 module.exports = async function handler(req, res) {
   setCors(res);
   if (req.method === "OPTIONS") return res.status(204).end();
-  if (req.method !== "POST") {
+  if (!["GET", "POST"].includes(req.method)) {
     return json(res, 405, { ok: false, error: "Method not allowed" });
   }
 
   try {
-    const body = await readJsonBody(req);
+    const body = await getBodyFromRequest(req);
     const plan = getPlanConfig(body.plan);
-    const userId = String(body.userId || "").trim();
+    const requestedUserId = String(body.userId || "").trim();
     const email = String(body.email || "").trim();
     const origin = getBaseUrl(req);
+    const profile = !requestedUserId && email ? await findProfileByEmail(email) : null;
+    const userId = requestedUserId || profile?.id || "";
 
     if (!userId) {
-      return json(res, 400, { ok: false, error: "Missing required field: userId" });
+      return json(res, 400, {
+        ok: false,
+        error: "Missing required field: userId. You can also provide a known profile email."
+      });
     }
 
     const successUrl =
@@ -56,6 +77,13 @@ module.exports = async function handler(req, res) {
       method: "POST",
       form,
     });
+
+    if (req.method === "GET" || body.redirect) {
+      res.statusCode = 302;
+      res.setHeader("Location", session.url);
+      res.end();
+      return;
+    }
 
     return json(res, 200, {
       ok: true,

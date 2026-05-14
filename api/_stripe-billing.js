@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
@@ -235,6 +235,23 @@ async function findProfileByStripeCustomerId(customerId) {
   return Array.isArray(rows) && rows.length ? rows[0] : null;
 }
 
+async function findProfileByEmail(email) {
+  if (!email) return null;
+  const url = `${supabaseRestUrl("profiles")}?email=eq.${encodeURIComponent(
+    email
+  )}&select=id,email,subscription_tier,stripe_customer_id,stripe_subscription_id&limit=1`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: getSupabaseHeaders(),
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`Supabase profile lookup by email failed (${res.status}): ${text}`);
+  }
+  const rows = text ? JSON.parse(text) : [];
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
 function deriveTierFromSubscription(subscription) {
   const priceId = subscription?.items?.data?.[0]?.price?.id || "";
   const metadataTier =
@@ -299,6 +316,7 @@ module.exports = {
   getBaseUrl,
   updateProfileByUserId,
   findProfileByStripeCustomerId,
+  findProfileByEmail,
   syncProfileFromSubscription,
   deriveTierFromSubscription,
   isActiveSubscriptionStatus,
