@@ -961,7 +961,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="checkpoint-signup-nudge" class="checkpoint-nudge" data-tone="generic" hidden>
       <div class="checkpoint-nudge-kicker" id="checkpoint-signup-kicker">Save this checkpoint</div>
       <div class="checkpoint-nudge-title" id="checkpoint-signup-title">Create your free account before you step away.</div>
-      <div class="checkpoint-nudge-copy" id="checkpoint-signup-copy">Free members can return to Lieutenant later and keep their place across devices.</div>
+      <div class="checkpoint-nudge-copy" id="checkpoint-signup-copy">Free members can return to Cadet later and keep their place across devices.</div>
       <div class="checkpoint-nudge-foot">
         <button class="mbtn mbtn-p checkpoint-nudge-btn" onclick="routeToCheckpointSignup()">SIGN UP FREE &amp; SAVE MY SPOT</button>
         <div class="checkpoint-nudge-note" id="checkpoint-signup-note">We will bring you right back to this sim after sign-in.</div>
@@ -1139,12 +1139,18 @@ async function initSupabaseAuthClient(){
       G.userId=session.user.id;
       G.userEmail=session.user.email;
       console.log('[Station Delta] Session active:', G.userEmail);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
     }else{
       const snapshot=readLocalAuthSnapshot();
       if(snapshot?.userId){
         G.userId=snapshot.userId;
         G.userEmail=snapshot.email || null;
         console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+        const restored = await loadCloudProgress();
+        if(restored) save();
+        syncBootModalState();
       }else if(hostedMode){
         console.log('[Station Delta] Guest mode — no session');
       }
@@ -1156,6 +1162,9 @@ async function initSupabaseAuthClient(){
       G.userId=snapshot.userId;
       G.userEmail=snapshot.email || null;
       console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
     }
   }
 }
@@ -3132,6 +3141,7 @@ function save(){
   }catch(err){
     console.warn('[Station Delta] Failed to save progress', err);
   }
+  queueCloudProgressSave();
 }
 function loadSave(){
   if(canUseLocalStorage()){
@@ -3148,6 +3158,61 @@ function loadSave(){
     }
   }
   ensureAnalytics();
+}
+
+let _cloudSaveTimer=null;
+function queueCloudProgressSave(){
+  if(!window._sb || !G.userId) return;
+  if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer=setTimeout(()=>{ saveCloudProgress(); },150);
+}
+
+async function saveCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb.from('progress').upsert({
+      user_id:G.userId,
+      sim_id:CADET_SAVE_KEY,
+      phase_id:String(G.phase||1),
+      step_id:JSON.stringify(G),
+      completed_at:new Date().toISOString()
+    }, { onConflict:'user_id,sim_id' });
+  }catch(err){
+    console.warn('[Station Delta] Failed to save cloud progress', err);
+  }
+}
+
+async function loadCloudProgress(){
+  if(!window._sb || !G.userId) return false;
+  try{
+    const { data, error } = await window._sb
+      .from('progress')
+      .select('phase_id, step_id')
+      .eq('user_id', G.userId)
+      .eq('sim_id', CADET_SAVE_KEY)
+      .maybeSingle();
+    if(error || !data) return false;
+    if(data.step_id){
+      try{
+        const parsed=JSON.parse(data.step_id);
+        G={...G,...parsed};
+        return true;
+      }catch(parseErr){
+        console.warn('[Station Delta] Failed to parse cloud progress snapshot', parseErr);
+      }
+    }
+    const phase=Number(data.phase_id);
+    if(Number.isFinite(phase) && phase>=1){
+      G.phase=phase;
+      G.step=0;
+      G.pendingPhaseStart=phase>1;
+      G.completedPhases=Array.from({length:Math.max(0,phase-1)},(_,i)=>i+1);
+      return true;
+    }
+  }catch(err){
+    console.warn('[Station Delta] Failed to load cloud progress', err);
+  }
+  return false;
 }
 
 function getHardModeElapsedMs(){
@@ -4331,6 +4396,33 @@ function resumeSession(){
   syncDots();syncObjCard();
   $cmd.focus();
 }
+
+function syncBootModalState(){
+  const bm=document.getElementById('boot-modal');
+  if(!bm) return;
+  const shouldResume = G.name!=='Cadet' && (G.phase>1 || G.step>0 || G.completedPhases.length>0 || G.pendingPhaseStart || G.bossActive || G.sandbox);
+  const pb=bm.querySelector('.mbtn-p');
+  let rb=bm.querySelector('[data-resume-secondary="1"]');
+  if(shouldResume){
+    bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
+    bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
+    pb.textContent='RESUME';
+    pb.onclick=resumeSession;
+    if(!rb){
+      rb=document.createElement('button');
+      rb.className='mbtn mbtn-s';
+      rb.textContent='Start Over';
+      rb.dataset.resumeSecondary='1';
+      rb.onclick=doRestart;
+      pb.after(rb);
+    }
+    return;
+  }
+  if(rb) rb.remove();
+  setTimeout(()=>{
+    document.getElementById('boot-name')?.focus();
+  }, 300);
+}
  
 /* ── STARTUP DECISION ── */
 loadSave();
@@ -4349,23 +4441,7 @@ if(window.matchMedia){
   else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
 }
  
-if(G.name!=='Cadet' && (G.phase>1 || G.step>0 || G.completedPhases.length>0 || G.pendingPhaseStart || G.bossActive || G.sandbox)){
-  const bm=document.getElementById('boot-modal');
-  bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
-  bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue where you left off?`;
-  const pb=bm.querySelector('.mbtn-p');
-  pb.textContent='RESUME';
-  pb.onclick=resumeSession;
-  const rb=document.createElement('button');
-  rb.className='mbtn mbtn-s';rb.textContent='Start Over';
-  rb.onclick=doRestart;
-  pb.after(rb);
-} else {
-  // First time — focus the name input after a short delay
-  setTimeout(()=>{
-    document.getElementById('boot-name').focus();
-  }, 300);
-}
+syncBootModalState();
 initSupabaseAuthClient();
 applyUIPreferences();
 </script>

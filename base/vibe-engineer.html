@@ -926,8 +926,8 @@ body.expert-mode #obj-reveal{display:none!important}
       </div>
       <div class="grad-next">
         <div class="grad-card">
-          <div class="grad-card-title">Vibe Agent Architect</div>
-          <div class="grad-card-copy">Design, evaluate, and govern multi-agent systems in production. Includes Playbook Save and Whatif scenarios.</div>
+          <div class="grad-card-title">Station Delta: Lieutenant</div>
+          <div class="grad-card-copy">Lead code review, production incident response, and AI-governed engineering decisions under pressure.</div>
           <button class="mbtn mbtn-p" onclick="continueToLieutenant()">CONTINUE TO LIEUTENANT →</button>
         </div>
         <div class="grad-card">
@@ -1440,7 +1440,7 @@ const ACHS = [
   {id:'crew_leader', icon:'👥', name:'Crew Leader',         desc:'Assembled a two-agent crew.'},
   {id:'prompter',    icon:'💬', name:'Prompt Crafter',      desc:'Sent your first structured agent prompt.'},
   {id:'shipper',     icon:'🚀', name:'Shipper',             desc:'Deployed your first app to production.'},
-  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Vibe Cadet Academy.'},
+  {id:'graduate',    icon:'🎖️', name:'Full Graduate',       desc:'Completed the entire Station Delta: Engineer simulation.'},
   {id:'senior_cadet',icon:'⭐', name:'Senior Cadet',        desc:'Completed the post-graduation capstone.'},
   {id:'quiz_ace',    icon:'🧠', name:'Quiz Ace',            desc:'Answered a quiz correctly on the first try.'},
   {id:'eagle',       icon:'🦅', name:'Eagle Eye',           desc:'Completed a phase without revealing the answer.'},
@@ -4973,7 +4973,7 @@ function applyEngineerReferenceContent(){
   if(achById.crew_leader){achById.crew_leader.name='MCP Operator';achById.crew_leader.desc='Connected tool access with deliberate permission boundaries.';}
   if(achById.prompter){achById.prompter.name='Prompt Pilot';achById.prompter.desc='Directed the rescue crew with clear, high-signal prompts.';}
   if(achById.shipper){achById.shipper.name='Rescue Shipper';achById.shipper.desc='Stabilized and shipped a live rescue service.';}
-  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed the Vibe Engineer commission. Systems stabilized.';}
+  if(achById.graduate){achById.graduate.name='Commission Graduate';achById.graduate.desc='Completed the Station Delta: Engineer commission. Systems stabilized.';}
 }
 
 function ensureEngineerScaffold(){
@@ -5195,7 +5195,7 @@ if(G.currentPath==='/home/cadet/projects') G.currentPath='/home/engineer/distres
 
 // Engineer wording polish across shared metadata surfaces.
 const _achGrad=ACHS.find(a=>a.id==='graduate');
-if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed the Vibe Engineer commission. Systems stabilized.';}
+if(_achGrad){_achGrad.name='Commission Graduate';_achGrad.desc='Completed the Station Delta: Engineer commission. Systems stabilized.';}
 const _achSenior=ACHS.find(a=>a.id==='senior_cadet');
 if(_achSenior){_achSenior.name='Senior Engineer';_achSenior.desc='Completed post-commission capstone objectives.';}
 const _achShip=ACHS.find(a=>a.id==='shipper');

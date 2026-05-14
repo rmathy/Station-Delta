@@ -736,7 +736,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     <div id="lola-strip-avatar">L.O.L.A. ▸</div>
     <div id="lola-strip-scroll">
       <div id="lola-strip-inner" class="no-scroll">
-        <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Vibe Cadet. Same terminal, but now your judgment affects the whole crew.</span>
+        <span class="lola-strip-msg"><span class="ls-tag">TIP</span>You graduated Station Delta: Cadet. Same terminal, but now your judgment affects the whole crew.</span>
       </div>
     </div>
     <div id="lola-strip-ctrls">
@@ -877,7 +877,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
     </div>
     <button class="mbtn mbtn-p" onclick="startAcademy()">ACCEPT COMMISSION</button>
     <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
-    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Sequel to Vibe Cadet Academy. No account needed. Runs in any browser.</div>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Continuation of the Station Delta track. Free account unlock. Runs in any browser.</div>
   </div>
 </div>
 
@@ -998,8 +998,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE LIEUTENANT v2.0
-   Sequel to Vibe Cadet Academy
+   STATION DELTA: LIEUTENANT v2.0
+   Continuation of Station Delta: Cadet
    Phases: Codebase reading · Diff review · Stack traces ·
    TypeScript errors · API literacy · Testing · Incidents ·
    AI code review · Team workflow
@@ -1087,7 +1087,7 @@ async function initSupabaseAuthClient(){
     if(snapshot?.userId){
       G.userId=snapshot.userId;
       G.userEmail=snapshot.email || null;
-      G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+      G.isPaid = hasOfficerAccessTier(snapshot.tier);
       console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
       save();
     }
@@ -1115,14 +1115,20 @@ async function initSupabaseAuthClient(){
       G.userId=session.user.id;
       G.userEmail=session.user.email;
       console.log('[Station Delta] Session active:', G.userEmail);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
       save();
     }else{
       const snapshot=readLocalAuthSnapshot();
       if(snapshot?.userId){
         G.userId=snapshot.userId;
         G.userEmail=snapshot.email || null;
-        G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+        G.isPaid = hasOfficerAccessTier(snapshot.tier);
         console.log('[Station Delta] Local auth snapshot active:', G.userEmail || G.userId);
+        const restored = await loadCloudProgress();
+        if(restored) save();
+        syncBootModalState();
         save();
       }else if(hostedMode){
         window.location.href=`/auth.html?redirect=${encodeURIComponent('/base/vibe-lieutenant.html')}`;
@@ -1135,8 +1141,11 @@ async function initSupabaseAuthClient(){
     if(snapshot?.userId){
       G.userId=snapshot.userId;
       G.userEmail=snapshot.email || null;
-      G.isPaid = snapshot.tier === 'individual' || snapshot.tier === 'fleet';
+      G.isPaid = hasOfficerAccessTier(snapshot.tier);
       console.log('[Station Delta] Local auth snapshot active after init failure:', G.userEmail || G.userId);
+      const restored = await loadCloudProgress();
+      if(restored) save();
+      syncBootModalState();
       save();
     }
   }
@@ -1174,7 +1183,7 @@ function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.le
 /* ── LOLA STRIP MESSAGES BY PHASE ── */
 const LOLA_STRIP = {
   0: [
-    {tag:'WELCOME',msg:"You graduated Vibe Cadet. The commands are the same — the stakes are higher."},
+    {tag:'WELCOME',msg:"You graduated Station Delta: Cadet. The commands are the same — the stakes are higher."},
     {tag:'REMEMBER',msg:"<code>ls -la</code> shows hidden files too. Always start there in an unfamiliar codebase."},
     {tag:'TIP',msg:"<code>cat package.json</code> tells you the whole stack in 30 seconds. That's your orientation sequence."},
     {tag:'LOLA',msg:"I'm still here. Same deal as Cadet — I'll explain everything. You've got this."},
@@ -1304,7 +1313,7 @@ const CAREER_LOG_DATA = [
   {phase:'Phase 6 — Testing Fundamentals',stat:'50-80%',context:'of AI-generated code contains subtle bugs that only tests catch. The ability to write a basic test — not deep TDD, just "does this function do what it says" — is the difference between shipping code you trust and code that works on your machine.',tags:['Vitest','Jest','Unit tests','CI/CD','AI verification']},
   {phase:'Phase 7 — Production Incident Response',stat:'2am',context:'is when production incidents happen. Every engineer who gets paged learns the same sequence: identify, isolate, mitigate, then fix. The ability to run through this loop calmly under pressure is how on-call rotations get survived and how reputations get built.',tags:['SRE','On-call','Incident management','Observability','Runbooks']},
   {phase:'Phase 8 — AI Code Review',stat:'~30%',context:'of AI-generated code contains at least one subtle logical error that passes visual inspection. Knowing the patterns where AI confidently goes wrong — off-by-one errors, security anti-patterns, wrong library APIs — and being able to catch them in review is one of the most valuable skills of the next decade.',tags:['AI safety','Code review','Security','Claude Code','Cursor']},
-  {phase:'Phase 9 — Team Workflow',stat:'10×',context:'multiplier on individual output when you can effectively operate within a team: writing clear PR descriptions, leaving useful review comments, understanding deployment gates, and coordinating a release. The terminal skills from Vibe Cadet are the foundation. This is the structure that makes them count.',tags:['GitHub','PRs','Team coordination','Engineering culture','Leadership']},
+  {phase:'Phase 9 — Team Workflow',stat:'10×',context:'multiplier on individual output when you can effectively operate within a team: writing clear PR descriptions, leaving useful review comments, understanding deployment gates, and coordinating a release. The terminal skills from Station Delta: Cadet are the foundation. This is the structure that makes them count.',tags:['GitHub','PRs','Team coordination','Engineering culture','Leadership']},
 ];
 
 /* ── GLOSSARY ── */
@@ -2591,6 +2600,7 @@ function save(){
   }catch(err){
     console.warn('[Station Delta] Failed to save progress', err);
   }
+  queueCloudProgressSave();
 }
 function loadSave(){
   if(!canUseLocalStorage()) return;
@@ -2600,6 +2610,61 @@ function loadSave(){
   }catch(err){
     console.warn('[Station Delta] Failed to load progress', err);
   }
+}
+
+let _cloudSaveTimer=null;
+function queueCloudProgressSave(){
+  if(!window._sb || !G.userId) return;
+  if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer=setTimeout(()=>{ saveCloudProgress(); },150);
+}
+
+async function saveCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb.from('progress').upsert({
+      user_id:G.userId,
+      sim_id:SAVE_KEY,
+      phase_id:String(G.phase||1),
+      step_id:JSON.stringify(G),
+      completed_at:new Date().toISOString()
+    }, { onConflict:'user_id,sim_id' });
+  }catch(err){
+    console.warn('[Station Delta] Failed to save cloud progress', err);
+  }
+}
+
+async function loadCloudProgress(){
+  if(!window._sb || !G.userId) return false;
+  try{
+    const { data, error } = await window._sb
+      .from('progress')
+      .select('phase_id, step_id')
+      .eq('user_id', G.userId)
+      .eq('sim_id', SAVE_KEY)
+      .maybeSingle();
+    if(error || !data) return false;
+    if(data.step_id){
+      try{
+        const parsed=JSON.parse(data.step_id);
+        G={...G,...parsed};
+        return true;
+      }catch(parseErr){
+        console.warn('[Station Delta] Failed to parse cloud progress snapshot', parseErr);
+      }
+    }
+    const phase=Number(data.phase_id);
+    if(Number.isFinite(phase) && phase>=1){
+      G.phase=phase;
+      G.step=0;
+      G.pendingPhaseStart=phase>1;
+      G.completedPhases=Array.from({length:Math.max(0,phase-1)},(_,i)=>i+1);
+      return true;
+    }
+  }catch(err){
+    console.warn('[Station Delta] Failed to load cloud progress', err);
+  }
+  return false;
 }
 
 /* ── ANALYTICS ── */
@@ -3181,7 +3246,7 @@ async function checkPaidTier(){
   G.paidTierChecked = true;
   if(!window._sb || !G.userId){
     const snapshot=readLocalAuthSnapshot();
-    G.isPaid = snapshot?.tier === 'individual' || snapshot?.tier === 'fleet';
+    G.isPaid = hasOfficerAccessTier(snapshot?.tier);
     syncPaidTierBootState();
     renderPlaybook();
     save();
@@ -3196,7 +3261,7 @@ async function checkPaidTier(){
       .single();
 
     if(error) throw error;
-    G.isPaid = data?.subscription_tier === 'individual' || data?.subscription_tier === 'fleet';
+    G.isPaid = hasOfficerAccessTier(data?.subscription_tier);
   }catch(err){
     console.warn('checkPaidTier failed', err);
     G.isPaid = false;
@@ -3210,6 +3275,19 @@ async function checkPaidTier(){
     setLola('Paid tier active. Deep Dive, Playbook, and What-If Scenarios are now enabled.');
   }
   return G.isPaid;
+}
+
+function hasOfficerAccessTier(tier){
+  const normalized=String(tier||'').toLowerCase().trim();
+  return [
+    'individual',
+    'fleet',
+    'bundle',
+    'ai_systems_bundle',
+    'officer_bundle',
+    'all_access',
+    'ai_systems_pass'
+  ].includes(normalized);
 }
 
 function showDeepDiveButton(phaseIdx){
@@ -3482,7 +3560,7 @@ function bootTerminal(){
     {t:'J.A.N.E.T. Assessment Protocol: LOADED',c:'ln-sys'},
     {t:'L.O.L.A. intelligence: ONLINE',c:'ln-sys'},
     {t:'',c:'ln-blank'},
-    {t:`Welcome, ${G.name}. You graduated Vibe Cadet — same terminal, higher stakes.`,c:'ln-lola'},
+    {t:`Welcome, ${G.name}. You graduated Station Delta: Cadet — same terminal, higher stakes.`,c:'ln-lola'},
     {t:`Path selected: ${pathLabel[G.learnerPath]||'GUIDED'}.`,c:'ln-lola'},
     ...explorerExtras,
     {t:'L.O.L.A.: Your mission: read this codebase, fix a bug, survive an incident, catch an AI hallucination, and ship.',c:'ln-lola'},
@@ -3551,6 +3629,31 @@ function resumeSession(){
     }
   }
   syncDots();syncObjCard();$cmd.focus();
+}
+
+function syncBootModalState(){
+  const bm=document.getElementById('boot-modal');
+  if(!bm) return;
+  const shouldResume = G.phase>1||G.completedPhases.length>0||G.pendingPhaseStart||G.bossActive||G.sandbox||G.step>0;
+  const pb=bm.querySelector('.mbtn-p');
+  let rb=bm.querySelector('[data-resume-secondary="1"]');
+  if(shouldResume){
+    bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
+    bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue?`;
+    pb.textContent='RESUME';
+    pb.onclick=resumeSession;
+    if(!rb){
+      rb=document.createElement('button');
+      rb.className='mbtn mbtn-s';
+      rb.textContent='Start Over';
+      rb.dataset.resumeSecondary='1';
+      rb.onclick=doRestart;
+      pb.after(rb);
+    }
+    return;
+  }
+  if(rb) rb.remove();
+  setTimeout(()=>document.getElementById('boot-name')?.focus(),300);
 }
 
 function doRestart(){openModal('restart-modal')}
@@ -4154,15 +4257,7 @@ if(window.matchMedia){
   if(mobileMq.addEventListener) mobileMq.addEventListener('change', syncMobilePreset);
   else if(mobileMq.addListener) mobileMq.addListener(syncMobilePreset);
 }
-if(G.phase>1||G.completedPhases.length>0||G.pendingPhaseStart||G.bossActive||G.sandbox){
-  const bm=document.getElementById('boot-modal');
-  bm.querySelector('.mtitle').textContent=`Welcome back, ${G.name}`;
-  bm.querySelector('.msub').textContent=`You're on Phase ${G.phase} of ${PHASES.length-1}. Continue?`;
-  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
-  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
-}else{
-  setTimeout(()=>document.getElementById('boot-name').focus(),300);
-}
+syncBootModalState();
 applyUIPreferences();
 </script>
 <script src="analytics-client.js"></script>
