@@ -487,6 +487,10 @@ button:hover{transform:translateY(-1px)}
         <button class="btn-danger" id="signOutBtn" type="button" onclick="window.runSignOut && window.runSignOut()">Sign Out</button>
       </div>
 
+      <div class="ghost-row">
+        <button class="btn-secondary" id="upgradeBtn" type="button" hidden onclick="window.runUpgradeToPaid && window.runUpgradeToPaid()">Unlock AI Systems Track — $19/month</button>
+      </div>
+
       <div class="message" id="messageBox">
         Enter free with Cadet and Engineer. Create a free account to unlock Lieutenant, keep your progress, and continue into Security, Platform, AI Systems, and Data when you are ready.
       </div>
@@ -546,15 +550,15 @@ button:hover{transform:translateY(-1px)}
 <script>
 const CONFIG = {
   supabaseUrl: 'https://bcipkdtxcbwcwbinekng.supabase.co',
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ',
-  upgradeUrl: 'https://buy.stripe.com/replace-with-your-station-delta-link'
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ'
 };
 
 const state = {
   mode: 'guest',
   session: null,
   profile: null,
-  tier: 'guest'
+  tier: 'guest',
+  billingPlan: null
 };
 
 const els = {
@@ -566,6 +570,7 @@ const els = {
   signUpBtn: document.getElementById('signUpBtn'),
   guestBtn: document.getElementById('guestBtn'),
   signOutBtn: document.getElementById('signOutBtn'),
+  upgradeBtn: document.getElementById('upgradeBtn'),
   messageBox: document.getElementById('messageBox'),
   tierValue: document.getElementById('tierValue'),
   statusCopy: document.getElementById('statusCopy'),
@@ -693,6 +698,12 @@ function getRedirectTarget() {
   return params.get('redirect');
 }
 
+function getBillingPlan() {
+  const params = new URLSearchParams(window.location.search);
+  const plan = String(params.get('billing') || '').trim();
+  return plan || null;
+}
+
 function getGuestRedirectTarget() {
   const target = getRedirectTarget();
   if (!target) return null;
@@ -749,8 +760,20 @@ function formatAuthError(error, fallback) {
   return message;
 }
 
+function hasPaidTrackAccess(tier) {
+  return [
+    'individual',
+    'fleet',
+    'bundle',
+    'ai_systems_bundle',
+    'officer_bundle',
+    'all_access',
+    'ai_systems_pass'
+  ].includes(String(tier || '').toLowerCase().trim());
+}
+
 function getTierDetails(tier) {
-  if (tier === 'individual' || tier === 'fleet') {
+  if (hasPaidTrackAccess(tier)) {
     return {
       label: tier === 'fleet' ? 'Fleet' : 'Paid',
       pill: tier === 'fleet' ? 'Fleet Access' : 'Officer Track Unlocked',
@@ -798,6 +821,30 @@ function renderState() {
     const dotClass = kind === 'paid' ? 'dot' : kind === 'free' ? 'dot free' : 'dot locked';
     return '<li><span class="' + dotClass + '"></span><span>' + label + '</span></li>';
   }).join('');
+
+  if (els.upgradeBtn) {
+    const showUpgrade = Boolean(state.session?.user?.id) && state.tier === 'free';
+    els.upgradeBtn.hidden = !showUpgrade;
+    if (showUpgrade) {
+      els.upgradeBtn.textContent = 'Unlock AI Systems Track — $19/month';
+    }
+  }
+}
+
+function getCheckoutUrl(planOverride = null) {
+  const plan = planOverride || state.billingPlan || 'ai_systems_pass';
+  const email = state.profile?.email || state.session?.user?.email || '';
+  const userId = state.session?.user?.id || '';
+  const params = new URLSearchParams({ plan, email, userId });
+  return '/api/stripe-checkout?' + params.toString();
+}
+
+function runUpgradeToPaid(planOverride = null) {
+  if (!state.session?.user?.id) {
+    setMessage('err', 'Sign in first, then unlock the AI Systems Track.');
+    return;
+  }
+  window.location.href = getCheckoutUrl(planOverride);
 }
 
 function togglePasswordVisibility() {
@@ -1150,11 +1197,13 @@ async function runSignOut() {
 }
 
 window.togglePasswordVisibility = togglePasswordVisibility;
+window.runUpgradeToPaid = runUpgradeToPaid;
 window.runSignIn = runSignIn;
 window.runSignUp = runSignUp;
 window.runForgotPassword = runForgotPassword;
 window.runSignOut = runSignOut;
 window.runContinueAsGuest = continueAsGuest;
+state.billingPlan = getBillingPlan();
 
 function bindAuthStateListener() {
   if (isFileProtocol()) return;

@@ -1118,6 +1118,13 @@ function goToAuthGate(){
   window.location.href=`/auth.html?redirect=${redirect}`;
 }
 
+function goToBillingCheckout(){
+  const params=new URLSearchParams({plan:'ai_systems_pass'});
+  if(G.userId) params.set('userId', G.userId);
+  if(G.userEmail) params.set('email', G.userEmail);
+  window.location.href=`/api/stripe-checkout?${params.toString()}`;
+}
+
 function applyOfficerAccessState(){
   const enterBtn=document.getElementById('boot-enter-btn');
   const resetBtn=document.getElementById('boot-reset-btn');
@@ -1130,16 +1137,16 @@ function applyOfficerAccessState(){
   }
 
   if(!G.userId){
-    enterBtn.textContent='SIGN IN FOR OFFICER ACCESS';
+    enterBtn.textContent='SIGN IN FOR AI SYSTEMS ACCESS';
     enterBtn.onclick=goToAuthGate;
-    note.textContent='Systems Integrity is part of the paid officer track. Sign in to verify your Station Delta access.';
+    note.textContent='Systems Integrity is part of the paid AI Systems track. Sign in to verify your Station Delta access.';
     return;
   }
 
   if(!G.isPaid){
-    enterBtn.textContent='RETURN TO ACCESS GATE';
-    enterBtn.onclick=goToAuthGate;
-    note.textContent='Your account is active, but Systems Integrity requires officer-track access. Upgrade to continue this path.';
+    enterBtn.textContent='UNLOCK AI SYSTEMS TRACK';
+    enterBtn.onclick=goToBillingCheckout;
+    note.textContent='Your account is active, but Systems Integrity requires paid AI Systems access. Upgrade to continue this path.';
     return;
   }
 
@@ -1176,8 +1183,8 @@ function syncBootModalState(){
   if(!hasProgress){
     applyOfficerAccessState();
   } else if (!isFileProtocol() && !G.isPaid) {
-    primary.textContent='RETURN TO ACCESS GATE';
-    primary.onclick=goToAuthGate;
+    primary.textContent='UNLOCK AI SYSTEMS TRACK';
+    primary.onclick=goToBillingCheckout;
   }
 }
 
