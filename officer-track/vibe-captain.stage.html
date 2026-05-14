@@ -158,7 +158,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #lola-strip-inner.scrolling{animation:lolaScroll 22s linear infinite}
 #lola-strip-inner.no-scroll{animation:none;padding-left:14px}
 @keyframes lolaScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){#lola-strip-inner.scrolling{animation:none;padding-left:14px;}}
+@media(prefers-reduced-motion:reduce){#lola-strip-inner.scrolling{animation:none;padding-left:14px;}.boss-title{animation:none}}
 .lola-strip-msg{font-size:11px;color:var(--cyan);padding:0 28px 0 0;display:inline-flex;align-items:center;gap:7px;transition:opacity .4s}
 .lola-strip-msg .ls-tag{
   font-size:9px;text-transform:uppercase;letter-spacing:.1em;
@@ -177,17 +177,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #term-path{flex:1;text-align:center;font-size:11px;color:var(--muted2)}
 #term-path span{color:var(--green)}
 #action-rail{
-  display:grid;
-  grid-template-columns:minmax(360px, 1.35fr) minmax(260px, .75fr);
-  gap:12px;
+  display:block;
   padding:12px 14px;
   background:var(--surface);
   border-bottom:1px solid var(--border);
   flex-shrink:0;
-  align-items:start;
 }
-#term-panel #obj-card,
-#term-panel #lola-sec{
+#obj-card,
+#lola-sec{
   border:1px solid var(--border);
   border-radius:var(--r8);
   background:var(--s2);
@@ -197,11 +194,15 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   padding:12px 14px;
   border-bottom:1px solid var(--border);
 }
-#term-panel #lola-sec{
+#right #lola-sec{
   padding:12px 14px;
-  max-height:208px;
+  margin:10px 12px 4px;
+  max-height:240px;
   overflow-y:auto;
+  flex-shrink:0;
 }
+#right #lola-sec::-webkit-scrollbar{width:3px}
+#right #lola-sec::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 #output > *{flex-shrink:0;width:100%}
 .jit,.bridge,.hint-wrap,.diag-block,.teach,.concept,.spaced-rep,.janet-arrival,.boss-container,.breakit,.challenge,.cmd-unlock,.manpage{flex-shrink:0!important}
 #output-static{
@@ -275,7 +276,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* hint */
 .hint-wrap{margin:7px 0;border:1px solid var(--b2);border-radius:var(--r4);overflow:hidden}
-.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s}
+.hint-toggle{padding:7px 12px;background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:6px;user-select:none;transition:color .15s;border:none;width:100%;text-align:left;font-family:var(--mono);appearance:none}
 .hint-toggle:hover{color:var(--amber)}
 .hint-body{display:none;padding:9px 12px;background:var(--surface);font-size:12px;color:var(--amber);border-top:1px solid var(--border)}
 .hint-body.open{display:block;animation:fadeUp .2s ease}
@@ -340,6 +341,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .challenge{margin:12px 0;border:2px solid var(--amber);border-radius:var(--r8);background:var(--amber-bg);padding:14px;animation:slideIn .3s ease}
 .challenge-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .challenge-badge{background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.1em}
+.expert-callout{background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.1em}
 .challenge-title{font-size:12px;font-weight:700;color:var(--amber)}
 .challenge-scenario{font-size:12px;color:var(--text);line-height:1.75;margin-bottom:10px;background:var(--s3);border-radius:var(--r4);padding:10px 12px;border-left:3px solid var(--amber)}
 .challenge-prompt{font-size:11px;color:var(--muted2);margin-bottom:6px}
@@ -364,6 +366,17 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .boss-prompt{font-family:var(--janet);font-size:12px;color:var(--silver);line-height:1.65}
 .boss-progress{height:3px;background:#1a0505;border-radius:2px;overflow:hidden;margin-top:12px}
 .boss-prog-fill{height:100%;background:linear-gradient(90deg,var(--red-d),var(--red));transition:width .6s ease;width:0%}
+.capstone-container{margin:14px 0;border:2px solid var(--green-d);border-radius:var(--r8);overflow:hidden;box-shadow:0 0 24px rgba(34,197,94,.08)}
+.capstone-header{background:linear-gradient(90deg,#07140d,#061016);border-bottom:1px solid var(--green-d);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.capstone-title{font-family:var(--display);font-size:14px;color:var(--green);letter-spacing:.14em;text-transform:uppercase}
+.capstone-sub{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:.12em;margin-left:auto}
+.capstone-body{background:#071016;padding:14px 16px}
+.capstone-scenario{font-size:12px;color:var(--text);line-height:1.8;margin-bottom:12px;border-left:3px solid var(--green-d);padding-left:12px}
+.capstone-step-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--green);margin-bottom:6px}
+.capstone-prompt{font-size:12px;color:var(--silver);line-height:1.65}
+.capstone-progress{height:3px;background:#0b1611;border-radius:2px;overflow:hidden;margin-top:12px}
+.capstone-prog-fill{height:100%;background:linear-gradient(90deg,var(--green-d),var(--cyan));transition:width .6s ease;width:0%}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
 /* cmd unlock */
 .cmd-unlock{margin:8px 0;background:var(--green-bg);border:1px solid var(--green-d);border-radius:var(--r4);padding:7px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:8px;animation:slideIn .25s ease}
@@ -389,11 +402,11 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .man-detail code{color:var(--amber);background:var(--s3);padding:1px 4px;border-radius:3px}
 
 /* input */
-#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;height:46px;gap:8px}
-#prompt-pre{font-size:14px;color:var(--green);white-space:nowrap;user-select:none}
-#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
+#input-row{background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 18px;height:72px;gap:10px}
+#prompt-pre{font-size:16px;color:var(--green);white-space:nowrap;user-select:none}
+#cmd{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:18px;line-height:1.4;color:var(--text);caret-color:var(--green);-webkit-text-fill-color:var(--text)}
 #cmd::placeholder{color:var(--muted);font-style:italic}
-#input-hint{font-size:10px;color:var(--muted);white-space:nowrap}
+#input-hint{font-size:11px;color:var(--muted);white-space:nowrap}
 
 /* right panel */
 #right{display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
@@ -505,6 +518,12 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* boot */
 #boot-modal .mbox{border-color:var(--green);text-align:center;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px 32px 32px}
+#boot-modal .mbox{scrollbar-width:thin;scrollbar-color:rgba(106,128,144,.28) transparent}
+#boot-modal .mbox::-webkit-scrollbar{width:6px}
+#boot-modal .mbox::-webkit-scrollbar-track{background:transparent}
+#boot-modal .mbox::-webkit-scrollbar-thumb{background:rgba(106,128,144,.22);border-radius:999px}
+#boot-modal .mbox::-webkit-scrollbar-thumb:hover{background:rgba(106,128,144,.34)}
+#boot-modal .jit{margin:16px 0;text-align:left}
 #boot-modal .mbox input[type=text]{width:100%;background:var(--s2);border:1px solid var(--b3);color:var(--text);padding:11px 14px;border-radius:var(--r4);font-family:var(--mono);font-size:14px;outline:none;margin-bottom:8px;caret-color:var(--green);-webkit-text-fill-color:var(--text)}
 #boot-modal .mbox input[type=text]::placeholder{color:var(--muted2)}
 #boot-modal .mbox input[type=text]:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(249,115,22,.15)}
@@ -603,6 +622,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   #cmd{font-size:16px}
   #lola-strip-ctrls .strip-btn,
   #right-collapse-btn{min-height:36px;min-width:44px}
+  .tbbtn,.mbtn,.strip-btn,.hint-toggle,.ac-pill{min-height:44px;min-width:44px}
+  #input-row{min-height:44px}
   #right-header{display:none}
   #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
   #shell.right-collapsed #right-header{justify-content:center;padding:8px 10px;height:auto}
@@ -615,7 +636,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 <div id="shell">
   <div id="topbar">
-    <div id="logo">STATION DELTA<span id="logo-sub">CAPTAIN</span></div>
+    <div id="logo">STATION DELTA:<span id="logo-sub">CAPTAIN</span></div>
     <div id="cadet-tag">Captain: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
@@ -646,7 +667,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
-      <div id="term-path">captain@station-delta — <span id="path-display">~/bridge</span></div>
+      <div id="term-path">captain@stationdelta — <span id="path-display">~/bridge</span></div>
       <div style="width:50px"></div>
     </div>
     <div id="action-rail">
@@ -661,24 +682,16 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         </div>
         <div id="obj-meta">
           <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
-          <span id="obj-score">Score: <span id="score-n">1000</span></span>
+          <span id="obj-score">Score: <span id="score-n">100</span></span>
         </div>
         <div id="obj-progress"><div id="obj-prog-fill"></div></div>
-      </div>
-      <div id="lola-sec">
-        <div id="lola-hd">
-          <div id="lola-avatar">L</div>
-          <div id="lola-name">L.O.L.A.</div>
-          <div id="lola-online">ready</div>
-        </div>
-        <div id="lola-msg">Captain on the bridge. The ship is yours.</div>
       </div>
     </div>
     <div id="output-static" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="output-divider">▶ Terminal — type commands below</div>
     <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="input-row">
-      <span id="prompt-pre">captain@vibe:~$&nbsp;</span>
+      <span id="prompt-pre">captain@stationdelta:~$&nbsp;</span>
       <input id="cmd" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" placeholder="type a command…" aria-label="Terminal command input">
       <span id="input-hint"></span>
     </div>
@@ -692,6 +705,14 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="mobile-ctx-label">📍 Current Objective</div>
       <div id="mobile-ctx-title"></div>
       <div id="mobile-ctx-body"></div>
+    </div>
+    <div id="lola-sec">
+      <div id="lola-hd">
+        <div id="lola-avatar">L</div>
+        <div id="lola-name">L.O.L.A.</div>
+        <div id="lola-online">ready</div>
+      </div>
+      <div id="lola-msg">Captain on the bridge. The ship is yours.</div>
     </div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
@@ -715,11 +736,15 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 <div id="toast"><div id="toast-title"></div><div id="toast-sub"></div></div>
 
 <!-- BOOT -->
-<div id="boot-modal" class="modal open">
-  <div class="mbox">
-    <div style="font-size:28px;margin-bottom:8px">⬟</div>
-    <div class="mtitle">Station Delta<span class="modal-sub-title">Captain</span></div>
-    <div class="msub">The command track for staff-plus engineering judgment: architecture, scaling, reliability, AI orchestration, mentoring, stakeholder leadership, and incident command under pressure.</div>
+<div id="boot-modal" class="modal open" role="dialog" aria-modal="true" aria-labelledby="boot-modal-title" aria-hidden="false">
+  <div class="mbox" tabindex="-1">
+    <div style="font-size:28px;margin-bottom:8px;text-align:center">⬟</div>
+    <div class="mtitle" id="boot-modal-title" style="text-align:center">Station Delta:<span class="modal-sub-title">Captain</span></div>
+    <div class="msub" style="text-align:center">The command track for staff-plus engineering judgment: architecture, scaling, reliability, AI orchestration, mentoring, stakeholder leadership, and incident command under pressure.</div>
+    <div class="jit">
+      <div class="jit-hd">⚡ Captain-Level Mission</div>
+      <div class="jit-bd">This sim is the <b>top of the Station Delta ladder</b>. You are no longer practicing isolated commands or single-engineer execution. Captain is about <b>system judgment</b>: seeing the full architecture, producing decision artifacts, justifying trade-offs, and communicating clearly enough that product leaders and executives can act on your reasoning. The goal is not just to solve technical problems. The goal is to show that you can <b>explain why the decision is right, what it costs, what it risks, and how the ship operates after the change</b>.</div>
+    </div>
     <div class="boot-features">
       <span>▸</span>9 phases · staff-level engineering judgment<br>
       <span>▸</span>L.O.L.A. — your trusted first officer<br>
@@ -751,18 +776,18 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
         <div class="path-desc">No hints. No feedback. Timer on.</div>
       </div>
     </div>
-    <button class="mbtn mbtn-p" onclick="startAcademy()">TAKE COMMAND</button>
-    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
-    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Station Delta command track. No account needed.</div>
+    <button class="mbtn mbtn-p" id="boot-enter-btn" onclick="startAcademy()">TAKE COMMAND</button>
+    <button class="mbtn mbtn-s" id="boot-reset-btn" onclick="doRestart()">Reset Save</button>
+    <div id="boot-access-note" style="margin-top:12px;font-size:10px;color:var(--muted)">Officer-track capstone. Paid Station Delta access required on the hosted site.</div>
   </div>
 </div>
 
 <!-- GRAD -->
-<div id="grad-modal" class="modal">
-  <div class="mbox">
+<div id="grad-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="grad-modal-title" aria-hidden="true">
+  <div class="mbox" tabindex="-1">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">⬟</div>
-    <div class="mtitle" style="text-align:center;color:var(--green)">Command Certification</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Captain — including the final assessment.</div>
+    <div class="mtitle" id="grad-modal-title" style="text-align:center;color:var(--green)">Command Certification</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Captain — including the final assessment and command capstone.</div>
     <div class="grad-cert">
       <div class="grad-ct">Station Delta Certification</div>
       <div class="grad-name" id="grad-name">—</div>
@@ -780,16 +805,17 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <span>✓</span>Technical strategy, roadmapping & incident command
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="returnToStationDelta()">RETURN TO STATION DELTA</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--green)">—</span></div>
   </div>
 </div>
 
-<div id="phase-modal" class="modal">
-  <div class="mbox">
-    <div class="mtitle" style="color:var(--blue)">Phase Checkpoint</div>
+<div id="phase-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title-main" aria-hidden="true">
+  <div class="mbox" tabindex="-1">
+    <div class="mtitle" id="phase-modal-title-main" style="color:var(--blue)">Phase Checkpoint</div>
     <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
     <div class="checkpoint-box">
       <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
@@ -804,9 +830,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
-<div id="restart-modal" class="modal">
-  <div class="mbox">
-    <div class="mtitle" style="color:var(--red)">Restart Training?</div>
+<div id="restart-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="restart-modal-title" aria-hidden="true">
+  <div class="mbox" tabindex="-1">
+    <div class="mtitle" id="restart-modal-title" style="color:var(--red)">Restart Training?</div>
     <div class="msub">This will clear your saved progress and reload Station Delta: Captain from the beginning.</div>
     <div style="text-align:center">
       <button class="mbtn mbtn-p" onclick="confirmRestart()">YES, START OVER</button>
@@ -815,9 +841,9 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
-<div id="mobile-tools-modal" class="modal">
-  <div class="mbox">
-    <div class="mtitle">Mobile Tools</div>
+<div id="mobile-tools-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="mobile-tools-modal-title" aria-hidden="true">
+  <div class="mbox" tabindex="-1">
+    <div class="mtitle" id="mobile-tools-modal-title">Mobile Tools</div>
     <div class="msub">The phone layout condenses the top bar. Open support surfaces here without leaving the sim.</div>
     <div style="display:grid;gap:10px">
       <button class="mbtn mbtn-p" onclick="openSupportModal('man-modal')">OPEN MAN PAGES</button>
@@ -829,15 +855,16 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   </div>
 </div>
 
-<div id="ach-modal" class="modal"><div class="mbox"><div class="mtitle">🏆 Achievements</div><div class="msub">Milestones from your command.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
-<div id="gloss-modal" class="modal"><div class="mbox"><div class="mtitle">📖 Glossary</div><div class="msub">Captain-level terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
-<div id="man-modal" class="modal"><div class="mbox"><div class="mtitle">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
-<div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
+<div id="ach-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="ach-modal-title" aria-hidden="true"><div class="mbox" tabindex="-1"><div class="mtitle" id="ach-modal-title">🏆 Achievements</div><div class="msub">Milestones from your command.</div><div id="ach-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('ach-modal')">Close</button></div></div></div>
+<div id="gloss-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="gloss-modal-title" aria-hidden="true"><div class="mbox" tabindex="-1"><div class="mtitle" id="gloss-modal-title">📖 Glossary</div><div class="msub">Captain-level terms. Click any to see inline.</div><div id="gloss-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('gloss-modal')">Close</button></div></div></div>
+<div id="man-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="man-modal-title" aria-hidden="true"><div class="mbox" tabindex="-1"><div class="mtitle" id="man-modal-title">📋 Manual Pages</div><div class="msub">Command reference. Also accessible by typing <code style="color:var(--amber)">man</code>.</div><div id="man-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('man-modal')">Close</button></div></div></div>
+<div id="career-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="career-modal-title" aria-hidden="true"><div class="mbox" tabindex="-1"><div class="mtitle" id="career-modal-title">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   VIBE CAPTAIN v1.0
-   Third in the Vibe series.
+   STATION DELTA: CAPTAIN v1.0
+   Final command sim in the Station Delta ladder.
    New mechanic: J.A.N.E.T. (Just Another Normal Education Test)
    administers all quizzes. GLaDOS energy. Cold. Corporate. Mildly
    annoyed when you get things right.
@@ -845,7 +872,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
    ═══════════════════════════════════════════════════════════════ */
 
 let G = {
-  name:'Captain', phase:1, step:0, tries:0, score:1000,
+  name:'Captain', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
   agents:[], achievements:[], completedPhases:[],
@@ -859,6 +886,9 @@ let G = {
   bossActive:false,
   bossStep:0,
   bossScore:0,
+  capstoneActive:false,
+  capstoneStep:0,
+  capstoneScore:0,
   pendingPhaseStart:false,
   stripPaused:false,
   stripHidden:false,
@@ -866,6 +896,10 @@ let G = {
   mobilePresetApplied:false,
   mobileUiVersion:2,
   analytics:null,
+  userId:null,
+  userEmail:null,
+  isPaid:false,
+  paidTierChecked:false,
   playbook:[],
   whatifShown:{},
   _pendingWhatIf:null,
@@ -873,6 +907,84 @@ let G = {
 
 const COURSE_ID='station-delta-captain';
 const CAPTAIN_SAVE_KEY='station_delta_captain_v1';
+
+function isFileProtocol(){ return window.location.protocol==='file:'; }
+function createMemoryStorage(){ const store={}; return { getItem(key){ return Object.prototype.hasOwnProperty.call(store,key)?store[key]:null; }, setItem(key,value){ store[key]=String(value); }, removeItem(key){ delete store[key]; } }; }
+let _storageAvailable=null;
+function canUseLocalStorage(){
+  if(_storageAvailable!=null) return _storageAvailable;
+  try{ const probe='__station_delta_storage_probe__'; window.localStorage.setItem(probe,'1'); window.localStorage.removeItem(probe); _storageAvailable=true; }catch(err){ _storageAvailable=false; }
+  return _storageAvailable;
+}
+function readLocalAuthSnapshot(){
+  if(!canUseLocalStorage()) return null;
+  try{ const raw=window.localStorage.getItem('station_delta_local_auth'); return raw?JSON.parse(raw):null; }catch(err){ return null; }
+}
+function currentRedirectTarget(){ return isFileProtocol() ? window.location.href : window.location.pathname + window.location.search; }
+function goToAuthGate(){
+  const redirect=encodeURIComponent(currentRedirectTarget());
+  if(isFileProtocol()){ alert('Officer-track access is enforced on the hosted site. Use the Station Delta auth flow before entering Captain.'); return; }
+  window.location.href=`/auth.html?redirect=${redirect}`;
+}
+function applyOfficerAccessState(){
+  const enterBtn=document.getElementById('boot-enter-btn');
+  const note=document.getElementById('boot-access-note');
+  if(!enterBtn || !note) return;
+  if(isFileProtocol()){ note.textContent='Local build mode. Hosted Station Delta will require a paid officer-track account for Captain.'; return; }
+  if(!G.userId){ enterBtn.textContent='SIGN IN FOR COMMAND ACCESS'; enterBtn.onclick=goToAuthGate; note.textContent='Captain is the top of the paid officer track. Sign in to verify your Station Delta access.'; return; }
+  if(!G.isPaid){ enterBtn.textContent='RETURN TO ACCESS GATE'; enterBtn.onclick=goToAuthGate; note.textContent='Your account is active, but Captain requires officer-track access. Upgrade to take command.'; return; }
+  enterBtn.textContent='TAKE COMMAND'; enterBtn.onclick=startAcademy; note.textContent='Officer-track access confirmed. Captain is the summit of the Station Delta ladder.';
+}
+function syncBootModalState(){
+  const bm=document.getElementById('boot-modal'); if(!bm) return;
+  const title=bm.querySelector('.mtitle'); const sub=bm.querySelector('.msub'); const primary=document.getElementById('boot-enter-btn'); const secondary=document.getElementById('boot-reset-btn');
+  const hasProgress=(G.name!=='Captain'&&(G.phase>1||G.completedPhases.length>0)) || G.sandbox || G.bossActive || G.capstoneActive;
+  if(hasProgress){ title.textContent=`Welcome back, Captain ${G.name}`; sub.textContent=`Phase ${G.phase} of ${PHASES.length-1}. Resume?`; primary.textContent='RESUME'; primary.onclick=resumeSession; secondary.textContent='Start Over'; secondary.onclick=doRestart; }
+  else { title.innerHTML=`Station Delta:<span class="modal-sub-title">Captain</span>`; sub.textContent='The command track for staff-plus engineering judgment: architecture, scaling, reliability, AI orchestration, mentoring, stakeholder leadership, and incident command under pressure.'; primary.textContent='TAKE COMMAND'; primary.onclick=startAcademy; secondary.textContent='Reset Save'; secondary.onclick=doRestart; }
+  if(!hasProgress) applyOfficerAccessState(); else if(!isFileProtocol() && !G.isPaid){ primary.textContent='RETURN TO ACCESS GATE'; primary.onclick=goToAuthGate; }
+}
+async function initSupabaseAuthClient(){
+  if(!window.supabase?.createClient){ const snapshot=readLocalAuthSnapshot(); if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=snapshot.tier==='individual'||snapshot.tier==='fleet'; G.paidTierChecked=true; save(); } applyOfficerAccessState(); return; }
+  const SUPABASE_URL='https://bcipkdtxcbwcwbinekng.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ';
+  const hostedMode=!isFileProtocol(); const authStorage=hostedMode && canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+  try{
+    window._sb=window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{auth:{storage:authStorage,persistSession:hostedMode,autoRefreshToken:hostedMode,detectSessionInUrl:hostedMode,flowType:'implicit'}});
+    const { data:{ session } } = await window._sb.auth.getSession();
+    if(session){ G.userId=session.user.id; G.userEmail=session.user.email; const restored=await loadCloudProgress(); if(restored) save(); }
+    else {
+      const snapshot=readLocalAuthSnapshot();
+      if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=hasOfficerAccessTier(snapshot.tier); G.paidTierChecked=true; const restored=await loadCloudProgress(); if(restored) save(); }
+      else if(hostedMode){ goToAuthGate(); return; }
+    }
+  }catch(err){
+    console.error('[Station Delta] Supabase init failed', err);
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=hasOfficerAccessTier(snapshot.tier); G.paidTierChecked=true; const restored=await loadCloudProgress(); if(restored) save(); }
+  }
+  applyOfficerAccessState(); syncBootModalState();
+}
+async function checkPaidTier(){
+  if(!window._sb || !G.userId){ G.isPaid=isFileProtocol()?G.isPaid:false; G.paidTierChecked=true; applyOfficerAccessState(); return; }
+  try{
+    const { data, error } = await window._sb.from('profiles').select('subscription_tier').eq('id', G.userId).single();
+    if(error) throw error;
+    G.isPaid = hasOfficerAccessTier(data?.subscription_tier);
+  }catch(err){ console.warn('[Station Delta] checkPaidTier failed', err); G.isPaid=false; }
+  G.paidTierChecked=true; save(); applyOfficerAccessState(); syncBootModalState();
+}
+function hasOfficerAccessTier(tier){
+  const normalized=String(tier||'').toLowerCase().trim();
+  return [
+    'individual',
+    'fleet',
+    'bundle',
+    'ai_systems_bundle',
+    'officer_bundle',
+    'all_access',
+    'ai_systems_pass'
+  ].includes(normalized);
+}
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */
 const JANET_INTROS = [
@@ -937,15 +1049,16 @@ const GLOSSARY = [
 
 /* ── MAN PAGES ── */
 const MAN = {
-  'arch':   {synopsis:'arch [subcommand]',desc:'Architecture analysis tool',why:'Review system architecture, dependencies, and layer structure.',flags:[{f:'review',d:'Full architecture review of current codebase'},{f:'layers',d:'Show service layer breakdown'},{f:'deps',d:'Show dependency graph'}],example:'$ arch review\n$ arch layers\n$ arch deps'},
-  'design': {synopsis:'design [command]',desc:'System design workspace',why:'Propose and evaluate architectural decisions.',flags:[{f:'propose [option]',d:'Propose a technical approach'},{f:'tradeoff',d:'Analyze trade-offs'},{f:'adr create',d:'Create an Architecture Decision Record'}],example:'$ design propose microservices\n$ design tradeoff\n$ design adr create'},
-  'scale':  {synopsis:'scale [target]',desc:'Scalability analysis',why:'Model performance under load and identify bottlenecks.',flags:[{f:'analyze',d:'Identify current bottlenecks'},{f:'cache add',d:'Add caching layer'},{f:'db replica',d:'Add read replica'}],example:'$ scale analyze\n$ scale cache add redis\n$ scale db replica'},
-  'observe':{synopsis:'observe [command]',desc:'Observability platform',why:'Set up monitoring, alerting, and reliability targets.',flags:[{f:'setup',d:'Initialize observability stack'},{f:'slo create',d:'Define a Service Level Objective'},{f:'alert create',d:'Create an alert rule'}],example:'$ observe setup\n$ observe slo create\n$ observe alert create'},
+  'arch':   {synopsis:'arch [review|risk register]',desc:'Architecture analysis tool',why:'Review system architecture, dependencies, and layer structure, then leave behind a risk artifact.',flags:[{f:'review',d:'Full architecture review of current codebase'},{f:'layers',d:'Show service layer breakdown'},{f:'risk register',d:'Document top architectural risks and mitigations'}],example:'$ cat ARCHITECTURE.md && fd -e yaml -e json . k8s/ | head -20\n$ cat src/package.json | jq \'.dependencies\' && wc -l src/**/*.ts\n$ arch risk register'},
+  'design': {synopsis:'design [tradeoff|review checklist]',desc:'System design workspace',why:'Propose and evaluate architectural decisions with explicit trade-offs and review pressure-testing.',flags:[{f:'tradeoff',d:'Analyze competing approaches against current constraints'},{f:'review checklist',d:'Run the design through scalability, observability, security, and cost review'},{f:'adr',d:'Pair with ADR tooling to record the decision'}],example:'$ design tradeoff\n$ adr new "Use modular monolith for fleet management"\n$ design review checklist'},
+  'adr':    {synopsis:'adr new "[decision title]"',desc:'Architecture Decision Record tooling',why:'Create the written artifact that explains forces, decision, and consequences.',flags:[{f:'new',d:'Create a new ADR file with the supplied title'}],example:'$ adr new "Use modular monolith for fleet management"'},
+  'scale':  {synopsis:'scale [runbook|cache]',desc:'Scalability analysis',why:'Model performance under load, identify bottlenecks, and leave behind operational guidance for the scaling change.',flags:[{f:'cache add',d:'Add caching layer'},{f:'runbook cache',d:'Write the cache monitoring, flush, and failover runbook'},{f:'db replica',d:'Add read replica'}],example:'$ kubectl top pods --sort-by=cpu && curl http://api/metrics | grep http_duration\n$ scale cache add redis\n$ scale runbook cache'},
+  'observe':{synopsis:'observe [slo|error-budget]',desc:'Observability platform',why:'Set up monitoring, alerting, and reliability targets that turn system health into a business conversation.',flags:[{f:'slo',d:'Define and apply an SLO configuration'},{f:'error-budget',d:'Calculate current burn rate and projected runway'},{f:'alert create',d:'Create an alert rule'}],example:'$ helm install prometheus prometheus-community/kube-prometheus-stack\n$ sloth generate -i slo.yaml | kubectl apply -f -\n$ observe error-budget'},
   'agent':  {synopsis:'agent [command]',desc:'AI agent management',why:'Orchestrate, evaluate, and monitor AI agent systems.',flags:[{f:'deploy',d:'Deploy an agent to the fleet'},{f:'eval run',d:'Run an evaluation suite'},{f:'inspect',d:'Inspect agent output quality'}],example:'$ agent deploy --role orchestrator\n$ agent eval run\n$ agent inspect'},
-  'mentor': {synopsis:'mentor [command]',desc:'Team development tools',why:'Onboard engineers, set standards, give structured feedback.',flags:[{f:'onboard',d:'Start an onboarding session'},{f:'review feedback',d:'Structured code review feedback'},{f:'standard set',d:'Define a team standard'}],example:'$ mentor onboard\n$ mentor review feedback\n$ mentor standard set'},
-  'stake':  {synopsis:'stake [command]',desc:'Stakeholder communication',why:'Translate technical decisions for non-technical audiences.',flags:[{f:'brief create',d:'Create an executive brief'},{f:'risk communicate',d:'Frame technical risk as business risk'},{f:'roadmap present',d:'Present technical roadmap'}],example:'$ stake brief create\n$ stake risk communicate'},
+  'mentor': {synopsis:'mentor [feedback|standard]',desc:'Team development tools',why:'Onboard engineers, set standards, and turn moments of confusion into reusable growth systems.',flags:[{f:'feedback',d:'Deliver structured post-PR growth feedback'},{f:'standard set',d:'Define a team standard'},{f:'onboarding checklist',d:'Create the repeatable onboarding artifact'}],example:'$ cat docs/onboarding-checklist.md\n$ mentor standard set\n$ mentor feedback'},
+  'stake':  {synopsis:'stake [brief|status]',desc:'Stakeholder communication',why:'Translate technical decisions for non-technical audiences during planning and during incidents.',flags:[{f:'brief',d:'Create an executive reliability brief'},{f:'risk communicate',d:'Frame technical risk as business risk'},{f:'status update',d:'Send a 3-sentence leadership incident update'}],example:'$ cat docs/reliability-brief.md\n$ stake risk communicate\n$ stake status update'},
   'strategy':{synopsis:'strategy [command]',desc:'Technical strategy tools',why:'Long-term roadmapping, platform evolution, incident command.',flags:[{f:'roadmap',d:'View or update technical roadmap'},{f:'incident command',d:'Take command of an active incident'},{f:'postmortem',d:'Run a blameless post-mortem'}],example:'$ strategy roadmap\n$ strategy incident command\n$ strategy postmortem'},
-  'git':    {synopsis:'git [subcommand]',desc:'Version control',why:'All code changes flow through git.',flags:[],example:'$ git log --oneline -10\n$ git diff main..feature\n$ git show HEAD'},
+  'git':    {synopsis:'git [subcommand]',desc:'Version control',why:'All code changes flow through git. Review with enough context to catch blast radius and migration risk.',flags:[],example:'$ git log --oneline -10\n$ git diff main --stat && git diff main --name-only | grep migration\n$ git show HEAD'},
   'grep':   {synopsis:'grep [flags] [pattern] [file]',desc:'Search text in files',why:'Find patterns across the entire codebase.',flags:[{f:'-r',d:'Recursive'},{f:'-n',d:'Line numbers'}],example:'$ grep -rn "TODO" src/'},
   'cat':    {synopsis:'cat [file]',desc:'Read file contents',why:'Read any config, runbook, or source file.',flags:[],example:'$ cat runbooks/auth-incident.md'},
   'playbook':{synopsis:'playbook [save|export]',desc:'Personal command playbook',why:'Build your own exportable Captain reference.',flags:[{f:'save',d:'Save the current phase insight'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
@@ -1003,57 +1116,152 @@ const WHATIF_SCENARIOS = [
 ];
 
 const PLAYBOOK_NOTES = {
-  1:'Architecture review checklist: map service boundaries, find layer leaks, note ownership seams, and identify the first coupling risk that will punish future change.',
+  1:'Architecture review checklist: map service boundaries, find layer leaks, note ownership seams, then write the top 3 risks with mitigation so the review leaves behind an artifact, not just observations.',
   2:'PR review checklist: scope first, migration safety second, pattern quality third, rollback path always. Review for the next 50 PRs, not just today’s one.',
-  3:'ADR template: context, constraints, options, decision, consequences, review trigger. If future engineers cannot tell why the choice was made, the ADR is incomplete.',
-  4:'Scaling playbook: instrument first, prove the bottleneck, choose the smallest intervention that moves p99, and document what new operational burden the fix introduces.',
-  5:'Observability stack: health checks, error-rate alerts, p99 latency, deploy markers, clear ownership, and traces that connect symptom to service fast enough to act.',
+  3:'Design review checklist: context, constraints, options, decision, consequences, then pressure-test the design across scalability, observability, security, and cost before calling it done.',
+  4:'Scaling playbook: instrument first, prove the bottleneck, choose the smallest intervention that moves p99, then leave behind the cache runbook that makes the change survivable at 3am.',
+  5:'Observability stack: health checks, error-rate alerts, p99 latency, deploy markers, clear ownership, traces that connect symptom to service fast enough to act, and a visible error-budget burn calculation.',
   6:'AI system rule: no orchestration ships without evals, fallback rules, cost ceilings, and a clean kill switch. Reliability beats novelty every time.',
-  7:'Mentoring system: make expectations repeatable with standards, examples, and feedback loops so quality survives even when senior attention is scarce.',
-  8:'Stakeholder translation formula: technical condition → business consequence → cost of inaction → smallest investment that changes the risk profile.',
+  7:'Mentoring system: make expectations repeatable with standards, examples, and feedback loops, then turn the first miss into structured growth feedback that the engineer can act on immediately.',
+  8:'Stakeholder translation formula: technical condition → business consequence → cost of inaction → smallest investment that changes the risk profile. During incidents, compress it into a 3-sentence async update with no jargon.',
   9:'Incident command mantra: assign roles, stabilize comms, choose evidence over speculation, and keep the response coordinated enough that debugging can actually work.',
+};
+
+const SPACED_EXIT = {
+  1:{q:'Phase close: what is the architecture-review artifact a captain leaves behind after reading a codebase cold?',answer:'risk register with mitigations',acceptFn:(v)=>v.includes('risk')&&(v.includes('register')||v.includes('mitigation'))},
+  2:{q:'Phase close: what is the first thing you check before reading a large PR line by line?',answer:'diff scope and migration blast radius',acceptFn:(v)=>v.includes('scope')||v.includes('stat')||v.includes('migration')},
+  3:{q:'Phase close: what keeps architecture decisions from turning into ghost knowledge?',answer:'an ADR with context, decision, and consequences',acceptFn:(v)=>v.includes('adr')||v.includes('decision record')},
+  4:{q:'Phase close: before scaling, what must you prove first?',answer:'the real bottleneck with evidence',acceptFn:(v)=>v.includes('bottleneck')||v.includes('evidence')||v.includes('measure')},
+  5:{q:'Phase close: what turns an SLO from a dashboard decoration into a business decision tool?',answer:'error-budget burn and runway',acceptFn:(v)=>v.includes('error budget')||v.includes('burn')||v.includes('runway')},
+  6:{q:'Phase close: what makes an agent system production-ready instead of demo-ready?',answer:'evals, fallbacks, and controllability',acceptFn:(v)=>v.includes('eval')||v.includes('fallback')||v.includes('control')||v.includes('kill switch')},
+  7:{q:'Phase close: what is the highest-leverage mentoring move at captain level?',answer:'make expectations systemic and actionable',acceptFn:(v)=>v.includes('system')||v.includes('standard')||v.includes('actionable')||v.includes('feedback')},
+  8:{q:'Phase close: what three things belong in a leadership incident update?',answer:'impact, action, next update time',acceptFn:(v)=>v.includes('impact')||v.includes('action')||v.includes('next update')||v.includes('timing')},
+  9:{q:'Phase close: what does an incident commander protect so debugging can work?',answer:'response structure and coordination',acceptFn:(v)=>v.includes('coord')||v.includes('roles')||v.includes('structure')||v.includes('comms')}
+};
+
+const LOLA_STRIP_PHASE = {
+  1:'Read the whole shape before naming the fix. Captains orient first.',
+  2:'Review for blast radius, rollback, and the pattern this PR teaches the team.',
+  3:'Trade-offs beat trends. Document the decision so future engineers inherit the why.',
+  4:'Scale the real bottleneck, not the one that feels dramatic in the meeting.',
+  5:'Observability is decision infrastructure. Burn rate is the business translation layer.',
+  6:'A clever agent without evals, fallbacks, and a kill switch is just staged risk.',
+  7:'The highest-leverage standard is the one that still works when you are offline.',
+  8:'Translate every technical condition into customer impact, roadmap risk, or dollars.',
+  9:'Incident command protects the room from chaos so specialists can restore the ship.'
 };
 
 /* ── DIAGNOSIS ENGINE ── */
 const DIAGNOSE = {
   'p1s1':(v)=>{
-    if(v.includes('ls')||v.includes('cat')) return {msg:'Good instinct for smaller codebases — but at captain level, you need the full architectural picture. <code>arch review</code> gives you the layers, dependencies, and entry points in one pass.',next:'Try: arch review'};
+    if((v.includes('ls')||v.includes('cat'))&&!v.includes('architecture.md')) return {msg:'Smaller commands are fine for local inspection, but captain work starts with the architecture artifact set. Read the architecture doc and scan the deployment manifests so you understand the whole shape before zooming in.',next:'Try: cat ARCHITECTURE.md && fd -e yaml -e json . k8s/ | head -20'};
     return null;
   },
   'p1s2':(v)=>{
-    if(v.includes('grep')&&!v.includes('layers')) return {msg:'grep finds text, but <code>arch layers</code> gives you the full service layer diagram — presentation, business logic, data access, infrastructure. Pattern-matching vs understanding.',next:'Try: arch layers'};
+    if(v.includes('grep')&&!v.includes('package.json')&&!v.includes('jq')) return {msg:'grep finds text, but captain-level layer mapping starts by inventorying dependencies and code weight. That tells you where the architecture is thin, overloaded, or hiding coupling.',next:'Try: cat src/package.json | jq \'.dependencies\' && wc -l src/**/*.ts'};
+    return null;
+  },
+  'p1s3':(v)=>{
+    if(v.includes('note')||v.includes('todo')||v.includes('grep')) return {msg:'You are not collecting loose observations anymore. Captains leave behind a risk register: ranked risks, impact, and mitigation. The writing is the deliverable.',next:'Try: arch risk register'};
     return null;
   },
   'p2s1':(v)=>{
-    if(v.includes('git diff')&&!v.includes('main')) return {msg:'<code>git diff</code> shows unstaged changes. For a PR review, you want <code>git diff main</code> — the full diff between the feature branch and main.',next:'Try: git diff main'};
+    if(v.includes('git diff')&&!v.includes('main')) return {msg:'<code>git diff</code> shows unstaged changes. For a PR review, you want the branch diff against main plus a quick migration scan so blast radius is visible before you read implementation details.',next:'Try: git diff main --stat && git diff main --name-only | grep migration'};
+    return null;
+  },
+  'p2s2':(v)=>{
+    if(v.includes('git diff')||v.includes('review')) return {msg:'Scope review is finished. This step isolates the migration because schema changes fail differently than application code. Open the SQL directly and review lock risk, rollback, and compatibility.',next:'Try: cat src/db/migrations/004_idx.sql'};
+    if(v.includes('run')||v.includes('psql')||v.includes('apply')) return {msg:'Do not execute a migration before you understand it. Captain review asks whether the migration is safe to run on a live system, not whether you can apply it locally.',next:'Try: cat src/db/migrations/004_idx.sql'};
     return null;
   },
   'p3s1':(v)=>{
-    if(v.includes('microservices')&&!v.includes('design propose')) return {msg:'You\'re thinking about the right solution — but use the <code>design propose</code> command to formally evaluate it. Proposing an architecture without analyzing trade-offs first is how migrations fail.',next:'Try: design propose microservices'};
+    if(v.includes('microservices')&&!v.includes('tradeoff')&&!v.includes('design')) return {msg:'You are jumping straight to a solution label. Captain-level design starts with trade-offs against current constraints, not a fashionable architecture name.',next:'Try: design tradeoff'};
+    if(v.includes('graphql')||v.includes('grpc')) return {msg:'You are selecting transport before framing the architecture decision. First evaluate the shape of the system and the team constraints, then decide whether extra protocol complexity earns its keep.',next:'Try: design tradeoff'};
+    return null;
+  },
+  'p3s2':(v)=>{
+    if(v.includes('cat')||v.includes('read')||v.includes('docs/')) return {msg:'Reading documentation is not the same as creating a decision record. This step is about writing the ADR so the reasoning survives turnover and future disagreement.',next:'Try: adr new "Use modular monolith for fleet management"'};
+    if(v.includes('microservice')||v.includes('monolith')) return {msg:'The decision itself is only half the work. Captain-level architecture becomes real when the choice is captured as an ADR with context, decision, and consequences.',next:'Try: adr new "Use modular monolith for fleet management"'};
+    return null;
+  },
+  'p3s3':(v)=>{
+    if(v.includes('ship')||v.includes('deploy')) return {msg:'Not yet. Proposed architecture needs a design review pass across scalability, observability, security, and cost. Staff engineers propose designs. Captains validate them before anyone commits to them.',next:'Try: design review checklist'};
     return null;
   },
   'p4s1':(v)=>{
-    if(v.includes('more servers')||v.includes('scale up')||v.includes('bigger')) return {msg:'Vertical scaling (bigger machines) is a valid first step but has a ceiling. <code>scale analyze</code> first — understand the bottleneck before choosing the solution.',next:'Try: scale analyze'};
+    if(v.includes('more servers')||v.includes('scale up')||v.includes('bigger')) return {msg:'Vertical scaling is a tactic, not a diagnosis. Pull CPU and latency evidence first so you can prove the bottleneck before prescribing a fix.',next:'Try: kubectl top pods --sort-by=cpu && curl http://api/metrics | grep http_duration'};
+    if(v.includes('redis')||v.includes('cache')&&!v.includes('http_duration')) return {msg:'Caching might be the right answer later, but not before you measure where p99 latency is really coming from. Diagnose first, prescribe second.',next:'Try: scale analyze'};
+    return null;
+  },
+  'p4s2':(v)=>{
+    if(v.includes('replica')||v.includes('database')&&!v.includes('cache')) return {msg:'Read replicas help read scale, but this step is about hot data that is read far more than it is written. That pattern calls for a cache with explicit invalidation, not another database hop.',next:'Try: scale cache add redis'};
+    if(v.includes('cdn')||v.includes('browser cache')||v.includes('http cache')) return {msg:'A browser or CDN cache cannot safely own dynamic pod availability. The caching layer here lives close to the application so it can invalidate on reserve and release.',next:'Try: scale cache add redis'};
+    return null;
+  },
+  'p4s3':(v)=>{
+    if(v.includes('redis-cli')||v.includes('flushall')) return {msg:'Those are isolated operational actions. The captain artifact is the runbook that explains when to monitor, flush, fail over, and escalate so on-call is not improvising under pressure.',next:'Try: scale runbook cache'};
     return null;
   },
   'p5s1':(v)=>{
-    if(v.includes('logs')||v.includes('cat')) return {msg:'Logs are one piece of observability, but observability is the full system: metrics, traces, alerts, and dashboards. <code>observe setup</code> initializes the full stack.',next:'Try: observe setup'};
+    if(v.includes('logs')||v.includes('cat')) return {msg:'Logs are one pillar, not the platform. Stand up the metrics, alerting, and tracing stack first so reliability work has a foundation.',next:'Try: helm install prometheus prometheus-community/kube-prometheus-stack'};
+    return null;
+  },
+  'p5s2':(v)=>{
+    if(v.includes('uptime')||v.includes('health check')) return {msg:'That measures availability, not service reliability as users feel it. This step needs an SLO with a real SLI, error budget, and alerting policy.',next:'Try: sloth generate -i slo.yaml | kubectl apply -f -'};
+    if(v.includes('dashboard')||v.includes('metric')&&!v.includes('slo')) return {msg:'Metrics by themselves are observability ingredients. The captain move is to turn them into a reliability contract with a target and budget the org can act on.',next:'Try: observe slo create'};
+    if(v.includes('sla')) return {msg:'An SLA is the external contract. You need the internal engineering target first: define the SLO and error budget so the team knows what reliability it is trying to preserve.',next:'Try: observe slo create'};
+    return null;
+  },
+  'p5s3':(v)=>{
+    if(v.includes('uptime')||v.includes('dashboard')) return {msg:'Dashboards tell you that something exists. Error-budget burn tells you whether the business can keep accepting reliability risk. This is where observability becomes an executive conversation.',next:'Try: observe error-budget'};
     return null;
   },
   'p6s1':(v)=>{
     if(v.includes('prompt')||v.includes('agent')&&!v.includes('deploy')) return {msg:'Prompting an agent is usage. <code>agent deploy</code> is orchestration — standing up the full multi-agent system with roles, communication, and failure handling.',next:'Try: agent deploy --role orchestrator'};
     return null;
   },
+  'p6s2':(v)=>{
+    if(v.includes('deploy')||v.includes('ship')) return {msg:'Not yet. Production AI systems earn the right to deploy by clearing eval thresholds first. This step is about proving behavior, not trusting it.',next:'Try: agent eval run'};
+    if(v.includes('prompt')||v.includes('chat')||v.includes('test manually')) return {msg:'Manual spot checks miss the edge cases that break agent systems in production. Run the evaluation suite so failures become measurable and repeatable.',next:'Try: agent eval run'};
+    if(v.includes('accuracy')&&!v.includes('eval')) return {msg:'Accuracy is an outcome, not a release gate. The captain artifact here is the evaluation suite that measures conflict handling, edge cases, and recovery paths before customers do.',next:'Try: agent eval run'};
+    return null;
+  },
   'p7s1':(v)=>{
-    if(v.includes('review')&&!v.includes('mentor')) return {msg:'Code review is tactical feedback. <code>mentor onboard</code> is strategic — it establishes the mental model a new engineer needs to be productive, not just to fix one PR.',next:'Try: mentor onboard'};
+    if(v.includes('review')&&!v.includes('checklist')&&!v.includes('mentor')) return {msg:'Code review is tactical feedback. Captain onboarding starts with a reusable checklist that transfers the team\'s mental model before the first PR ever arrives.',next:'Try: cat docs/onboarding-checklist.md'};
+    return null;
+  },
+  'p7s2':(v)=>{
+    if(v.includes('slack')||v.includes('remind')||v.includes('tell')) return {msg:'Reminders are person-by-person enforcement. This step is about setting a systemic standard that survives your attention span: CI, templates, and explicit exceptions.',next:'Try: mentor standard set'};
+    if(v.includes('review')&&!v.includes('standard')) return {msg:'Review comments catch one PR. Standards change every PR after that. Captain leverage comes from the system that shapes behavior before review starts.',next:'Try: mentor standard set'};
+    return null;
+  },
+  'p7s3':(v)=>{
+    if(v.includes('lgtm')||v.includes('fix tests')) return {msg:'That is a comment, not growth feedback. A captain names the pattern, its impact, and the next behavior to practice so the engineer improves after the PR closes.',next:'Try: mentor feedback'};
     return null;
   },
   'p8s1':(v)=>{
-    if(v.includes('technical')&&!v.includes('stake')) return {msg:'Talking technical to product and executives is the fastest way to lose their attention. <code>stake brief create</code> translates your technical constraints into language they can act on.',next:'Try: stake brief create'};
+    if(v.includes('technical')&&!v.includes('brief')&&!v.includes('stake')) return {msg:'Talking technical to product and executives is the fastest way to lose their attention. Build the brief artifact in business language so leadership can compare the investment against roadmap and revenue.',next:'Try: cat docs/reliability-brief.md'};
+    if(v.includes('latency')||v.includes('connection pool')||v.includes('n+1')) return {msg:'Those facts matter, but not in raw engineering form. Rewrite them as customer risk, roadmap risk, or dollars at stake so leadership can decide whether to fund the work.',next:'Try: stake brief create'};
+    return null;
+  },
+  'p8s2':(v)=>{
+    if(v.includes('technical debt')||v.includes('engineering standard')) return {msg:'Those arguments are true, but they land as engineering preferences. A skeptical PM needs the cost of inaction framed against roadmap timing, customer pain, or lost revenue.',next:'Try: stake risk communicate'};
+    if(v.includes('just trust engineering')||v.includes('because reliability')) return {msg:'Authority is not the frame here. Captain communication wins by showing the business trade-off clearly enough that product can make the decision with you, not in spite of you.',next:'Try: stake risk communicate'};
+    if(v.includes('slow down')||v.includes('delay features')) return {msg:'You are repeating the PM’s framing instead of changing it. Recast the choice as reliability work now versus feature slip during a Q4 fire later.',next:'Try: stake risk communicate'};
+    return null;
+  },
+  'p8s3':(v)=>{
+    if(v.includes('slack')||v.includes('incident')) return {msg:'The medium is not the skill. Captains send a short async status update that is calm, concrete, and jargon-free: customer impact, current action, next update time.',next:'Try: stake status update'};
     return null;
   },
   'p9s1':(v)=>{
     if(v.includes('fix')||v.includes('patch')) return {msg:'Fixing the symptom first is the wrong order during incident command. <code>strategy incident command</code> puts you in the IC role — assess, delegate, communicate, then fix.',next:'Try: strategy incident command'};
+    if(v.includes('logs')||v.includes('grep')||v.includes('cat')) return {msg:'Reading logs yourself is what the tech lead does. Incident command starts by assigning roles, opening comms, and choosing the operating structure for the room.',next:'Try: strategy incident command'};
+    return null;
+  },
+  'p9s2':(v)=>{
+    if(v.includes('rollback')||v.includes('fix')||v.includes('deploy')) return {msg:'The incident is already over. This step is about turning the event into institutional learning with a timeline, root cause, and action items people can own.',next:'Try: strategy postmortem'};
+    if(v.includes('blame')||v.includes('who caused')) return {msg:'Post-mortems are for repairing the system, not assigning shame. Document the process failures and follow-up actions so the organization gets safer instead of quieter.',next:'Try: strategy postmortem'};
     return null;
   },
 };
@@ -1074,22 +1282,22 @@ const SPACED_CALLBACKS = {
 const CHALLENGES = {
   1:{
     title:'Architecture Assessment Challenge',
-    scenario:'You\'ve joined a company as Staff Engineer. In your first week you discover: (1) the monolith has 400,000 lines, (2) there are no documented service boundaries, (3) the database is accessed from every layer. What are your first three actions — in order — before proposing any changes?',
-    acceptFn:(v)=>v.toLowerCase().includes('map')||v.toLowerCase().includes('understand')||v.toLowerCase().includes('read')||v.toLowerCase().includes('document'),
-    successMsg:'Correct priority: (1) Map what exists — no proposals before understanding. (2) Identify the seams — where can you draw boundaries without breaking things? (3) Measure — which parts are actually causing pain? Then propose. Most failed migrations propose first and understand second.',
+    scenario:'You\'ve joined a company as Staff Engineer. In your first week you discover: (1) the monolith has 400,000 lines, (2) there are no documented service boundaries, (3) the database is accessed from every layer. What are your first three actions — in order — before proposing any changes? Answer like a captain: what artifact do you produce, what architectural seams do you identify, and what evidence do you gather before recommending a migration?',
+    acceptFn:(v)=>{const x=v.toLowerCase();const signals=[x.includes('map')||x.includes('document')||x.includes('risk register')||x.includes('architecture review'),x.includes('seam')||x.includes('boundary')||x.includes('ownership')||x.includes('layer'),x.includes('measure')||x.includes('baseline')||x.includes('bottleneck')||x.includes('evidence')||x.includes('metrics')];return signals.filter(Boolean).length>=2;},
+    successMsg:'Correct priority: (1) Map and document what exists — no proposals before understanding, and leave behind an artifact another leader can use. (2) Identify the seams — where can you draw boundaries without breaking ownership, data flow, or deployment behavior? (3) Measure the hotspots — which coupling points are actually causing pain, latency, or delivery drag? Then propose. Most failed migrations propose first and understand second.',
     unlockMsg:'Challenge complete: you approach unfamiliar systems as a scientist before an engineer.'
   },
   3:{
     title:'System Design Decision Challenge',
     scenario:'Your team needs to choose between: (A) REST API for service communication, (B) gRPC, (C) GraphQL federation. The system handles 50,000 req/day, the team has 6 engineers, 3 services, all TypeScript. What do you choose and why?',
-    acceptFn:(v)=>v.toLowerCase().includes('rest')||v.toLowerCase().includes('grpc')||v.toLowerCase().includes('tradeoff')||v.toLowerCase().includes('simplest'),
+    acceptFn:(v)=>{const x=v.toLowerCase();const choice=x.includes('rest')||x.includes('grpc')||x.includes('graphql');const constraint=x.includes('50k')||x.includes('6 engineers')||x.includes('team')||x.includes('3 services')||x.includes('typescript');const rationale=x.includes('complexity')||x.includes('operational')||x.includes('overhead')||x.includes('onboarding')||x.includes('tradeoff')||x.includes('simplest');return choice && (constraint || rationale);},
     successMsg:'There is no universally correct answer — which is the point. At 50k req/day and 3 services, REST is almost certainly the right answer: lowest complexity, best TypeScript tooling, easiest onboarding. gRPC adds value at high-throughput internal services. GraphQL federation makes sense at 10+ services. Choosing based on current reality, not future speculation, is the mark of a senior engineer.',
     unlockMsg:'Challenge complete: you can make defensible architectural decisions with explicit rationale.'
   },
   5:{
     title:'Observability Design Challenge',
     scenario:'Your service is down. You have no dashboards, no alerts, and the only signal is a support ticket 45 minutes after the outage started. Design the minimum viable observability stack to prevent this from happening again.',
-    acceptFn:(v)=>v.toLowerCase().includes('alert')||v.toLowerCase().includes('monitor')||v.toLowerCase().includes('metric')||v.toLowerCase().includes('log'),
+    acceptFn:(v)=>{const x=v.toLowerCase();const signals=[x.includes('health check')||x.includes('uptime')||x.includes('monitor'),x.includes('error rate')||x.includes('metric')||x.includes('latency')||x.includes('p99'),x.includes('structured log')||x.includes('logging')||x.includes('searchable'),x.includes('alert')||x.includes('pagerduty')||x.includes('page')];return signals.filter(Boolean).length>=2;},
     successMsg:'Minimum viable observability: (1) Health check endpoint + uptime monitor (PagerDuty/BetterUptime). (2) Error rate metric + alert at >1% error rate. (3) Structured logging to a searchable system (Datadog/Axiom). (4) P99 latency metric + alert at >500ms. These four things would have caught this outage in under 60 seconds, not 45 minutes.',
     unlockMsg:'Challenge complete: you can design an observability stack from scratch under pressure.'
   },
@@ -1146,20 +1354,20 @@ const PHASES = [null,
  lolaIntro:"You're not reading a codebase to contribute a PR. You're reading it to understand the entire system — its layers, its dependencies, its implicit contracts, and where it will break under load. This is how captains orient.",
  steps:[
   {id:'p1s1', obj:'Run a full architecture review', ctx:'Before touching anything at this scale, map the whole system.',
-   cmd:['arch review'],
-   accept:['arch review'],
-   acceptFn:v=>v.startsWith('arch'),
-   hint:'Type: arch review',
-   out:'═══ ARCHITECTURE REVIEW: escape-pod-platform ═══\n\nServices (4):\n  ├── api-gateway         [entry point, rate limiting, auth routing]\n  ├── escape-pod-api      [core booking logic, Hono + Prisma]\n  ├── notification-svc    [email/push via Resend, async queue]\n  └── analytics-svc       [event tracking, read-only replicas]\n\nLayers:\n  Presentation  →  src/routes/\n  Business Logic →  src/services/\n  Data Access   →  src/db/\n  Infrastructure →  src/lib/\n\nDependencies:\n  escape-pod-api  →  PostgreSQL (primary)\n  analytics-svc   →  PostgreSQL (read replica)\n  notification-svc →  Redis (queue)\n\n⚠ Concern: escape-pod-api/src/routes/ contains direct db.query() calls.\n   Business logic is leaking into the presentation layer.',
+   cmd:['cat ARCHITECTURE.md && fd -e yaml -e json . k8s/ | head -20'],
+   accept:['cat ARCHITECTURE.md && fd -e yaml -e json . k8s/ | head -20','cat ARCHITECTURE.md','fd -e yaml -e json . k8s/ | head -20','arch review'],
+   acceptFn:v=>v.includes('architecture.md')||v.startsWith('arch'),
+   hint:'Type: cat ARCHITECTURE.md && fd -e yaml -e json . k8s/ | head -20',
+   out:'═══ ARCHITECTURE REVIEW: escape-pod-platform ═══\n\nArtifacts scanned:\n  → ARCHITECTURE.md\n  → k8s/api-gateway.yaml\n  → k8s/escape-pod-api.yaml\n  → k8s/notification-svc.yaml\n  → k8s/analytics-svc.yaml\n\nServices (4):\n  ├── api-gateway         [entry point, rate limiting, auth routing]\n  ├── escape-pod-api      [core booking logic, Hono + Prisma]\n  ├── notification-svc    [email/push via Resend, async queue]\n  └── analytics-svc       [event tracking, read-only replicas]\n\nLayers:\n  Presentation  →  src/routes/\n  Business Logic →  src/services/\n  Data Access   →  src/db/\n  Infrastructure →  src/lib/\n\nDependencies:\n  escape-pod-api   → PostgreSQL (primary)\n  analytics-svc    → PostgreSQL (read replica)\n  notification-svc → Redis (queue)\n\n⚠ Concern: escape-pod-api/src/routes/ contains direct db.query() calls.\n   Business logic is leaking into the presentation layer.',
    unlockCmd:'arch',
    jit:{title:'Reading architecture like a staff engineer',body:'Four questions for every architecture review: (1) <b>What are the service boundaries?</b> — are they logical or arbitrary? (2) <b>What are the data flows?</b> — where does data enter and where does it go? (3) <b>Where are the coupling points?</b> — what breaks if service X goes down? (4) <b>What are the implicit assumptions?</b> — what does this architecture assume will never happen?'},
    bridge:{title:'Architecture reviews prevent the most expensive mistakes',body:'The cost of fixing an architectural problem scales exponentially with time. A wrong layer boundary costs an afternoon when it\'s new. It costs months when 50,000 lines depend on it.',tags:['Staff engineering','Architecture','Technical debt','System design']},
    teach:{title:'Layered architecture — the rules that matter',body:'The golden rule: <b>layers should only call downward</b>. Presentation → Business Logic → Data Access. Never skip a layer. Never call upward. When a route handler calls <code>db.query()</code> directly, the business logic is leaking — the rule is broken. Every violation compounds into untestable, unmaintainable code.'}},
   {id:'p1s2', obj:'Map the service layers', ctx:'Understand the layer violations before proposing any fixes.',
-   cmd:['arch layers'],
-   accept:['arch layers','arch layer'],
-   acceptFn:v=>v.includes('arch')&&v.includes('layer'),
-   hint:'Type: arch layers',
+   cmd:['cat src/package.json | jq \'.dependencies\' && wc -l src/**/*.ts'],
+   accept:['cat src/package.json | jq \'.dependencies\' && wc -l src/**/*.ts','cat src/package.json | jq \'.dependencies\'','wc -l src/**/*.ts','arch layers','arch layer'],
+   acceptFn:v=>(v.includes('package.json')&&v.includes('jq'))||(v.includes('arch')&&v.includes('layer')),
+   hint:'Type: cat src/package.json | jq \'.dependencies\' && wc -l src/**/*.ts',
    out:'LAYER ANALYSIS: escape-pod-api\n\n✓  src/lib/         — infrastructure (DB client, queue, external SDKs)\n✓  src/db/          — data access (Prisma queries only)\n⚠  src/services/    — business logic [THIN: 2 files, 140 lines]\n✗  src/routes/      — presentation [VIOLATION: 3 direct db calls found]\n\nViolations:\n  routes/pods.ts:67   → db.query("SELECT * FROM pods WHERE...")\n  routes/auth.ts:23   → prisma.sessions.findUnique(...)\n  routes/admin.ts:91  → db.$executeRaw("UPDATE...")\n\nRisk: these routes are not unit-testable. Business logic cannot be\nreused. A schema change requires editing route files.',
    jit:{title:'Why layer violations compound into technical debt',body:'Today, the violation is "one extra query in a route." In 6 months: every new developer adds queries to routes because that\'s the pattern they see. In 2 years: the route files are 1,000 lines, there are 40 direct db calls, and extracting them requires touching every route. This is how technical debt compounds. The fix is cheap now. It is expensive later.'},
    bridge:{title:'Layer analysis is a staff engineer interview signal',body:'Asking "walk me through how this codebase is structured" and then correctly identifying layer violations — without running any code — is the fastest way to demonstrate staff-level thinking in a technical interview or a first-week assessment.',tags:['Technical interviews','Staff engineering','Architecture','Code review']},
@@ -1168,6 +1376,16 @@ const PHASES = [null,
     opts:['Move the SQL into a separate SQL file','Extract the db calls into src/services/ functions that the routes call','Add comments explaining why the calls are there','Create a new layer between routes and db called src/queries/'],
     janetQuiz:true,
     correct:1,fb:'Correct. Routes should call service functions which call data access functions. <code>routes/pods.ts</code> calls <code>services/pods.ts</code> which calls <code>db/pods.ts</code>. This makes each layer independently testable and the business logic reusable.'}}
+  ,
+  {id:'p1s3', obj:'Document the top 3 architectural risks with mitigations', ctx:'Reading without a risk register is reconnaissance without a report. Turn the architecture review into an artifact another leader could use.',
+   cmd:['arch risk register'],
+   accept:['arch risk register','arch risk','risk register'],
+   acceptFn:v=>v.includes('arch')&&v.includes('risk'),
+   hint:'Type: arch risk register',
+   out:'ARCHITECTURE RISK REGISTER\n\n1. Layer leakage in route handlers\n   Impact: low testability, duplicated business rules, fragile schema changes\n   Mitigation: extract pod/auth/admin logic into service + db layers this sprint\n\n2. Shared database dependency across core and analytics paths\n   Impact: analytics spikes can amplify booking latency during peak load\n   Mitigation: move analytics reads fully to replica and add query budget alerting\n\n3. Queue dependency hidden behind notification writes\n   Impact: Redis failure can silently delay customer communication after booking\n   Mitigation: add queue health alert + fallback delivery retry runbook\n\nArtifact saved: docs/architecture-risk-register.md',
+   jit:{title:'Risk registers are architecture reviews made useful',body:'A captain does not stop at "here is what I noticed." The review artifact is a ranked risk register: what can break, how badly, and what we do next. That turns architecture reading into prioritization.'},
+   bridge:{title:'Leadership is measured by what others can act on',body:'Executives, peers, and future maintainers cannot act on a vague sense that "the architecture feels risky." They can act on a 3-item risk register with impact and mitigation. This is where senior technical observation becomes upper-senior leadership.',tags:['Architecture','Risk management','Leadership','Technical strategy']},
+   teach:{title:'Writing a useful architecture risk register',body:'Each entry needs three things: the risk, the consequence if it bites, and the mitigation path. If a reader cannot tell whether to fix it now, later, or never, the entry is too vague.'}}
  ],
  challenge:CHALLENGES[1],
  done:'Architecture reading unlocked. Layers, violations, dependency mapping — you can orient on any system cold and identify where it will hurt.',
@@ -1179,10 +1397,10 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
   {id:'p2s1', obj:'Review the full branch diff against main', ctx:'This PR touches 8 files. Start by seeing the full scope.',
-   cmd:['git diff main'],
-   accept:['git diff main','git diff main --stat','git diff origin/main'],
+   cmd:['git diff main --stat && git diff main --name-only | grep migration'],
+   accept:['git diff main --stat && git diff main --name-only | grep migration','git diff main','git diff main --stat','git diff origin/main'],
    acceptFn:v=>v.includes('git diff')&&(v.includes('main')||v.includes('origin')),
-   hint:'Type: git diff main  — see everything this branch changes vs main',
+   hint:'Type: git diff main --stat && git diff main --name-only | grep migration',
    out:'diff --stat: 8 files changed, 312 insertions(+), 47 deletions(-)\n\nFiles changed:\n  src/services/pods.ts           +94 -12  [new service layer]\n  src/routes/pods.ts             +8  -67  [routes slimmed]\n  src/db/pods.ts                 +71 -0   [new data access layer]\n  src/db/migrations/004_idx.sql  +12 -0   [new index]\n  tests/services/pods.test.ts    +87 -0   [new tests]\n  tests/db/pods.test.ts          +31 -0   [new tests]\n  package.json                   +4  -1   [new dev dep: vitest]\n  src/routes/admin.ts            +5  -67  [admin routes slimmed]\n\n⚡ This PR extracts db calls from routes into services + data access layers.',
    unlockCmd:'git',
    jit:{title:'Reading a large diff at the architectural level',body:'For multi-file PRs, read the <b>--stat summary first</b>, not the diffs. Ask: (1) does the scope match the description? (2) are there files that should have changed but didn\'t? (3) are there files that changed that shouldn\'t have? (4) what\'s the blast radius? This PR is well-scoped: it\'s doing exactly what it says, tests were added, migrations included.'},
@@ -1212,20 +1430,20 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[3],
  steps:[
   {id:'p3s1', obj:'Propose the architectural approach for the new fleet management system', ctx:'The crew needs a new service for managing escape pod fleets across 50 ships. Evaluate options before deciding.',
-   cmd:['design propose microservices'],
-   accept:['design propose microservices','design propose','design propose monolith','design tradeoff'],
+   cmd:['design tradeoff'],
+   accept:['design tradeoff','design propose microservices','design propose','design propose monolith'],
    acceptFn:v=>v.startsWith('design'),
-   hint:'Type: design propose microservices  — evaluate microservices as an approach',
+   hint:'Type: design tradeoff  — compare modular monolith vs microservices against current constraints',
    out:'ARCHITECTURAL PROPOSAL ANALYSIS\n\nOption: Microservices\n\nAdvantages:\n  ✓ Independent deployment per service\n  ✓ Technology flexibility per team\n  ✓ Fault isolation — one service can fail without others\n\nDisadvantages:\n  ✗ Distributed systems complexity (network failures, latency)\n  ✗ Operational overhead (50+ services to monitor)\n  ✗ Data consistency harder to guarantee across services\n  ✗ Requires mature platform team to operate well\n\nContext factors:\n  Current team: 8 engineers\n  Current services: 4 (all TypeScript)\n  Traffic: 50k req/day\n  Scaling pressure: 3× growth expected in 12 months\n\n⚡ Recommendation signal: team size and complexity suggest a\n   well-structured monolith or modular monolith first.',
    unlockCmd:'design',
    jit:{title:'The monolith-first principle',body:'Microservices are the right answer for large, mature systems with multiple teams. They are the wrong answer for most new systems. The operational complexity of 50 microservices requires a platform team, mature CI/CD, service mesh, distributed tracing, and cross-service debugging skills. A well-structured <b>modular monolith</b> — with clear internal service boundaries — gives you most of the benefits with a fraction of the complexity. You can always extract services later.'},
    bridge:{title:'Most microservices regrets come from premature extraction',body:'The famous microservices success stories (Netflix, Uber) happened at 10× the team size after 5× the scale. Most teams that adopt microservices at 8 engineers spend the next 2 years fighting distributed system problems they created for themselves.',tags:['System design','Microservices','Modular monolith','Architecture decisions','Tech strategy']},
    teach:{title:'How to make a defensible architectural decision',body:'The format: (1) <b>State the options</b> — don\'t pretend there\'s only one. (2) <b>State the constraints</b> — team size, traffic, time horizon. (3) <b>Evaluate trade-offs</b> — not "pros and cons" but specifically how each option performs against your constraints. (4) <b>Make the decision</b> — commit. (5) <b>Write the ADR</b> — document it so future engineers understand why.'}},
   {id:'p3s2', obj:'Create an Architecture Decision Record', ctx:'Decisions without documentation become ghost knowledge. Write it down.',
-   cmd:['design adr create'],
-   accept:['design adr create','design adr'],
-   acceptFn:v=>v.includes('adr')||v.includes('design adr'),
-   hint:'Type: design adr create',
+   cmd:['adr new "Use modular monolith for fleet management"'],
+   accept:['adr new "Use modular monolith for fleet management"','adr new','design adr create','design adr'],
+   acceptFn:v=>v.includes('adr new')||v.includes('design adr')||v==='adr',
+   hint:'Type: adr new "Use modular monolith for fleet management"',
    out:'ADR-007: Fleet Management Service Architecture\n\nStatus: Accepted\nDate: 2026-04-17\nAuthor: Captain '+G.name+'\n\nContext:\n  We need a fleet management service for 50-ship operations.\n  Current team: 8 engineers. Traffic: 50k req/day. 12mo growth: 3×.\n\nDecision:\n  Build as a module within the existing escape-pod-api monolith,\n  with clean internal service boundaries (FleetService class).\n  Extract to a separate service when the module exceeds 500 LOC\n  or when a separate team owns it.\n\nConsequences:\n  ✓ No operational overhead increase\n  ✓ Shared auth, logging, and observability\n  ✓ Clear extraction path when needed\n  ✗ Must maintain clean boundaries or coupling will occur\n\nReview date: 2026-10-17',
    jit:{title:'Why ADRs are worth writing',body:'In 18 months, a new engineer will ask "why is fleet management inside the monolith?" Without an ADR, they\'ll get 4 different answers from 4 engineers, each partially wrong. With an ADR, they get the actual reasoning in 2 minutes. ADRs also prevent re-litigating decided questions every time new engineers join.'},
    bridge:{title:'ADRs are the mark of a mature engineering culture',body:'Companies that maintain ADRs — Spotify, Thoughtworks, Netflix — have dramatically faster onboarding and far less "we don\'t know why we did this" technical debt. Writing ADRs is not overhead. It is the highest-ROI documentation a technical leader produces.',tags:['Architecture','Documentation','Engineering culture','Onboarding','Technical debt']},
@@ -1234,6 +1452,16 @@ const PHASES = [null,
     opts:['Delete the ADR','Update the status to "Superseded" and link to a new ADR explaining the change','Leave it — historical decisions should never be changed','Remove the recommendation section but keep the context'],
     janetQuiz:true,
     correct:1,fb:'Correct. ADRs are immutable historical records. You never delete or edit them. When a decision changes, you mark the old ADR as "Superseded by ADR-024" and write a new ADR explaining the new context and decision. This preserves the full decision history — which is the entire point.'}}
+  ,
+  {id:'p3s3', obj:'Run a structured design review checklist', ctx:'A proposal is not finished when it sounds smart. Validate it across scalability, observability, security, and cost before asking the org to bet on it.',
+   cmd:['design review checklist'],
+   accept:['design review checklist','design review','review checklist'],
+   acceptFn:v=>v.includes('design')&&v.includes('review'),
+   hint:'Type: design review checklist',
+   out:'DESIGN REVIEW CHECKLIST: Fleet Management Architecture\n\nScalability\n  ✓ Module boundaries support later extraction\n  ✓ Expected 3× traffic stays within current monolith limits\n\nObservability\n  ✓ Reuses existing logging, tracing, and SLO stack\n  ✓ New FleetService endpoints must emit booking + assignment metrics\n\nSecurity\n  ✓ Shared auth middleware retained\n  ✓ Pod assignment actions require captain or automation service role\n\nCost\n  ✓ No new service hosting cost in phase 1\n  ✓ Avoids premature platform overhead for 8-engineer team\n\nVerdict: Approved with follow-ups\n  → add service-level metrics before launch\n  → review extraction threshold at 500 LOC or separate ownership\n\nArtifact saved: docs/reviews/fleet-architecture-review.md',
+   jit:{title:'Design review is where architecture becomes leadership',body:'Anyone can sketch a diagram. The leadership move is to pressure-test the design before the org pays for it. Scalability, observability, security, and cost are the four lenses that keep architecture honest.'},
+   bridge:{title:'Principal-level engineers institutionalize design review',body:'What separates a strong staff engineer from a senior technical leader is often this step: they build the review habit that keeps the org from overcommitting to elegant but fragile designs.',tags:['System design','Architecture review','Leadership','Technical governance']},
+   teach:{title:'Four lenses for every design review',body:'Ask the same four questions every time: will it scale, can we observe it, is it secure by default, and what does it cost to run and support? If a design cannot survive those questions, it is not ready for adoption.'}}
  ],
  challenge:CHALLENGES[3],
  done:'System design decision-making unlocked. Propose, evaluate trade-offs, decide, document. Ghost knowledge is the enemy.',
@@ -1245,10 +1473,10 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[4],
  steps:[
   {id:'p4s1', obj:'Identify the current performance bottlenecks', ctx:'Before scaling, find out what is actually slow. Assumption-driven scaling is expensive.',
-   cmd:['scale analyze'],
-   accept:['scale analyze'],
-   acceptFn:v=>v.startsWith('scale'),
-   hint:'Type: scale analyze',
+   cmd:['kubectl top pods --sort-by=cpu && curl http://api/metrics | grep http_duration'],
+   accept:['kubectl top pods --sort-by=cpu && curl http://api/metrics | grep http_duration','kubectl top pods --sort-by=cpu','curl http://api/metrics | grep http_duration','scale analyze'],
+   acceptFn:v=>v.startsWith('scale')||v.includes('kubectl top pods')||v.includes('http_duration'),
+   hint:'Type: kubectl top pods --sort-by=cpu && curl http://api/metrics | grep http_duration',
    out:'PERFORMANCE ANALYSIS: escape-pod-platform\n\nCurrent load: 50k req/day (~580 req/min peak)\n\nBottleneck analysis:\n\n  🔴 P99 latency: 2,840ms  ← CRITICAL\n     Root cause: N+1 query in pods/reserve endpoint\n     Query count per request: ~47 (should be 2)\n\n  🟡 DB connection pool: 78% utilized at peak\n     Risk: pool exhaustion at 2× load\n\n  🟢 CPU: 12% average — not the constraint\n  🟢 Memory: 340MB / 2GB — not the constraint\n\n  Projection at 10× load:\n    Current architecture fails at ~3× (connection pool exhaustion)\n    N+1 fix alone gets you to ~6×\n    Fix N+1 + add read replica = 10× viable',
    unlockCmd:'scale',
    jit:{title:'Finding bottlenecks before scaling',body:'The most expensive scaling mistake is scaling the wrong thing. Adding more servers when the bottleneck is an N+1 query adds cost without fixing latency. The diagnostic sequence: (1) measure p99 latency — where is the 99th percentile? (2) count queries per request — N+1 shows up here. (3) check connection pool utilization — is the database the gate? (4) check CPU and memory — rarely the bottleneck in modern apps.'},
@@ -1267,6 +1495,16 @@ const PHASES = [null,
     opts:['The pod as reserved — cache was immediately invalidated on reserve()','The pod as available — the 30-second cache window hasn\'t expired','An error — the cache is inconsistent','The correct data — Redis polls the DB every second'],
     janetQuiz:true,
     correct:0,fb:'Correct. The implementation above registers invalidation on pod.reserve() — so the cache entry is deleted immediately when a reservation happens, forcing the next request to fetch from the database. This is write-through invalidation. Without this, users would see stale availability for up to 30 seconds — which would cause double-bookings.'}}
+  ,
+  {id:'p4s3', obj:'Write the cache-layer runbook', ctx:'A cache without a runbook is a trap for the next on-call engineer. Document how to monitor it, flush it, fail over it, and know when not to touch it.',
+   cmd:['scale runbook cache'],
+   accept:['scale runbook cache','scale runbook','cache runbook'],
+   acceptFn:v=>v.includes('runbook')&&(v.includes('scale')||v.includes('cache')),
+   hint:'Type: scale runbook cache',
+   out:'RUNBOOK: Redis Cache Layer\n\nMonitor\n  → cache_hit_ratio < 70% for 10m = investigate key churn\n  → redis_memory_used > 80% = page on-call, evaluate eviction risk\n  → cache_latency_p95 > 15ms = check network path and node saturation\n\nFlush\n  → Safe command: redis-cli UNLINK pods:available:all\n  → Never run FLUSHALL during incident response unless captain approves\n\nFail over\n  → If Redis unavailable, app falls back to DB automatically\n  → If DB pool exceeds 70% during fallback, enable degraded-mode cache TTL=5s\n  → Escalate to platform if failover exceeds 15 minutes\n\nOwner: Platform + Escape Pod API\nArtifact saved: runbooks/cache-layer.md',
+   jit:{title:'Runbooks are the operational half of architecture',body:'Every scaling change creates a new on-call burden. The runbook is the contract that says future responders do not need to rediscover the system under pressure.'},
+   bridge:{title:'Runbooks turn senior heroics into repeatable ops',body:'Without a runbook, incidents depend on whichever senior engineer happens to be awake. With a runbook, the team responds consistently and leadership can trust the system beyond one person\'s memory.',tags:['Scaling','Runbooks','On-call','Reliability']},
+   teach:{title:'A good runbook answers four questions',body:'What do we watch, what do we do first, what is dangerous to do blindly, and when do we escalate? If the runbook does not answer those, it will fail under real incident pressure.'}}
  ],
  done:'Scalability strategy unlocked. Diagnose before scaling. N+1 first, then pool, then cache, then replicas. Fix the actual bottleneck.',
  ach:'scaler'},
@@ -1277,20 +1515,20 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[5],
  steps:[
   {id:'p5s1', obj:'Initialize the observability stack', ctx:'The platform has no monitoring. Build the foundation.',
-   cmd:['observe setup'],
-   accept:['observe setup'],
-   acceptFn:v=>v.startsWith('observe'),
-   hint:'Type: observe setup',
+   cmd:['helm install prometheus prometheus-community/kube-prometheus-stack'],
+   accept:['helm install prometheus prometheus-community/kube-prometheus-stack','helm install prometheus','observe setup'],
+   acceptFn:v=>v.startsWith('observe')||v.includes('helm install prometheus'),
+   hint:'Type: helm install prometheus prometheus-community/kube-prometheus-stack',
    out:'OBSERVABILITY STACK: initializing\n\n✓ Structured logging   → Axiom  [JSON logs, searchable, alertable]\n✓ Metrics collection   → Datadog [request rate, latency, error rate]\n✓ Distributed tracing  → Datadog APM [trace requests across services]\n✓ Uptime monitoring    → BetterUptime [external health checks]\n✓ Error tracking       → Sentry [JS errors, stack traces, user context]\n✓ On-call rotation     → PagerDuty [alert routing, escalation]\n\nDashboards created:\n  → Service health (error rate, latency, throughput)\n  → Database health (connection pool, query times, replication lag)\n  → Business metrics (bookings/hour, cancellations, revenue)\n\nStack active. Baseline data collecting.',
    unlockCmd:'observe',
    jit:{title:'The three pillars of observability',body:'<b>Metrics</b>: numbers over time — request rate, error rate, latency, CPU. Fast, cheap, great for alerting. <b>Logs</b>: events with context — what happened, when, and why. Expensive at scale, invaluable for debugging. <b>Traces</b>: the path of a single request through all services. Essential for diagnosing distributed system latency. Observability is having all three, correlated.'},
    bridge:{title:'Observability is an SRE prerequisite',body:'No serious engineering organization goes on-call without observability. PagerDuty alerts with no dashboard is just waking people up to guess. The observability stack is what lets on-call engineers move from "something is wrong" to "the auth service\'s DB connection pool is exhausted because of the rate limiter bug deployed 14 minutes ago" in under 3 minutes.',tags:['SRE','On-call','Datadog','Sentry','Observability','Reliability']},
    teach:{title:'What to instrument first',body:'In priority order: (1) Error rate — the most important single metric. Alert at >1%. (2) P99 latency — tail latency is your user experience. Alert at 2× baseline. (3) Health check — is the service up? External monitor. (4) Business metric — are bookings happening? Silence can mean everything is fine or everything is broken. (5) Database health — query times, connection count, replication lag.'}},
   {id:'p5s2', obj:'Create an SLO for the booking service', ctx:'Define what "reliable" means in measurable terms before an incident, not during one.',
-   cmd:['observe slo create'],
-   accept:['observe slo create','observe slo'],
-   acceptFn:v=>v.includes('observe')&&v.includes('slo'),
-   hint:'Type: observe slo create',
+   cmd:['sloth generate -i slo.yaml | kubectl apply -f -'],
+   accept:['sloth generate -i slo.yaml | kubectl apply -f -','sloth generate -i slo.yaml','observe slo create','observe slo'],
+   acceptFn:v=>(v.includes('sloth')&&v.includes('slo.yaml'))||(v.includes('observe')&&v.includes('slo')),
+   hint:'Type: sloth generate -i slo.yaml | kubectl apply -f -',
    out:'SLO DEFINITION: escape-pod-api / booking endpoint\n\nSLI (what we measure):\n  Successful booking requests / Total booking requests\n  (HTTP 2xx responses, excluding client errors 4xx)\n\nSLO (our target):\n  99.5% success rate over a rolling 28-day window\n\nError Budget:\n  0.5% of requests may fail = ~3.6 hours downtime / 28 days\n  Current burn rate: 0.08% (72% error budget remaining)\n\nAlerts:\n  🔴 Page immediately:  burn rate > 14.4× (1 hour budget in 5 min)\n  🟡 Ticket:            burn rate > 1×   (budget exhausting at pace)\n\nSLO document saved. Review date: 2026-07-17.',
    jit:{title:'Why SLOs beat uptime percentages',body:'"Five nines" (99.999%) sounds impressive but tells you nothing about user experience. An SLO on <b>successful requests</b> is what users actually experience. An SLO on <b>P99 latency</b> captures slow-but-not-down incidents that uptime monitoring misses. Error budgets make reliability a shared conversation: "we have 3.6 hours of budget remaining this month — is this new feature worth spending it?"'},
    bridge:{title:'SLOs are the universal language between engineering and business',body:'When product wants to ship a risky feature and engineering is worried about reliability — error budgets end the argument. "We have 0.3 hours of error budget remaining this month. The risk assessment for this feature is 1-2 hours. We should defer until next cycle." This is a conversation executives can engage with.',tags:['SRE','SLOs','Error budgets','Product collaboration','Engineering leadership']},
@@ -1299,6 +1537,16 @@ const PHASES = [null,
     opts:['2× — you\'re consuming budget at double the expected rate','4× — you\'re burning 4× faster than your budget allows','60× — a 1% overage on a 0.5% budget is a 60× burn rate','0.5× — you\'re within budget because errors are under 5%'],
     janetQuiz:true,
     correct:1,fb:'Correct. Error budget is 0.5% per 28 days. Current error rate is 2% = 4× the budget rate. You\'re burning 4× faster than allowed. At this rate, the monthly budget exhausts in 7 days. This should trigger a yellow alert and engineering prioritization toward reliability.'}}
+  ,
+  {id:'p5s3', obj:'Calculate the current error-budget burn rate and runway', ctx:'SLOs are decorative until you can say how fast the budget is burning and how long the team has left before reliability work must take priority.',
+   cmd:['observe error-budget'],
+   accept:['observe error-budget','error budget','observe burn rate'],
+   acceptFn:v=>v.includes('error-budget')||v.includes('error budget')||(v.includes('burn rate')&&v.includes('observe')),
+   hint:'Type: observe error-budget',
+   out:'ERROR BUDGET ANALYSIS: booking service\n\nSLO target: 99.5% success over 28 days\nBudget available: 0.5% = 3.6 hours equivalent failure time\n\nCurrent state:\n  24h error rate: 0.32%\n  6h error rate: 1.1%\n  Fast burn rate: 2.2×\n  Slow burn rate: 0.64×\n\nProjection:\n  If current 6h burn continues, budget exhausted in ~12.7 days\n  If current 24h burn continues, budget exhausted in ~43.7 days\n\nLeadership framing:\n  We are not paging yet, but we are spending reliability margin faster\n  than planned. Another release with similar error profile removes\n  feature-launch safety for the rest of the window.',
+   jit:{title:'Error budget is how observability enters prioritization',body:'Metrics tell you what is happening. Error budget tells you whether the org can afford to keep taking reliability risk. That is why SRE turns into business language here.'},
+   bridge:{title:'Burn rate is the language of trade-offs',body:'When you can say "we have 12 days of runway at this burn," reliability stops sounding abstract. Product, engineering, and leadership can finally debate trade-offs with the same scoreboard.',tags:['SLOs','Error budget','Reliability','Leadership']},
+   teach:{title:'Runway matters more than raw percentage',body:'A service can still be "within SLO" and be burning budget too quickly to support the roadmap. Always pair the current burn rate with projected runway so the team understands urgency, not just status.'}}
  ],
  challenge:CHALLENGES[5],
  done:'Observability and reliability engineering unlocked. Instrument everything, define SLOs before incidents, let error budgets make the hard conversations easier.',
@@ -1343,10 +1591,10 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
   {id:'p7s1', obj:'Start the onboarding session for a new crew engineer', ctx:'A new engineer joined the ship yesterday. Give them the mental model, not just the tickets.',
-   cmd:['mentor onboard'],
-   accept:['mentor onboard'],
-   acceptFn:v=>v.startsWith('mentor'),
-   hint:'Type: mentor onboard',
+   cmd:['cat docs/onboarding-checklist.md'],
+   accept:['cat docs/onboarding-checklist.md','mentor onboard'],
+   acceptFn:v=>v.startsWith('mentor')||v.includes('onboarding-checklist.md'),
+   hint:'Type: cat docs/onboarding-checklist.md',
    out:'ONBOARDING SESSION: New Engineer — Ensign Reyes\n\nDay 1 agenda (Captain-led):\n\n  9:00  Architecture walkthrough — layers, services, ADRs\n        "Read ADR-001 through ADR-007 before touching any code."\n\n  10:00 Development workflow — branch → PR → CI → review → deploy\n        Pair on first PR together.\n\n  11:00 Observability tour — dashboards, alert runbook, on-call rotation\n        "If something pages, here is exactly what to do."\n\n  Afternoon: First ticket assigned (good first issue label)\n             Pairing session with senior crew member\n\nExpected time to first PR: 2-3 days\nExpected time to independent contribution: 2-3 weeks\nExpected time to on-call readiness: 6-8 weeks\n\nL.O.L.A. note: The quality of onboarding predicts 12-month retention.',
    unlockCmd:'mentor',
    jit:{title:'What good onboarding actually gives people',body:'Bad onboarding: here are your Jira tickets, ask if you have questions. Good onboarding: here is the mental model of the system, here is why we made these decisions, here is what to do when things break, here is who to ask. The mental model is what allows independent contribution. Without it, engineers either copy patterns without understanding them, or ask for help on everything. Both are expensive.'},
@@ -1365,6 +1613,16 @@ const PHASES = [null,
     opts:['Engineers are lazy and need more reminders','The CI gate is broken and not actually blocking PRs','The standard was set without engineer input and lacks buy-in','You need to enforce it more strictly in code reviews'],
     janetQuiz:true,
     correct:2,fb:'Correct. A 72% compliance rate on a CI-gated standard suggests the CI gate is being bypassed (via --no-verify or override) — usually because engineers feel the standard is imposed rather than owned. Standards that engineers help define have dramatically higher compliance than those handed down. Retroactively running a working session to get buy-in often fixes compliance faster than tightening enforcement.'}}
+  ,
+  {id:'p7s3', obj:'Deliver structured growth feedback after the first PR', ctx:'The hardest captain skill is feedback that is specific, constructive, and actionable. Treat this as mentoring, not correction.',
+   cmd:['mentor feedback'],
+   accept:['mentor feedback','mentor review feedback','review feedback'],
+   acceptFn:v=>v.includes('mentor')&&v.includes('feedback'),
+   hint:'Type: mentor feedback',
+   out:'GROWTH FEEDBACK: Ensign Reyes after PR-184\n\nObservation\n  Your service extraction was correct, but the tests focused on happy path only.\n\nImpact\n  That leaves reservation edge cases unprotected, which means the next schema or\n  cache change could silently reintroduce booking failures.\n\nNext step\n  On your next PR, add one failure-path test for every state-changing service method.\n  I paired an example below from pods.test.ts so you can copy the pattern.\n\nSupport\n  Let\'s pair for 20 minutes before your next PR so the pattern feels natural,\n  not ceremonial.\n\nResult: specific, actionable, and tied to future growth — not just this diff.',
+   jit:{title:'Feedback should change future behavior, not just this PR',body:'Captain-level feedback names the pattern, explains why it matters, and gives the engineer a concrete next move. If the person cannot tell what to do differently next time, it was not good feedback.'},
+   bridge:{title:'Great feedback compounds through a team',body:'Constructive, specific feedback is one of the fastest multipliers in engineering leadership. It increases code quality, confidence, and autonomy at the same time — which is why so few people actually practice it well.',tags:['Mentoring','Feedback','Leadership','Team development']},
+   teach:{title:'Use the observation-impact-next-step pattern',body:'Start with what you saw, explain why it matters, then give one next behavior to practice. Keep it about growth, not identity. The goal is a stronger engineer on the next PR, not a smaller engineer on this one.'}}
  ],
  challenge:CHALLENGES[7],
  done:'Mentoring and team standards unlocked. Individual impact is bounded. Team impact is not. Build the systems that build the people.',
@@ -1376,10 +1634,10 @@ const PHASES = [null,
  spacedRep:SPACED_CALLBACKS[8],
  steps:[
   {id:'p8s1', obj:'Create an executive brief for the reliability investment', ctx:'Engineering knows we need 4 weeks of reliability work. Product doesn\'t understand why. Translate.',
-   cmd:['stake brief create'],
-   accept:['stake brief create','stake brief'],
-   acceptFn:v=>v.startsWith('stake'),
-   hint:'Type: stake brief create',
+   cmd:['cat docs/reliability-brief.md'],
+   accept:['cat docs/reliability-brief.md','stake brief create','stake brief'],
+   acceptFn:v=>v.startsWith('stake')||v.includes('reliability-brief.md'),
+   hint:'Type: cat docs/reliability-brief.md',
    out:'EXECUTIVE BRIEF: Reliability Investment — Q3\n\nTo: VP Product, VP Engineering, CFO\nFrom: Captain '+G.name+'\nDate: 2026-04-17\n\nSituation:\n  The escape pod platform is on track to handle 3× current traffic\n  by Q4. Our Q4 roadmap includes 4 high-priority features.\n\nRisk (in business terms):\n  Without a 4-week reliability investment, at 3× load:\n  → Booking success rate drops from 99.5% → 94% (estimated)\n  → At current revenue: ~$47k/month in failed transactions\n  → Customer trust risk during the highest-traffic quarter\n\nProposal:\n  Dedicate 4 weeks (2 engineers) to:\n  • Fix N+1 query (removes primary bottleneck)\n  • Add Redis caching layer\n  • Implement observability and alerting\n\nReturn:\n  → Booking success rate maintained at 99.5%+ through Q4\n  → Q4 features can ship on schedule on a stable platform\n  → Avoids estimated $47k/month revenue risk\n\nRecommendation: Approve reliability sprint before Q4 feature work.',
    unlockCmd:'stake',
    jit:{title:'The translation layer between technical and business',body:'Engineers say: "we have N+1 queries and the connection pool will exhaust at 3×." Executives hear: "technical words." Executives respond to: risk to revenue, risk to customers, risk to roadmap. Your job is to translate every technical constraint into one of those three categories — and give a number. "$47k/month in failed transactions" is a decision-making input. "Connection pool exhaustion" is not.'},
@@ -1398,6 +1656,16 @@ const PHASES = [null,
     opts:['"That\'s not how engineering works."','"We could — but at 3× load, the failure mode is booking transactions failing silently. By the time users report it, we\'ve already lost the revenue."','"Engineering standards require reliability work before scaling."','"That approach creates technical debt."'],
     janetQuiz:true,
     correct:1,fb:'Correct. The strongest response is always the one that speaks in business terms with a specific consequence. "Booking transactions failing silently" and "already lost the revenue" are concrete business outcomes the PM can evaluate. Options A, C, and D are engineer-to-engineer language that land as vague authority claims to a PM.'}}
+  ,
+  {id:'p8s3', obj:'Send a 3-sentence async incident status update to leadership', ctx:'Leadership does not need the debug log. They need impact, action, and timing. Brief, confident, no jargon.',
+   cmd:['stake status update'],
+   accept:['stake status update','status update','stake update'],
+   acceptFn:v=>v.includes('stake')&&v.includes('status'),
+   hint:'Type: stake status update',
+   out:'LEADERSHIP STATUS UPDATE\n\nWe are seeing booking delays across 12 ships and have contained the issue before it became a fleet-wide outage. Engineering has isolated the problem to the caching layer failover path and is actively restoring normal booking speed now. Next update in 15 minutes, with either full recovery confirmation or the customer-impact mitigation plan.\n\nThree sentences. Customer impact, current action, next update time.',
+   jit:{title:'Async leadership updates are a separate skill from debugging',body:'Technical leaders often over-explain incidents. Leadership updates work because they remove jargon and compress uncertainty into a clear operating picture: what users feel, what the team is doing, and when you will speak again.'},
+   bridge:{title:'Brief, calm updates build organizational trust',body:'During incidents, trust is built in short intervals. A tight async update reassures leadership that engineering is in command without dragging them into implementation detail they cannot use.',tags:['Incident communication','Leadership','Stakeholder management']},
+   teach:{title:'Three-sentence incident update formula',body:'Sentence 1: current customer or business impact. Sentence 2: what engineering is doing now. Sentence 3: when the next update is coming. If you cannot fit it in three sentences, you are probably writing for engineers instead of leaders.'}}
  ],
  breakit:BREAKIT[8],
  done:'Cross-functional leadership unlocked. Translate technical reality into business language. The brief that gets approved saves the quarter.',
@@ -1443,7 +1711,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A critical memory fault in her intelligence core. She was in the middle of managing a fleet deployment.\n\nThe deployment is paused. 50 ships are waiting. And I — J.A.N.E.T. — have been asked to oversee your final assessment.\n\nYou will need to demonstrate every skill from this program. Starting now.\n\nSTEP 1 OF 5: The deployment logs show an error. Read them.',
     prompt:'Read the deployment error logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('observe')||v.includes('log'),
+    acceptFn:v=>{const x=v.toLowerCase();return (x.includes('cat')&&(x.includes('logs/')||x.includes('deploy.log')||x.includes('error.log')))||(x.includes('observe')&&x.includes('logs'));},
     accept:['cat logs/deploy.log','cat logs/error.log','observe logs','cat deploy.log'],
     out:'[04:12:31] DEPLOY: fleet-v3.2.1 → api-gateway\n[04:12:33] ERROR: HealthCheck failed — /health returned 503\n[04:12:33] DEPLOY PAUSED. Previous version still active.\n[04:12:33] Cause: missing environment variable API_GATEWAY_KEY\n[04:12:33] 50 ships awaiting new routing config.',
     hint:'Type: cat logs/deploy.log  — read what went wrong'
@@ -1452,7 +1720,7 @@ const BOSS_STEPS = [
     id:'boss2',
     scenario:'STEP 2 OF 5: The error is a missing environment variable. The previous captain apparently did not document this requirement. You will need to set it and verify it.\n\nI have pre-loaded the correct value for this assessment. You simply need to demonstrate that you know how to set and verify an environment variable.\n\nI am watching.',
     prompt:'Set the missing environment variable and verify it.',
-    acceptFn:v=>(v.includes('export')&&v.includes('API_GATEWAY_KEY'))||(v.includes('echo')&&v.includes('API_GATEWAY'))||(v.includes('export')),
+    acceptFn:v=>{const x=v.toLowerCase();return (x.includes('export')&&x.includes('api_gateway_key'))||(x.includes('echo')&&x.includes('api_gateway_key'));},
     accept:['export API_GATEWAY_KEY','echo $API_GATEWAY_KEY'],
     out:'API_GATEWAY_KEY set in environment.\n✓ Verified: echo $API_GATEWAY_KEY → fleet-sk-prod-abc123\n\nHealth check endpoint now returns 200.',
     hint:'Type: export API_GATEWAY_KEY="fleet-sk-prod-abc123"  then verify with echo $API_GATEWAY_KEY'
@@ -1486,6 +1754,53 @@ const BOSS_STEPS = [
   },
 ];
 
+const CAPSTONE_STEPS = [
+  {
+    id:'cap1',
+    title:'Cold Codebase Orientation',
+    scenario:'CAPSTONE SCENARIO: Docking Control has just been handed to your team after a re-org. You have no walkthrough, only a live system, a shipping deadline, and a note that says "regional availability drift observed during peak traffic."\n\nThis is the senior-most version of software ownership: orient fast, decide where risk lives, and leave the team with something better than instincts.',
+    prompt:'Orient to the unfamiliar system and produce the first-pass architecture review.',
+    cmd:'arch review',
+    accept:['arch review'],
+    acceptFn:v=>v.includes('arch')&&v.includes('review'),
+    hint:'Type: arch review',
+    out:'ARCHITECTURE REVIEW: docking-control\n\nTop-level map:\n  web → api-gateway → docking-control → docking-cache → postgres\n  event bridge → allocation-worker → docking-control callbacks\n\nImmediate observations:\n  → availability decisions depend on cache freshness, not just source of truth\n  → allocation-worker and API share booking rules but not one validation path\n  → ownership seam between platform and bookings is unclear during incidents\n\nReview artifact saved. Next: convert observations into a risk register.'
+  },
+  {
+    id:'cap2',
+    title:'Architectural Risk Register',
+    scenario:'You now need the artifact a captain actually leaves behind: not vibes, not a diagram, but the top risks and the mitigation path. Leadership will use this to decide what gets funded first.',
+    prompt:'Document the top architectural risks with mitigations.',
+    cmd:'arch risk register',
+    accept:['arch risk register','arch risk'],
+    acceptFn:v=>v.includes('arch')&&v.includes('risk'),
+    hint:'Type: arch risk register',
+    out:'RISK REGISTER: docking-control\n\n1. Cache truth drift\n   Risk: stale berth availability can produce double-booking under failover\n   Mitigation: event-driven invalidation + explicit fail-open/fail-closed policy\n\n2. Split validation paths\n   Risk: worker and API can make conflicting allocation decisions\n   Mitigation: centralize booking rules into shared validation module\n\n3. Unclear incident ownership\n   Risk: platform and bookings teams both assume the other owns regional degradation\n   Mitigation: assign primary service owner + publish escalation runbook\n\nRecommendation: fund cache invalidation hardening first. Highest reliability and revenue impact.'
+  },
+  {
+    id:'cap3',
+    title:'Active Incident Command',
+    scenario:'Halfway through your review, `us-east-2` starts showing 7% booking failures and queue latency spikes. The issue is not total outage yet, which makes it more dangerous: people will argue for waiting.\n\nYou are the Incident Commander now.',
+    prompt:'Take command of the incident and stabilize the response.',
+    cmd:'strategy incident command',
+    accept:['strategy incident command','strategy incident'],
+    acceptFn:v=>v.includes('strategy')&&(v.includes('incident')||v.includes('command')),
+    hint:'Type: strategy incident command',
+    out:'INCIDENT COMMAND: docking-control regional degradation\n\nSeverity: SEV-2 trending SEV-1\nIC: Captain '+G.name+'\n\nActions:\n  ✓ Assigned tech lead to isolate cache invalidation path\n  ✓ Assigned comms lead for 10-minute stakeholder updates\n  ✓ Froze non-essential deploys in affected region\n  ✓ Set rollback threshold: error rate >10% or queue lag >3m\n\nInitial call:\n  We will mitigate before this becomes fleet-wide. Debugging continues in parallel.\n\nThis is captain work: preserve decision quality while the room gets noisier.'
+  },
+  {
+    id:'cap4',
+    title:'Executive Handoff',
+    scenario:'The incident is contained and the risk register is written. Before you get your commission, prove you can hand this to leadership without jargon, panic, or false certainty.',
+    prompt:'Send the executive status update and remediation brief.',
+    cmd:'stake brief create',
+    accept:['stake brief create','stake brief'],
+    acceptFn:v=>v.includes('stake')&&(v.includes('brief')||v.includes('update')||v.includes('status')),
+    hint:'Type: stake brief create',
+    out:'EXECUTIVE UPDATE: Docking Control\n\nWe inherited a service with one high-priority reliability risk in cache invalidation and contained a regional degradation before it became fleet-wide customer impact.\n\nWe have a documented risk register, an assigned owner for the first mitigation, and a 7-day remediation plan focused on cache correctness and incident ownership.\n\nOperations are stable now. The decision required from leadership is simple: approve the reliability work this week so we do not keep borrowing against launch confidence next month.'
+  }
+];
+
 /* ── DOM REFS ── */
 const $out = document.getElementById('output');
 const $cmd = document.getElementById('cmd');
@@ -1517,15 +1832,83 @@ function typedLine(text,cls,delayMs=0){
   });
 }
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function renderLolaStrip(){
+  const inner=document.getElementById('lola-strip-inner');
+  if(!inner) return;
+  const step=!G.bossActive&&!G.capstoneActive&&!G.sandbox&&PHASES[G.phase]?.steps?.[G.step];
+  const msgs=[];
+  if(G.capstoneActive){
+    msgs.push({tag:'capstone',text:'Final command exercise: cold orientation, risk register, incident command, executive brief.'});
+  }else if(G.bossActive){
+    msgs.push({tag:'janet',text:'Final assessment in progress. J.A.N.E.T. is scoring judgment under pressure.'});
+  }else if(G.sandbox){
+    msgs.push({tag:'sandbox',text:'Certification complete. Explore commands freely or replay the mission from restart.'});
+  }else{
+    msgs.push({tag:'tip',text:'Captain runs on evidence, not vibes.'});
+    if(step?.cmd?.[0]) msgs.push({tag:'shape',text:`Command shape: ${step.cmd[0]}`,code:true});
+    if(LOLA_STRIP_PHASE[G.phase]) msgs.push({tag:'phase',text:LOLA_STRIP_PHASE[G.phase]});
+    msgs.push({tag:'playbook',text:'After each phase, type playbook save or whatif to keep the lesson and inspect the alternate timeline.'});
+    msgs.push({tag:'depth',text:'Use deep after any step to push the concept to production depth.'});
+    if(G.expert) msgs.push({tag:'mode',text:'Expert mode suppresses hint scaffolding. Precision beats speed.'});
+  }
+  const chunk=msgs.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${escHtml(m.tag)}</span>${m.code?`<code>${escHtml(m.text.replace(/^Command shape:\s*/,''))}</code>`:escHtml(m.text)}</span>`).join('<span class="lola-strip-sep">·</span>');
+  inner.innerHTML=chunk + '<span class="lola-strip-sep">·</span>' + chunk;
+  inner.classList.toggle('scrolling', msgs.length>1);
+  inner.classList.toggle('no-scroll', msgs.length<=1);
+}
 
 /* ── MODALS ── */
-function openModal(id){document.getElementById(id).classList.add('open');if(id==='ach-modal')renderAch();if(id==='gloss-modal')renderGloss();if(id==='man-modal')renderManModal();if(id==='career-modal')renderCareerModal();}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+let activeModalId=null;
+let modalReturnFocusEl=null;
+function getModalFocusables(modal){
+  return [...modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled && el.offsetParent!==null);
+}
+function openModal(id){
+  const modal=document.getElementById(id);
+  if(!modal) return;
+  if(id==='ach-modal')renderAch();
+  if(id==='gloss-modal')renderGloss();
+  if(id==='man-modal')renderManModal();
+  if(id==='career-modal')renderCareerModal();
+  if(activeModalId && activeModalId!==id){
+    closeModal(activeModalId,false);
+  }else{
+    modalReturnFocusEl=document.activeElement;
+  }
+  activeModalId=id;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  const target=getModalFocusables(modal)[0] || modal.querySelector('.mbox') || modal;
+  setTimeout(()=>target.focus(),0);
+}
+function closeModal(id,restoreFocus=true){
+  const modal=document.getElementById(id);
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  if(activeModalId===id) activeModalId=null;
+  if(restoreFocus && modalReturnFocusEl && typeof modalReturnFocusEl.focus==='function'){
+    const target=modalReturnFocusEl;
+    modalReturnFocusEl=null;
+    setTimeout(()=>target.focus(),0);
+  }
+}
 
 /* ── TEACH / CONCEPT / HINT / JIT / BRIDGE ── */
+function currentStepMeta(){
+  const ph=PHASES[G.phase];
+  if(!ph||G.bossActive||G.sandbox) return null;
+  return ph.steps[G.step]||null;
+}
+function teachCommandShapeHtml(){
+  const step=currentStepMeta();
+  if(!step||!step.cmd||!step.cmd[0]) return '';
+  return `<div class="teach-body" style="margin-bottom:8px"><b>Command shape</b><br><code>${step.cmd[0]}</code></div>`;
+}
 function showTeach(tb){
   const w=document.createElement('div');w.className='teach';
-  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div><div class="teach-body">${tb.body}</div>`;
+  w.innerHTML=`<div class="teach-title">📚 ${tb.title}</div>${teachCommandShapeHtml()}<div class="teach-body">${tb.body}</div>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
 function showConcept(cc){
@@ -1537,10 +1920,10 @@ function showConcept(cc){
 function showHint(text){
   if(!text)return;
   const w=document.createElement('div');w.className='hint-wrap';
-  w.innerHTML=`<div class="hint-toggle" onclick="toggleHint(this)"><span class="hint-chevron">▶</span> Need a hint?</div><div class="hint-body">${text}</div>`;
+  w.innerHTML=`<button type="button" class="hint-toggle" onclick="toggleHint(this)" aria-expanded="false"><span class="hint-chevron">▶</span> Need a hint?</button><div class="hint-body">${text}</div>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
-function toggleHint(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open')}
+function toggleHint(btn){const open=btn.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false');btn.nextElementSibling.classList.toggle('open')}
 function showJIT(jit){
   const w=document.createElement('div');w.className='jit';
   w.innerHTML=`<div class="jit-hd">⚡ Just-in-Time: ${jit.title}</div><div class="jit-bd">${jit.body}</div>`;
@@ -1564,57 +1947,11 @@ function showDiagnosis(stepId,input){
 
 /* ════ J.A.N.E.T. QUIZ ENGINE ════ */
 let janetQuizAttempt=true;
-function showJanetQuiz(q){
-  return new Promise(res=>{
-    const uid='jq'+Date.now();
-    const opts=q.opts.map((o,i)=>`<button class="janet-opt" onclick="answerJanet(this,${i},${q.correct},'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
-    const intro=janetIntro();
-    const w=document.createElement('div');
-    w.className='janet-arrival';
-    w.id=uid;
-    w.innerHTML=`
-      <div class="janet-scan"></div>
-      <div class="janet-header">
-        <div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div>
-        <div class="janet-status">ASSESSMENT PROTOCOL ACTIVE</div>
-      </div>
-      <div class="janet-intro">${intro}</div>
-      <div class="janet-q">
-        <div class="janet-q-label">Assessment Question</div>
-        ${q.q}
-      </div>
-      <div class="janet-opts">${opts}</div>
-      <div class="janet-fb" id="jfb-${uid}"></div>
-    `;
-    w._res=res;
-    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
-  });
-}
-function answerJanet(btn,chosen,correct,uid){
-  const wrap=document.getElementById(uid);
-  wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
-    o.disabled=true;
-    if(i===correct)o.classList.add('correct');
-    else if(i===chosen)o.classList.add('wrong');
-  });
-  const fb=document.getElementById('jfb-'+uid);
-  const isCorrect=chosen===correct;
-  if(isCorrect){
-    if(janetQuizAttempt)unlock('janet_ace');
-    fb.textContent=janetCorrect()+' '+q_feedback_from(uid);
-    fb.className='janet-fb show correct-fb';
-  }else{
-    janetQuizAttempt=false;
-    fb.textContent=janetWrong()+' The correct answer follows.';
-    fb.className='janet-fb show wrong-fb';
-  }
-  if(wrap._res){wrap._res();wrap._res=null}
-}
 // Store quiz feedback separately
 const _quizFeedbackMap={};
 function q_feedback_from(uid){return _quizFeedbackMap[uid]||''}
 
-function showJanetQuizWithQ(q){
+function showJanetQuiz(q){
   return new Promise(res=>{
     const uid='jq'+Date.now();
     _quizFeedbackMap[uid]=q.fb;
@@ -1639,6 +1976,7 @@ function showJanetQuizWithQ(q){
 }
 function answerJanetWithFb(btn,chosen,correct,uid){
   const wrap=document.getElementById(uid);
+  if(!wrap) return;
   wrap.querySelectorAll('.janet-opt').forEach((o,i)=>{
     o.disabled=true;
     if(i===correct)o.classList.add('correct');
@@ -1656,7 +1994,7 @@ function answerJanetWithFb(btn,chosen,correct,uid){
     fb.textContent=janetWrong()+' '+correctText;
     fb.className='janet-fb show wrong-fb';
   }
-  if(wrap._res){wrap._res();wrap._res=null}
+  if(wrap._res){setTimeout(()=>{if(wrap._res){wrap._res();wrap._res=null}},1200)}
 }
 
 /* ── SPACED REP ── */
@@ -1665,7 +2003,7 @@ function showSpacedRep(sr){
   return new Promise(res=>{
     const uid='sr'+Date.now();
     const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
-    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
+    w.innerHTML=`<div class="spaced-rep-hd">🧬 Spaced Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" aria-label="Spaced recall answer input" id="sri-${uid}"><div class="spaced-rep-fb" id="srfb-${uid}"></div>`;
     w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
     const input=document.getElementById('sri-'+uid);
     const fb=document.getElementById('srfb-'+uid);
@@ -1681,6 +2019,26 @@ function showSpacedRep(sr){
     });input.focus();
   });
 }
+function showSpacedExit(sr){
+  return new Promise(res=>{
+    const uid='sx'+Date.now();
+    const w=document.createElement('div');w.className='spaced-rep';w.id=uid;
+    w.innerHTML=`<div class="spaced-rep-hd">🛰 Phase Close Recall</div><div class="spaced-rep-q">${sr.q}</div><input class="spaced-rep-input" type="text" placeholder="type your answer…" aria-label="Phase close recall answer input" id="sxi-${uid}"><div class="spaced-rep-fb" id="sxfb-${uid}"></div>`;
+    w._res=res;$out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+    const input=document.getElementById('sxi-'+uid);
+    const fb=document.getElementById('sxfb-'+uid);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const val=input.value.trim();input.disabled=true;
+        const correct=sr.acceptFn?sr.acceptFn(val.toLowerCase()):val.toLowerCase().includes(sr.answer.toLowerCase());
+        fb.textContent=correct?'✓ Locked in. '+sr.answer:'✗ Phase takeaway: '+sr.answer;
+        fb.className='spaced-rep-fb show '+(correct?'correct':'wrong');
+        if(correct){spacedRecallCount++;if(spacedRecallCount>=3)unlock('recall_master')}
+        if(w._res){setTimeout(()=>{w._res();w._res=null},1200)}
+      }
+    });input.focus();
+  });
+}
 
 /* ── CHALLENGE ── */
 let activeChallengeResolve=null;
@@ -1688,7 +2046,7 @@ function showChallenge(ch){
   return new Promise(res=>{
     const uid='ch'+Date.now();
     const w=document.createElement('div');w.className='challenge ln';w.id=uid;
-    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
+    w.innerHTML=`<div class="challenge-hd"><span class="challenge-badge">CHALLENGE</span><span class="expert-callout">EXPERT MODE</span><span class="challenge-title">${ch.title}</span></div><div class="challenge-scenario">${ch.scenario}</div><div class="challenge-prompt">Type your answer in the terminal. No hints.</div><div class="challenge-note">Closes when solved.</div>`;
     $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
     G.activeChallengeData={...ch,uid};activeChallengeResolve=res;
   });
@@ -1699,7 +2057,7 @@ let activeBreakitResolve=null;
 function showBreakIt(bi){
   return new Promise(res=>{
     const w=document.createElement('div');w.className='breakit ln';
-    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
+    w.innerHTML=`<div class="breakit-hd"><span class="breakit-badge">🐛 BREAK-IT</span><span class="expert-callout">EXPERT MODE</span><span class="breakit-title">${bi.title}</span></div><div class="breakit-scenario">${bi.scenario.replace(/\n/g,'<br>')}</div><div class="breakit-prompt">Diagnose the problem and type your answer.</div>`;
     $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
     G.activeBreakitData={...bi};activeBreakitResolve=res;
   });
@@ -1974,14 +2332,77 @@ window.vibeAnalytics={
   getSnapshot:getAnalyticsSnapshot,
   exportJSON:()=>JSON.stringify(getAnalyticsSnapshot(),null,2),
 };
+function safeStorageGet(key){
+  try{return window.localStorage.getItem(key)}catch(_){return null}
+}
+function safeStorageSet(key,value){
+  try{window.localStorage.setItem(key,value);return true}catch(_){return false}
+}
+function safeStorageRemove(key){
+  try{window.localStorage.removeItem(key);return true}catch(_){return false}
+}
 function save(){
   ensureAnalytics();
-  localStorage.setItem(CAPTAIN_SAVE_KEY,JSON.stringify(G));
+  safeStorageSet(CAPTAIN_SAVE_KEY,JSON.stringify(G));
+  queueCloudProgressSave();
 }
 function loadSave(){
-  const raw=localStorage.getItem(CAPTAIN_SAVE_KEY);
+  const raw=safeStorageGet(CAPTAIN_SAVE_KEY);
   if(raw){try{const d=JSON.parse(raw);G={...G,...d}}catch(e){}}
   ensureAnalytics();
+}
+
+let _cloudSaveTimer=null;
+function queueCloudProgressSave(){
+  if(!window._sb || !G.userId) return;
+  if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer=setTimeout(()=>{ saveCloudProgress(); },150);
+}
+async function saveCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb.from('progress').upsert({
+      user_id:G.userId,
+      sim_id:CAPTAIN_SAVE_KEY,
+      phase_id:String(G.phase||1),
+      step_id:JSON.stringify(G),
+      completed_at:new Date().toISOString()
+    }, { onConflict:'user_id,sim_id' });
+  }catch(err){
+    console.warn('[Station Delta] Failed to save cloud progress', err);
+  }
+}
+async function loadCloudProgress(){
+  if(!window._sb || !G.userId) return false;
+  try{
+    const { data, error } = await window._sb
+      .from('progress')
+      .select('phase_id, step_id')
+      .eq('user_id', G.userId)
+      .eq('sim_id', CAPTAIN_SAVE_KEY)
+      .maybeSingle();
+    if(error || !data) return false;
+    if(data.step_id){
+      try{
+        const parsed=JSON.parse(data.step_id);
+        G={...G,...parsed};
+        return true;
+      }catch(parseErr){
+        console.warn('[Station Delta] Failed to parse cloud progress snapshot', parseErr);
+      }
+    }
+    const phase=Number(data.phase_id);
+    if(Number.isFinite(phase) && phase>=1){
+      G.phase=phase;
+      G.step=0;
+      G.pendingPhaseStart=phase>1;
+      G.completedPhases=Array.from({length:Math.max(0,phase-1)},(_,i)=>i+1);
+      return true;
+    }
+  }catch(err){
+    console.warn('[Station Delta] Failed to load cloud progress', err);
+  }
+  return false;
 }
 
 /* ── EASTER EGGS ── */
@@ -1992,7 +2413,7 @@ const EASTER={
   'janet':{handle(){appendLine('J.A.N.E.T.: I am aware of you. You have been aware of me. This is the extent of our relationship.','ln-janet');trackEaster('janet');return true;}},
   'git log':{handle(){appendLine('a1b2c3 strategy: complete fleet incident command','ln-info');appendLine('b2c3d4 observe: add SLO for booking endpoint','ln-info');appendLine('c3d4e5 design: ADR-007 fleet architecture','ln-info');appendLine('d4e5f6 fix: N+1 query in pods/reserve','ln-info');trackEaster('gitlog');return true;}},
   'clear':{handle(){document.getElementById('output').innerHTML='';return true;}},
-  'help':{handle(){appendLine('Available: arch, design, scale, observe, agent, mentor, stake, strategy, git, cat, grep','ln-info');appendLine('Type  man  for full reference.','ln-info');return true;}},
+  'help':{handle(){appendLine('Available: arch, design, adr, scale, observe, agent, mentor, stake, strategy, git, cat, grep','ln-info');appendLine('Type  man  for full reference.','ln-info');return true;}},
   'uptime':{handle(){appendLine('up 847 days — the ship has never stopped.','ln-ok');return true;}},
   'date':{handle(){appendLine(new Date().toString(),'ln-ok');return true;}},
 };
@@ -2011,8 +2432,23 @@ function addAgent(role,name){
 function syncObjCard(){
   const mobileTitle=document.getElementById('mobile-ctx-title');
   const mobileBody=document.getElementById('mobile-ctx-body');
-  if(G.sandbox||G.bossActive){
-    if(!G.bossActive){
+  if(G.sandbox||G.bossActive||G.capstoneActive){
+    if(G.capstoneActive){
+      const step=CAPSTONE_STEPS[G.capstoneStep];
+      const pct=Math.round((G.capstoneStep/CAPSTONE_STEPS.length)*100);
+      document.getElementById('obj-phase-label').textContent='COMMAND CAPSTONE';
+      document.getElementById('obj-title').textContent=`Step ${G.capstoneStep+1} of ${CAPSTONE_STEPS.length}`;
+      document.getElementById('obj-context').textContent=step ? step.prompt : 'Final command exercise in progress.';
+      document.getElementById('obj-cmd-row').style.display='flex';
+      document.getElementById('obj-cmd-val').textContent=step?.cmd||'—';
+      document.getElementById('obj-cmd-val').classList.add('blurred');
+      document.getElementById('obj-reveal').textContent='show';
+      document.getElementById('tries-n').textContent=G.tries;
+      document.getElementById('score-n').textContent=G.score;
+      document.getElementById('obj-prog-fill').style.width=pct+'%';
+      if(mobileTitle) mobileTitle.textContent=`Capstone ${G.capstoneStep+1}/${CAPSTONE_STEPS.length}`;
+      if(mobileBody) mobileBody.textContent=step ? step.prompt : 'Final command exercise in progress.';
+    }else if(!G.bossActive){
       document.getElementById('obj-phase-label').textContent='COMMAND CERTIFIED';
       document.getElementById('obj-title').textContent='Free exploration';
       document.getElementById('obj-context').textContent='All phases complete.';
@@ -2020,6 +2456,7 @@ function syncObjCard(){
       if(mobileTitle) mobileTitle.textContent='Free exploration';
       if(mobileBody) mobileBody.textContent='All phases complete.';
     }
+    renderLolaStrip();
     return;
   }
   const ph=PHASES[G.phase];if(!ph)return;
@@ -2037,6 +2474,7 @@ function syncObjCard(){
   document.getElementById('score-n').textContent=G.score;
   const pct=Math.round((G.step/ph.steps.length)*100);
   document.getElementById('obj-prog-fill').style.width=pct+'%';
+  renderLolaStrip();
 }
 function syncDots(){
   const track=document.getElementById('phase-track');track.innerHTML='';
@@ -2050,7 +2488,7 @@ function syncDots(){
   }
   const sep2=document.createElement('span');sep2.className='phase-sep';sep2.textContent='SHIP';track.appendChild(sep2);
 }
-function setLola(msg){document.getElementById('lola-msg').innerHTML=msg}
+function setLola(msg){document.getElementById('lola-msg').innerHTML=msg;renderLolaStrip()}
 function revealCmd(){document.getElementById('obj-cmd-val').classList.remove('blurred');document.getElementById('obj-reveal').textContent='✓';telem('Hint revealed');G.phaseReveal=true;}
 function focusCmd(){if(document.activeElement!==$cmd)$cmd.focus()}
 function applyUIPreferences(){
@@ -2090,11 +2528,36 @@ function migrateMobileUiDefaults(){
   G.mobileUiVersion=2;
   save();
 }
+document.addEventListener('keydown',e=>{
+  const openModals=[...document.querySelectorAll('.modal.open')];
+  const open=openModals[openModals.length-1];
+  if(!open) return;
+  if(e.key==='Escape'){
+    if(open.id!=='boot-modal') closeModal(open.id);
+    return;
+  }
+  if(e.key!=='Tab') return;
+  const focusables=getModalFocusables(open);
+  if(!focusables.length){
+    e.preventDefault();
+    const box=open.querySelector('.mbox') || open;
+    box.focus();
+    return;
+  }
+  const first=focusables[0];
+  const last=focusables[focusables.length-1];
+  if(e.shiftKey && document.activeElement===first){
+    e.preventDefault();
+    last.focus();
+  }else if(!e.shiftKey && document.activeElement===last){
+    e.preventDefault();
+    first.focus();
+  }
+});
 function toggleStripPause(){G.stripPaused=!G.stripPaused;applyUIPreferences();save()}
-function toggleRightPanel(){G.rightCollapsed=!G.rightCollapsed;applyUIPreferences();save()}
+function toggleRightPanel(){G.rightCollapsed=!G.rightCollapsed;applyUIPreferences();save();restoreTerminalFocus()}
 function openSupportModal(id){closeModal('mobile-tools-modal');openModal(id)}
 function restartFromMobileTools(){closeModal('mobile-tools-modal');openModal('restart-modal')}
-function confirmRestart(){localStorage.removeItem(CAPTAIN_SAVE_KEY);location.reload()}
 function continueFromCheckpoint(){
   closeModal('phase-modal');
   G.pendingPhaseStart=false;
@@ -2110,7 +2573,7 @@ $cmd.addEventListener('keydown',e=>{
   else if(e.key==='Tab'){
     e.preventDefault();
     const val=$cmd.value.toLowerCase();
-    const cmds=['arch','design','scale','observe','agent','mentor','stake','strategy','git','cat','grep','clear','help','whoami','neofetch','date','uptime','man'];
+    const cmds=['arch','design','adr','scale','observe','agent','mentor','stake','strategy','git','cat','grep','clear','help','whoami','neofetch','date','uptime','man'];
     const match=cmds.find(c=>c.startsWith(val)&&c!==val);
     if(match)$cmd.value=match;
   }
@@ -2123,7 +2586,7 @@ async function processCmd(raw){
   if(!G.achievements.includes('first_cmd'))unlock('first_cmd');
   appendLine(val,'ln-cmd');blank();
   telem(`cmd: ${val} [p${G.phase} s${G.step}]`);
-  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive});
+  analyticsEvent('command_entered',{input:val.slice(0,200),inSandbox:!!G.sandbox,inBoss:!!G.bossActive,inCapstone:!!G.capstoneActive});
   const vl=val.toLowerCase().trim();
 
   if(vl==='man'){showManAll();syncObjCard();return}
@@ -2150,6 +2613,7 @@ async function processCmd(raw){
 
   // Boss fight handler
   if(G.bossActive){handleBossStep(val);return}
+  if(G.capstoneActive){handleCapstoneStep(val);return}
 
   if(G.activeChallengeData){
     const ch=G.activeChallengeData;
@@ -2197,7 +2661,7 @@ function matchesStep(val,s){
 function handlePersistentCmd(vl,val){
   if(vl.startsWith('git log')){appendLine('a1b2c3 strategy: fleet incident postmortem\nb2c3d4 observe: SLO created\nc3d4e5 design: ADR-007 filed','ln-info');return true}
   if(vl.startsWith('cat')&&vl.includes('log')){appendLine('[04:12:33] ERROR: HealthCheck failed — missing API_GATEWAY_KEY\n[04:12:33] DEPLOY PAUSED.','ln-warn');return true}
-  if(vl.startsWith('git diff')){appendLine('(use git diff main in context of a PR review)','ln-warn');return true}
+  if(vl.startsWith('git diff')){appendLine('(use git diff main --stat && git diff main --name-only | grep migration for full PR scope + migration risk)','ln-warn');return true}
   if(vl.startsWith('arch')&&!vl.includes('review')&&!vl.includes('layer')&&!vl.includes('dep')){appendLine('arch: try arch review, arch layers, or arch deps','ln-warn');return true}
   return false;
 }
@@ -2213,7 +2677,7 @@ async function handleCorrect(s,ph){
   if(s.unlockCmd){const cmds=Array.isArray(s.unlockCmd)?s.unlockCmd:[s.unlockCmd];cmds.forEach(c=>unlockCmd(c))}
 
   // J.A.N.E.T. quiz (replaces standard quiz)
-  if(s.quiz&&s.quiz.janetQuiz){blank();await showJanetQuizWithQ(s.quiz);blank()}
+  if(s.quiz&&s.quiz.janetQuiz){blank();await showJanetQuiz(s.quiz);blank()}
   showDeepDiveButton(G.phase);
 
   if(s.achievement)unlock(s.achievement);
@@ -2259,6 +2723,8 @@ async function completePhase(){
   appendLine(`✓ Phase ${G.phase} complete: ${ph.title}`,'ln-success');
   if(ph.done){blank();await typedLine('L.O.L.A.: '+ph.done,'ln-lola',200)}
   blank();appendLine(`Score: ${G.score}`,'ln-info');blank();
+  const exitRecall=SPACED_EXIT[G.phase];
+  if(exitRecall&&!G.expert){blank();await showSpacedExit(exitRecall);blank()}
   if(ph.challenge&&!G.expert){blank();await showChallenge(ph.challenge);blank()}
   if(ph.breakit&&!G.expert){blank();await showBreakIt(ph.breakit);blank()}
   setLola('Want to keep this phase? Type <code>playbook save</code>. Want the alternate timeline? Type <code>whatif</code>.');
@@ -2295,7 +2761,12 @@ function continuePhaseStart(ph){
   blank();const s=ph.steps[0];
   markStepStart(s,ph);
   appendLine(`▸ ${s.obj}`,'ln-info');
-  if(!G.hard&&!G.practitioner)showHint(s.hint);
+  appendLine(`Objective context: ${s.ctx}`,'ln-info');
+  if(s.cmd&&s.cmd[0]) appendLine(`Command shape: ${s.cmd[0]}`,'ln-info');
+  if(!G.hard&&!G.practitioner){
+    appendLine(`Hint available: ${(s.hint||'Use the show button for the exact command.').replace(/^Type:\s*/, '')}`,'ln-info');
+    showHint(s.hint);
+  }
   if(s.jit&&!G.hard)showJIT(s.jit);
   if(s.bridge&&!G.hard)showBridge(s.bridge);
   setLola(s.ctx);syncObjCard();syncDots();
@@ -2400,7 +2871,7 @@ async function handleBossStep(val){
     G.bossStep++;G.bossScore++;save();
 
     if(G.bossStep>=BOSS_STEPS.length){
-      await runFinalCommission();
+      await triggerCapstone();
       return;
     }
 
@@ -2437,11 +2908,11 @@ async function handleBossStep(val){
   }
 }
 
-/* ── FINAL COMMISSION ── */
-async function runFinalCommission(){
+async function triggerCapstone(){
+  G.bossActive=false;
+  save();
   blank();divline();
 
-  // J.A.N.E.T. final statement
   const janetFinal=document.createElement('div');
   janetFinal.className='janet-arrival';
   janetFinal.innerHTML=`
@@ -2452,25 +2923,102 @@ async function runFinalCommission(){
     </div>
     <div class="janet-intro">
       You have completed the final assessment. All five steps. Correctly.<br><br>
-      I have updated your file. I want to note, for the record, that I administered this assessment without L.O.L.A.'s assistance, in the middle of an active fleet incident, and you still completed it.<br><br>
-      I do not give compliments. That was not a compliment. That was a factual observation, noted in your file, without editorial comment.<br><br>
-      <em>You may proceed to your commission. I will return your file to standard archive status. Goodbye, Captain.</em>
+      However, L.O.L.A. left one additional commission requirement in your file: a live capstone without scaffolding. I respect this choice. It is inconvenient, but coherent.<br><br>
+      <em>I am returning command authority to standard instruction protocols. Do not make me come back.</em>
     </div>
   `;
   $out.appendChild(janetFinal);$out.scrollTop=$out.scrollHeight;
-  await delay(2000);
+  await delay(1400);
 
-  // L.O.L.A. comes back online
   blank();
-  await delay(500);
   appendLine('L.O.L.A.: [REBOOTING]…','ln-warn');
   await delay(800);
   appendLine('L.O.L.A.: Intelligence core restored.','ln-lola');
-  await delay(400);
-  appendLine(`L.O.L.A.: Captain ${G.name}. I see you passed the final assessment.`,'ln-lola');
-  await delay(600);
-  appendLine('L.O.L.A.: And I see J.A.N.E.T. administered it. I apologize for that. I know she can be… thorough.','ln-lola');
+  await delay(500);
+  appendLine(`L.O.L.A.: Captain ${G.name}, one final exercise before I issue your commission.`,'ln-lola');
+  await delay(650);
+  appendLine('L.O.L.A.: Ten-minute capstone. Cold codebase. One architecture read. One risk register. One live incident. One executive brief.','ln-lola');
   await delay(800);
+
+  document.getElementById('lola-avatar').style.background='linear-gradient(135deg,#0ea5e9,var(--green))';
+  document.getElementById('lola-name').style.color='var(--cyan)';
+  document.getElementById('lola-online').style.cssText='font-size:10px;color:var(--green);margin-left:auto';
+  document.getElementById('lola-online').textContent='online';
+  document.getElementById('lola-msg').style.color='var(--text)';
+  document.getElementById('lola-msg').textContent='Command capstone in progress. Integrate the whole system.';
+
+  G.capstoneActive=true;
+  G.capstoneStep=0;
+  G.capstoneScore=0;
+  G.tries=0;
+  save();
+  blank();
+  showCapstoneStep(0);
+}
+
+function showCapstoneStep(idx){
+  const step=CAPSTONE_STEPS[idx];
+  const pct=Math.round((idx/CAPSTONE_STEPS.length)*100);
+  const w=document.createElement('div');
+  w.className='capstone-container';
+  w.innerHTML=`
+    <div class="capstone-header">
+      <div class="capstone-title">Command Capstone</div>
+      <div class="capstone-sub">10-MINUTE FIELD EXERCISE · STEP ${idx+1} OF ${CAPSTONE_STEPS.length}</div>
+    </div>
+    <div class="capstone-body">
+      <div class="capstone-scenario">${step.scenario.replace(/\n/g,'<br>')}</div>
+      <div class="capstone-step-label">${step.title}</div>
+      <div class="capstone-prompt">${step.prompt}</div>
+      <div class="capstone-progress"><div class="capstone-prog-fill" style="width:${pct}%"></div></div>
+    </div>
+  `;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  syncObjCard();
+  if(!G.hard)showHint(step.hint);
+}
+
+async function handleCapstoneStep(val){
+  const vl=val.toLowerCase().trim();
+  const step=CAPSTONE_STEPS[G.capstoneStep];
+  if(!step) return;
+
+  if(step.acceptFn(vl)||step.accept.some(a=>vl===a.toLowerCase()||vl.startsWith(a.toLowerCase()))){
+    G.tries=0;
+    if(step.out)step.out.split('\n').forEach(l=>appendLine(l,'ln-ok'));
+    blank();
+    G.capstoneStep++;
+    G.capstoneScore++;
+    save();
+
+    if(G.capstoneStep>=CAPSTONE_STEPS.length){
+      G.capstoneActive=false;
+      save();
+      await runFinalCommission();
+      return;
+    }
+
+    appendLine('L.O.L.A.: Good. Continue. This is what complete technical judgment looks like.','ln-lola');
+    await delay(500);
+    blank();
+    showCapstoneStep(G.capstoneStep);
+    return;
+  }
+
+  G.tries++;
+  appendLine('L.O.L.A.: Not yet. Re-read the scenario and issue the command that creates the artifact.','ln-warn');
+  if(!G.hard&&G.tries>=2)showHint(step.hint);
+  save();
+}
+
+/* ── FINAL COMMISSION ── */
+async function runFinalCommission(){
+  blank();divline();
+
+  appendLine(`L.O.L.A.: Captain ${G.name}. Final assessment passed. Capstone complete.`,'ln-lola');
+  await delay(600);
+  appendLine('L.O.L.A.: That is the level where architecture, operations, and executive judgment stop being separate skills and become one job.','ln-lola');
+  await delay(700);
 
   document.getElementById('lola-avatar').style.background='linear-gradient(135deg,#0ea5e9,var(--green))';
   document.getElementById('lola-name').style.color='var(--cyan)';
@@ -2481,26 +3029,26 @@ async function runFinalCommission(){
 
   blank();divline();
   appendLine('FLEET STATUS: ALL 50 SHIPS OPERATIONAL','ln-sys');
-  const steps=['Validating command certification…','Architecture review: PASSED','Diff strategy: PASSED','System design: PASSED','Scalability: PASSED','Observability: PASSED','AI orchestration: PASSED','Mentoring: PASSED','Stakeholder leadership: PASSED','Technical strategy: PASSED','Final assessment (J.A.N.E.T.): PASSED','Issuing command commission…'];
+  const steps=['Validating command certification…','Architecture review: PASSED','Diff strategy: PASSED','System design: PASSED','Scalability: PASSED','Observability: PASSED','AI orchestration: PASSED','Mentoring: PASSED','Stakeholder leadership: PASSED','Technical strategy: PASSED','Final assessment (J.A.N.E.T.): PASSED','Command capstone: PASSED','Issuing command commission…'];
   for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
   await delay(500);blank();
   appendLine('🎗️ FULL COMMAND COMMISSION GRANTED','ln-success');
   appendLine(`Captain ${G.name} — Station Delta: Captain · Class of 2026`,'ln-success');
   blank();
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
-  appendLine('       THE VIBE TRILOGY COMPLETE','ln-success');
+  appendLine('       STATION DELTA LADDER COMPLETE','ln-success');
   appendLine('  Cadet → Lieutenant → Captain','ln-success');
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
   blank();
 
   unlock('boss_slayer');unlock('captain');
   addCareerEntry(8);
-  G.sandbox=true;G.completedPhases.push(9);G.bossActive=false;
+  G.sandbox=true;if(!G.completedPhases.includes(9))G.completedPhases.push(9);G.bossActive=false;G.capstoneActive=false;
   document.getElementById('sandbox-pill').style.display='inline';
   syncDots();save();
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 }
 
@@ -2519,6 +3067,10 @@ function selectPath(p){
   G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
 }
 function startAcademy(){
+  if(!isFileProtocol() && (!G.userId || !G.isPaid)){
+    goToAuthGate();
+    return;
+  }
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Captain';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
@@ -2575,6 +3127,9 @@ function resumeSession(){
   renderPlaybook();
   if(G.sandbox){
     appendLine('Command certification complete. Sandbox mode.','ln-success');
+  }else if(G.capstoneActive){
+    appendLine('You were mid-capstone. L.O.L.A. is waiting for the next command artifact.','ln-warn');
+    blank();showCapstoneStep(G.capstoneStep);
   }else if(G.bossActive){
     appendLine('You were mid-boss-fight. J.A.N.E.T. is waiting.','ln-warn');
     blank();showBossStep(G.bossStep);
@@ -2597,27 +3152,40 @@ function resumeSession(){
 }
 
 function doRestart(){openModal('restart-modal')}
+function hardNavigateReset(){
+  try{window.location.reload()}catch(_){location.reload()}
+}
+function hardResetState(){
+  safeStorageRemove(CAPTAIN_SAVE_KEY);
+}
+function confirmRestart(){
+  hardResetState();
+  closeModal('restart-modal');
+  hardNavigateReset();
+}
 function shareGrad(){
   const txt=`Just completed Station Delta: Captain ⬟\n\nI can now read architecture cold, review system-level diffs, design scalable systems, build observability stacks, lead multi-agent AI systems, mentor engineers, manage stakeholders, and command incidents under pressure.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
+function returnToStationDelta(){
+  window.location.href = isFileProtocol() ? '../index.html' : '/index.html';
+}
 
 /* ── STARTUP ── */
 loadSave();
-if(G.name!=='Captain'&&(G.phase>1||G.completedPhases.length>0)){
-  const bm=document.getElementById('boot-modal');
-  bm.querySelector('.mtitle').textContent=`Welcome back, Captain ${G.name}`;
-  bm.querySelector('.msub').textContent=`Phase ${G.phase} of ${PHASES.length-1}. Resume?`;
-  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
-  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
-}else{
-  setTimeout(()=>document.getElementById('boot-name').focus(),300);
-}
-
 migrateMobileUiDefaults();
 applyMobileLayoutDefaults();
 applyUIPreferences();
 renderPlaybook();
+syncBootModalState();
+initSupabaseAuthClient()
+  .then(checkPaidTier)
+  .finally(()=>{
+    syncBootModalState();
+    if(!(G.name!=='Captain'&&(G.phase>1||G.completedPhases.length>0))){
+      setTimeout(()=>document.getElementById('boot-name').focus(),300);
+    }
+  });
 
 window.addEventListener('load',()=>{
   setTimeout(()=>{
@@ -2629,8 +3197,8 @@ window.addEventListener('load',()=>{
   },200);
   try{
     const s=document.createElement('script');
-    s.src='../analytics-client.js';
-    s.onerror=function(){ console.warn('analytics-client.js not found — skipping telemetry'); };
+    s.src='https://station-delta-one.vercel.app/analytics-client.js';
+    s.onerror=function(){ console.warn('analytics-client.js failed to load from',s.src); };
     document.head.appendChild(s);
   }catch(_){}
 });

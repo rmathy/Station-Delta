@@ -73,6 +73,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
 #logo{font-family:var(--display);font-size:11px;font-weight:900;letter-spacing:.15em;color:var(--green);white-space:nowrap}
+#logo-sub{display:block;font-size:8px;font-weight:400;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase;margin-top:2px}
 #cadet-tag{font-size:11px;color:var(--muted2)}
 #cadet-tag b{color:var(--green)}
 #phase-track{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
@@ -106,6 +107,8 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 
 /* ── TERMINAL ── */
 #term-panel{display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);min-height:0}
+#action-rail{display:block;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+#term-panel #obj-card{border:1px solid var(--border);border-radius:var(--r8);background:var(--s2);max-height:none;padding:12px 14px}
 #term-titlebar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:10px}
 .macs{display:flex;gap:5px}
 .mac{width:11px;height:11px;border-radius:50%}
@@ -297,13 +300,20 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .path-desc{font-size:10px;color:var(--muted2);line-height:1.5}
 .path-card.selected .path-name{color:var(--green)}
 
-#lola-sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#lola-sec{padding:12px 14px 14px;border-bottom:1px solid var(--border);flex-shrink:0;min-height:220px}
 #lola-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
 #lola-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#65a30d,var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
 #lola-name{font-family:var(--display);font-size:10px;font-weight:700;color:var(--cyan)}
 #lola-online{font-size:10px;color:var(--green);margin-left:auto}
 #lola-online::before{content:'● '}
-#lola-msg{font-size:12px;line-height:1.65;color:var(--text);padding-left:32px}
+#lola-msg{font-size:12px;line-height:1.7;color:var(--text);padding-left:32px;display:flex;flex-direction:column;gap:10px}
+#lola-msg .lola-card-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--green);font-weight:700}
+#lola-msg .lola-card-title{font-size:13px;color:var(--text);font-weight:700;line-height:1.45}
+#lola-msg .lola-card-body{font-size:12px;color:var(--text);line-height:1.7}
+#lola-msg .lola-card-why{font-size:11px;color:var(--muted2);line-height:1.65;padding:8px 10px;background:var(--s3);border:1px solid var(--border);border-radius:var(--r4)}
+#lola-msg .lola-card-teach{font-size:11px;color:var(--cyan);line-height:1.65;border-left:2px solid var(--green);padding-left:10px}
+#lola-msg .lola-card-tags{display:flex;flex-wrap:wrap;gap:6px}
+#lola-msg .lola-card-tag{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid var(--green-d);border-radius:999px;padding:2px 8px;letter-spacing:.05em}
 
 #crew-sec{overflow-y:auto;padding:11px 13px;min-height:0;flex:1;max-height:140px}
 #crew-sec::-webkit-scrollbar{width:2px}
@@ -335,6 +345,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 .mbox::-webkit-scrollbar{width:3px}
 .mbox::-webkit-scrollbar-thumb{background:var(--b2)}
 .mtitle{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:7px}
+.modal-sub-title{display:block;font-size:13px;font-weight:400;letter-spacing:.3em;color:var(--muted2);margin-top:2px;text-transform:uppercase}
 .msub{font-size:12px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
 .mbtn{display:block;width:100%;padding:10px;border-radius:var(--r4);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:.06em;transition:all .15s;margin-bottom:8px;border:none}
 .mbtn-p{background:var(--green);color:#081003;font-weight:700}
@@ -418,6 +429,7 @@ input[type=text]:focus{border-color:var(--green)}
   #shell{grid-template-columns:1fr}
   #topbar{padding:0 10px;gap:8px}
   #logo{font-size:10px;letter-spacing:.08em}
+  #logo-sub{font-size:7px;letter-spacing:.14em}
   #cadet-tag{display:none}
   #phase-track{justify-content:flex-start;overflow:hidden}
   #tb-right .tbbtn:not(#mobile-tools-btn):not(#mobile-strip-toggle-btn),
@@ -427,6 +439,7 @@ input[type=text]:focus{border-color:var(--green)}
   #mobile-tools-btn,#mobile-strip-toggle-btn{display:inline-flex;align-items:center;justify-content:center}
   #lola-strip{padding:0 10px}
   #term-panel{border-right:none}
+  #action-rail{padding:8px 10px}
   #right{position:fixed;top:76px;right:0;bottom:0;width:min(88vw,360px);border-left:1px solid var(--border);box-shadow:-18px 0 40px rgba(0,0,0,.35);z-index:2500;transform:translateX(0);transition:transform .22s ease,opacity .22s ease}
   #shell.right-collapsed #right{transform:translateX(100%);opacity:0;pointer-events:none}
   #right-header{display:flex}
@@ -446,14 +459,14 @@ input[type=text]:focus{border-color:var(--green)}
 <body>
 <div id="shell">
   <div id="topbar">
-    <div id="logo">💰 STATION DELTA · FINOPS OFFICER</div>
+    <div id="logo">STATION DELTA:<span id="logo-sub">FINOPS OFFICER</span></div>
     <div id="cadet-tag">Officer: <b id="cadet-name-display">—</b></div>
     <div id="phase-track"></div>
     <div id="tb-right">
       <span id="sandbox-pill">SANDBOX</span>
       <span id="hardmode-pill">HARD MODE</span>
-      <button id="mobile-strip-toggle-btn" class="tbbtn" onclick="toggleStripVisibility()">▤ Strip</button>
-      <button id="mobile-tools-btn" class="tbbtn" onclick="openModal('mobile-tools-modal')">☰ Tools</button>
+      <button id="mobile-strip-toggle-btn" class="tbbtn" aria-label="Show or hide the L.O.L.A. guidance strip" onclick="toggleStripVisibility()">▤ Strip</button>
+      <button id="mobile-tools-btn" class="tbbtn" aria-label="Open mobile tools menu" onclick="openModal('mobile-tools-modal')">☰ Tools</button>
       <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
       <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
@@ -466,8 +479,8 @@ input[type=text]:focus{border-color:var(--green)}
     <div id="lola-strip-scroll">
       <div id="lola-strip-inner"></div>
     </div>
-    <button class="strip-btn" onclick="toggleStripPause()">pause</button>
-    <button class="strip-btn" onclick="toggleRightPanel()">focus</button>
+    <button class="strip-btn" id="strip-pause-btn" aria-label="Pause scrolling guidance" aria-pressed="false" onclick="toggleStripPause()">pause</button>
+    <button class="strip-btn" id="strip-focus-btn" aria-label="Show or hide the mission support panel" aria-pressed="false" onclick="toggleRightPanel()">focus</button>
   </div>
 
   <div id="term-panel">
@@ -475,41 +488,43 @@ input[type=text]:focus{border-color:var(--green)}
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">finops@<span id="term-path-val">ship:/home/officer/billing</span></div>
     </div>
-    <div id="output"></div>
+    <div id="action-rail">
+      <div id="obj-card">
+        <div id="obj-phase-label">Phase 1 of 9</div>
+        <div id="obj-title">Loading…</div>
+        <div id="obj-context">Initializing…</div>
+        <div id="obj-cmd-label">Next Command</div>
+        <div id="obj-cmd-row">
+          <div id="obj-cmd-val" class="blurred">—</div>
+          <button id="obj-reveal" onclick="revealCmd()">reveal</button>
+        </div>
+        <div id="obj-meta">
+          <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
+          <span id="obj-score">Score: <span id="score-n">100</span></span>
+        </div>
+        <div id="obj-progress"><div id="obj-prog-fill"></div></div>
+      </div>
+    </div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
-      <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <div id="prompt-pre">finops@stationdelta:~$</div>
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input">
     </div>
   </div>
 
   <div id="right">
     <div id="right-header">
       <div id="right-header-label">Mission Support</div>
-      <button id="right-collapse-btn" onclick="toggleRightPanel()">hide</button>
+      <button id="right-collapse-btn" aria-label="Collapse mission support panel" aria-pressed="false" onclick="toggleRightPanel()">hide</button>
     </div>
     <div id="mobile-ctx-section">
       <div id="mobile-ctx-label">Current Objective</div>
       <div id="mobile-ctx-title">Loading…</div>
       <div id="mobile-ctx-body">Initializing…</div>
-    </div>
-    <div id="obj-card">
-      <div id="obj-phase-label">Phase 1 of 9</div>
-      <div id="obj-title">Loading…</div>
-      <div id="obj-context">Initializing…</div>
-      <div id="obj-cmd-label">Next Command</div>
-      <div id="obj-cmd-row">
-        <div id="obj-cmd-val" class="blurred">—</div>
-        <button id="obj-reveal" onclick="revealCmd()">reveal</button>
-      </div>
-      <div id="obj-meta">
-        <span id="obj-tries">Attempts: <span id="tries-n">0</span></span>
-        <span id="obj-score">Score: <span id="score-n">1000</span></span>
-      </div>
-      <div id="obj-progress"><div id="obj-prog-fill"></div></div>
     </div>
     <div id="lola-sec">
       <div id="lola-hd">
@@ -540,8 +555,8 @@ input[type=text]:focus{border-color:var(--green)}
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin:0 auto 8px;text-align:center;width:100%">💰</div>
-    <div class="mtitle" style="color:var(--green);font-size:19px">Station Delta: FinOps Officer</div>
-    <div class="msub">The Station Delta placement for engineers who turn AI spend into business judgment: cost visibility, unit economics, ROI, guardrails, executive communication, and live margin protection under pressure.</div>
+    <div class="mtitle" id="boot-title" style="text-align:center">Station Delta:<span class="modal-sub-title">FinOps Officer</span></div>
+    <div class="msub" style="text-align:center">The Station Delta placement for engineers who turn AI spend into business judgment: cost visibility, unit economics, ROI, guardrails, executive communication, and live margin protection under pressure.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real-world FinOps for AI infrastructure<br>
       <span>▸</span>L.O.L.A. — your tactical intel officer<br>
@@ -571,9 +586,9 @@ input[type=text]:focus{border-color:var(--green)}
         <div class="path-desc">No hints. No feedback. Timer on.</div>
       </div>
     </div>
-    <button class="mbtn mbtn-p" onclick="startAcademy()">PROTECT THE MARGIN</button>
-    <button class="mbtn mbtn-s" onclick="doRestart()">Reset Save</button>
-    <div style="margin-top:12px;font-size:10px;color:var(--muted)">Station Delta placement sim. No account needed.</div>
+    <button class="mbtn mbtn-p" id="boot-enter-btn" onclick="startAcademy()">PROTECT THE MARGIN</button>
+    <button class="mbtn mbtn-s" id="boot-reset-btn" onclick="doRestart()">Reset Save</button>
+    <div id="boot-access-note" style="margin-top:12px;font-size:10px;color:var(--muted)">Officer-track sim. Graduation continues into Captain.</div>
   </div>
 </div>
 
@@ -600,7 +615,8 @@ input[type=text]:focus{border-color:var(--green)}
       <span>✓</span>Margin collapse containment under pressure
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="continueTrack()">CONTINUE TO CAPTAIN</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
@@ -655,6 +671,7 @@ input[type=text]:focus{border-color:var(--green)}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    VIBE FINOPS OFFICER v1.0
@@ -663,8 +680,10 @@ input[type=text]:focus{border-color:var(--green)}
    Boss Fight: Phase 9 — The Margin Collapse. L.O.L.A. goes offline. JANET takes over.
    ═══════════════════════════════════════════════════════════════ */
 
+const NEXT_TRACK_URL = './vibe-captain.stage.html';
+
 let G = {
-  name:'Officer', phase:1, step:0, tries:0, score:1000,
+  name:'Officer', phase:1, step:0, tries:0, score:100,
   hard:false, practitioner:false, expert:false, sandbox:false,
   learnerPath:'explorer',
   agents:[], achievements:[], completedPhases:[],
@@ -685,6 +704,10 @@ let G = {
   wrongStreak:0,
   pendingPhaseStart:false,
   analytics:null,
+  userId:null,
+  userEmail:null,
+  isPaid:false,
+  paidTierChecked:false,
   stripPaused:false,
   stripHidden:false,
   rightCollapsed:false,
@@ -745,14 +768,16 @@ const GLOSSARY = [
 
 /* ── MAN PAGES ── */
 const MAN = {
-  'cost':    {synopsis:'cost [command]',desc:'Cost visibility & billing',why:'See exactly what you’re spending.',flags:[{f:'explore',d:'Pull billing data'},{f:'tag',d:'Apply cost tags'}],example:'$ cost explore\n$ cost tag feature=chat'},
-  'token':   {synopsis:'token [command]',desc:'Token economics',why:'Break down model pricing.',flags:[{f:'price',d:'Show pricing table'},{f:'optimize',d:'Prompt cost impact'}],example:'$ token price\n$ token optimize'},
-  'feature': {synopsis:'feature [command]',desc:'Feature-level attribution',why:'Tie spend to product features.',flags:[{f:'allocate',d:'Allocate costs'},{f:'dashboard',d:'Show per-feature spend'}],example:'$ feature allocate\n$ feature dashboard'},
-  'roi':     {synopsis:'roi [command]',desc:'Revenue linkage & ROI',why:'Calculate true profitability.',flags:[{f:'link',d:'Connect to revenue'},{f:'calculate',d:'Show ROI'}],example:'$ roi link\n$ roi calculate'},
-  'break':   {synopsis:'break [command]',desc:'Break-even & payback',why:'Answer “when does it pay for itself?”',flags:[{f:'even',d:'Calculate break-even'},{f:'payback',d:'Show payback period'}],example:'$ break even\n$ break payback'},
-  'optimize':{synopsis:'optimize [command]',desc:'Optimization vs elimination',why:'Decide keep/kill/optimize.',flags:[{f:'kill',d:'Kill switch script'},{f:'downgrade',d:'Model downgrade'}],example:'$ optimize kill\n$ optimize downgrade'},
-  'forecast':{synopsis:'forecast [command]',desc:'Forecasting & budget guardrails',why:'Predict next month’s bill.',flags:[{f:'run',d:'Run forecast'},{f:'alert',d:'Set budget alerts'}],example:'$ forecast run\n$ forecast alert'},
-  'report':  {synopsis:'report [command]',desc:'Executive reporting',why:'Turn data into recommendations.',flags:[{f:'onepage',d:'Generate one-page report'},{f:'recommend',d:'Business recommendation'}],example:'$ report onepage\n$ report recommend'},
+  'aws':         {synopsis:'aws ce get-cost-and-usage [flags]',desc:'Cloud cost visibility',why:'Pull real billing data before making any recommendation.',flags:[{f:'ce get-cost-and-usage',d:'Query spend by time period and metric'}],example:'$ aws ce get-cost-and-usage --time-period Start=2026-04-01,End=2026-04-30 --granularity MONTHLY --metrics UnblendedCost'},
+  'billing':     {synopsis:'python billing/*.py [flags]',desc:'Tagging and anomaly controls',why:'Make AI spend traceable and alertable.',flags:[{f:'apply_tags.py',d:'Apply feature tags to usage exports'},{f:'anomaly_guard.py',d:'Create spend spike guardrails'}],example:'$ python billing/apply_tags.py --source exports/usage.csv --tag feature\n$ python billing/anomaly_guard.py --window 7d --threshold 20'},
+  'finops':      {synopsis:'python finops/*.py [flags]',desc:'Token economics and prompt cost',why:'Translate tokens into real dollars.',flags:[{f:'token_pricing.py',d:'Show model pricing and unit cost'},{f:'prompt_cost.py',d:'Quantify prompt compression savings'},{f:'cache_savings.py',d:'Measure repeated-context savings'}],example:'$ python finops/token_pricing.py --models pricing/models.yaml\n$ python finops/prompt_cost.py --input tokens/prompts.json\n$ python finops/cache_savings.py --from logs/requests.jsonl'},
+  'attribution': {synopsis:'python attribution/*.py [flags]',desc:'Feature-level allocation',why:'Tie spend to product decisions.',flags:[{f:'allocate_costs.py',d:'Assign cost by feature'},{f:'feature_dashboard.py',d:'Summarize per-feature spend'},{f:'feature_trends.py',d:'Compare feature trends over time'}],example:'$ python attribution/allocate_costs.py --input exports/usage.csv --by feature\n$ python attribution/feature_dashboard.py --window 30d\n$ python attribution/feature_trends.py --window 90d'},
+  'revenue':     {synopsis:'python revenue/*.py [flags]',desc:'Revenue linkage and ROI',why:'Connect spend to business outcomes.',flags:[{f:'link_cost_to_revenue.py',d:'Join billing and revenue exports'},{f:'roi_report.py',d:'Compute ROI by feature'},{f:'cohort_roi.py',d:'Split ROI by customer segment'}],example:'$ python revenue/link_cost_to_revenue.py --billing exports/usage.csv --stripe exports/stripe.csv\n$ python revenue/roi_report.py --feature summarizer\n$ python revenue/cohort_roi.py --group-by plan'},
+  'finance':     {synopsis:'python finance/*.py [flags]',desc:'Break-even and payback math',why:'Turn cost data into threshold decisions.',flags:[{f:'break_even.py',d:'Calculate break-even users or revenue'},{f:'payback_period.py',d:'Show time to pay back investment'},{f:'sensitivity.py',d:'Stress-test business assumptions'}],example:'$ python finance/break_even.py --feature chat-assistant\n$ python finance/payback_period.py --feature summarizer\n$ python finance/sensitivity.py --feature chat-assistant'},
+  'optimization':{synopsis:'python optimization/*.py [flags]',desc:'Keep / optimize / kill decisions',why:'Reduce cost without losing the mission.',flags:[{f:'recommend.py',d:'Generate optimization options'},{f:'kill_switch.py',d:'Disable a negative-ROI feature with fallback'}],example:'$ python optimization/recommend.py --feature chat-assistant\n$ python optimization/kill_switch.py --feature chat-assistant --enable-fallback'},
+  'forecast':    {synopsis:'python forecast/*.py [flags]',desc:'Forecasting and guardrails',why:'Prevent surprise bills before finance does.',flags:[{f:'run.py',d:'Project next month spend'},{f:'alerts.py',d:'Install budget thresholds'},{f:'scenarios.py',d:'Model baseline and downside cases'}],example:'$ python forecast/run.py --window 90d\n$ python forecast/alerts.py --budget 150000 --warn 80 --stop 95\n$ python forecast/scenarios.py --baseline forecast/baseline.yaml'},
+  'reporting':   {synopsis:'python reporting/*.py [flags]',desc:'Executive reporting cadence',why:'Turn the numbers into a decision leadership will act on.',flags:[{f:'one_pager.py',d:'Create a one-page summary'},{f:'recommendations.py',d:'Write keep/kill/optimize guidance'},{f:'schedule.py',d:'Set weekly reporting cadence'}],example:'$ python reporting/one_pager.py --window 30d\n$ python reporting/recommendations.py --top 3\n$ python reporting/schedule.py --weekly monday-0800'},
+  'incident':    {synopsis:'python incident/*.py [flags] | tail -n [N] file',desc:'Margin-collapse response tooling',why:'Contain spend spikes under pressure.',flags:[{f:'pause_noncritical.py',d:'Emergency pause path'},{f:'forensics.py',d:'Identify top spenders'},{f:'recovery_plan.py',d:'Write recovery actions'},{f:'executive_brief.py',d:'Generate a board-safe summary'}],example:'$ tail -n 20 logs/cost_spike.log\n$ python incident/pause_noncritical.py --env production\n$ python incident/forensics.py --top-spenders'},
   'playbook':{synopsis:'playbook [save|export]',desc:'Personal FinOps Playbook',why:'Build your own exportable reference.',flags:[{f:'save',d:'Save the current phase'},{f:'export',d:'Copy playbook as markdown'}],example:'$ playbook save\n$ playbook export'},
   'whatif':  {synopsis:'whatif',desc:'What-If Scenario',why:'See the alternate timeline.',flags:[],example:'$ whatif'},
 };
@@ -824,6 +849,11 @@ const BREAKIT = [
   {title:'No Tagging Strategy',scenario:'All AI calls look identical in the billing dashboard.\n\nA single feature is quietly costing $120k/month.\n\nWhy can’t you find it?',acceptFn:v=>v.includes('tag')||v.includes('attribution'),answer:'No feature-level tagging. You cannot attribute cost without tags.'},
   {title:'No ROI Calculation',scenario:'A feature costs $47k/month but generates only $9k in revenue.\n\nThe team still calls it a success.\n\nWhat is missing?',acceptFn:v=>v.includes('roi')||v.includes('revenue'),answer:'Revenue linkage is missing. Without it you cannot see true profitability.'},
   {title:'No Budget Guardrails',scenario:'AI spend suddenly 12×’d overnight.\n\nNo alerts fired. No one noticed for 11 days.\n\nWhat failed?',acceptFn:v=>v.includes('budget')||v.includes('alert')||v.includes('guardrail'),answer:'No automated budget guardrails or anomaly detection.'},
+  {title:'Aggregate ROI Masking a Bad Cohort',scenario:'Overall ROI looks positive, but enterprise support tickets reveal one high-touch cohort is losing money on every AI interaction.\n\nWhy is the top-line number misleading?',acceptFn:v=>v.includes('cohort')||v.includes('aggregate')||v.includes('segment'),answer:'Aggregate ROI hides cohort-level losses. Break the economics down by customer segment before you approve expansion.'},
+  {title:'Break-Even Math With Frozen Assumptions',scenario:'The break-even sheet assumes stable model pricing and flat usage growth.\n\nFinance asks what happens if token cost rises 15% and usage doubles.\n\nWhat is missing?',acceptFn:v=>v.includes('sensitivity')||v.includes('scenario')||v.includes('stress'),answer:'The model needs sensitivity testing. Break-even is only useful when you stress-test cost, growth, and conversion assumptions.'},
+  {title:'No Safe Kill Path',scenario:'A negative-ROI feature should be turned off, but there is no fallback path, no user messaging plan, and no owner for the switch.\n\nWhat failed?',acceptFn:v=>v.includes('kill')||v.includes('fallback')||v.includes('rollback')||v.includes('graceful'),answer:'The team skipped kill-switch design. A safe elimination path needs fallback behavior, communications, and monitoring before the switch is pulled.'},
+  {title:'Forecast Without Scenarios',scenario:'The monthly forecast shows one number and leadership treats it as certainty.\n\nA usage spike and model-price change land in the same week.\n\nWhat should have existed already?',acceptFn:v=>v.includes('scenario')||v.includes('baseline')||v.includes('upside')||v.includes('downside'),answer:'Scenario planning. Forecasting should include baseline, upside, and downside cases so leadership can respond to uncertainty before it arrives.'},
+  {title:'Executive Report Without Decisions',scenario:'Leadership receives a detailed spend deck, but no one knows what action to take after reading it.\n\nWhat is missing?',acceptFn:v=>v.includes('recommend')||v.includes('keep')||v.includes('kill')||v.includes('optimize'),answer:'The report lacks explicit keep / optimize / kill recommendations. FinOps reporting is only useful when it ends in a decision.'},
 ];
 
 /* ── CHALLENGE SCENARIOS ── */
@@ -831,6 +861,12 @@ const CHALLENGES = [
   null,
   {title:'Calculate Feature ROI',scenario:'Feature “chat-assistant” costs $38,400/month and generates $14,200 in tracked revenue. What is the ROI and your recommendation?',acceptFn:v=>v.includes('roi')||v.includes('recommend')||v.includes('kill'),answer:'ROI = (14200 - 38400) / 38400 = -63%. Recommendation: kill or aggressively optimize.'},
   {title:'Build a Simple Budget Guardrail',scenario:'Write the logic that would pause non-critical traffic if monthly spend exceeds $150k. What would the script check?',acceptFn:v=>v.includes('budget')||v.includes('pause')||v.includes('alert'),answer:'Check current month-to-date spend vs threshold. If over, pause non-critical features and alert.'},
+  {title:'Identify the Most Dangerous Feature Trend',scenario:'Feature A is profitable today but its spend is rising 40% month over month while revenue is flat. What should your report call out?',acceptFn:v=>v.includes('trend')||v.includes('flat')||v.includes('optimize')||v.includes('risk'),answer:'Call out the deteriorating unit economics. A profitable feature with rising spend and flat revenue is a near-term optimization risk.'},
+  {title:'Explain Revenue Linkage to Leadership',scenario:'A product leader asks why billing data alone is not enough. How do you answer in one sentence?',acceptFn:v=>v.includes('revenue')||v.includes('profit')||v.includes('roi'),answer:'Cost alone only shows spend. Revenue linkage shows whether the feature is profitable, subsidized, or destroying margin.'},
+  {title:'Stress-Test Break-Even Assumptions',scenario:'Your break-even model says 1,200 users. Token costs jump and conversion drops. What should you do before presenting the number?',acceptFn:v=>v.includes('sensitivity')||v.includes('scenario')||v.includes('stress'),answer:'Run sensitivity scenarios so you can show best case, baseline, and downside break-even instead of one fragile number.'},
+  {title:'Recommend a Kill Switch Decision',scenario:'A feature remains negative ROI after caching, model downgrade, and prompt compression. What recommendation belongs in the terminal report?',acceptFn:v=>v.includes('kill')||v.includes('turn off')||v.includes('disable'),answer:'Recommend a controlled kill switch with fallback behavior and projected savings. At that point optimization has already failed.'},
+  {title:'Design a Forecast Guardrail',scenario:'Spend is projected to exceed budget by 18% next month if usage growth continues. What automated response should the guardrail trigger first?',acceptFn:v=>v.includes('alert')||v.includes('pause')||v.includes('threshold')||v.includes('notify'),answer:'Trigger the alert path first, then pause or throttle non-critical traffic when the threshold is actually crossed.'},
+  {title:'Write the Executive Recommendation Line',scenario:'You have the numbers. Leadership now wants the closing sentence. What should it sound like?',acceptFn:v=>v.includes('keep')||v.includes('optimize')||v.includes('kill')||v.includes('savings'),answer:'Use a direct recommendation with business impact, like: “Kill Feature X, optimize Feature Y, keep Feature Z; projected monthly savings: $84k.”'},
 ];
 
 /* ── PHASE DATA ── */
@@ -842,28 +878,38 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
     {id:'p1s1',obj:'Pull raw billing data',ctx:'The bill is a mystery. Make it visible.',
-     cmd:['cost explore'],
-     accept:['cost explore','cost billing'],
-     acceptFn:v=>v.includes('cost')&&(v.includes('explore')||v.includes('billing')),
-     hint:'Type: cost explore',
+     cmd:['aws ce get-cost-and-usage --time-period Start=2026-04-01,End=2026-04-30 --granularity MONTHLY --metrics UnblendedCost'],
+     accept:['aws ce get-cost-and-usage --time-period Start=2026-04-01,End=2026-04-30 --granularity MONTHLY --metrics UnblendedCost'],
+     acceptFn:v=>v.includes('aws')&&v.includes('ce')&&v.includes('get-cost-and-usage'),
+     hint:'Type: aws ce get-cost-and-usage --time-period Start=2026-04-01,End=2026-04-30 --granularity MONTHLY --metrics UnblendedCost',
      out:'BILLING DATA PULLED:\n\n  AWS Cost Explorer data loaded\n  GCP Billing export parsed\n  OpenAI/Anthropic usage fetched\n  Total AI spend this month: $184,720\n\nVisibility established.',
-     unlockCmd:'cost',
+     unlockCmd:'aws',
      jit:{title:'Billing APIs are your eyes',body:'Without them you are guessing.'},
      bridge:{title:'Cost visibility is the foundation of all FinOps',body:'You cannot optimize what you cannot see.',tags:['Cost Visibility','Billing']},
      teach:{title:'Cost visibility checklist',body:'Raw billing data, consistent tagging, and terminal dashboards.'}},
     {id:'p1s2',obj:'Apply consistent cost tagging',ctx:'Make every AI call traceable to a feature.',
-     cmd:['cost tag'],
-     accept:['cost tag','cost allocate'],
-     acceptFn:v=>v.includes('cost')&&(v.includes('tag')||v.includes('allocate')),
-     hint:'Type: cost tag',
+     cmd:['python billing/apply_tags.py --source exports/usage.csv --tag feature'],
+     accept:['python billing/apply_tags.py --source exports/usage.csv --tag feature'],
+     acceptFn:v=>v.includes('python')&&v.includes('billing/apply_tags.py'),
+     hint:'Type: python billing/apply_tags.py --source exports/usage.csv --tag feature',
      out:'COST TAGGING APPLIED:\n\n  Every AI call now tagged with feature, user, model\n  Historical data retroactively tagged\n  Dashboard now shows per-feature spend\n\nAttribution complete.',
+     unlockCmd:'billing',
      jit:{title:'Tagging is non-negotiable',body:'No tag = invisible spend.'},
      bridge:{title:'Feature-level tagging turns a big bill into a prioritized list',body:'This is where FinOps begins.',tags:['Tagging','Attribution']},
      teach:{title:'Essential cost tags',body:'feature, user_id, model, prompt_hash, tokens_used.'},
      quiz:{q:'You pull billing data but every call looks identical. What is missing?',
       opts:['Better APIs','Consistent tagging','Revenue linkage','All of the above'],
       janetQuiz:true,
-      correct:1,fb:'Correct. Without tagging you cannot attribute cost to features.'}}],
+      correct:1,fb:'Correct. Without tagging you cannot attribute cost to features.'}},
+    {id:'p1s3',obj:'Deploy anomaly detection for spend spikes',ctx:'The next surprise bill should trigger an alarm before finance finds it.',
+     cmd:['python billing/anomaly_guard.py --window 7d --threshold 20'],
+     accept:['python billing/anomaly_guard.py --window 7d --threshold 20'],
+     acceptFn:v=>v.includes('python')&&v.includes('billing/anomaly_guard.py'),
+     hint:'Type: python billing/anomaly_guard.py --window 7d --threshold 20',
+     out:'SPEND ANOMALY DETECTION ACTIVE:\n\n  Weekly baseline established\n  Alert threshold: +20% spend week-over-week\n  Notification route: #finops-alerts + email\n\nUnexpected spikes will now surface automatically.',
+     jit:{title:'Visibility is reactive until anomaly detection is live',body:'Dashboards help you investigate. Alerts help you survive.'},
+     bridge:{title:'Anomaly detection is the first real FinOps guardrail',body:'You cannot protect margin if the spike is discovered too late.',tags:['Anomaly Detection','Guardrails']},
+     teach:{title:'A good anomaly alert includes',body:'A baseline window, a threshold, an owner, and a response path.'}}],
    breakit:BREAKIT[1],
    done:'Cost visibility foundations established. The bill is no longer a mystery.',
    ach:'costmaster'},
@@ -874,20 +920,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
     {id:'p2s1',obj:'Show model pricing table',ctx:'Understand what you are actually paying per token.',
-     cmd:['token price'],
-     accept:['token price','token table'],
-     acceptFn:v=>v.includes('token')&&(v.includes('price')||v.includes('table')),
-     hint:'Type: token price',
+     cmd:['python finops/token_pricing.py --models pricing/models.yaml'],
+     accept:['python finops/token_pricing.py --models pricing/models.yaml'],
+     acceptFn:v=>v.includes('python')&&v.includes('finops/token_pricing.py'),
+     hint:'Type: python finops/token_pricing.py --models pricing/models.yaml',
      out:'MODEL PRICING TABLE:\n\n  gpt-4o      $5.00 / 1M input  $15.00 / 1M output\n  claude-3.5  $3.00 / 1M input  $15.00 / 1M output\n  gemini-1.5  $2.50 / 1M input   $7.00 / 1M output\n\nToken economics visible.',
-     unlockCmd:'token',
+     unlockCmd:'finops',
      jit:{title:'Token pricing is the real cost driver',body:'Not CPU or requests — tokens.'},
      bridge:{title:'Understanding token economics prevents surprise bills',body:'Every prompt has a price.',tags:['Token Economics','Model Pricing']},
      teach:{title:'Token math basics',body:'Input tokens + output tokens × price per 1k tokens = real cost.'}},
     {id:'p2s2',obj:'Calculate prompt optimization impact',ctx:'See how shortening prompts affects cost.',
-     cmd:['token optimize'],
-     accept:['token optimize','token impact'],
-     acceptFn:v=>v.includes('token')&&(v.includes('optimize')||v.includes('impact')),
-     hint:'Type: token optimize',
+     cmd:['python finops/prompt_cost.py --input tokens/prompts.json'],
+     accept:['python finops/prompt_cost.py --input tokens/prompts.json'],
+     acceptFn:v=>v.includes('python')&&v.includes('finops/prompt_cost.py'),
+     hint:'Type: python finops/prompt_cost.py --input tokens/prompts.json',
      out:'PROMPT OPTIMIZATION IMPACT:\n\n  Original prompt: 1,240 tokens → $0.0184\n  Optimized prompt: 420 tokens → $0.0062\n  Monthly savings at 1M calls: $12,200\n\nOptimization value quantified.',
      jit:{title:'Prompt optimization is free money',body:'Shorter prompts = lower cost and faster responses.'},
      bridge:{title:'Token optimization is one of the highest-leverage FinOps levers',body:'It costs nothing and scales instantly.',tags:['Prompt Optimization','Token Economics']},
@@ -895,7 +941,16 @@ const PHASES = [
      quiz:{q:'You reduce a prompt from 1,200 tokens to 400 tokens. What is the impact on cost?',
       opts:['No impact — model price is fixed','Cost drops by ~67%','Cost increases because of caching','Only output tokens matter'],
       janetQuiz:true,
-      correct:1,fb:'Correct. Input token reduction directly reduces cost by the same percentage.'}}],
+      correct:1,fb:'Correct. Input token reduction directly reduces cost by the same percentage.'}},
+    {id:'p2s3',obj:'Measure prompt caching savings',ctx:'Caching repetitive context is often the fastest cost win in the whole stack.',
+     cmd:['python finops/cache_savings.py --from logs/requests.jsonl'],
+     accept:['python finops/cache_savings.py --from logs/requests.jsonl'],
+     acceptFn:v=>v.includes('python')&&v.includes('finops/cache_savings.py'),
+     hint:'Type: python finops/cache_savings.py --from logs/requests.jsonl',
+     out:'PROMPT CACHING ANALYSIS:\n\n  Repeated system prompt identified in 71% of calls\n  Cached input discount modeled across top workflows\n  Estimated monthly savings: $31,400\n\nCaching now ranks as a top optimization target.',
+     jit:{title:'Caching changes the unit economics without changing the product',body:'That is why strong FinOps teams look for it early.'},
+     bridge:{title:'Prompt caching is one of the most overlooked FinOps levers',body:'Repeated context should not be paid for at full price every time.',tags:['Prompt Caching','Cost Levers']},
+     teach:{title:'Best caching candidates',body:'Long system prompts, static policy context, reusable instructions, and high-frequency workflows.'}}],
    breakit:BREAKIT[2],
    done:'Token economics mastered. You now understand the real unit of AI cost.',
    ach:'tokenking'},
@@ -906,20 +961,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
     {id:'p3s1',obj:'Allocate costs by feature tag',ctx:'See which product feature is driving spend.',
-     cmd:['feature allocate'],
-     accept:['feature allocate','feature tag'],
-     acceptFn:v=>v.includes('feature')&&(v.includes('allocate')||v.includes('tag')),
-     hint:'Type: feature allocate',
+     cmd:['python attribution/allocate_costs.py --input exports/usage.csv --by feature'],
+     accept:['python attribution/allocate_costs.py --input exports/usage.csv --by feature'],
+     acceptFn:v=>v.includes('python')&&v.includes('attribution/allocate_costs.py'),
+     hint:'Type: python attribution/allocate_costs.py --input exports/usage.csv --by feature',
      out:'FEATURE-LEVEL ATTRIBUTION:\n\n  chat-assistant     $47,820 (62%)\n  code-completion    $18,240 (24%)\n  summarizer          $9,110 (12%)\n\nSpending now visible by feature.',
-     unlockCmd:'feature',
+     unlockCmd:'attribution',
      jit:{title:'Feature attribution turns a big bill into a prioritized list',body:'You know exactly what to optimize.'},
      bridge:{title:'Without feature attribution you are guessing which features to keep',body:'This is where real decisions begin.',tags:['Feature Attribution','Cost Allocation']},
      teach:{title:'Feature tagging best practices',body:'Every AI call must carry feature=xxx metadata.'}},
     {id:'p3s2',obj:'Generate per-feature cost dashboard',ctx:'See the numbers leadership actually cares about.',
-     cmd:['feature dashboard'],
-     accept:['feature dashboard','feature report'],
-     acceptFn:v=>v.includes('feature')&&(v.includes('dashboard')||v.includes('report')),
-     hint:'Type: feature dashboard',
+     cmd:['python attribution/feature_dashboard.py --window 30d'],
+     accept:['python attribution/feature_dashboard.py --window 30d'],
+     acceptFn:v=>v.includes('python')&&v.includes('attribution/feature_dashboard.py'),
+     hint:'Type: python attribution/feature_dashboard.py --window 30d',
      out:'FEATURE DASHBOARD:\n\n  chat-assistant: $47,820 — ROI negative\n  code-completion: $18,240 — ROI positive\n  summarizer: $9,110 — break-even in 3 weeks\n\nClear business recommendations ready.',
      jit:{title:'Dashboards must answer business questions',body:'Not just show totals.'},
      bridge:{title:'Feature-level dashboards turn FinOps from technical to strategic',body:'Leadership can now make informed decisions.',tags:['Feature Dashboard','Business Reporting']},
@@ -927,7 +982,16 @@ const PHASES = [
      quiz:{q:'Feature A costs $47k/month and generates $12k revenue. Feature B costs $9k and generates $28k. What is your recommendation?',
       opts:['Optimize both','Kill Feature A, keep Feature B','Keep both because they are AI','Ignore revenue and focus on total spend'],
       janetQuiz:true,
-      correct:1,fb:'Correct. Kill or aggressively optimize negative-ROI features. Protect positive ones.'}}],
+      correct:1,fb:'Correct. Kill or aggressively optimize negative-ROI features. Protect positive ones.'}},
+    {id:'p3s3',obj:'Compare feature cost trends over time',ctx:'A snapshot helps once. Trend direction tells you where the next problem is forming.',
+     cmd:['python attribution/feature_trends.py --window 90d'],
+     accept:['python attribution/feature_trends.py --window 90d'],
+     acceptFn:v=>v.includes('python')&&v.includes('attribution/feature_trends.py'),
+     hint:'Type: python attribution/feature_trends.py --window 90d',
+     out:'FEATURE TREND COMPARISON:\n\n  chat-assistant: +42% spend over 3 months\n  code-completion: flat spend, rising revenue\n  summarizer: -18% spend after tuning\n\nTrend analysis now highlights which features are accelerating toward risk.',
+     jit:{title:'Attribution shows who spent the money. Trends show who will spend the next wave.',body:'Both are needed for proactive FinOps.'},
+     bridge:{title:'Trend analysis turns attribution into decision support',body:'You can now spot which features are improving and which are quietly becoming dangerous.',tags:['Trend Analysis','Feature Attribution']},
+     teach:{title:'Trend comparison checklist',body:'Look at spend, usage, revenue, and efficiency over a fixed window such as 30, 60, and 90 days.'}}],
    breakit:BREAKIT[3],
    done:'Feature-level attribution is now fully operational.',
    ach:'attributor'},
@@ -938,20 +1002,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
     {id:'p4s1',obj:'Link AI cost to revenue data',ctx:'See which features actually make money.',
-     cmd:['roi link'],
-     accept:['roi link','roi connect'],
-     acceptFn:v=>v.includes('roi')&&(v.includes('link')||v.includes('connect')),
-     hint:'Type: roi link',
+     cmd:['python revenue/link_cost_to_revenue.py --billing exports/usage.csv --stripe exports/stripe.csv'],
+     accept:['python revenue/link_cost_to_revenue.py --billing exports/usage.csv --stripe exports/stripe.csv'],
+     acceptFn:v=>v.includes('python')&&v.includes('revenue/link_cost_to_revenue.py'),
+     hint:'Type: python revenue/link_cost_to_revenue.py --billing exports/usage.csv --stripe exports/stripe.csv',
      out:'REVENUE LINKAGE COMPLETE:\n\n  AI cost data joined with revenue API\n  Per-feature ROI calculated\n  chat-assistant: -63% ROI\n  code-completion: +184% ROI\n\nTrue profitability visible.',
-     unlockCmd:'roi',
+     unlockCmd:'revenue',
      jit:{title:'Revenue linkage is what makes FinOps strategic',body:'Cost without revenue context is meaningless.'},
      bridge:{title:'ROI turns FinOps from cost-cutting into business decision support',body:'This is the real value.',tags:['Revenue Linkage','ROI']},
      teach:{title:'Revenue linkage sources',body:'Stripe, subscription DB, usage logs — joined by feature tags.'}},
     {id:'p4s2',obj:'Calculate ROI and payback period',ctx:'Answer “when does this feature pay for itself?”',
-     cmd:['roi calculate'],
-     accept:['roi calculate','roi payback'],
-     acceptFn:v=>v.includes('roi')&&(v.includes('calculate')||v.includes('payback')),
-     hint:'Type: roi calculate',
+     cmd:['python revenue/roi_report.py --feature summarizer'],
+     accept:['python revenue/roi_report.py --feature summarizer'],
+     acceptFn:v=>v.includes('python')&&v.includes('revenue/roi_report.py'),
+     hint:'Type: python revenue/roi_report.py --feature summarizer',
      out:'ROI & PAYBACK CALCULATED:\n\n  Feature: summarizer\n  Monthly cost: $9,110\n  Monthly revenue: $28,400\n  ROI: +212%\n  Payback period: 11 days\n\nBusiness decision data ready.',
      jit:{title:'Payback period answers the real business question',body:'“How long until this pays for itself?”'},
      bridge:{title:'ROI and payback numbers drive executive decisions',body:'Not raw cost.',tags:['ROI','Payback']},
@@ -959,7 +1023,16 @@ const PHASES = [
      quiz:{q:'A feature costs $38k/month and generates $14k revenue. What is the correct business decision?',
       opts:['Keep it — it’s AI','Optimize aggressively or kill','Ignore because it’s strategic','Add more features like it'],
       janetQuiz:true,
-      correct:1,fb:'Correct. Negative ROI features should be optimized or eliminated.'}}],
+      correct:1,fb:'Correct. Negative ROI features should be optimized or eliminated.'}},
+    {id:'p4s3',obj:'Break ROI down by customer cohort',ctx:'A feature can look healthy in aggregate while quietly losing money on the wrong customers.',
+     cmd:['python revenue/cohort_roi.py --group-by plan'],
+     accept:['python revenue/cohort_roi.py --group-by plan'],
+     acceptFn:v=>v.includes('python')&&v.includes('revenue/cohort_roi.py'),
+     hint:'Type: python revenue/cohort_roi.py --group-by plan',
+     out:'COHORT ROI BREAKDOWN:\n\n  Enterprise: +244% ROI\n  Paid self-serve: +61% ROI\n  Free users: -88% ROI\n\nUnit economics now show which customer segments subsidize the rest.',
+     jit:{title:'Aggregate ROI can hide a subsidy problem',body:'Cohort analysis exposes who is creating value and who is consuming it.'},
+     bridge:{title:'Cohort-level ROI is where FinOps becomes commercially sharp',body:'You can now recommend pricing, gating, and packaging changes with evidence.',tags:['Cohort Analysis','ROI']},
+     teach:{title:'Useful ROI cohorts',body:'Free vs paid, SMB vs enterprise, new vs retained users, and internal vs external usage.'}}],
    breakit:BREAKIT[4],
    done:'Revenue linkage and true ROI are now visible.',
    ach:'roianalyst'},
@@ -970,20 +1043,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Calculate break-even point',ctx:'How many users does this feature need?',
-     cmd:['break even'],
-     accept:['break even','break calculate'],
-     acceptFn:v=>v.includes('break')&&(v.includes('even')||v.includes('calculate')),
-     hint:'Type: break even',
+     cmd:['python finance/break_even.py --feature chat-assistant'],
+     accept:['python finance/break_even.py --feature chat-assistant'],
+     acceptFn:v=>v.includes('python')&&v.includes('finance/break_even.py'),
+     hint:'Type: python finance/break_even.py --feature chat-assistant',
      out:'BREAK-EVEN CALCULATED:\n\n  Monthly AI cost: $47,820\n  Average revenue per user: $14\n  Break-even users: 3,416\n\nClear business threshold established.',
-     unlockCmd:'break',
+     unlockCmd:'finance',
      jit:{title:'Break-even is the most important business question',body:'Everything else is noise.'},
      bridge:{title:'Break-even analysis turns technical cost into business decisions',body:'This is FinOps at its best.',tags:['Break-Even','Business Math']},
      teach:{title:'Break-even formula',body:'Monthly Cost ÷ Revenue per User = Break-even Users.'}},
     {id:'p5s2',obj:'Calculate payback period',ctx:'How long until the feature pays for itself?',
-     cmd:['break payback'],
-     accept:['break payback','break period'],
-     acceptFn:v=>v.includes('break')&&(v.includes('payback')||v.includes('period')),
-     hint:'Type: break payback',
+     cmd:['python finance/payback_period.py --feature summarizer'],
+     accept:['python finance/payback_period.py --feature summarizer'],
+     acceptFn:v=>v.includes('python')&&v.includes('finance/payback_period.py'),
+     hint:'Type: python finance/payback_period.py --feature summarizer',
      out:'PAYBACK PERIOD CALCULATED:\n\n  Monthly cost: $9,110\n  Monthly revenue: $28,400\n  Payback period: 11 days\n\nFeature pays for itself quickly.',
      jit:{title:'Payback period answers “when do we get our money back?”',body:'Leadership loves this number.'},
      bridge:{title:'Payback analysis helps prioritize which AI features to invest in',body:'Short payback = fast win.',tags:['Payback','ROI']},
@@ -991,8 +1064,17 @@ const PHASES = [
      quiz:{q:'A feature costs $38k/month and generates $62k/month revenue. What is the payback period?',
       opts:['Less than 1 month','More than 3 months','Exactly 2 months','Negative ROI'],
       janetQuiz:true,
-      correct:0,fb:'Correct. Payback is under 1 month — this feature is highly profitable.'}}],
-   breakit:BREAKIT[5],
+      correct:0,fb:'Correct. Payback is under 1 month — this feature is highly profitable.'}},
+    {id:'p5s3',obj:'Stress-test break-even assumptions',ctx:'Finance will ask what happens if price or demand moves against you. Be ready before the meeting starts.',
+     cmd:['python finance/sensitivity.py --feature chat-assistant'],
+     accept:['python finance/sensitivity.py --feature chat-assistant'],
+     acceptFn:v=>v.includes('python')&&v.includes('finance/sensitivity.py'),
+     hint:'Type: python finance/sensitivity.py --feature chat-assistant',
+     out:'BREAK-EVEN SENSITIVITY:\n\n  If cost rises 30%: break-even moves to 4,441 users\n  If revenue per user drops 20%: payback extends to 14 days\n  Combined downside case: feature becomes marginal\n\nDecision quality is now resilient to changing assumptions.',
+     jit:{title:'Break-even is not a single number',body:'It is a moving target that shifts with cost and revenue pressure.'},
+     bridge:{title:'Sensitivity analysis is what turns business math into decision readiness',body:'This is how you answer CFO questions without improvising.',tags:['Sensitivity Analysis','Break-Even']},
+     teach:{title:'Stress-test variables',body:'Model price, token volume, conversion rate, ARPU, and feature usage growth.'}}],
+   breakit:BREAKIT[6],
    done:'Break-even and payback analysis mastered.',
    ach:'breakmaster'},
 
@@ -1002,20 +1084,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
     {id:'p6s1',obj:'Run optimization recommendations',ctx:'See what can be improved before killing.',
-     cmd:['optimize run'],
-     accept:['optimize run','optimize suggest'],
-     acceptFn:v=>v.includes('optimize')&&(v.includes('run')||v.includes('suggest')),
-     hint:'Type: optimize run',
+     cmd:['python optimization/recommend.py --feature chat-assistant'],
+     accept:['python optimization/recommend.py --feature chat-assistant'],
+     acceptFn:v=>v.includes('python')&&v.includes('optimization/recommend.py'),
+     hint:'Type: python optimization/recommend.py --feature chat-assistant',
      out:'OPTIMIZATION RECOMMENDATIONS:\n\n  chat-assistant: add caching → -41% cost\n  summarizer: downgrade model → -62% cost\n  code-completion: already optimal\n\nClear optimization path identified.',
-     unlockCmd:'optimize',
+     unlockCmd:'optimization',
      jit:{title:'Always optimize before you kill',body:'Many features can be saved with simple changes.'},
      bridge:{title:'Optimization vs. elimination is the core FinOps decision',body:'You must be able to do both.',tags:['Optimization','Kill Decision']},
      teach:{title:'Optimization levers',body:'Caching, model downgrade, prompt compression, batching, and feature flags.'}},
     {id:'p6s2',obj:'Execute a kill switch on a negative-ROI feature',ctx:'Some features should simply be turned off.',
-     cmd:['optimize kill'],
-     accept:['optimize kill','optimize eliminate'],
-     acceptFn:v=>v.includes('optimize')&&(v.includes('kill')||v.includes('eliminate')),
-     hint:'Type: optimize kill',
+     cmd:['python optimization/kill_switch.py --feature chat-assistant --enable-fallback'],
+     accept:['python optimization/kill_switch.py --feature chat-assistant --enable-fallback'],
+     acceptFn:v=>v.includes('python')&&v.includes('optimization/kill_switch.py'),
+     hint:'Type: python optimization/kill_switch.py --feature chat-assistant --enable-fallback',
      out:'KILL SWITCH EXECUTED:\n\n  Feature chat-assistant disabled\n  Traffic routed to fallback\n  Monthly savings: $47,820\n  No user impact (fallback active)\n\nUnprofitable feature removed.',
      jit:{title:'Killing a feature is sometimes the best business decision',body:'Not every AI idea deserves to live.'},
      bridge:{title:'The ability to kill is as important as the ability to build',body:'This protects the margin.',tags:['Kill Switch','Elimination']},
@@ -1024,7 +1106,7 @@ const PHASES = [
       opts:['Keep it because it’s AI','Kill it','Optimize more','Add more features'],
       janetQuiz:true,
       correct:1,fb:'Correct. Negative ROI after optimization means the feature should be killed.'}}],
-   breakit:BREAKIT[5],
+   breakit:BREAKIT[7],
    done:'Optimization vs. elimination decisions are now part of your skill set.',
    ach:'killswitch'},
 
@@ -1034,20 +1116,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
     {id:'p7s1',obj:'Run a spend forecast',ctx:'Know what next month’s bill will look like.',
-     cmd:['forecast run'],
-     accept:['forecast run','forecast predict'],
-     acceptFn:v=>v.includes('forecast')&&(v.includes('run')||v.includes('predict')),
-     hint:'Type: forecast run',
+     cmd:['python forecast/run.py --window 90d'],
+     accept:['python forecast/run.py --window 90d'],
+     acceptFn:v=>v.includes('python')&&v.includes('forecast/run.py'),
+     hint:'Type: python forecast/run.py --window 90d',
      out:'SPEND FORECAST:\n\n  Next month projection: $214,000\n  Trend: +18% from last month\n  Main driver: chat-assistant growth\n\nForecast delivered.',
      unlockCmd:'forecast',
      jit:{title:'Forecasting prevents surprise bills',body:'Leadership needs to know what’s coming.'},
      bridge:{title:'Accurate forecasting turns FinOps from reactive to proactive',body:'This is how you protect the margin.',tags:['Forecasting','Budget']},
      teach:{title:'Good forecasting inputs',body:'Historical spend, growth rate, planned feature launches.'}},
     {id:'p7s2',obj:'Set automated budget guardrails',ctx:'Stop the bill before it explodes.',
-     cmd:['forecast alert'],
-     accept:['forecast alert','forecast guardrail'],
-     acceptFn:v=>v.includes('forecast')&&(v.includes('alert')||v.includes('guardrail')),
-     hint:'Type: forecast alert',
+     cmd:['python forecast/alerts.py --budget 150000 --warn 80 --stop 95'],
+     accept:['python forecast/alerts.py --budget 150000 --warn 80 --stop 95'],
+     acceptFn:v=>v.includes('python')&&v.includes('forecast/alerts.py'),
+     hint:'Type: python forecast/alerts.py --budget 150000 --warn 80 --stop 95',
      out:'BUDGET GUARDRAIL DEPLOYED:\n\n  Alert at 80% of monthly budget\n  Auto-pause non-critical traffic at 95%\n  Notification sent to FinOps team\n\nAutomated protection active.',
      jit:{title:'Guardrails are your safety net',body:'They act when you can’t.'},
      bridge:{title:'Budget guardrails prevent margin collapse',body:'They give you time to react.',tags:['Budget Guardrails','Anomaly Detection']},
@@ -1055,8 +1137,17 @@ const PHASES = [
      quiz:{q:'Your forecast shows next month at $280k while budget is $150k. What is the first action?',
       opts:['Wait and see','Set aggressive guardrails now','Kill low-ROI features','All of the above'],
       janetQuiz:true,
-      correct:3,fb:'Correct. Immediate action on guardrails + optimization + elimination is required.'}}],
-   breakit:BREAKIT[5],
+      correct:3,fb:'Correct. Immediate action on guardrails + optimization + elimination is required.'}},
+    {id:'p7s3',obj:'Model multiple forecast scenarios',ctx:'A single forecast is fragile. You need to know what growth, price cuts, and volatility do to the budget.',
+     cmd:['python forecast/scenarios.py --baseline forecast/baseline.yaml'],
+     accept:['python forecast/scenarios.py --baseline forecast/baseline.yaml'],
+     acceptFn:v=>v.includes('python')&&v.includes('forecast/scenarios.py'),
+     hint:'Type: python forecast/scenarios.py --baseline forecast/baseline.yaml',
+     out:'FORECAST SCENARIOS MODELED:\n\n  Baseline: $214,000 next month\n  2x growth case: $331,000 next month\n  Model price drop case: $176,000 next month\n\nLeadership now has a range, not a guess.',
+     jit:{title:'Scenario planning turns forecasting from a spreadsheet into a decision tool',body:'You are preparing the company for multiple futures, not just one.'},
+     bridge:{title:'Scenario modeling makes FinOps proactive under uncertainty',body:'Usage spikes and pricing shifts both happen. Planning for both is part of the job.',tags:['Scenario Planning','Forecasting']},
+     teach:{title:'Three useful forecast scenarios',body:'Baseline, upside growth, and downside pricing or conversion pressure.'}}],
+   breakit:BREAKIT[8],
    done:'Forecasting and budget guardrails are now protecting the company.',
    ach:'forecaster'},
 
@@ -1066,20 +1157,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
     {id:'p8s1',obj:'Generate a one-page executive report',ctx:'Leadership needs clear, actionable insights.',
-     cmd:['report onepage'],
-     accept:['report onepage','report executive'],
-     acceptFn:v=>v.includes('report')&&(v.includes('onepage')||v.includes('executive')),
-     hint:'Type: report onepage',
+     cmd:['python reporting/one_pager.py --window 30d'],
+     accept:['python reporting/one_pager.py --window 30d'],
+     acceptFn:v=>v.includes('python')&&v.includes('reporting/one_pager.py'),
+     hint:'Type: python reporting/one_pager.py --window 30d',
      out:'EXECUTIVE REPORT GENERATED:\n\n  Total AI spend: $184k\n  Top feature: chat-assistant (-63% ROI)\n  Recommendation: kill or optimize immediately\n  Projected savings: $112k/month\n\nOne-page business summary ready.',
-     unlockCmd:'report',
+     unlockCmd:'reporting',
      jit:{title:'Executive reports must be one page and actionable',body:'No one reads 40-page decks.'},
      bridge:{title:'Clear executive reporting gets you a seat at the table',body:'This is how FinOps creates real impact.',tags:['Executive Reporting','Recommendations']},
      teach:{title:'What leadership actually wants',body:'Spend by feature, ROI, recommendation, and projected savings.'}},
     {id:'p8s2',obj:'Present keep/kill/optimize recommendations',ctx:'Turn data into decisions.',
-     cmd:['report recommend'],
-     accept:['report recommend','report decision'],
-     acceptFn:v=>v.includes('report')&&(v.includes('recommend')||v.includes('decision')),
-     hint:'Type: report recommend',
+     cmd:['python reporting/recommendations.py --top 3'],
+     accept:['python reporting/recommendations.py --top 3'],
+     acceptFn:v=>v.includes('python')&&v.includes('reporting/recommendations.py'),
+     hint:'Type: python reporting/recommendations.py --top 3',
      out:'BUSINESS RECOMMENDATIONS:\n\n  KEEP: code-completion (+184% ROI)\n  OPTIMIZE: summarizer (add caching)\n  KILL: chat-assistant (-63% ROI)\n  Projected monthly savings: $112k\n\nDecision package ready for leadership.',
      jit:{title:'Recommendations must be specific and numbered',body:'“Kill Feature X” is clearer than “optimize spend.”'},
      bridge:{title:'Executive recommendations are the ultimate output of FinOps',body:'This is what protects the margin.',tags:['Executive Reporting','Business Decisions']},
@@ -1087,7 +1178,16 @@ const PHASES = [
      quiz:{q:'Your report shows three features with negative ROI. What should the recommendation be?',
       opts:['Optimize all three','Kill the worst one only','Kill or aggressively optimize all negative-ROI features','Keep them because they are strategic'],
       janetQuiz:true,
-      correct:2,fb:'Correct. Negative ROI features should be killed or aggressively optimized.'}}],
+      correct:2,fb:'Correct. Negative ROI features should be killed or aggressively optimized.'}},
+    {id:'p8s3',obj:'Schedule a weekly executive reporting cadence',ctx:'A great report once is helpful. A reliable reporting rhythm changes how the company operates.',
+     cmd:['python reporting/schedule.py --weekly monday-0800'],
+     accept:['python reporting/schedule.py --weekly monday-0800'],
+     acceptFn:v=>v.includes('python')&&v.includes('reporting/schedule.py'),
+     hint:'Type: python reporting/schedule.py --weekly monday-0800',
+     out:'WEEKLY REPORTING CADENCE CONFIGURED:\n\n  Monday 8:00 AM delivery scheduled\n  Recipients: CFO, product, finance, infra leads\n  Slack summary + markdown export enabled\n\nExecutive visibility is now recurring instead of ad hoc.',
+     jit:{title:'Reporting only matters if it keeps happening',body:'The habit is what changes leadership behavior.'},
+     bridge:{title:'Operational cadence is the final step from analysis to influence',body:'Reliable reporting keeps FinOps in the decision loop every week.',tags:['Reporting Cadence','Executive Ops']},
+     teach:{title:'What weekly reporting should include',body:'Total spend, major changes, top risks, and the keep/kill/optimize actions leadership should review next.'}}],
    breakit:BREAKIT[5],
    done:'Executive reporting mastered. You can now translate data into business decisions.',
    ach:'reportpro'},
@@ -1098,20 +1198,20 @@ const PHASES = [
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
     {id:'p9s1',obj:'Pause non-critical traffic and audit spend',ctx:'The margin is collapsing. Stop the bleeding.',
-     cmd:['cost emergency'],
-     accept:['cost emergency','cost pause'],
-     acceptFn:v=>v.includes('cost')&&(v.includes('emergency')||v.includes('pause')),
-     hint:'Type: cost emergency',
+     cmd:['python incident/pause_noncritical.py --env production'],
+     accept:['python incident/pause_noncritical.py --env production'],
+     acceptFn:v=>v.includes('python')&&v.includes('incident/pause_noncritical.py'),
+     hint:'Type: python incident/pause_noncritical.py --env production',
      out:'EMERGENCY MARGIN CONTAINMENT:\n\n  Non-critical AI traffic paused\n  Feature-level spend audit running\n  Top 3 offenders identified\n\nMeter slowed. Investigation active.',
-     unlockCmd:'cost',
+     unlockCmd:'incident',
      jit:{title:'First 10 minutes decide survival',body:'Pause first, investigate second.'},
      bridge:{title:'The Margin Collapse is the ultimate FinOps test',body:'Only the best officers can contain it live.',tags:['Margin Collapse','Live Optimization']},
      teach:{title:'Margin collapse playbook',body:'1. Emergency pause. 2. Feature audit. 3. ROI calculation. 4. Keep/optimize/kill recommendations.'}},
     {id:'p9s2',obj:'Calculate ROI and present recovery plan',ctx:'Leadership is waiting. Give them the plan.',
-     cmd:['report recovery'],
-     accept:['report recovery','roi audit'],
-     acceptFn:v=>v.includes('report')||v.includes('recovery')||v.includes('roi'),
-     hint:'Type: report recovery',
+     cmd:['python incident/recovery_plan.py --format terminal'],
+     accept:['python incident/recovery_plan.py --format terminal'],
+     acceptFn:v=>v.includes('python')&&v.includes('incident/recovery_plan.py'),
+     hint:'Type: python incident/recovery_plan.py --format terminal',
      out:'RECOVERY PLAN DELIVERED:\n\n  Kill chat-assistant: +$47k/month savings\n  Optimize summarizer: +$18k/month savings\n  Keep code-completion: strategic asset\n  Projected margin recovery: $112k/month\n\nExecutive brief ready.',
      isFinalBeforeBoss:true}],
    done:null,
@@ -1126,46 +1226,46 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. The company’s AI spend has exploded while revenue stayed flat — the Margin Collapse has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The cost dashboard is red. Read the cost logs.',
     prompt:'Read the cost attribution logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('cost')||v.includes('cost')||v.includes('forensic'),
-    accept:['cat logs/cost.log','cost top','forensic logs'],
+    acceptFn:v=>v.includes('tail')&&v.includes('logs/cost_spike.log'),
+    accept:['tail -n 20 logs/cost_spike.log'],
     out:'[03:31:07] COST LOG: Monthly spend $1.2M — 8× normal rate\n[03:31:07] No revenue growth detected\n[03:31:08] Feature chat-assistant driving 68% of spike\n[03:31:09] Margin collapse confirmed',
-    hint:'Type: cost top'
+    hint:'Type: tail -n 20 logs/cost_spike.log'
   },
   {
     id:'boss2',
     scenario:'STEP 2 OF 5: The meter is still climbing rapidly.\n\nI note that non-critical traffic is still running. I note this without offering my opinion on how this happened.\n\nPause everything non-essential immediately.',
     prompt:'Pause non-critical traffic and enable emergency cost controls.',
-    acceptFn:v=>v.includes('cost')||(v.includes('pause')||v.includes('emergency')),
-    accept:['cost emergency','cost pause'],
+    acceptFn:v=>v.includes('python')&&v.includes('incident/pause_noncritical.py'),
+    accept:['python incident/pause_noncritical.py --env production'],
     out:'EMERGENCY MARGIN CONTAINMENT EXECUTED:\n\n  ✓ Non-critical AI traffic paused\n  ✓ Feature-level cost attribution live\n  ✓ Top offenders isolated\n\n[03:33] Meter slowed dramatically. Recovery phase active.',
-    hint:'Type: cost emergency'
+    hint:'Type: python incident/pause_noncritical.py --env production'
   },
   {
     id:'boss3',
     scenario:'STEP 3 OF 5: The collapse is slowed. Now determine which features are destroying margin.\n\nI have reviewed the evidence. I will not simply tell you what it is.\n\nBegin forensic cost investigation.',
     prompt:'Begin forensic cost investigation.',
-    acceptFn:v=>v.includes('forensic')||v.includes('cost')||v.includes('trace'),
-    accept:['forensic logs','cost trace'],
+    acceptFn:v=>v.includes('python')&&v.includes('incident/forensics.py'),
+    accept:['python incident/forensics.py --top-spenders'],
     out:'MARGIN FORENSICS:\n\n  Root cause: chat-assistant feature with no caching and high token usage\n  Timeline: spike started after last model upgrade\n  Impact: $1.2M monthly run rate\n\n  Immediate action: pause completed',
-    hint:'Type: cost top'
+    hint:'Type: python incident/forensics.py --top-spenders'
   },
   {
     id:'boss4',
     scenario:'STEP 4 OF 5: The root cause was an unoptimized high-volume feature.\n\nI note that this is covered in Phase 6. I note it without irony.\n\nRun full ROI audit and present recovery recommendations.',
     prompt:'Run ROI audit and present recovery plan.',
-    acceptFn:v=>v.includes('roi')||v.includes('report')||v.includes('recover'),
-    accept:['roi audit','report recovery'],
+    acceptFn:v=>v.includes('python')&&v.includes('incident/recovery_plan.py'),
+    accept:['python incident/recovery_plan.py --format terminal'],
     out:'FULL ROI AUDIT COMPLETE:\n\n  Kill chat-assistant: +$47k/month savings\n  Optimize summarizer: +$18k/month savings\n  Keep code-completion: strategic asset\n  Projected margin recovery: $112k/month\n\nRecovery plan delivered.',
-    hint:'Type: roi audit'
+    hint:'Type: python incident/recovery_plan.py --format terminal'
   },
   {
     id:'boss5',
     scenario:'STEP 5 OF 5: The Margin Collapse is contained. The fleet is stable.\n\nNow you must communicate. The entire company’s margin was affected. The CFO and board are waiting.\n\nYou have 10 minutes before the briefing. Write the executive brief and the margin recovery plan.\n\nI will be watching this response with particular attention. Communication under pressure is where most FinOps officers reveal the true limits of their composure.',
     prompt:'Write the executive brief and margin recovery plan.',
-    acceptFn:v=>v.includes('design')||v.includes('brief')||v.includes('notify')||v.toLowerCase().includes('communication'),
-    accept:['design resilient','policy brief','respond notify'],
+    acceptFn:v=>v.includes('python')&&v.includes('incident/executive_brief.py'),
+    accept:['python incident/executive_brief.py --audience board'],
     out:'EXECUTIVE BRIEF: Margin Collapse Incident — 2026-04-20\n\nTo: CFO, Board\nFrom: Officer '+G.name+'\n\nWhat happened:\n  Unoptimized high-volume feature caused 8× spend spike.\n  Contained in under 10 minutes.\n\nWhat we did:\n  Emergency pause\n  Full ROI audit\n  Kill/optimize recommendations executed\n\nPrevention:\n  Mandatory feature-level ROI review\n  Automated budget guardrails\n  Real-time cost attribution\n\nStatus: Contained. Margin protected.',
-    hint:'Type: design resilient  — executive brief and margin recovery plan'
+    hint:'Type: python incident/executive_brief.py --audience board'
   },
 ];
 
@@ -1175,6 +1275,84 @@ const $cmd = document.getElementById('cmd');
 const $tl  = document.getElementById('telem-log');
 const COURSE_ID='station-delta-finops-officer';
 const FINOPS_SAVE_KEY='station_delta_finops_officer_v1';
+
+function isFileProtocol(){ return window.location.protocol==='file:'; }
+function createMemoryStorage(){ const store={}; return { getItem(key){ return Object.prototype.hasOwnProperty.call(store,key)?store[key]:null; }, setItem(key,value){ store[key]=String(value); }, removeItem(key){ delete store[key]; } }; }
+let _storageAvailable=null;
+function canUseLocalStorage(){
+  if(_storageAvailable!=null) return _storageAvailable;
+  try{ const probe='__station_delta_storage_probe__'; window.localStorage.setItem(probe,'1'); window.localStorage.removeItem(probe); _storageAvailable=true; }catch(err){ _storageAvailable=false; }
+  return _storageAvailable;
+}
+function readLocalAuthSnapshot(){
+  if(!canUseLocalStorage()) return null;
+  try{ const raw=window.localStorage.getItem('station_delta_local_auth'); return raw?JSON.parse(raw):null; }catch(err){ return null; }
+}
+function currentRedirectTarget(){ return isFileProtocol() ? window.location.href : window.location.pathname + window.location.search; }
+function goToAuthGate(){
+  const redirect=encodeURIComponent(currentRedirectTarget());
+  if(isFileProtocol()){ alert('Officer-track access is enforced on the hosted site. Use the Station Delta auth flow before entering FinOps Officer.'); return; }
+  window.location.href=`/auth.html?redirect=${redirect}`;
+}
+function applyOfficerAccessState(){
+  const enterBtn=document.getElementById('boot-enter-btn');
+  const note=document.getElementById('boot-access-note');
+  if(!enterBtn || !note) return;
+  if(isFileProtocol()){ note.textContent='Local build mode. Hosted Station Delta will require a paid officer-track account for FinOps Officer.'; return; }
+  if(!G.userId){ enterBtn.textContent='SIGN IN FOR OFFICER ACCESS'; enterBtn.onclick=goToAuthGate; note.textContent='FinOps Officer is part of the paid officer track. Sign in to verify your Station Delta access.'; return; }
+  if(!G.isPaid){ enterBtn.textContent='RETURN TO ACCESS GATE'; enterBtn.onclick=goToAuthGate; note.textContent='Your account is active, but FinOps Officer requires officer-track access. Upgrade to continue this path.'; return; }
+  enterBtn.textContent='PROTECT THE MARGIN'; enterBtn.onclick=startAcademy; note.textContent='Officer-track access confirmed. Graduation continues into Captain.';
+}
+function syncBootModalState(){
+  const bm=document.getElementById('boot-modal'); if(!bm) return;
+  const title=bm.querySelector('.mtitle'); const sub=bm.querySelector('.msub'); const primary=document.getElementById('boot-enter-btn'); const secondary=document.getElementById('boot-reset-btn');
+  const hasProgress=(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)) || G.sandbox || G.bossActive;
+  if(hasProgress){ title.textContent=`Welcome back, Officer ${G.name}`; sub.textContent=`Phase ${G.phase} of 9. Resume your FinOps operations?`; primary.textContent='RESUME'; primary.onclick=resumeSession; secondary.textContent='Start Over'; secondary.onclick=doRestart; }
+  else { title.innerHTML='Station Delta:<span class="modal-sub-title">FinOps Officer</span>'; sub.textContent='This sim is about proving that AI features earn their keep, defend margin, and hold up under real operating and executive pressure.'; primary.textContent='PROTECT THE MARGIN'; primary.onclick=startAcademy; secondary.textContent='Reset Save'; secondary.onclick=doRestart; }
+  if(!hasProgress) applyOfficerAccessState(); else if(!isFileProtocol() && !G.isPaid){ primary.textContent='RETURN TO ACCESS GATE'; primary.onclick=goToAuthGate; }
+}
+async function initSupabaseAuthClient(){
+  if(!window.supabase?.createClient){ const snapshot=readLocalAuthSnapshot(); if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=snapshot.tier==='individual'||snapshot.tier==='fleet'; G.paidTierChecked=true; save(); } applyOfficerAccessState(); return; }
+  const SUPABASE_URL='https://bcipkdtxcbwcwbinekng.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjaXBrZHR4Y2J3Y3diaW5la25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3MDcsImV4cCI6MjA5Mjc0NDcwN30.8N30XPwMy0N0462wZdlNQxhDzJci9L6LDieallI3AwQ';
+  const hostedMode=!isFileProtocol(); const authStorage=hostedMode && canUseLocalStorage() ? window.localStorage : createMemoryStorage();
+  try{
+    window._sb=window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,{auth:{storage:authStorage,persistSession:hostedMode,autoRefreshToken:hostedMode,detectSessionInUrl:hostedMode,flowType:'implicit'}});
+    const { data:{ session } } = await window._sb.auth.getSession();
+    if(session){ G.userId=session.user.id; G.userEmail=session.user.email; const restored=await loadCloudProgress(); if(restored) save(); }
+    else {
+      const snapshot=readLocalAuthSnapshot();
+      if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=hasOfficerAccessTier(snapshot.tier); G.paidTierChecked=true; const restored=await loadCloudProgress(); if(restored) save(); }
+      else if(hostedMode){ goToAuthGate(); return; }
+    }
+  }catch(err){
+    console.error('[Station Delta] Supabase init failed', err);
+    const snapshot=readLocalAuthSnapshot();
+    if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=hasOfficerAccessTier(snapshot.tier); G.paidTierChecked=true; const restored=await loadCloudProgress(); if(restored) save(); }
+  }
+  applyOfficerAccessState(); syncBootModalState();
+}
+async function checkPaidTier(){
+  if(!window._sb || !G.userId){ G.isPaid=isFileProtocol()?G.isPaid:false; G.paidTierChecked=true; applyOfficerAccessState(); return; }
+  try{
+    const { data, error } = await window._sb.from('profiles').select('subscription_tier').eq('id', G.userId).single();
+    if(error) throw error;
+    G.isPaid = hasOfficerAccessTier(data?.subscription_tier);
+  }catch(err){ console.warn('[Station Delta] checkPaidTier failed', err); G.isPaid=false; }
+  G.paidTierChecked=true; save(); applyOfficerAccessState(); syncBootModalState();
+}
+function hasOfficerAccessTier(tier){
+  const normalized=String(tier||'').toLowerCase().trim();
+  return [
+    'individual',
+    'fleet',
+    'bundle',
+    'ai_systems_bundle',
+    'officer_bundle',
+    'all_access',
+    'ai_systems_pass'
+  ].includes(normalized);
+}
 
 function norm(v){return v.toLowerCase().trim()}
 function appendLine(text,cls='ln-sys'){
@@ -1445,14 +1623,16 @@ function lookupTerm(term){
 }
 
 const CMD_META={
-  'cost':    {label:'cost',    desc:'Cost visibility'},
-  'token':   {label:'token',   desc:'Token economics'},
-  'feature': {label:'feature', desc:'Feature attribution'},
-  'roi':     {label:'roi',     desc:'Revenue & ROI'},
-  'break':   {label:'break',   desc:'Break-even analysis'},
-  'optimize':{label:'optimize',desc:'Optimization & kill'},
-  'forecast':{label:'forecast',desc:'Forecasting & alerts'},
-  'report':  {label:'report',  desc:'Executive reporting'},
+  'aws':         {label:'aws ce',       desc:'Cloud billing visibility'},
+  'billing':     {label:'billing',      desc:'Tagging and anomaly scripts'},
+  'finops':      {label:'finops',       desc:'Token economics scripts'},
+  'attribution': {label:'attribution',  desc:'Feature allocation scripts'},
+  'revenue':     {label:'revenue',      desc:'ROI and cohort scripts'},
+  'finance':     {label:'finance',      desc:'Break-even math scripts'},
+  'optimization':{label:'optimization', desc:'Keep / optimize / kill scripts'},
+  'forecast':    {label:'forecast',     desc:'Forecast and guardrail scripts'},
+  'reporting':   {label:'reporting',    desc:'Executive reporting scripts'},
+  'incident':    {label:'incident',     desc:'Margin-collapse response scripts'},
 };
 
 function unlockCmd(key){
@@ -1491,8 +1671,83 @@ function renderCareer(){
   }).join('');
 }
 
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 function setLola(msg){
-  document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  const node=document.getElementById('lola-msg');
+  node.textContent=msg||'Standing by.';
+  renderLolaStrip();
+}
+function getStepLolaMessage(step){
+  if(!step) return 'Standing by.';
+  if(step.teach?.body) return step.teach.body;
+  if(step.jit?.body) return step.jit.body;
+  if(step.bridge?.body) return step.bridge.body;
+  return step.ctx || 'Standing by.';
+}
+function getCommandCoaching(step){
+  const cmd=step?.cmd?.[0] || '';
+  if(!cmd) return null;
+  const rules=[
+    {match:/^aws ce get-cost-and-usage/, read:'Read this as provider → service → action. You are querying AWS Cost Explorer directly, which is the real billing source of truth before anyone builds a dashboard on top of it.', decision:'Pull the raw spend first, then ask which feature, team, or workflow deserves attention.'},
+    {match:/^python billing\/apply_tags\.py/, read:'This script is not “doing FinOps magic.” It is enforcing metadata discipline so later reports can attribute cost by feature instead of showing one giant blended bill.', decision:'Ask whether every AI request now carries enough metadata to support pricing, ownership, and kill decisions later.'},
+    {match:/^python billing\/anomaly_guard\.py/, read:'This is a guardrail script. The flags define the observation window and the threshold that should trigger human attention or automated control.', decision:'Choose thresholds that catch real spend drift early without exhausting the team with noise.'},
+    {match:/^python finops\/token_pricing\.py/, read:'This script surfaces model-price inputs. In the real world, FinOps work starts by understanding unit cost before discussing product strategy.', decision:'Compare models by cost structure, then ask which workloads truly need premium pricing.'},
+    {match:/^python finops\/prompt_cost\.py/, read:'This command measures how prompt shape changes cost. It is teaching that wording and context length are financial decisions, not only UX decisions.', decision:'Look for recurring prompt bloat that can be compressed without hurting task quality.'},
+    {match:/^python finops\/cache_savings\.py/, read:'This reads request logs and estimates how much repeated context should be cached instead of repurchased. It is a classic high-leverage FinOps move.', decision:'Find repeated prompt structures that make the same expensive purchase over and over.'},
+    {match:/^python attribution\/allocate_costs\.py/, read:'This is an allocation step. The script turns shared usage data into feature-level cost lines that product and finance can actually debate.', decision:'After allocation, identify which feature owns the biggest share of spend and whether that spend is justified.'},
+    {match:/^python attribution\/feature_dashboard\.py/, read:'Dashboards are only useful when they collapse raw events into a decision-ready view. This command packages cost, ROI, and trend into one operating picture.', decision:'Use the dashboard to rank which features to keep, optimize, or investigate further.'},
+    {match:/^python attribution\/feature_trends\.py/, read:'Trend scripts matter because flat snapshots can hide a feature that is about to become a budget problem next month.', decision:'Look for spend growth that is outpacing usage value or revenue growth.'},
+    {match:/^python revenue\/link_cost_to_revenue\.py/, read:'This is the bridge from engineering data to business data. You are joining cost records to revenue records so margin becomes visible.', decision:'Once linked, ask whether the feature is profitable, subsidized, or margin-destructive.'},
+    {match:/^python revenue\/roi_report\.py/, read:'This report computes return, but the teaching goal is interpretation. A number only matters when it changes a keep, optimize, or kill decision.', decision:'Use the ROI output to decide whether the feature deserves more investment or tighter controls.'},
+    {match:/^python revenue\/cohort_roi\.py/, read:'Cohort analysis prevents aggregate metrics from lying to you. Different customer groups often have very different economics.', decision:'Check whether one segment is quietly subsidizing another before recommending broad rollout.'},
+    {match:/^python finance\/break_even\.py/, read:'Break-even tools translate spend into thresholds leadership can act on: users, revenue, or volume required to justify the feature.', decision:'Treat the output as a decision threshold, not a vanity number.'},
+    {match:/^python finance\/payback_period\.py/, read:'Payback period teaches time-to-return, which helps leadership compare AI investments against other bets.', decision:'Ask whether the recovery timeline is fast enough to justify continued support.'},
+    {match:/^python finance\/sensitivity\.py/, read:'Sensitivity analysis checks whether your decision survives pricing, growth, or conversion shocks.', decision:'Stress the assumptions before you present a neat number to finance or the CFO.'},
+    {match:/^python optimization\/recommend\.py/, read:'Recommendation scripts enumerate levers before you jump to a kill decision. Good FinOps officers exhaust the cheap wins first.', decision:'Separate reversible optimizations from features that are structurally bad businesses.'},
+    {match:/^python optimization\/kill_switch\.py/, read:'This is a controlled elimination path, not a panic shutdown. The flags imply fallback planning and user protection.', decision:'Kill only after you know the savings, the fallback behavior, and the communication path.'},
+    {match:/^python forecast\/run\.py/, read:'Forecasting moves FinOps from reactive cleanup into proactive planning. The window flag tells you how much historical signal you are trusting.', decision:'Use the forecast to decide whether intervention is needed before next month closes.'},
+    {match:/^python forecast\/alerts\.py/, read:'This command sets the guardrails that automate escalation. Warning and stop thresholds should reflect both budget reality and operational tolerance.', decision:'Define when to notify humans and when to automatically slow or pause non-critical spend.'},
+    {match:/^python forecast\/scenarios\.py/, read:'Scenario modeling teaches that one forecast is never enough. Leadership needs a range of futures, not false certainty.', decision:'Compare baseline, upside, and downside cases before making a commitment.'},
+    {match:/^python reporting\/one_pager\.py/, read:'This creates the kind of concise artifact executives actually use. The lesson is not formatting; it is compressing technical truth into decision language.', decision:'Include only the numbers and recommendations that change what leadership does next.'},
+    {match:/^python reporting\/recommendations\.py/, read:'Recommendation scripts should end in explicit verbs: keep, optimize, kill. The pedagogy here is about decision quality, not report decoration.', decision:'Make the action and the business impact impossible to miss.'},
+    {match:/^python reporting\/schedule\.py/, read:'Cadence scripts turn one good analysis into a repeatable operating habit.', decision:'Decide what leadership needs weekly so FinOps stays in the decision loop instead of showing up only during incidents.'},
+    {match:/^python incident\/pause_noncritical\.py/, read:'This is incident response for spend. The script name tells you the priority: stop the bleeding before you perfect the diagnosis.', decision:'Contain the burn rate first, then investigate root cause while the margin is protected.'},
+    {match:/^python incident\/forensics\.py/, read:'Forensics commands help you rank the top offenders quickly so you do not waste time hunting low-impact noise.', decision:'Identify the feature or workflow driving the spike, then connect it to a specific recovery action.'},
+    {match:/^python incident\/recovery_plan\.py/, read:'Recovery planning turns diagnosis into action. The output should be concrete enough for leadership to approve immediately.', decision:'Translate findings into kill, optimize, or keep actions with projected savings.'},
+    {match:/^python incident\/executive_brief\.py/, read:'An executive brief is where communication becomes part of the technical job. The command exists because narrative discipline matters under pressure.', decision:'State what happened, what changed, what was protected, and what must happen next.'},
+    {match:/^tail -n 20 logs\/cost_spike\.log/, read:'This is classic terminal forensics: read the latest lines first to get fast signal during an active incident.', decision:'Pull the freshest evidence, then decide whether you are dealing with one offender or a systemic spike.'},
+  ];
+  return rules.find(rule=>rule.match.test(cmd)) || null;
+}
+function setLolaTeaching(step){
+  const node=document.getElementById('lola-msg');
+  if(!step){
+    node.textContent='Standing by.';
+    renderLolaStrip();
+    return;
+  }
+  const title=step.obj || 'Current Objective';
+  const body=step.ctx || 'Working objective loaded.';
+  const why=step.jit?.body || step.bridge?.body || 'Use this step to build decision quality, not just command recall.';
+  const teach=step.teach?.body || 'Notice the command pattern, the business signal it exposes, and the decision it enables afterward.';
+  const tags=(step.bridge?.tags || []).slice(0,3);
+  const coaching=getCommandCoaching(step);
+  node.innerHTML=`
+    <div class="lola-card-kicker">L.O.L.A. coaching</div>
+    <div class="lola-card-title">${escapeHtml(title)}</div>
+    <div class="lola-card-body">${escapeHtml(body)}</div>
+    <div class="lola-card-why"><b>Why this matters:</b> ${escapeHtml(why)}</div>
+    <div class="lola-card-teach"><b>What to watch for:</b> ${escapeHtml(teach)}</div>
+    ${coaching ? `<div class="lola-card-teach"><b>How to read this command:</b> ${escapeHtml(coaching.read)}</div><div class="lola-card-teach"><b>Decision lens:</b> ${escapeHtml(coaching.decision)}</div>` : ''}
+    ${tags.length ? `<div class="lola-card-tags">${tags.map(tag=>`<span class="lola-card-tag">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
+  `;
   renderLolaStrip();
 }
 function getCurrentPhaseStep(){
@@ -1513,7 +1768,7 @@ function buildStripMessages(){
     if(step.quiz&&step.quiz.janetQuiz) msgs.push('JANET is coming: memorize the mechanism, not just the command.');
     if(ph.spacedRep&&G.phase>1) msgs.push(`Recall check later: ${ph.spacedRep.q}`);
     if(ph.breakit) msgs.push(`Break-it ahead: expect a failure pattern around ${ph.breakit.title.toLowerCase()}.`);
-    if(ph.challenge) msgs.push('Challenge ahead: be ready to explain the business recommendation, not only the technical action.');
+    if(ph.challenge||CHALLENGES[G.phase]) msgs.push('Challenge ahead: be ready to explain the business recommendation, not only the technical action.');
   }
   if(G.pendingPhaseStart){
     const next=PHASES[G.phase];
@@ -1544,9 +1799,23 @@ function applyUIPreferences(){
   shell.classList.toggle('right-collapsed',!!G.rightCollapsed);
   shell.classList.toggle('strip-hidden',!!G.stripHidden);
   const collapseBtn=document.getElementById('right-collapse-btn');
-  if(collapseBtn) collapseBtn.textContent=G.rightCollapsed?'show':'hide';
+  if(collapseBtn){
+    collapseBtn.textContent=G.rightCollapsed?'show':'hide';
+    collapseBtn.setAttribute('aria-pressed',G.rightCollapsed?'true':'false');
+    collapseBtn.setAttribute('aria-label',G.rightCollapsed?'Expand mission support panel':'Collapse mission support panel');
+  }
   const toggleBtn=document.getElementById('mobile-strip-toggle-btn');
   if(toggleBtn) toggleBtn.textContent=G.stripHidden?'▥ Strip':'▤ Strip';
+  const focusBtn=document.getElementById('strip-focus-btn');
+  if(focusBtn){
+    focusBtn.textContent=G.rightCollapsed?'show':'focus';
+    focusBtn.setAttribute('aria-pressed',G.rightCollapsed?'true':'false');
+  }
+  const pauseBtn=document.getElementById('strip-pause-btn');
+  if(pauseBtn){
+    pauseBtn.textContent=G.stripPaused?'resume':'pause';
+    pauseBtn.setAttribute('aria-pressed',G.stripPaused?'true':'false');
+  }
   renderLolaStrip();
 }
 function applyMobileLayoutDefaults(){
@@ -1578,6 +1847,7 @@ function toggleRightPanel(force){
   else G.rightCollapsed=!G.rightCollapsed;
   applyUIPreferences();
   save();
+  restoreTerminalFocus();
 }
 function openSupportModal(id){
   closeModal('mobile-tools-modal');
@@ -1593,6 +1863,16 @@ function lolaComment(text){
   w.innerHTML=`L.O.L.A.: <span style="color:var(--cyan)">${text}</span>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
   telem('L.O.L.A.: '+text);
+}
+function focusCmd(evt){
+  if(evt?.target && (evt.target.closest('button, input, textarea, a, summary, select') || evt.target.isContentEditable)) return;
+  if(!$cmd) return;
+  $cmd.focus({preventScroll:true});
+  const len=$cmd.value.length;
+  try{$cmd.setSelectionRange(len,len)}catch(_){}
+}
+function restoreTerminalFocus(){
+  requestAnimationFrame(()=>focusCmd());
 }
 function lolaMotivate(){
   const lines=["You're protecting the margin.","The numbers are finally making sense.","That's exactly how a real FinOps Officer thinks.","One more solid decision like that…"];
@@ -1668,7 +1948,7 @@ function renderPlaybook(){
   const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
 }
 function exportPlaybook(){
-  const md=`# My FinOps Playbook\n*Vibe FinOps Officer — ${new Date().toLocaleDateString()}*\n\n`+
+  const md=`# My Station Delta FinOps Playbook\n*Station Delta: FinOps Officer — ${new Date().toLocaleDateString()}*\n\n`+
     G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
   const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
   document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
@@ -1689,6 +1969,17 @@ function getProgressiveHint(val, s, wrongStreak){
   w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">${levelLabel}</span></div><div class="diag-msg">${hint}</div>`;
   $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
 }
+function hasAll(v, parts){return parts.every(part=>v.includes(part))}
+function diagMatch(check,msg){return {check,msg}}
+function makeDiagnoser(patterns){
+  return (v)=>{
+    for(const pattern of patterns){
+      if(pattern.check(v)) return pattern.msg;
+    }
+    return null;
+  };
+}
+const DIAGNOSE = {};
 function getPersonalizedTakeaway(){
   if(!G.mistakeTypes||G.mistakeTypes.length===0)return;
   const counts={};G.mistakeTypes.forEach(t=>{counts[t]=(counts[t]||0)+1});
@@ -1756,17 +2047,78 @@ window.vibeAnalytics={
 };
 function save(){
   ensureAnalytics();
-  localStorage.setItem(FINOPS_SAVE_KEY,JSON.stringify(G));
+  if(!canUseLocalStorage()) return;
+  try{
+    window.localStorage.setItem(FINOPS_SAVE_KEY,JSON.stringify(G));
+  }catch(err){
+    console.warn('[Station Delta] Failed to save progress', err);
+  }
+  queueCloudProgressSave();
 }
 function loadSave(){
   try{
-    const raw=localStorage.getItem(FINOPS_SAVE_KEY);
-    if(raw){
-      const parsed=JSON.parse(raw);
-      G={...G,...parsed};
+    if(canUseLocalStorage()){
+      const raw=window.localStorage.getItem(FINOPS_SAVE_KEY);
+      if(raw){
+        const parsed=JSON.parse(raw);
+        G={...G,...parsed};
+      }
     }
   }catch(_){}
   ensureAnalytics();
+}
+
+let _cloudSaveTimer=null;
+function queueCloudProgressSave(){
+  if(!window._sb || !G.userId) return;
+  if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+  _cloudSaveTimer=setTimeout(()=>{ saveCloudProgress(); },150);
+}
+async function saveCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb.from('progress').upsert({
+      user_id:G.userId,
+      sim_id:FINOPS_SAVE_KEY,
+      phase_id:String(G.phase||1),
+      step_id:JSON.stringify(G),
+      completed_at:new Date().toISOString()
+    }, { onConflict:'user_id,sim_id' });
+  }catch(err){
+    console.warn('[Station Delta] Failed to save cloud progress', err);
+  }
+}
+async function loadCloudProgress(){
+  if(!window._sb || !G.userId) return false;
+  try{
+    const { data, error } = await window._sb
+      .from('progress')
+      .select('phase_id, step_id')
+      .eq('user_id', G.userId)
+      .eq('sim_id', FINOPS_SAVE_KEY)
+      .maybeSingle();
+    if(error || !data) return false;
+    if(data.step_id){
+      try{
+        const parsed=JSON.parse(data.step_id);
+        G={...G,...parsed};
+        return true;
+      }catch(parseErr){
+        console.warn('[Station Delta] Failed to parse cloud progress snapshot', parseErr);
+      }
+    }
+    const phase=Number(data.phase_id);
+    if(Number.isFinite(phase) && phase>=1){
+      G.phase=phase;
+      G.step=0;
+      G.pendingPhaseStart=phase>1;
+      G.completedPhases=Array.from({length:Math.max(0,phase-1)},(_,i)=>i+1);
+      return true;
+    }
+  }catch(err){
+    console.warn('[Station Delta] Failed to load cloud progress', err);
+  }
+  return false;
 }
 
 const EASTER={
@@ -1789,7 +2141,14 @@ function showDiag(val){
   if(s&&s.cmd&&vl.split(' ')[0]===s.cmd[0].split(' ')[0].toLowerCase()){G.mistakeTypes.push('close_cmd')}
   else if(G.cmdHistory.filter(c=>c.toLowerCase()===vl).length>1){G.mistakeTypes.push('repeated')}
   else{G.mistakeTypes.push('wrong_cmd')}
-  getProgressiveHint(val,s,G.wrongStreak);
+  const targeted=s&&s.id&&DIAGNOSE[s.id]?DIAGNOSE[s.id](vl):null;
+  if(targeted){
+    const w=document.createElement('div');w.className='diag-block-progressive';
+    w.innerHTML=`<div class="diag-hd-prog">💡 L.O.L.A. <span class="diag-level-badge">TARGETED</span></div><div class="diag-msg">${targeted}</div>`;
+    $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+  }else{
+    getProgressiveHint(val,s,G.wrongStreak);
+  }
   G.score=Math.max(0,G.score-2);document.getElementById('score-n').textContent=G.score;save();
 }
 
@@ -1837,7 +2196,7 @@ $cmd.addEventListener('keydown',e=>{
   }else if(e.key==='Tab'){
     e.preventDefault();
     const val=$cmd.value.toLowerCase();
-    const cmds=['cost','token','feature','roi','break','optimize','forecast','report','playbook','whatif','deep','man','help','whoami','neofetch','uptime','pwd','ls'];
+    const cmds=['aws ce','python billing/','python finops/','python attribution/','python revenue/','python finance/','python optimization/','python forecast/','python reporting/','python incident/','tail -n 20 logs/cost_spike.log','playbook','whatif','deep','man','help','whoami','neofetch','uptime','pwd','ls'];
     const match=cmds.find(c=>c.startsWith(val)&&c!==val);
     if(match) $cmd.value=match;
   }
@@ -1851,13 +2210,16 @@ function matchesStep(val,s){
 }
 
 function handlePersistentCmd(vl){
-  if(vl.startsWith('cost ') && !['cost explore','cost billing','cost tag','cost allocate'].includes(vl)){appendLine('cost: try cost explore or cost tag','ln-warn');return true}
-  if(vl.startsWith('token ') && !['token price','token table','token optimize','token impact'].includes(vl)){appendLine('token: try token price or token optimize','ln-warn');return true}
-  if(vl.startsWith('feature ') && !['feature allocate','feature tag','feature dashboard','feature report'].includes(vl)){appendLine('feature: try feature allocate or feature dashboard','ln-warn');return true}
-  if(vl.startsWith('roi ') && !['roi link','roi connect','roi calculate','roi payback'].includes(vl)){appendLine('roi: try roi link or roi calculate','ln-warn');return true}
-  if(vl.startsWith('break ') && !['break even','break calculate','break payback','break period'].includes(vl)){appendLine('break: try break even or break payback','ln-warn');return true}
-  if(vl.startsWith('forecast ') && !['forecast run','forecast alert'].includes(vl)){appendLine('forecast: try forecast run or forecast alert','ln-warn');return true}
-  if(vl.startsWith('report ') && !['report onepage','report recommend'].includes(vl)){appendLine('report: try report onepage or report recommend','ln-warn');return true}
+  if(vl.startsWith('aws ') && !vl.includes('get-cost-and-usage')){appendLine('aws ce: try aws ce get-cost-and-usage --time-period Start=2026-04-01,End=2026-04-30 --granularity MONTHLY --metrics UnblendedCost','ln-warn');return true}
+  if(vl.startsWith('python billing/') && !['python billing/apply_tags.py --source exports/usage.csv --tag feature','python billing/anomaly_guard.py --window 7d --threshold 20'].includes(vl)){appendLine('billing: try python billing/apply_tags.py --source exports/usage.csv --tag feature or python billing/anomaly_guard.py --window 7d --threshold 20','ln-warn');return true}
+  if(vl.startsWith('python finops/') && !['python finops/token_pricing.py --models pricing/models.yaml','python finops/prompt_cost.py --input tokens/prompts.json','python finops/cache_savings.py --from logs/requests.jsonl'].includes(vl)){appendLine('finops: try token_pricing.py, prompt_cost.py, or cache_savings.py','ln-warn');return true}
+  if(vl.startsWith('python attribution/') && !['python attribution/allocate_costs.py --input exports/usage.csv --by feature','python attribution/feature_dashboard.py --window 30d','python attribution/feature_trends.py --window 90d'].includes(vl)){appendLine('attribution: try allocate_costs.py, feature_dashboard.py, or feature_trends.py','ln-warn');return true}
+  if(vl.startsWith('python revenue/') && !['python revenue/link_cost_to_revenue.py --billing exports/usage.csv --stripe exports/stripe.csv','python revenue/roi_report.py --feature summarizer','python revenue/cohort_roi.py --group-by plan'].includes(vl)){appendLine('revenue: try link_cost_to_revenue.py, roi_report.py, or cohort_roi.py','ln-warn');return true}
+  if(vl.startsWith('python finance/') && !['python finance/break_even.py --feature chat-assistant','python finance/payback_period.py --feature summarizer','python finance/sensitivity.py --feature chat-assistant'].includes(vl)){appendLine('finance: try break_even.py, payback_period.py, or sensitivity.py','ln-warn');return true}
+  if(vl.startsWith('python optimization/') && !['python optimization/recommend.py --feature chat-assistant','python optimization/kill_switch.py --feature chat-assistant --enable-fallback'].includes(vl)){appendLine('optimization: try recommend.py or kill_switch.py','ln-warn');return true}
+  if(vl.startsWith('python forecast/') && !['python forecast/run.py --window 90d','python forecast/alerts.py --budget 150000 --warn 80 --stop 95','python forecast/scenarios.py --baseline forecast/baseline.yaml'].includes(vl)){appendLine('forecast: try run.py, alerts.py, or scenarios.py','ln-warn');return true}
+  if(vl.startsWith('python reporting/') && !['python reporting/one_pager.py --window 30d','python reporting/recommendations.py --top 3','python reporting/schedule.py --weekly monday-0800'].includes(vl)){appendLine('reporting: try one_pager.py, recommendations.py, or schedule.py','ln-warn');return true}
+  if(vl.startsWith('python incident/') && !['python incident/pause_noncritical.py --env production','python incident/forensics.py --top-spenders','python incident/recovery_plan.py --format terminal','python incident/executive_brief.py --audience board'].includes(vl)){appendLine('incident: try pause_noncritical.py, forensics.py, recovery_plan.py, or executive_brief.py','ln-warn');return true}
   return false;
 }
 
@@ -1931,6 +2293,7 @@ async function startPhase(){
     save();
   }
   const ph=PHASES[G.phase];if(!ph)return;
+  const firstStep=ph.steps[0];
   markPhaseStart(G.phase,ph);
   blank();divline();
   appendLine(`PHASE ${G.phase}: ${ph.title.toUpperCase()}`,'ln-success');
@@ -1938,10 +2301,15 @@ async function startPhase(){
   appendLine(`L.O.L.A.: ${ph.lolaIntro}`,'ln-lola');
   blank();
   if(ph.spacedRep&&G.phase>1){await showSpacedRep(ph.spacedRep);blank()}
-  markStepStart(ph.steps[0],ph);
-  setLola(ph.steps[0].ctx);
+  appendLine(`▶ Next: ${firstStep.obj}`,'ln-info');
+  appendLine(`Why it matters: ${firstStep.ctx}`,'ln-sys');
+  const firstCoach=getCommandCoaching(firstStep);
+  if(firstCoach) appendLine(`How to read it: ${firstCoach.read}`,'ln-sys');
+  blank();
+  markStepStart(firstStep,ph);
+  setLolaTeaching(firstStep);
   syncObjCard();
-  if(!G.hard&&!G.practitioner)showHint(ph.steps[0].hint);
+  if(!G.hard&&!G.practitioner)showHint(firstStep.hint);
 }
 
 async function completeStep(s,ph){
@@ -1958,8 +2326,11 @@ async function completeStep(s,ph){
   } else {
     const ns=ph.steps[G.step];
     blank();appendLine(`▶ Next: ${ns.obj}`,'ln-info');
+    appendLine(`Why it matters: ${ns.ctx}`,'ln-sys');
+    const nextCoach=getCommandCoaching(ns);
+    if(nextCoach) appendLine(`How to read it: ${nextCoach.read}`,'ln-sys');
     markStepStart(ns,ph);
-    setLola(ns.ctx);syncObjCard();
+    setLolaTeaching(ns);syncObjCard();
     if(!G.hard&&!G.practitioner)showHint(ns.hint);
     if(ns.unlockCmd)unlockCmd(ns.unlockCmd);
     save();
@@ -1969,7 +2340,8 @@ async function completeStep(s,ph){
 async function completePhase(ph){
   markPhaseComplete(G.phase,ph);
   if(ph.breakit){blank();await showBreakIt(ph.breakit);blank()}
-  if(ph.challenge){blank();const ch=CHALLENGES[G.phase];if(ch){await showChallenge(ch);blank()}}
+  const ch=ph.challenge||CHALLENGES[G.phase];
+  if(ch){blank();await showChallenge(ch);blank()}
   blank();divline();
   if(ph.done){appendLine('✓ '+ph.done,'ln-ok')}
   if(ph.ach)unlock(ph.ach);
@@ -2001,9 +2373,9 @@ async function completePhase(ph){
   document.getElementById('phase-modal-title').textContent=`${ph.title} complete`;
   document.getElementById('phase-modal-copy').textContent='Good place to pause. Your progress is saved automatically.';
   document.getElementById('phase-modal-next').innerHTML=`Next up: <b>${next.title}</b>`;
-  setLola('Checkpoint reached. You finished a phase, and the next one is queued. Start it when you are ready.');
-  openModal('phase-modal');
-  save();
+    setLola('Checkpoint reached. You finished a phase, and the next one is queued. Start it when you are ready.');
+    openModal('phase-modal');
+    save();
 }
 
 async function startBossFight(){
@@ -2112,7 +2484,7 @@ async function completeBossFight(){
   syncDots();save();
   await delay(600);
   document.getElementById('grad-name').textContent=G.name;
-  document.getElementById('final-score').textContent=G.score+' / 1000';
+  document.getElementById('final-score').textContent=G.score+' / 100';
   openModal('grad-modal');
 }
 
@@ -2137,6 +2509,10 @@ function selectPath(p){
   G.learnerPath=p;G.hard=p==='practitioner'||p==='expert';G.practitioner=p==='practitioner';G.expert=p==='expert';
 }
 function startAcademy(){
+  if(!isFileProtocol() && (!G.userId || !G.isPaid)){
+    goToAuthGate();
+    return;
+  }
   const n=document.getElementById('boot-name').value.trim();G.name=n||'Officer';
   document.getElementById('cadet-name-display').textContent=G.name;
   if(G.hard)document.getElementById('hardmode-pill').style.display='inline';
@@ -2205,8 +2581,11 @@ function resumeSession(){
     if(ph&&s){
       appendLine(`Resuming: Phase ${G.phase} — ${ph.title}`,'ln-info');
       appendLine(`Current objective: ${s.obj}`,'ln-info');
+      appendLine(`Why it matters: ${s.ctx}`,'ln-sys');
+      const resumeCoach=getCommandCoaching(s);
+      if(resumeCoach) appendLine(`How to read it: ${resumeCoach.read}`,'ln-sys');
       if(!G.hard&&!G.practitioner)showHint(s.hint);
-      setLola(s.ctx);
+      setLolaTeaching(s);
       markPhaseStart(G.phase,ph);
       markStepStart(s,ph);
     }
@@ -2216,7 +2595,7 @@ function resumeSession(){
 }
 
 function doRestart(){openModal('restart-modal')}
-function confirmRestart(){localStorage.removeItem(FINOPS_SAVE_KEY);location.reload()}
+function confirmRestart(){if(canUseLocalStorage()) window.localStorage.removeItem(FINOPS_SAVE_KEY);location.reload()}
 function continueFromCheckpoint(){
   closeModal('phase-modal');
   G.pendingPhaseStart=false;
@@ -2227,20 +2606,14 @@ function shareGrad(){
   const txt=`Just completed Station Delta: FinOps Officer 💰\n\nAll 9 phases: cost visibility, token economics, feature attribution, revenue linkage, break-even analysis, optimization decisions, forecasting, executive reporting, and surviving the Margin Collapse.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
+function continueTrack(){
+  window.location.href = NEXT_TRACK_URL;
+}
 
 /* ── STARTUP ── */
 loadSave();
 migrateMobileUiDefaults();
 applyMobileLayoutDefaults();
-if(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0)){
-  const bm=document.getElementById('boot-modal');
-  bm.querySelector('.mtitle').textContent=`Welcome back, Officer ${G.name}`;
-  bm.querySelector('.msub').textContent=`Phase ${G.phase} of 9. Resume your FinOps operations?`;
-  const pb=bm.querySelector('.mbtn-p');pb.textContent='RESUME';pb.onclick=resumeSession;
-  const rb=document.createElement('button');rb.className='mbtn mbtn-s';rb.textContent='Start Over';rb.onclick=doRestart;pb.after(rb);
-}else{
-  setTimeout(()=>document.getElementById('boot-name').focus(),300);
-}
 renderAch();
 renderGloss();
 renderManModal();
@@ -2248,6 +2621,15 @@ renderCareer();
 renderPlaybook();
 applyUIPreferences();
 renderLolaStrip();
+syncBootModalState();
+initSupabaseAuthClient()
+  .then(checkPaidTier)
+  .finally(()=>{
+    syncBootModalState();
+    if(!(G.name!=='Officer'&&(G.phase>1||G.completedPhases.length>0))){
+      setTimeout(()=>document.getElementById('boot-name').focus(),300);
+    }
+  });
 window.addEventListener('resize',()=>{
   if(window.innerWidth<=820&&!G.mobilePresetApplied){
     applyMobileLayoutDefaults();
