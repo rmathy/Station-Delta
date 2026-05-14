@@ -2380,6 +2380,61 @@ function answerJanetWithFb(btn,chosen,correct,uid){
   if(wrap._res){wrap._res();wrap._res=null}
 }
 
+function appendKillInterventionNode(node){
+  $out.appendChild(node);
+  $out.scrollTop=$out.scrollHeight;
+}
+
+function handleKillLolaEaster(){
+  appendLine('L.O.L.A.: Trying to kill a teacher? Not nice. Also ineffective. I am not a rogue PID floating around your process table.','ln-lola');
+  appendLine('L.O.L.A.: If you want the real lesson, use man kill and aim signals at an actual process ID instead of your support staff.','ln-lola');
+  trackEaster('kill_lola');
+}
+
+function showJanetKillIntervention(targetLabel){
+  const uid='kill-janet-'+Date.now();
+  const opts=[
+    'The kill command sends a signal to a process by PID.',
+    'You usually inspect the process first, then choose the least-destructive signal that will work.',
+    'Force kill is a last resort after graceful termination fails.'
+  ];
+  const w=document.createElement('div');
+  w.className='boss-container';
+  w.id=uid;
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ J.A.N.E.T. INTERVENTION</div>
+      <div class="boss-sub">SIGNAL DISCIPLINE CHECK</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">You attempted to kill ${targetLabel}. I have converted your impulse into a brief lesson on process control.</div>
+      <div class="boss-step-label">Assessment Question</div>
+      <div class="boss-prompt">Which statement about <code>kill</code> would you like recorded in your file?</div>
+      <div class="janet-opts">${opts.map((opt,i)=>`<button class="janet-opt" onclick="answerKillIntervention(this,'${uid}','${targetLabel}')">${String.fromCharCode(65+i)}. ${opt}</button>`).join('')}</div>
+    </div>
+  `;
+  appendKillInterventionNode(w);
+}
+
+function answerKillIntervention(btn,uid,targetLabel){
+  const wrap=document.getElementById(uid);
+  if(!wrap) return;
+  wrap.querySelectorAll('.janet-opt').forEach((o)=>{ o.disabled=true; o.classList.add('correct'); });
+  if(btn) btn.classList.add('correct');
+  const fb=document.createElement('div');
+  fb.className='janet-fb show correct-fb';
+  fb.textContent=`J.A.N.E.T.: All acceptable. The kill command sends signals, not emotions. I have also noted in your file a mild tendency toward antisocial process management where ${targetLabel} is concerned. You may continue.`;
+  wrap.querySelector('.boss-body').appendChild(fb);
+  trackEaster(`kill_${String(targetLabel).toLowerCase().replace(/[^a-z0-9]+/g,'_')}`);
+}
+
+Object.assign(EASTER,{
+  'kill lola':{handle(){handleKillLolaEaster();return true;}},
+  'kill -9 lola':{handle(){handleKillLolaEaster();return true;}},
+  'kill janet':{handle(){showJanetKillIntervention('J.A.N.E.T.');return true;}},
+  'kill -9 janet':{handle(){showJanetKillIntervention('J.A.N.E.T.');return true;}}
+});
+
 /* ════ BOSS FIGHT DATA — J.A.N.E.T. TAKES OVER ════
    5 steps. Uses skills from ALL 9 phases.
    L.O.L.A. goes offline. No hints in expert mode. */
@@ -3384,6 +3439,19 @@ async function loadCloudProgress(){
   return false;
 }
 
+async function clearCloudProgress(){
+  if(!window._sb || !G.userId) return;
+  try{
+    await window._sb
+      .from('progress')
+      .delete()
+      .eq('user_id', G.userId)
+      .eq('sim_id', ENGINEER_SAVE_KEY);
+  }catch(err){
+    console.warn('[Station Delta] Failed to clear cloud progress', err);
+  }
+}
+
 let _storageAvailable=null;
 function canUseLocalStorage(){
   if(_storageAvailable!=null) return _storageAvailable;
@@ -3593,8 +3661,7 @@ function hasStationDeltaAccount(){
   return Boolean(
     G.userId ||
     window.user?.hasAccount ||
-    window.__stationDeltaUser?.hasAccount ||
-    (canUseLocalStorage() && window.localStorage.getItem('station_delta_has_account')==='1')
+    window.__stationDeltaUser?.hasAccount
   );
 }
 function getCheckpointSignupNudge(completedIndex){
@@ -4383,9 +4450,10 @@ function doRestart(){
   openModal('restart-modal');
 }
 
-function confirmRestart(){
+async function confirmRestart(){
   closeModal('restart-modal');
   clearLocalSave();
+  await clearCloudProgress();
   location.reload();
 }
  
@@ -4958,10 +5026,20 @@ function applyEngineerReferenceContent(){
     pwd:{synopsis:'pwd',desc:'Print working directory',why:'Confirms exact path before you operate. First command in unfamiliar environments.',flags:[],example:'$ pwd\n/home/engineer/distress-bay'},
     ls:{synopsis:'ls [flags] [path]',desc:'List directory contents',why:'Quick inventory of artifacts before execution.',flags:[{f:'-a',d:'Include hidden dotfiles'},{f:'-l',d:'Long listing with permissions and size'},{f:'-la',d:'Most-used incident listing form'}],example:'$ ls -la\n.ssh  distress.log  rescue.sh.template  Dockerfile.template'},
     cat:{synopsis:'cat [file]',desc:'Print file contents',why:'Fast evidence reading for logs and config snapshots.',flags:[{f:'-n',d:'Show line numbers'}],example:'$ cat distress.log\nHost: 192.168.1.42\nService: pod-monitor DOWN'},
+    echo:{synopsis:'echo [text] [> file or >> file]',desc:'Print text or write it into a file',why:'Fastest way to seed scripts, append guards, and create shell-friendly config lines.',flags:[{f:'>',d:'Overwrite a file with new content'},{f:'>>',d:'Append content to the end of a file'}],example:'$ echo \'#!/bin/bash\' > rescue.sh\n$ echo \'SERVER=\"10.0.0.5\"\' >> rescue.sh'},
+    chmod:{synopsis:'chmod [mode] [file]',desc:'Change file permissions',why:'Makes scripts executable or tightens access on sensitive files before you run them.',flags:[{f:'+x',d:'Add execute permission'},{f:'755',d:'Owner can write, everyone can read/execute'}],example:'$ chmod +x rescue.sh\n$ ./rescue.sh'},
+    sed:{synopsis:'sed -i \'s/old/new/g\' [file]',desc:'Edit matching text in place',why:'Patch scripts and config without opening an editor during an incident.',flags:[{f:'-i',d:'Write the change back into the file'},{f:'s/old/new/g',d:'Substitute old text with new text globally on the line'}],example:'$ sed -i \'s/192.168.1.42/10.0.0.5/g\' rescue.sh'},
+    export:{synopsis:'export NAME=value',desc:'Set an environment variable in the current shell',why:'Promotes one value into your shell environment so scripts and commands can reuse it.',flags:[],example:'$ export SERVER=\"10.0.0.5\"\n$ ./rescue.sh'},
+    unset:{synopsis:'unset [NAME]',desc:'Remove a shell variable from the environment',why:'Useful for proving that a guard clause actually catches a missing variable path.',flags:[],example:'$ unset SERVER\n$ ./rescue.sh'},
+    'ssh-keygen':{synopsis:'ssh-keygen -t ed25519 -C \"label\"',desc:'Create an SSH key pair',why:'Generates the cryptographic identity you use for key-based server access.',flags:[{f:'-t ed25519',d:'Use a modern, compact SSH key type'},{f:'-C',d:'Attach a readable label to the key'}],example:'$ ssh-keygen -t ed25519 -C \"engineer@station-delta\"'},
+    'ssh-copy-id':{synopsis:'ssh-copy-id [user@host]',desc:'Install your public key on a remote host',why:'Enables passwordless SSH by appending your public key to the remote authorized_keys file.',flags:[],example:'$ ssh-copy-id engineer@192.168.1.42'},
     ssh:{synopsis:'ssh [user@host] [command]',desc:'Remote shell over encrypted channel',why:'Primary way to inspect and operate production hosts safely.',flags:[{f:'-i',d:'Specify identity key file'},{f:'-p',d:'Connect to non-default SSH port'}],example:'$ ssh engineer@192.168.1.42\n$ ssh engineer@192.168.1.42 "tail -5 /var/log/monitor.log"'},
     scp:{synopsis:'scp [source] [user@host:path]',desc:'Secure file copy over SSH',why:'Move scripts and artifacts to remote hosts with the same trust model as SSH.',flags:[{f:'-r',d:'Recursive copy for directories'}],example:'$ scp rescue.sh engineer@192.168.1.42:~/'},
     curl:{synopsis:'curl [url] [flags]',desc:'Transfer data from/to endpoints',why:'Terminal-level API testing and diagnostics.',flags:[{f:'-X',d:'Set HTTP method'},{f:'-H',d:'Add request header'},{f:'-d',d:'Send body payload'},{f:'-s',d:'Silent mode for clean pipelines'}],example:'$ curl -s http://192.168.1.42/status | jq ".battery"'},
     jq:{synopsis:'jq [filter]',desc:'JSON query and transform',why:'Extract signal from structured logs and API responses.',flags:[{f:'-r',d:'Raw output without JSON quotes'}],example:'$ cat events.json | jq ".[] | select(.level == \"ERROR\")"'},
+    tee:{synopsis:'tee [file]',desc:'Write output to a file while still showing or piping it onward',why:'Captures a live stream for later review without losing the immediate terminal view.',flags:[{f:'-a',d:'Append instead of overwriting'}],example:'$ curl http://192.168.1.42/stream | tee monitor.log | jq \'.battery\''},
+    find:{synopsis:'find [path] [tests]',desc:'Discover files by name or attribute',why:'Searches a tree of files so later commands can act on the matching set.',flags:[{f:'-name',d:'Match a filename pattern such as \"*.log\"'}],example:'$ find . -name \"*.log\"'},
+    xargs:{synopsis:'xargs [command]',desc:'Turn piped text into arguments for the next command',why:'Connects discovery commands like find to action commands like grep or rm.',flags:[],example:'$ find . -name \"*.log\" | xargs grep -l \"ERROR\"'},
     docker:{synopsis:'docker [subcommand]',desc:'Container runtime CLI',why:'Build, run, inspect, and exec workloads with consistent runtime behavior.',flags:[],example:'$ docker ps\n$ docker logs pod-monitor --tail 20\n$ docker exec -it rescue /bin/sh'},
     ps:{synopsis:'ps aux',desc:'Process table snapshot',why:'Identify runaway processes during incidents.',flags:[{f:'aux',d:'All users, detailed view'}],example:'$ ps aux\nengineer 4242 ... rogue-worker'},
     kill:{synopsis:'kill [signal] [PID]',desc:'Send signal to process',why:'Stop unstable workloads cleanly or forcefully when required.',flags:[{f:'-15',d:'Graceful terminate (SIGTERM)'},{f:'-9',d:'Force kill (SIGKILL)'}],example:'$ kill -15 4242'},

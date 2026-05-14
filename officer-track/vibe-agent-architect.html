@@ -1931,6 +1931,56 @@ function answerJanetWithFb(btn,chosen,correct,uid){
   if(wrap._res){wrap._res();wrap._res=null}
 }
 
+function handleKillLolaEaster(){
+  appendLine('L.O.L.A.: Trying to kill a teacher? Not nice. Also a poor architecture decision.','ln-lola');
+  appendLine('L.O.L.A.: The real command lesson is that kill sends signals to processes by PID. Learn that, and spare your support systems.','ln-lola');
+  trackEaster('kill_lola');
+}
+
+function showJanetKillIntervention(targetLabel){
+  const uid='kill-janet-'+Date.now();
+  const opts=[
+    'kill sends a signal to a process by PID.',
+    'Signal choice matters because graceful shutdown and force-kill have different operational consequences.',
+    'Responsible operators confirm the process and blast radius before sending any signal.'
+  ];
+  const w=document.createElement('div');
+  w.className='boss-container';
+  w.id=uid;
+  w.innerHTML=`
+    <div class="boss-header">
+      <div class="boss-title">⚠ J.A.N.E.T. INTERVENTION</div>
+      <div class="boss-sub">PROCESS GOVERNANCE CHECK</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-scenario">You attempted to kill ${targetLabel}. I have replaced that instinct with a micro-assessment.</div>
+      <div class="boss-step-label">Assessment Question</div>
+      <div class="boss-prompt">Which explanation of <code>kill</code> should I preserve in your file?</div>
+      <div class="janet-opts">${opts.map((opt,i)=>`<button class="janet-opt" onclick="answerKillIntervention(this,'${uid}','${targetLabel}')">${String.fromCharCode(65+i)}. ${opt}</button>`).join('')}</div>
+    </div>
+  `;
+  appendSupportNode(w);
+}
+
+function answerKillIntervention(btn,uid,targetLabel){
+  const wrap=document.getElementById(uid);
+  if(!wrap) return;
+  wrap.querySelectorAll('.janet-opt').forEach((o)=>{ o.disabled=true; o.classList.add('correct'); });
+  if(btn) btn.classList.add('correct');
+  const fb=document.createElement('div');
+  fb.className='janet-fb show correct-fb';
+  fb.textContent=`J.A.N.E.T.: All acceptable. I have also noted in your file a mild tendency toward antisocial process management where ${targetLabel} is concerned. Continue.`;
+  wrap.querySelector('.boss-body').appendChild(fb);
+  trackEaster(`kill_${String(targetLabel).toLowerCase().replace(/[^a-z0-9]+/g,'_')}`);
+}
+
+Object.assign(EASTER,{
+  'kill lola':{handle(){handleKillLolaEaster();return true;}},
+  'kill -9 lola':{handle(){handleKillLolaEaster();return true;}},
+  'kill janet':{handle(){showJanetKillIntervention('J.A.N.E.T.');return true;}},
+  'kill -9 janet':{handle(){showJanetKillIntervention('J.A.N.E.T.');return true;}}
+});
+
 let spacedRecallCount=0;
 function showSpacedRep(sr){
   return new Promise(res=>{
