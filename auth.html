@@ -665,6 +665,7 @@ function writeLocalAuthSnapshot() {
     email: state.profile.email || state.session.user.email || '',
     tier: state.profile.subscription_tier || 'free',
     accessToken: state.session.access_token || '',
+    refreshToken: state.session.refresh_token || '',
     updatedAt: Date.now()
   };
   window.localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(snapshot));
@@ -808,15 +809,18 @@ function togglePasswordVisibility() {
 }
 
 async function loadProfile(userId) {
-  if (isFileProtocol()) {
-    const snapshot = readLocalAuthSnapshot();
-    const accessToken = state.session?.access_token || snapshot?.accessToken;
-    if (!accessToken) throw new Error('No access token available for local profile lookup.');
+  const snapshot = readLocalAuthSnapshot();
+  const accessToken = state.session?.access_token || snapshot?.accessToken || '';
+  if (accessToken) {
     const rows = await supabaseHttp(`/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=email,subscription_tier`, {
       accessToken
     });
     const data = Array.isArray(rows) ? rows[0] : rows;
-    return data;
+    if (data) return data;
+  }
+
+  if (isFileProtocol()) {
+    throw new Error('No access token available for local profile lookup.');
   }
   const supabase = getSupabaseClient();
   if (!supabase) throw new Error('Supabase client unavailable.');
@@ -828,6 +832,30 @@ async function loadProfile(userId) {
 
   if (error) throw error;
   return data;
+}
+
+async function hydrateHostedSessionFromAuthResponse(authPayload) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return false;
+  const accessToken = authPayload?.access_token || '';
+  const refreshToken = authPayload?.refresh_token || '';
+  if (!accessToken || !refreshToken) return false;
+
+  try {
+    const { error } = await withTimeout(
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }),
+      10000,
+      'Session hydration'
+    );
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.warn('[Station Delta Auth] Hosted session hydration failed', error);
+    return false;
+  }
 }
 
 async function refreshSession() {
@@ -915,36 +943,28 @@ async function signIn() {
   }
   setButtonsDisabled(true);
   setMessage('', 'Signing in...');
-  if (isFileProtocol()) {
-    const data = await withTimeout(
-      supabaseHttp('/auth/v1/token?grant_type=password', {
-        method: 'POST',
-        body: { email, password }
-      }),
-      15000,
-      'Sign-in request'
-    );
-    state.session = { user: data.user, access_token: data.access_token };
-  } else {
-    const { error } = await withTimeout(
-      supabase.auth.signInWithPassword({ email, password }),
-      15000,
-      'Sign-in request'
-    );
-    if (error) throw error;
-  }
+  const data = await withTimeout(
+    supabaseHttp('/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      body: { email, password }
+    }),
+    15000,
+    'Sign-in request'
+  );
+  state.session = {
+    user: data.user,
+    access_token: data.access_token,
+    refresh_token: data.refresh_token || ''
+  };
   setMessage('', 'Credentials accepted. Loading your Station Delta access...');
-  if (isFileProtocol()) {
-    state.mode = 'authenticated';
-    state.profile = await loadProfile(state.session.user.id);
-    state.tier = state.profile?.subscription_tier || 'free';
-    writeLocalAuthSnapshot();
-    renderState();
-    if (maybeRedirectToTarget()) return;
-    setMessage('ok', 'Welcome back. Your account is active and your access tier has been confirmed.');
-    return;
+  if (!isFileProtocol()) {
+    await hydrateHostedSessionFromAuthResponse(data);
   }
-  await refreshSession();
+  state.mode = 'authenticated';
+  state.profile = await loadProfile(state.session.user.id);
+  state.tier = state.profile?.subscription_tier || 'free';
+  writeLocalAuthSnapshot();
+  renderState();
   if (maybeRedirectToTarget()) return;
   setMessage('ok', 'Welcome back. Your account is active and your access tier has been confirmed.');
 }
@@ -964,25 +984,29 @@ async function signUp() {
   }
   setButtonsDisabled(true);
   setMessage('', 'Creating account...');
-  if (isFileProtocol()) {
-    const data = await withTimeout(
-      supabaseHttp('/auth/v1/signup', {
-        method: 'POST',
-        body: { email, password }
-      }),
-      15000,
-      'Account creation request'
-    );
-    state.session = data.session ? { user: data.user, access_token: data.session.access_token } : null;
-  } else {
-    const { error } = await withTimeout(
-      supabase.auth.signUp({ email, password }),
-      15000,
-      'Account creation request'
-    );
-    if (error) throw error;
-  }
-  if (isFileProtocol() && state.session?.user?.id) {
+  const data = await withTimeout(
+    supabaseHttp('/auth/v1/signup', {
+      method: 'POST',
+      body: { email, password }
+    }),
+    15000,
+    'Account creation request'
+  );
+  state.session = data.session
+    ? {
+        user: data.user,
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token || ''
+      }
+    : null;
+
+  if (state.session?.user?.id) {
+    if (!isFileProtocol()) {
+      await hydrateHostedSessionFromAuthResponse({
+        access_token: state.session.access_token,
+        refresh_token: state.session.refresh_token
+      });
+    }
     state.mode = 'authenticated';
     state.profile = await loadProfile(state.session.user.id);
     state.tier = state.profile?.subscription_tier || 'free';
