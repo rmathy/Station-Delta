@@ -425,34 +425,17 @@ input[type=text]:focus{border-color:var(--green)}
 .checkpoint-next{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.7}
 .checkpoint-next b{color:var(--blue)}
 
-@media (max-width:820px){
-  #shell{grid-template-columns:1fr}
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 28px 1fr 220px}
+  #shell.right-collapsed{grid-template-rows:48px 28px 28px 1fr 52px}
+  #right{border-top:1px solid var(--border);min-height:180px;max-height:36vh;overflow-y:auto}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px;overflow:hidden}
+  #lola-sec,#crew-sec,#telem-sec{display:none}
+  #lola-strip-ctrls .strip-btn{min-height:32px;min-width:44px}
+  #output{font-size:12px;padding:10px 12px}
+  #input-row{height:56px;padding:0 12px calc(6px + env(safe-area-inset-bottom,0px))}
+  #cmd{font-size:16px}
   #topbar{padding:0 10px;gap:8px}
-  #logo{font-size:10px;letter-spacing:.08em}
-  #logo-sub{font-size:7px;letter-spacing:.14em}
-  #cadet-tag{display:none}
-  #phase-track{justify-content:flex-start;overflow:hidden}
-  #tb-right .tbbtn:not(#mobile-tools-btn):not(#mobile-strip-toggle-btn),
-  #tb-right #sandbox-pill,
-  #tb-right #hardmode-pill,
-  #tb-right #career-impact-btn{display:none!important}
-  #mobile-tools-btn,#mobile-strip-toggle-btn{display:inline-flex;align-items:center;justify-content:center}
-  #lola-strip{padding:0 10px}
-  #term-panel{border-right:none}
-  #action-rail{padding:8px 10px}
-  #right{position:fixed;top:76px;right:0;bottom:0;width:min(88vw,360px);border-left:1px solid var(--border);box-shadow:-18px 0 40px rgba(0,0,0,.35);z-index:2500;transform:translateX(0);transition:transform .22s ease,opacity .22s ease}
-  #shell.right-collapsed #right{transform:translateX(100%);opacity:0;pointer-events:none}
-  #right-header{display:flex}
-  #mobile-ctx-section{display:block}
-  #obj-card{padding:10px 12px}
-  #crew-sec{max-height:none}
-  #playbook-sec{max-height:180px}
-  #telem-sec{height:88px}
-  #input-row{padding:0 10px}
-  .mbox{padding:18px 16px}
-  .path-cards{grid-template-columns:1fr;gap:10px}
-  .path-card{text-align:left;display:flex;align-items:flex-start;gap:10px}
-  .path-icon{margin-bottom:0;flex-shrink:0}
 }
 </style>
 </head>
@@ -474,13 +457,17 @@ input[type=text]:focus{border-color:var(--green)}
     </div>
   </div>
 
-  <div id="lola-strip" class="strip-static">
+  <div id="lola-strip">
     <div id="lola-strip-avatar">L</div>
     <div id="lola-strip-scroll">
-      <div id="lola-strip-inner"></div>
+      <div id="lola-strip-inner" class="no-scroll">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Every dollar your AI stack spends is traceable. This sim teaches you to find it, attribute it, and control it.</span>
+      </div>
     </div>
-    <button class="strip-btn" id="strip-pause-btn" aria-label="Pause scrolling guidance" aria-pressed="false" onclick="toggleStripPause()">pause</button>
-    <button class="strip-btn" id="strip-focus-btn" aria-label="Show or hide the mission support panel" aria-pressed="false" onclick="toggleRightPanel()">focus</button>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+      <button class="strip-btn" aria-label="Expand side panels" onclick="toggleRightPanel()">Focus</button>
+    </div>
   </div>
 
   <div id="term-panel">
@@ -512,7 +499,7 @@ input[type=text]:focus{border-color:var(--green)}
     </div>
     <div id="input-row">
       <div id="prompt-pre">finops@stationdelta:~$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="send" aria-label="Terminal command input">
     </div>
   </div>
 
@@ -874,7 +861,7 @@ const PHASES = [
   null,
   /* Phase 1: Cost Visibility Foundations */
   {title:'Cost Visibility Foundations',
-   lolaIntro:"See exactly what you’re spending in the terminal.",
+   lolaIntro:"Most AI teams have no idea what they’re actually spending. They have a cloud bill and a vague feeling of dread. This phase changes that. You’re going to pull real billing data, tag every call to its source, and set up anomaly detection so the next surprise hits an alert before it hits finance. Visibility is not optional — it’s the first day of any FinOps operation.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
     {id:'p1s1',obj:'Pull raw billing data',ctx:'The bill is a mystery. Make it visible.',
@@ -916,7 +903,7 @@ const PHASES = [
 
   /* Phase 2: Token Economics */
   {title:'Token Economics',
-   lolaIntro:"Break down what a single token actually costs across models.",
+   lolaIntro:"Most engineers think about AI cost in terms of API calls. That's wrong. The real unit is tokens — and the price varies dramatically by model, by direction, and by context window. A prompt that costs $0.018 could cost $0.006 after optimization. At a million calls a month, that gap is $12,000. This phase is about understanding the economics before you start making decisions based on them.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
     {id:'p2s1',obj:'Show model pricing table',ctx:'Understand what you are actually paying per token.',
@@ -957,7 +944,7 @@ const PHASES = [
 
   /* Phase 3: Feature-Level Attribution */
   {title:'Feature-Level Attribution',
-   lolaIntro:"Tie AI spend directly to specific product features.",
+   lolaIntro:"A total spend number is almost useless for making decisions. You need to know which feature is causing the burn. Attribution turns one large undifferentiated bill into a ranked list of features with their cost, their revenue contribution, and a clear signal on what to do next. By the end of this phase you'll be able to tell leadership exactly which feature is the problem — and prove it.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
     {id:'p3s1',obj:'Allocate costs by feature tag',ctx:'See which product feature is driving spend.',
@@ -998,7 +985,7 @@ const PHASES = [
 
   /* Phase 4: Revenue Linkage */
   {title:'Revenue Linkage',
-   lolaIntro:"Pull income data and calculate true ROI per AI feature.",
+   lolaIntro:"Cost data alone tells you what you're spending. Revenue data tells you whether it's worth it. Most companies skip the link between the two and then wonder why their AI budget feels out of control. This phase closes that gap. You're going to join billing data to revenue data, calculate real ROI per feature, and find out which ones are profitable and which ones are quietly subsidized by the ones that are.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
     {id:'p4s1',obj:'Link AI cost to revenue data',ctx:'See which features actually make money.',
@@ -1039,7 +1026,7 @@ const PHASES = [
 
   /* Phase 5: Break-Even & Payback Analysis */
   {title:'Break-Even & Payback Analysis',
-   lolaIntro:"Answer “When does this AI feature pay for itself?”",
+   lolaIntro:”Every AI feature has a break-even point — the number of users, or the days of revenue, it needs before the cost is covered. Most teams build features without ever calculating this number. That's fine until leadership asks. This phase gives you the math, the framing, and the sensitivity analysis to answer the CFO's version of that question before she asks it. And she will ask it.”,
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Calculate break-even point',ctx:'How many users does this feature need?',
@@ -1080,7 +1067,7 @@ const PHASES = [
 
   /* Phase 6: Optimization vs. Elimination */
   {title:'Optimization vs. Elimination',
-   lolaIntro:"Decide whether to optimize or kill a feature based on profitability.",
+   lolaIntro:"This is the phase that separates FinOps engineers from cost-cutters. Killing a feature is easy. Knowing when optimization still has runway — versus when you're throwing good money after bad — is the real skill. You're going to work through the full decision: caching, model downgrade, prompt compression, and then the kill switch when none of it is enough. The goal is always the right decision, not the cheapest one.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
     {id:'p6s1',obj:'Run optimization recommendations',ctx:'See what can be improved before killing.',
@@ -1112,7 +1099,7 @@ const PHASES = [
 
   /* Phase 7: Forecasting & Budget Guardrails */
   {title:'Forecasting & Budget Guardrails',
-   lolaIntro:"Predict next month’s bill and set automated alerts.",
+   lolaIntro:"Reactive FinOps is damage control. Proactive FinOps is a forecast, a guardrail, and a plan that runs without you. This phase is about getting ahead of the bill — modeling next month before it happens, setting automated alerts that fire before finance notices, and building scenario models so you have answers ready for both the growth case and the downside case. By the end of this you stop being surprised.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
     {id:'p7s1',obj:'Run a spend forecast',ctx:'Know what next month’s bill will look like.',
@@ -1153,7 +1140,7 @@ const PHASES = [
 
   /* Phase 8: Executive Reporting */
   {title:'Executive Reporting',
-   lolaIntro:"Turn raw data into clear business recommendations.",
+   lolaIntro:"You have all the data. Now the hard part: turning it into something a CFO or program director will read in 90 seconds and act on. Executive FinOps reporting is not about showing your work — it's about landing a clear keep, optimize, or kill recommendation with the number that justifies it. This phase is about that translation. The audience is busy, skeptical, and not interested in methodology. Give them the answer.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
     {id:'p8s1',obj:'Generate a one-page executive report',ctx:'Leadership needs clear, actionable insights.',
@@ -1194,7 +1181,7 @@ const PHASES = [
 
   /* Phase 9: The Margin Collapse (Boss Fight) */
   {title:'The Margin Collapse',
-   lolaIntro:"The company’s AI spend has exploded while revenue stayed flat. Leadership (via J.A.N.E.T.) demands answers in 10 minutes. You must audit every feature, calculate real ROI, recommend which AI systems to keep/optimize/kill, and present the recovery plan.",
+   lolaIntro:"The spend has spiked 8× in 72 hours. Revenue is flat. Finance has noticed. Leadership wants an answer in the next ten minutes and J.A.N.E.T. is already composing the incident report. Everything from the previous eight phases was preparation for this moment: emergency containment first, then feature attribution, then ROI, then a recovery plan with real numbers. L.O.L.A. is going offline now. You know what to do.",
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
     {id:'p9s1',obj:'Pause non-critical traffic and audit spend',ctx:'The margin is collapsing. Stop the bleeding.',
