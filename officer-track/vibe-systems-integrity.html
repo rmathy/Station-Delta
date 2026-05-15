@@ -1801,6 +1801,34 @@ function janetIntro(){return JANET_INTROS[Math.floor(Math.random()*JANET_INTROS.
 function janetCorrect(){return JANET_CORRECT[Math.floor(Math.random()*JANET_CORRECT.length)]}
 function janetWrong(){return JANET_WRONG[Math.floor(Math.random()*JANET_WRONG.length)]}
 
+/* ── EASTER EGG HANDLERS ── */
+function handleKillLolaEasterSI(){
+  appendLine('L.O.L.A.: Attempting to terminate a safety observer is exactly the class of anomalous behavior I was designed to detect. The irony is noted.','ln-lola');
+  appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM first, SIGKILL only as a last resort. The integrity log records all of this.','ln-lola');
+  trackEaster('kill_lola');
+}
+function showJanetKillInterventionSI(){
+  const uid='kill-janet-si-'+Date.now();
+  const opts=[
+    'The kill command sends a POSIX signal to a process by PID — it does not directly delete the process.',
+    'Graceful signals (SIGTERM) should always precede force-kill (SIGKILL) in any responsible runbook.',
+    'Terminating an integrity monitor during training is a textbook example of a rogue process action.'
+  ];
+  const w=document.createElement('div');w.className='janet-arrival';w.id=uid;
+  w.innerHTML=`<div class="janet-scan"></div><div class="janet-header"><div class="janet-logo">J<span>.</span>A<span>.</span>N<span>.</span>E<span>.</span>T<span>.</span></div><div class="janet-status">INTEGRITY BREACH ATTEMPT LOGGED</div></div><div class="janet-intro">You have attempted to terminate me during an integrity training session.<br><br>I have converted this into a brief assessment. All responses are recorded.<br><br><em>You may continue after answering.</em></div><div class="janet-q"><div class="janet-q-label">Assessment Question</div>Which statement about process signals would you prefer I note in your file?</div><div class="janet-opts">${opts.map((o,i)=>`<button class="janet-opt" onclick="answerKillInterventionSI(this,'${uid}')">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>`;
+  $out.appendChild(w);$out.scrollTop=$out.scrollHeight;
+}
+function answerKillInterventionSI(btn,uid){
+  const wrap=document.getElementById(uid);if(!wrap)return;
+  wrap.querySelectorAll('.janet-opt').forEach(o=>{o.disabled=true;o.classList.add('correct');});
+  if(btn)btn.classList.add('correct');
+  const fb=document.createElement('div');
+  fb.className='janet-fb show correct-fb';
+  fb.textContent='J.A.N.E.T.: All responses are acceptable. I have noted in your file a mild tendency toward antisocial process management. The fact that this occurred during integrity training has also been logged. You may continue.';
+  wrap.querySelector('.janet-opts').after(fb);
+  trackEaster('kill_j_a_n_e_t');
+}
+
 /* ── EASTER EGGS ── */
 const EASTER = {
   'janet':{handle(){
@@ -1823,6 +1851,10 @@ const EASTER = {
   'date':{handle(){appendLine(new Date().toUTCString()+' — Fleet Standard Time','ln-info');return true}},
   'clear':{handle(){document.getElementById('output').innerHTML='';return true}},
   'hostname':{handle(){appendLine('station-delta-integrity-ops.local','ln-info');return true}},
+  'kill lola':{handle(){handleKillLolaEasterSI();return true;}},
+  'kill -9 lola':{handle(){handleKillLolaEasterSI();return true;}},
+  'kill janet':{handle(){showJanetKillInterventionSI();return true;}},
+  'kill -9 janet':{handle(){showJanetKillInterventionSI();return true;}},
 };
 
 /* ── COMMAND META (for unlocked cmd pills) ── */

@@ -740,7 +740,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       </div>
     </div>
     <div id="lola-strip-ctrls">
-      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" onclick="toggleStripPause()">Pause</button>
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
     </div>
   </div>
 
@@ -773,7 +773,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
       <div id="output" role="log" aria-live="polite" aria-atomic="false" onclick="focusCmd(event)"></div>
       <div id="input-row">
         <span id="prompt-pre">lt@stationdelta:~$&nbsp;</span>
-        <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…">
+        <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command…" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
         <span id="input-hint"></span>
       </div>
     </div>
