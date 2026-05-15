@@ -1348,6 +1348,8 @@ function setLola(msg){
 }
 function updateLolaStrip(msg){
   const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
+  if(inner.dataset.lastMsg===msg)return;
+  inner.dataset.lastMsg=msg;
   const wrap=document.createElement('span');wrap.className='lola-strip-msg';
   const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
   wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
@@ -1359,7 +1361,8 @@ function toggleStripPause(){
   btn.setAttribute('aria-pressed',String(!paused));
 }
 function toggleRightPanel(){
-  const shell=document.getElementById('shell');shell.classList.toggle('right-collapsed');
+  const shell=document.getElementById('shell');if(!shell)return;
+  shell.classList.toggle('right-collapsed');
   const btn=document.getElementById('right-collapse-btn');if(!btn)return;
   const collapsed=shell.classList.contains('right-collapsed');
   btn.setAttribute('aria-pressed',String(collapsed));
@@ -1368,9 +1371,9 @@ function toggleRightPanel(){
 function showPhaseCheckpoint(completedIdx){
   const ph=PHASES[completedIdx];
   const nextPh=PHASES[completedIdx+1];
-  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIdx} complete`;
-  document.getElementById('phase-modal-title').textContent=ph?`${ph.title} complete`:'Course complete';
-  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
+  const kicker=document.getElementById('phase-modal-kicker');if(kicker)kicker.textContent=`Phase ${completedIdx} complete`;
+  const ptitle=document.getElementById('phase-modal-title');if(ptitle)ptitle.textContent=ph?`${ph.title} complete`:'Course complete';
+  const pcopy=document.getElementById('phase-modal-copy');if(pcopy)pcopy.textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
   const nextEl=document.getElementById('phase-modal-next');
   if(nextEl)nextEl.innerHTML=nextPh?`Next up: <b>${nextPh.title}</b>`:'Prepare for the final assessment.';
   openModal('phase-modal');
