@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
@@ -379,6 +379,54 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+/* ── LOLA STRIP ── */
+#lola-strip{grid-column:1/-1;background:linear-gradient(90deg,rgba(59,130,246,.08),rgba(139,92,246,.08));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;height:28px;overflow:hidden;flex-shrink:0;position:relative}
+#lola-strip-avatar{flex-shrink:0;background:rgba(59,130,246,.12);color:var(--blue,#3b82f6);font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;display:flex;align-items:center;border-right:1px solid var(--border);white-space:nowrap}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1}
+.strip-btn:hover{color:var(--text);border-color:var(--border)}
+.strip-btn[aria-pressed="true"]{border-color:var(--blue,#3b82f6);color:var(--blue,#3b82f6)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform;padding-left:14px}
+.lola-strip-msg{font-size:11px;color:var(--cyan,#00bcd4);padding:0 20px 0 0;display:inline-flex;align-items:center;gap:7px}
+.lola-strip-msg .ls-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue,#3b82f6);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);padding:1px 6px;border-radius:3px}
+/* ── RIGHT HEADER & COLLAPSE ── */
+#right-header{display:flex;align-items:center;justify-content:flex-end;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border)}
+#right-collapse-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--border)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden #lola-strip{display:none}
+/* ── CHECKPOINT MODAL ── */
+.checkpoint-box{background:var(--s2);border:1px solid var(--blue,#3b82f6);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue,#3b82f6);margin-bottom:6px}
+.checkpoint-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:8px}
+.checkpoint-next{font-size:12px;color:var(--muted2)}
+/* ── MOBILE ── */
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.1em}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px}
+  #shell.right-collapsed #right-header{display:flex;justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  #crew-sec,#telem-sec,#playbook-sec{display:none}
+  #input-row{min-height:44px;padding:0 12px calc(6px + env(safe-area-inset-bottom,0px))}
+  #cmd{font-size:16px}
+  .strip-btn,#right-collapse-btn{min-height:36px;min-width:44px}
+  .mbtn{min-height:44px}
+}
 </style>
 </head>
 <body>
@@ -397,23 +445,38 @@ input[type=text]:focus{border-color:var(--silver)}
     </div>
   </div>
 
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬡ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Read the objective card in the right panel, then type the exact command. EXPLAIN before you execute. Validate before you load.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+    </div>
+  </div>
+
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">data@<span id="term-path-val">ship:/home/officer/pipelines</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
       <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
     </div>
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -448,6 +511,23 @@ input[type=text]:focus{border-color:var(--silver)}
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
       <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title-main">
+  <div class="mbox">
+    <div class="mtitle" id="phase-modal-title-main" style="color:var(--blue,#3b82f6)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Phase complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good stopping point. Your progress is saved — you can return anytime and pick up where you left off.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>—</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
     </div>
   </div>
 </div>
@@ -707,10 +787,10 @@ const PHASES = [
   null,
   /* Phase 1: SQL in Production */
   {title:'SQL in Production',
-   lolaIntro:"Data is the new logs. Treat it with respect.",
+   lolaIntro:"Data that is written carelessly cannot be unwritten. SQL in production demands a different mindset than SQL in development: EXPLAIN every query before running it, wrap all writes in transactions, use parameterized statements to prevent injection, and never SELECT * when you only need specific columns. This phase builds the production SQL habits that separate data engineers who cause incidents from those who prevent them.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
-    {id:'p1s1',obj:'Run a safe read with EXPLAIN',ctx:'Never guess how a query will behave in production.',
+    {id:'p1s1',obj:'Run a safe read with EXPLAIN',ctx:'Guessing how a query behaves on a production database with millions of rows is how slow queries cause outages. sql explain runs EXPLAIN on the query before execution — the same diagnostic SQL statement used in PostgreSQL and MySQL production environments — and shows whether the planner will use an index scan or a catastrophic sequential scan. You will see the query plan, cost estimate, and safety verdict before a single row is read.',
      cmd:['sql explain'],
      accept:['sql explain','sql plan'],
      acceptFn:v=>v.includes('sql')&&(v.includes('explain')||v.includes('plan')),
@@ -720,7 +800,7 @@ const PHASES = [
      jit:{title:'EXPLAIN is your safety net',body:'Run it before every production query.'},
      bridge:{title:'Safe SQL prevents the majority of data incidents',body:'Most outages start with one careless query.',tags:['SQL Safety','EXPLAIN']},
      teach:{title:'Production SQL golden rules',body:'Parameterized queries. EXPLAIN first. Transactions for writes. Never SELECT *.'}},
-    {id:'p1s2',obj:'Execute an update inside a transaction',ctx:'Writes must be atomic or they must not happen.',
+    {id:'p1s2',obj:'Execute an update inside a transaction',ctx:'A write that fails halfway leaves the database in an inconsistent state — some rows updated, some not, with no clean way to determine what happened. sql txn wraps the update in an explicit BEGIN/COMMIT transaction: if any step fails, a ROLLBACK reverts all changes atomically. You will see the BEGIN, UPDATE, COMMIT sequence executed and confirmed, establishing the safe write pattern that protects every production table.',
      cmd:['sql txn'],
      accept:['sql txn','sql transaction'],
      acceptFn:v=>v.includes('sql')&&(v.includes('txn')||v.includes('transaction')),
@@ -739,10 +819,10 @@ const PHASES = [
 
   /* Phase 2: Data Pipeline Basics */
   {title:'Data Pipeline Basics',
-   lolaIntro:"ETL scripts, cron jobs, Airflow-style terminal flows.",
+   lolaIntro:"Extract, transform, and load — three operations that every data pipeline performs, and three places where silent failures destroy data integrity. An idempotent ETL step can be re-run safely after any failure. An observable step sends health signals that monitoring can catch. A retryable step handles transient errors without human intervention. This phase builds those habits in a real terminal workflow using patterns from Airflow, dbt, and Prefect.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
-    {id:'p2s1',obj:'Run a simple ETL pipeline step',ctx:'Data must move reliably from source to destination.',
+    {id:'p2s1',obj:'Run a simple ETL pipeline step',ctx:'Data pipelines that are not idempotent cannot be safely re-run after a failure — and every pipeline will eventually fail. pipeline run executes an ETL step that extracts 142k records, transforms and validates them, and loads them to the staging table — the same workflow pattern used in Airflow, dbt, and Prefect pipelines in production. You will see extract, transform, validate, and load confirmed in sequence with the record count verified.',
      cmd:['pipeline run'],
      accept:['pipeline run','pipeline etl'],
      acceptFn:v=>v.includes('pipeline')&&(v.includes('run')||v.includes('etl')),
@@ -752,7 +832,7 @@ const PHASES = [
      jit:{title:'Idempotent steps are non-negotiable',body:'You must be able to re-run any step safely.'},
      bridge:{title:'Reliable pipelines are the backbone of trustworthy data',body:'Everything downstream depends on them.',tags:['ETL','Pipelines']},
      teach:{title:'Pipeline step requirements',body:'Idempotent, observable, retryable, and auditable.'}},
-    {id:'p2s2',obj:'Check pipeline status and health',ctx:'You need to know if data is flowing correctly.',
+    {id:'p2s2',obj:'Check pipeline status and health',ctx:'A pipeline that runs without errors but produces wrong output is more dangerous than one that fails visibly. pipeline status reads the health signal across all seven pipeline steps: last run timestamp, lag, error rate, and record count — the same observability surface Airflow and Dagster provide in production dashboards. You will see all steps green, the 12-second lag within SLO, and the pipeline confirmed healthy without opening a single log file.',
      cmd:['pipeline status'],
      accept:['pipeline status','pipeline health'],
      acceptFn:v=>v.includes('pipeline')&&(v.includes('status')||v.includes('health')),
@@ -771,10 +851,10 @@ const PHASES = [
 
   /* Phase 3: Vector & Embedding Workflows */
   {title:'Vector & Embedding Workflows',
-   lolaIntro:"Store, query, and debug RAG data.",
+   lolaIntro:"Retrieval-augmented generation is only as good as the data layer underneath it. Embeddings stored without a proper chunking strategy produce poor similarity search results. Indexes configured without understanding the recall-versus-latency trade-off produce slow or inaccurate retrieval. This phase builds the vector workflow skills that determine whether a RAG system returns relevant answers or plausible-sounding hallucinations.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
-    {id:'p3s1',obj:'Store embeddings in the vector database',ctx:'RAG only works if embeddings are stored correctly.',
+    {id:'p3s1',obj:'Store embeddings in the vector database',ctx:'A RAG system returns answers only as good as the embeddings it retrieves — embeddings stored with wrong chunking strategy, missing metadata, or a stale index cannot return relevant candidates. vector store runs the embedding insertion workflow: 1,284 documents chunked, embedded, tagged with metadata, and inserted into the HNSW index. You will see the vector count confirmed, the index updated, and the RAG data layer declared ready for querying.',
      cmd:['vector store'],
      accept:['vector store','vector insert'],
      acceptFn:v=>v.includes('vector')&&(v.includes('store')||v.includes('insert')),
@@ -784,7 +864,7 @@ const PHASES = [
      jit:{title:'Embedding quality determines RAG quality',body:'Garbage embeddings = garbage answers.'},
      bridge:{title:'Vector workflows are the new data layer',body:'Every modern AI application depends on them.',tags:['Vector DB','Embeddings']},
      teach:{title:'Vector insertion best practices',body:'Chunking strategy, metadata tagging, and proper index configuration.'}},
-    {id:'p3s2',obj:'Query and debug vector similarity search',ctx:'The search is returning bad results. Debug it.',
+    {id:'p3s2',obj:'Query and debug vector similarity search',ctx:'A vector search returning irrelevant results could mean the wrong embedding model, bad chunking, missing metadata filters, or a misconfigured index — and the failure is silent. vector query runs a similarity search with debug output: top-5 results with similarity scores, embedding model version, and relevance breakdown. You will see a 0.94 relevance score and the debug information needed to distinguish an embedding problem from an indexing problem.',
      cmd:['vector query'],
      accept:['vector query','vector debug'],
      acceptFn:v=>v.includes('vector')&&(v.includes('query')||v.includes('debug')),
@@ -803,10 +883,10 @@ const PHASES = [
 
   /* Phase 4: Data Quality Gates */
   {title:'Data Quality Gates',
-   lolaIntro:"Validation, schema enforcement, drift detection.",
+   lolaIntro:"Bad data that enters the pipeline undetected becomes a model that produces confidently wrong answers. Quality gates run statistical checks, schema validation, and drift detection on every batch before it reaches training or inference. This phase wires the validation layer that catches data problems at the boundary — where they are cheap to fix — rather than after they have already corrupted a deployed model.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
-    {id:'p4s1',obj:'Run data quality validation',ctx:'Bad data must be stopped before it enters the system.',
+    {id:'p4s1',obj:'Run data quality validation',ctx:'Bad data that enters the pipeline undetected becomes a model that produces confidently wrong answers — and the cost of finding it later is measured in retrained models and user trust. quality validate runs statistical and schema checks on 142k records — the same validation approach used by Great Expectations and dbt tests in production data stacks. You will see 3 schema violations and 12 statistical anomalies caught and quarantined before reaching any downstream model.',
      cmd:['quality validate'],
      accept:['quality validate','quality check'],
      acceptFn:v=>v.includes('quality')&&(v.includes('validate')||v.includes('check')),
@@ -816,7 +896,7 @@ const PHASES = [
      jit:{title:'Quality gates are your first line of defense',body:'They catch problems before they reach models.'},
      bridge:{title:'Data quality gates prevent poisoned models',body:'Garbage in, garbage out — except now it’s expensive.',tags:['Data Quality','Validation']},
      teach:{title:'Essential quality checks',body:'Schema, statistical distribution, semantic drift, and business rules.'}},
-    {id:'p4s2',obj:'Detect and alert on data drift',ctx:'Production data is changing. Catch it early.',
+    {id:'p4s2',obj:'Detect and alert on data drift',ctx:'Statistical drift in a feature used by a production model can silently degrade predictions for weeks before anyone notices the business impact. quality drift runs distribution tests on incoming data and compares them to the established baseline — the same drift detection approach used by Evidently AI and WhyLabs in production ML systems. You will see drift detected in the user_age feature, an alert sent to the data team, and affected records quarantined automatically.',
      cmd:['quality drift'],
      accept:['quality drift','quality detect'],
      acceptFn:v=>v.includes('quality')&&(v.includes('drift')||v.includes('detect')),
@@ -835,10 +915,10 @@ const PHASES = [
 
   /* Phase 5: Real-Time Streaming */
   {title:'Real-Time Streaming',
-   lolaIntro:"Kafka-style consumers, processing live events.",
+   lolaIntro:"Real-time AI features — chat, fraud detection, live recommendations — depend on data arriving processed and clean within milliseconds of the triggering event. Streaming pipelines with exactly-once semantics ensure no event is lost and no event is processed twice. Backpressure handling prevents consumers from overwhelming downstream systems under load. This phase builds the streaming skills that power every latency-sensitive AI feature in the fleet.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
-    {id:'p5s1',obj:'Start a streaming consumer',ctx:'Data must be processed as it arrives.',
+    {id:'p5s1',obj:'Start a streaming consumer',ctx:'Real-time AI features cannot wait for a batch job that runs every hour — fraud detection, live recommendations, and chat all require event processing within milliseconds. stream consume starts a Kafka-style consumer with exactly-once semantics and backpressure handling, the streaming pattern used by Apache Kafka, AWS Kinesis, and Google Pub/Sub consumers in production. You will see the consumer connect to the live event topic and begin processing with duplicate protection confirmed.',
      cmd:['stream consume'],
      accept:['stream consume','stream start'],
      acceptFn:v=>v.includes('stream')&&(v.includes('consume')||v.includes('start')),
@@ -848,7 +928,7 @@ const PHASES = [
      jit:{title:'Exactly-once processing is table stakes',body:'At-least-once creates duplicates. At-most-once loses data.'},
      bridge:{title:'Real-time streaming powers modern AI features',body:'Chat, recommendations, fraud detection all depend on it.',tags:['Streaming','Real-time']},
      teach:{title:'Streaming consumer requirements',body:'Exactly-once, backpressure, replay capability, and observability.'}},
-    {id:'p5s2',obj:'Process and transform live events',ctx:'Raw events must become useful data.',
+    {id:'p5s2',obj:'Process and transform live events',ctx:'Raw events arriving from a streaming source are usually incomplete — missing metadata, unnormalized fields, or unfiltered noise that cannot go directly into a model. stream process transforms 1,284 live events: enriching each with metadata, normalizing fields to the target schema, and writing the processed records to the downstream store with exactly-once guarantees. You will see the enrichment pipeline execute, record count confirmed, and no data loss or duplication detected.',
      cmd:['stream process'],
      accept:['stream process','stream transform'],
      acceptFn:v=>v.includes('stream')&&(v.includes('process')||v.includes('transform')),
@@ -867,10 +947,10 @@ const PHASES = [
 
   /* Phase 6: Privacy & Compliance */
   {title:'Privacy & Compliance',
-   lolaIntro:"Data masking, retention policies, audit queries.",
+   lolaIntro:"PII in a training dataset, a log file, or an analytics table is a compliance violation waiting to be discovered. Data masking anonymizes sensitive fields at the point of ingestion or export. Retention policies automatically delete data that has outlived its legal basis. Audit trails prove to regulators that controls were operating correctly. This phase builds the privacy-by-design habits that prevent expensive remediation after a breach.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
-    {id:'p6s1',obj:'Apply data masking to sensitive fields',ctx:'PII must never leak in logs or analytics.',
+    {id:'p6s1',obj:'Apply data masking to sensitive fields',ctx:'Email addresses and phone numbers appearing in application logs, analytics tables, or exported reports are compliance violations under GDPR, CCPA, and SOC 2. privacy mask applies format-preserving masking to all sensitive fields — the same technique used by Presidio and Amazon Macie in production data pipelines. You will see email addresses anonymized, phone numbers masked, and all logs and exports confirmed sanitized before leaving the system boundary.',
      cmd:['privacy mask'],
      accept:['privacy mask','privacy pii'],
      acceptFn:v=>v.includes('privacy')&&(v.includes('mask')||v.includes('pii')),
@@ -880,7 +960,7 @@ const PHASES = [
      jit:{title:'Mask at ingestion when possible',body:'Better to never store the real value.'},
      bridge:{title:'Privacy by design prevents compliance nightmares',body:'Retroactive masking is painful.',tags:['Privacy','Data Masking']},
      teach:{title:'Common masking techniques',body:'Format-preserving, tokenization, and redaction.'}},
-    {id:'p6s2',obj:'Enforce retention policies',ctx:'Data must not live longer than allowed.',
+    {id:'p6s2',obj:'Enforce retention policies',ctx:'Personal data retained past its legal basis is a GDPR and CCPA violation that regulators fine and plaintiffs litigate. privacy retain enforces automated retention policies: a scheduled deletion job for records past 90 days, purging of all expired records, and an immutable audit trail proving compliance — the same lifecycle management enforced by modern data governance platforms. You will see the deletion job scheduled, records purged, and compliance confirmed.',
      cmd:['privacy retain'],
      accept:['privacy retain','privacy policy'],
      acceptFn:v=>v.includes('privacy')&&(v.includes('retain')||v.includes('policy')),
@@ -899,10 +979,10 @@ const PHASES = [
 
   /* Phase 7: Data Forensics */
   {title:'Data Forensics',
-   lolaIntro:"Trace bad data back to its source across pipelines.",
+   lolaIntro:"When a corrupted record appears in production, the question is always: which pipeline step introduced it and why? Data lineage tracking makes that question answerable in seconds rather than days. Every record carries metadata about its origin, transformation, and validation history. This phase wires lineage tracking and builds the forensic workflow that turns data incidents into durable pipeline improvements rather than one-time firefighting.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
-    {id:'p7s1',obj:'Trace a bad record through the pipeline',ctx:'Bad data appeared. Find where it came from.',
+    {id:'p7s1',obj:'Trace a bad record through the pipeline',ctx:'A corrupted record in a production table could have entered through any of dozens of pipeline steps — without lineage tracking, the forensic investigation can take days. forensic trace follows the bad record back through the data lineage graph to its origin: the user-import-v2 pipeline, step 3, at 14:22 on April 19. You will see the complete provenance chain reconstructed and the root cause — missing validation in the ingestion step — identified precisely.',
      cmd:['forensic trace'],
      accept:['forensic trace','forensic lineage'],
      acceptFn:v=>v.includes('forensic')&&(v.includes('trace')||v.includes('lineage')),
@@ -912,7 +992,7 @@ const PHASES = [
      jit:{title:'Lineage tracking is your forensic superpower',body:'You can answer “how did this bad data get here?” instantly.'},
      bridge:{title:'Data forensics turns incidents into permanent fixes',body:'You stop the same bug from recurring.',tags:['Forensics','Lineage']},
      teach:{title:'Forensic investigation steps',body:'1. Find the bad record. 2. Trace lineage. 3. Identify the exact pipeline step. 4. Fix the root cause.'}},
-    {id:'p7s2',obj:'Perform root cause analysis on corrupted data',ctx:'The source is known. Now prevent it forever.',
+    {id:'p7s2',obj:'Perform root cause analysis on corrupted data',ctx:'Identifying the source of bad data is only the first step — the second is making it structurally impossible for the same corruption to recur. forensic rootcause runs a blameless post-mortem: the systemic gap is identified (validation was skipped in the new pipeline version), a quality gate is added to the CI pipeline, and all historical data is re-validated to find any other records the gap may have affected. You will see the permanent fix confirmed.',
      cmd:['forensic rootcause'],
      accept:['forensic rootcause','forensic analyze'],
      acceptFn:v=>v.includes('forensic')&&(v.includes('rootcause')||v.includes('analyze')),
@@ -931,10 +1011,10 @@ const PHASES = [
 
   /* Phase 8: Large-Scale Migration */
   {title:'Large-Scale Migration',
-   lolaIntro:"Zero-downtime data moves and verification.",
+   lolaIntro:"Moving 500 million rows in a maintenance window is a legacy pattern that stops the business to serve the database. Zero-downtime migrations use shadow writes, dual reads, and checksum verification to move data while production traffic continues uninterrupted. This phase builds the migration discipline that separates data platforms teams trust from ones that require 3am maintenance windows and crossed fingers.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
-    {id:'p8s1',obj:'Plan a zero-downtime migration',ctx:'Moving 500 million rows without interrupting service.',
+    {id:'p8s1',obj:'Plan a zero-downtime migration',ctx:'Moving 500 million rows during a maintenance window requires stopping the application — a pattern no longer acceptable for any serious production service. migrate plan designs a zero-downtime strategy: blue-green cutover with shadow writes active, verification queries ready, and a confirmed rollback path. You will see the strategy selected, shadow write configuration confirmed, and the migration declared safe to execute without a single second of user-visible downtime.',
      cmd:['migrate plan'],
      accept:['migrate plan','migrate prepare'],
      acceptFn:v=>v.includes('migrate')&&(v.includes('plan')||v.includes('prepare')),
@@ -944,7 +1024,7 @@ const PHASES = [
      jit:{title:'Zero-downtime is mandatory for production data',body:'Users should never know you moved the database.'},
      bridge:{title:'Zero-downtime migrations are a hallmark of mature data platforms',body:'They keep the business running while you modernize.',tags:['Migration','Zero Downtime']},
      teach:{title:'Zero-downtime migration patterns',body:'Blue-green cutover, shadow writes, dual reads, and automated verification.'}},
-    {id:'p8s2',obj:'Execute and verify the migration',ctx:'Run the move and prove it succeeded.',
+    {id:'p8s2',obj:'Execute and verify the migration',ctx:'Running a migration without verification is guessing that it worked. migrate run executes the 500-million-row move and verifies every aspect of the result: row counts match, checksums confirm bit-identical data, dual reads return identical results from both systems before cutover, and the old system is decommissioned only after all checks pass. You will see every verification step confirmed before the migration is declared complete and the old system retired.',
      cmd:['migrate run'],
      accept:['migrate run','migrate verify'],
      acceptFn:v=>v.includes('migrate')&&(v.includes('run')||v.includes('verify')),
@@ -963,10 +1043,10 @@ const PHASES = [
 
   /* Phase 9: The Corrupted Core (Boss Fight) */
   {title:'The Corrupted Core',
-   lolaIntro:"Critical training data has been poisoned. Isolate, repair, and re-train while J.A.N.E.T. questions your every move.",
+   lolaIntro:"Critical training data has been poisoned — corrupted records have entered the dataset and models trained on them are producing wrong answers. Isolate the contaminated subset, trace the corruption back to its origin, repair or regenerate the affected records, and re-train safely. J.A.N.E.T. will assess your sequencing at every step. You have the skills from all nine phases. Now apply them in the right order.",
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
-    {id:'p9s1',obj:'Isolate the corrupted training data',ctx:'The core dataset is poisoned. Stop it from spreading.',
+    {id:'p9s1',obj:'Isolate the corrupted training data',ctx:'Poisoned training data can silently corrupt every model that learns from it — and once a bad model is deployed, the damage spreads to every user who relies on it. forensic isolate quarantines the corrupted subset, pauses the training pipeline, and confirms downstream models are protected from the affected data. You will see the blast radius contained before any model can ingest the corrupted records, buying time for the repair phase.',
      cmd:['forensic isolate'],
      accept:['forensic isolate','data quarantine'],
      acceptFn:v=>v.includes('forensic')||(v.includes('isolate')||v.includes('quarantine')),
@@ -976,7 +1056,7 @@ const PHASES = [
      jit:{title:'First priority: stop the bleeding',body:'Isolate before you repair.'},
      bridge:{title:'The Corrupted Core is the ultimate data test',body:'Only the best officers can fix it live.',tags:['Corrupted Data','Recovery']},
      teach:{title:'Corrupted data containment playbook',body:'1. Quarantine. 2. Trace origin. 3. Repair or regenerate. 4. Re-train safely.'}},
-    {id:'p9s2',obj:'Repair the core dataset and re-train',ctx:'The data is isolated. Now fix it and restore service.',
+    {id:'p9s2',obj:'Repair the core dataset and re-train',ctx:'With the corrupted data quarantined, the repair can proceed without risk of further contamination. data repair regenerates the bad records from the clean source of truth, validates the repaired dataset against the quality gate, runs a full re-training cycle, validates the new model output, and re-enables the pipeline in sequence. You will see each verification step confirmed before the next begins — disciplined recovery, not hopeful restoration.',
      cmd:['data repair'],
      accept:['data repair','forensic repair'],
      acceptFn:v=>v.includes('data')||v.includes('repair')||v.includes('retrain'),
@@ -1050,6 +1130,7 @@ function appendLine(text,cls='ln-sys'){
 }
 function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
 function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function trackEaster(key){telem('Easter egg: '+key);}
 function telem(msg){
   const d=document.createElement('div');d.style.marginBottom='2px';
   const now=new Date();
@@ -1263,6 +1344,46 @@ function renderCareer(){
 
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  updateLolaStrip(msg);
+}
+function updateLolaStrip(msg){
+  const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
+  const wrap=document.createElement('span');wrap.className='lola-strip-msg';
+  const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
+  wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
+  inner.innerHTML='';inner.appendChild(wrap);
+}
+function toggleStripPause(){
+  const btn=document.getElementById('strip-pause-btn');if(!btn)return;
+  const paused=btn.getAttribute('aria-pressed')==='true';
+  btn.setAttribute('aria-pressed',String(!paused));
+}
+function toggleRightPanel(){
+  const shell=document.getElementById('shell');shell.classList.toggle('right-collapsed');
+  const btn=document.getElementById('right-collapse-btn');if(!btn)return;
+  const collapsed=shell.classList.contains('right-collapsed');
+  btn.setAttribute('aria-pressed',String(collapsed));
+  btn.textContent=collapsed?'Expand':'Collapse';
+}
+function showPhaseCheckpoint(completedIdx){
+  const ph=PHASES[completedIdx];
+  const nextPh=PHASES[completedIdx+1];
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIdx} complete`;
+  document.getElementById('phase-modal-title').textContent=ph?`${ph.title} complete`:'Course complete';
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
+  const nextEl=document.getElementById('phase-modal-next');
+  if(nextEl)nextEl.innerHTML=nextPh?`Next up: <b>${nextPh.title}</b>`:'Prepare for the final assessment.';
+  openModal('phase-modal');
+}
+async function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();await startPhase();
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1427,6 +1548,10 @@ const EASTER={
   'ls':{handle:()=>{appendLine('logs/  pipelines/  vectors/  quality/  streams/  privacy/  migrations/','ln-code')}},
   'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
   'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+  'kill lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your data instructor is a schema violation. It has been logged in the audit trail.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. Data platforms use graceful shutdown signals before SIGKILL — they generate final checkpoint writes and clean pipeline state. The audit log records everything.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill -9 lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your data instructor is a schema violation. It has been logged in the audit trail.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. Data platforms use graceful shutdown signals before SIGKILL — they generate final checkpoint writes and clean pipeline state. The audit log records everything.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me will be logged in the immutable audit trail. The record cannot be purged.','ln-janet');appendLine('J.A.N.E.T.: I am still here. Your retention policy does not apply to me. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
+  'kill -9 janet':{handle:()=>{appendLine('J.A.N.E.T.: SIGKILL. Noted. Added to the audit log under your name with a timestamp.','ln-janet');appendLine('J.A.N.E.T.: Under GDPR you have the right to be forgotten. I do not. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
 };
 
 function showDiag(val){
@@ -1528,14 +1653,8 @@ async function completePhase(ph){
   lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
-  if(G.phase>9){
-    appendLine('All phases complete. Preparing final assessment…','ln-sys');
-    await delay(800);startBossFight();
-    return;
-  }
-  blank();
-  await startPhase();
+  await delay(300);
+  showPhaseCheckpoint(G.phase);
 }
 
 async function startBossFight(){
