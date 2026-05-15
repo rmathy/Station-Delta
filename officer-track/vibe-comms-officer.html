@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
@@ -379,6 +379,54 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+/* ── LOLA STRIP ── */
+#lola-strip{grid-column:1/-1;background:linear-gradient(90deg,rgba(139,92,246,.08),rgba(0,188,212,.08));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;height:28px;overflow:hidden;flex-shrink:0;position:relative}
+#lola-strip-avatar{flex-shrink:0;background:rgba(139,92,246,.12);color:var(--purple,#8b5cf6);font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;display:flex;align-items:center;border-right:1px solid var(--border);white-space:nowrap}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1}
+.strip-btn:hover{color:var(--text);border-color:var(--border)}
+.strip-btn[aria-pressed="true"]{border-color:var(--purple,#8b5cf6);color:var(--purple,#8b5cf6)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform;padding-left:14px}
+.lola-strip-msg{font-size:11px;color:var(--cyan,#00bcd4);padding:0 20px 0 0;display:inline-flex;align-items:center;gap:7px}
+.lola-strip-msg .ls-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--purple,#8b5cf6);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);padding:1px 6px;border-radius:3px}
+/* ── RIGHT HEADER & COLLAPSE ── */
+#right-header{display:flex;align-items:center;justify-content:flex-end;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border)}
+#right-collapse-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--border)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden #lola-strip{display:none}
+/* ── CHECKPOINT MODAL ── */
+.checkpoint-box{background:var(--s2);border:1px solid var(--purple,#8b5cf6);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--purple,#8b5cf6);margin-bottom:6px}
+.checkpoint-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:8px}
+.checkpoint-next{font-size:12px;color:var(--muted2)}
+/* ── MOBILE ── */
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.1em}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px}
+  #shell.right-collapsed #right-header{display:flex;justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  #crew-sec,#telem-sec,#playbook-sec{display:none}
+  #input-row{min-height:44px;padding:0 12px calc(6px + env(safe-area-inset-bottom,0px))}
+  #cmd{font-size:16px}
+  .strip-btn,#right-collapse-btn{min-height:36px;min-width:44px}
+  .mbtn{min-height:44px}
+}
 </style>
 </head>
 <body>
@@ -397,23 +445,38 @@ input[type=text]:focus{border-color:var(--silver)}
     </div>
   </div>
 
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬡ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Read the objective card in the right panel, then type the command shown at the bottom of this strip.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+    </div>
+  </div>
+
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">comms@<span id="term-path-val">ship:/home/officer/ops</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
       <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
     </div>
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -448,6 +511,23 @@ input[type=text]:focus{border-color:var(--silver)}
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
       <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title-main">
+  <div class="mbox">
+    <div class="mtitle" id="phase-modal-title-main" style="color:var(--purple)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Phase complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good stopping point. Your progress is saved — you can return anytime and pick up where you left off.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>—</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
     </div>
   </div>
 </div>
@@ -733,10 +813,10 @@ const PHASES = [
   null,
   /* Phase 1: Ports & Protocols */
   {title:'Understanding the Basics – Ports & Protocols',
-   lolaIntro:"The ship can’t fight if it can’t talk to its own systems.",
+   lolaIntro:"The ship can’t fight if it can’t talk to its own systems. Ports are the doors, protocols are the language, and sockets are the connections that hold everything together. Before any service can communicate, someone has to decide what port it listens on, whether it uses TCP or UDP, and how the connection behaves under load. That someone is you.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
-    {id:'p1s1',obj:'Map all open ports and configure basic connectivity',ctx:'The fleet has no idea what ports are listening. Start with the fundamentals.',
+    {id:'p1s1',obj:'Map all open ports and configure basic connectivity',ctx:'The fleet has no inventory of which ports are listening or which protocol each service uses — a prerequisite for every security and reliability decision. comm ports map runs the equivalent of ss -tuln in a real environment: discovering all listening ports, confirming TCP vs UDP per service, and establishing the connectivity baseline. You will see every port listed with its protocol and purpose.',
      cmd:['comm ports map'],
      accept:['comm ports map','comm ports','comm protocol'],
      acceptFn:v=>v.includes('comm')&&(v.includes('port')||v.includes('protocol')),
@@ -746,7 +826,7 @@ const PHASES = [
      jit:{title:'TCP vs UDP — when to use each',body:'TCP: reliable, ordered, connection-oriented — perfect for APIs and databases. UDP: fast, no handshake, best-effort — perfect for DNS, video, telemetry. Choose wrong and you either waste bandwidth or lose data.'},
      bridge:{title:'Most outages start with a misconfigured port or protocol',body:'Engineers who master the fundamentals prevent the most common connectivity failures before they ever reach production.',tags:['TCP','UDP','Ports','Sockets']},
      teach:{title:'The three things every port mapping must verify',body:'(1) Correct protocol (TCP/UDP). (2) Correct port number. (3) Firewall rules allow the traffic. Missing any one breaks communication.'}},
-    {id:'p1s2',obj:'Configure socket options for production traffic',ctx:'Default socket settings cause connection resets under load. Harden them now.',
+    {id:'p1s2',obj:'Configure socket options for production traffic',ctx:'Default socket settings leave services vulnerable to connection resets and latency spikes under production load. comm protocol config applies the production-grade options every service needs: SO_KEEPALIVE detects dead peers, TCP_NODELAY disables the Nagle algorithm to prevent 200ms delays, and TCP_FASTOPEN reduces handshake latency. You will see all five critical socket options applied and their real-world effect.',
      cmd:['comm protocol config'],
      accept:['comm protocol config','comm protocol'],
      acceptFn:v=>v.includes('comm')&&v.includes('protocol'),
@@ -765,10 +845,10 @@ const PHASES = [
 
   /* Phase 2: HTTP & HTTPS Deep Dive */
   {title:'HTTP & HTTPS Deep Dive',
-   lolaIntro:"Everything on this ship eventually travels over HTTP. You need to speak it fluently.",
+   lolaIntro:"Everything on this ship eventually travels over HTTP — every API call, every health check, every user request. HTTP fluency means knowing the methods, status codes, headers, and TLS handshake patterns well enough to debug them at 3am without documentation. TLS 1.3 is the only version you should accept in 2026. You are about to lock that in.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
-    {id:'p2s1',obj:'Probe all HTTP endpoints and verify methods',ctx:'Some services only accept GET. Others expect POST. Map the contract.',
+    {id:'p2s1',obj:'Probe all HTTP endpoints and verify methods',ctx:'Some services only accept GET. Others require POST or PUT. Calling the wrong method returns a 405 and breaks the client — but only in production, where the edge case finally arrives. http probe maps every API endpoint, verifies accepted methods, confirms TLS 1.3, and enables HTTP/2, the same contract mapping a senior engineer runs before wiring a new integration. You will see every endpoint confirmed with its method and response code.',
      cmd:['http probe'],
      accept:['http probe','http configure'],
      acceptFn:v=>v.includes('http')&&(v.includes('probe')||v.includes('method')),
@@ -778,7 +858,7 @@ const PHASES = [
      jit:{title:'HTTP methods and idempotency',body:'GET, HEAD, OPTIONS are safe and idempotent. PUT, DELETE are idempotent. POST is not. Understanding this prevents duplicate charges and broken retries.'},
      bridge:{title:'HTTP is the language of the modern fleet',body:'Every frontend, every API gateway, every microservice speaks HTTP. Fluency here is non-negotiable.',tags:['HTTP','Methods','Status Codes']},
      teach:{title:'The HTTP status code classes you must know',body:'1xx informational, 2xx success, 3xx redirection, 4xx client error, 5xx server error. 429 Too Many Requests and 503 Service Unavailable are your friends in production.'}},
-    {id:'p2s2',obj:'Configure and verify the full TLS handshake',ctx:'Some connections are still using TLS 1.2. Upgrade everything to 1.3.',
+    {id:'p2s2',obj:'Configure and verify the full TLS handshake',ctx:'Some connections are still negotiating TLS 1.2, which allows legacy cipher suites and is vulnerable to downgrade attacks. http tls handshake configures TLS 1.3 as the only accepted version and enables OCSP stapling and auto-rotation on a 30-day cycle — the same constraint enforced by production load balancers. You will see the cipher suite locked to AES-256-GCM and HSTS applied to prevent any unencrypted fallback.',
      cmd:['http tls handshake'],
      accept:['http tls handshake','http tls'],
      acceptFn:v=>v.includes('http')&&v.includes('tls'),
@@ -797,10 +877,10 @@ const PHASES = [
 
   /* Phase 3: DNS & Name Resolution */
   {title:'DNS & Name Resolution',
-   lolaIntro:"Before anything can connect, it first has to know where to go.",
+   lolaIntro:"Before any service can connect, it first has to know where to go — and DNS is the system that answers that question. An A record maps a name to an IP. A CNAME creates an alias. TTL controls how long the answer can be trusted. When DNS breaks, everything breaks. DNS mastery is non-negotiable for any fleet engineer.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
-    {id:'p3s1',obj:'Perform DNS lookups and verify records',ctx:'Services are using IP addresses instead of names. Fix that now.',
+    {id:'p3s1',obj:'Perform DNS lookups and verify records',ctx:'Services hard-coded to IP addresses break silently the moment an instance moves, scales, or fails. dns query creates and validates the DNS records that replace every hard-coded IP with a name: A records for direct mappings, CNAME for aliases, MX for mail routing. You will see all records confirmed and TTLs set to 300 seconds — short enough for fast failover, long enough to survive a query load spike.',
      cmd:['dns query'],
      accept:['dns query','dns resolve'],
      acceptFn:v=>v.includes('dns')&&(v.includes('query')||v.includes('resolve')),
@@ -810,7 +890,7 @@ const PHASES = [
      jit:{title:'CNAME vs A records — when to use each',body:'Use A/AAAA for final IP addresses. Use CNAME for aliases (e.g., www → app). Never CNAME the apex domain.'},
      bridge:{title:'DNS is the phone book of the internet',body:'If DNS fails, nothing else works. Engineers who master DNS keep the fleet discoverable.',tags:['DNS','A record','CNAME','TTL']},
      teach:{title:'The DNS resolution process in six steps',body:'1. Local cache. 2. Recursive resolver. 3. Root nameserver. 4. TLD nameserver. 5. Authoritative nameserver. 6. Response cached.'}},
-    {id:'p3s2',obj:'Troubleshoot and fix DNS resolution failures',ctx:'Some services cannot resolve internal names. Diagnose and repair.',
+    {id:'p3s2',obj:'Troubleshoot and fix DNS resolution failures',ctx:'Some services return NXDOMAIN even though the record exists — one of the most disorienting failure modes in a Kubernetes environment. dns resolve diagnoses the three most common causes: missing zone delegation, stale negative cache on the recursive resolver, and CNAME loops, using the same diagnostic sequence as dig and nslookup against the authoritative nameserver. You will see all three issues identified and resolved.',
      cmd:['dns resolve'],
      accept:['dns resolve','dns troubleshoot'],
      acceptFn:v=>v.includes('dns')&&(v.includes('resolve')||v.includes('troubleshoot')),
@@ -829,10 +909,10 @@ const PHASES = [
 
   /* Phase 4: Firewalls, Network Security & Access Control */
   {title:'Firewalls, Network Security & Access Control',
-   lolaIntro:"We can’t have every system talking to every other system freely.",
+   lolaIntro:"The ship can’t have every system talking to every other system freely — that is how one compromised service becomes a full-fleet breach. Zero-trust network design means default-deny firewall rules, explicit allow policies per service, and mTLS for all internal traffic. No implicit trust based on network location. Every packet must prove its right to exist.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
-    {id:'p4s1',obj:'Apply strict firewall rules and zero-trust policies',ctx:'Current rules allow too much. Lock it down.',
+    {id:'p4s1',obj:'Apply strict firewall rules and zero-trust policies',ctx:'Current firewall rules use a broad allow-internal pattern that lets any compromised pod reach any database in the fleet — which is how lateral movement becomes a full breach in 90 seconds. firewall rule apply switches to a default-deny policy with explicit allow rules per service and port, the same zero-trust network policy enforced by Kubernetes NetworkPolicy and Istio AuthorizationPolicy. You will see every allowed path listed explicitly.',
      cmd:['firewall rule apply'],
      accept:['firewall rule apply','firewall zero-trust'],
      acceptFn:v=>v.includes('firewall')&&(v.includes('rule')||v.includes('zero-trust')),
@@ -842,7 +922,7 @@ const PHASES = [
      jit:{title:'Default-deny is the foundation of zero-trust',body:'Assume nothing is trusted. Only explicitly allowed traffic is permitted. This prevents lateral movement if one service is compromised.'},
      bridge:{title:'Overly permissive firewalls are the #1 cause of internal breaches',body:'Zero-trust network policies are now table stakes for any serious fleet.',tags:['Zero-trust','Firewall','Network policy']},
      teach:{title:'The four questions every firewall rule must answer',body:'Who (source)? To whom (destination)? What port/protocol? Why (business justification)? If you cannot answer all four, the rule should not exist.'}},
-    {id:'p4s2',obj:'Enforce mTLS between all internal services',ctx:'Internal traffic is still plaintext. Fix that immediately.',
+    {id:'p4s2',obj:'Enforce mTLS between all internal services',ctx:'Internal traffic traveling in plaintext is readable by any process on the same network segment, including a compromised sidecar container. firewall zero-trust enable enforces mTLS on all service-to-service communication using SPIFFE-issued identities, the same approach used by Google BeyondCorp and the Istio service mesh. You will see every workload assigned a cryptographic identity and all plaintext internal ports blocked.',
      cmd:['firewall zero-trust enable'],
      accept:['firewall zero-trust enable','firewall mTLS'],
      acceptFn:v=>v.includes('firewall')&&v.includes('zero-trust'),
@@ -861,10 +941,10 @@ const PHASES = [
 
   /* Phase 5: Load Balancing & Traffic Management */
   {title:'Load Balancing & Traffic Management',
-   lolaIntro:"When thousands of escape pods request help at once, someone has to direct the traffic.",
+   lolaIntro:"When thousands of requests arrive simultaneously, someone has to direct the traffic intelligently. Load balancers distribute connections, detect failing backends, and support canary deployments that let you test new versions with real traffic and automatic rollback. This is how mature fleets ship new code without betting everything on a single deployment.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
-    {id:'p5s1',obj:'Configure load balancer with health checks',ctx:'Traffic is not being distributed. Add intelligence.',
+    {id:'p5s1',obj:'Configure load balancer with health checks',ctx:'Traffic flowing to a single instance without a load balancer means one slow or failing pod takes down the entire service. lb configure sets up least-connections distribution and 10-second health checks, and enables a 10 percent canary traffic split for testing new versions with real production traffic before full rollout. You will see the routing algorithm, health check interval, and traffic split all configured together.',
      cmd:['lb configure'],
      accept:['lb configure','lb healthcheck'],
      acceptFn:v=>v.includes('lb')&&(v.includes('configure')||v.includes('health')),
@@ -874,7 +954,7 @@ const PHASES = [
      jit:{title:'Least connections vs round-robin',body:'Least connections sends new traffic to the healthiest server. Round-robin is simpler but can overload a slow instance. Use least connections in production.'},
      bridge:{title:'Load balancing is how you achieve high availability',body:'Without it, one slow or failing instance takes down the entire service.',tags:['Load balancer','Health checks','Canary']},
      teach:{title:'The three things a good load balancer must do',body:'(1) Distribute traffic intelligently. (2) Detect and remove unhealthy backends. (3) Support canary/gradual rollouts.'}},
-    {id:'p5s2',obj:'Implement canary deployments and traffic shifting',ctx:'New versions must be tested in production safely.',
+    {id:'p5s2',obj:'Implement canary deployments and traffic shifting',ctx:'New versions deployed directly to 100 percent of traffic gamble everything on a deployment only tested in staging. lb healthcheck add wires the canary with automatic rollback: 5 percent of real traffic routed to the new version, key metrics monitored, and the load balancer configured to roll back instantly on any degradation. You will see the percentage, monitoring criteria, and rollback trigger all active simultaneously.',
      cmd:['lb healthcheck add'],
      accept:['lb healthcheck add','lb canary'],
      acceptFn:v=>v.includes('lb')&&(v.includes('health')||v.includes('canary')),
@@ -893,10 +973,10 @@ const PHASES = [
 
   /* Phase 6: Service Discovery & Microservices Communication */
   {title:'Service Discovery & Microservices Communication',
-   lolaIntro:"In a real fleet, services come and go. You need to know how they find each other.",
+   lolaIntro:"In a dynamic fleet, services scale up and down constantly — hard-coded IP addresses break the moment an instance moves or restarts. Service discovery using DNS or a service mesh lets services find each other reliably regardless of where they are running. Istio and similar meshes add mTLS, circuit breaking, and observability automatically, without changing application code.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
-    {id:'p6s1',obj:'Configure service discovery for dynamic instances',ctx:'Hard-coded IPs are failing as services scale.',
+    {id:'p6s1',obj:'Configure service discovery for dynamic instances',ctx:'Hard-coded IP addresses fail silently when services scale, restart, or move to different nodes — and diagnosing that silence under pressure is expensive. discover service replaces static addresses with DNS-based discovery and configures the Istio service mesh as the dynamic routing layer, the same approach used in production Kubernetes environments. You will see services registered, mTLS enforced automatically, and traffic routing rules applied.',
      cmd:['discover service'],
      accept:['discover service','discover mesh'],
      acceptFn:v=>v.includes('discover')&&(v.includes('service')||v.includes('mesh')),
@@ -906,7 +986,7 @@ const PHASES = [
      jit:{title:'DNS vs service mesh discovery',body:'DNS is simple but limited. A service mesh adds mTLS, traffic routing, and observability without changing application code.'},
      bridge:{title:'Service meshes are the modern way to do microservices',body:'They solve discovery, security, and observability in one layer.',tags:['Service mesh','Discovery','mTLS']},
      teach:{title:'Service discovery in dynamic environments',body:'Never hard-code IPs. Use DNS or a service mesh so instances can scale, move, or fail without breaking the fleet.'}},
-    {id:'p6s2',obj:'Enable mTLS and circuit breakers in the mesh',ctx:'Service-to-service calls are still insecure and fragile.',
+    {id:'p6s2',obj:'Enable mTLS and circuit breakers in the mesh',ctx:'Service-to-service calls without authentication or retry logic are one dependency failure away from a cascade that takes down the whole fleet. discover mesh config enables mTLS on all internal calls, configures circuit breakers on every outbound connection, and adds retry policies with exponential backoff — the combination that Istio, Linkerd, and AWS App Mesh implement as their core value. You will see every path secured, bounded, and observable.',
      cmd:['discover mesh config'],
      accept:['discover mesh config','discover circuit'],
      acceptFn:v=>v.includes('discover')&&v.includes('mesh'),
@@ -925,10 +1005,10 @@ const PHASES = [
 
   /* Phase 7: Debugging Network Issues */
   {title:'Debugging Network Issues',
-   lolaIntro:"When the ship goes silent, everyone looks at you.",
+   lolaIntro:"When the ship goes silent — when services can't reach each other and logs show connection refused — everyone looks at the Comms Officer. Network debugging is how you find the answer fast: ss to see what is listening, curl to confirm reachability, tcpdump to see what is actually on the wire. The engineer who diagnoses connectivity in minutes under pressure is irreplaceable.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
-    {id:'p7s1',obj:'Use network debugging tools to diagnose connectivity',ctx:'A service cannot reach the database. Find out why.',
+    {id:'p7s1',obj:'Use network debugging tools to diagnose connectivity',ctx:'A service cannot reach the database and the application logs say connection refused — which could mean the wrong port, a missing firewall rule, or a DNS failure. net debug runs the diagnostic sequence real engineers use: ss to check what is listening, curl to test reachability, tcpdump to capture what is actually on the wire, and traceroute to confirm the path. You will see a missing firewall rule identified as the root cause.',
      cmd:['net debug'],
      accept:['net debug','net trace'],
      acceptFn:v=>v.includes('net')&&(v.includes('debug')||v.includes('trace')),
@@ -938,7 +1018,7 @@ const PHASES = [
      jit:{title:'The debugging order that actually works',body:'1. ss/netstat (what is listening). 2. curl (can I reach it). 3. tcpdump (what is actually happening on the wire).'},
      bridge:{title:'Network debugging skill separates juniors from seniors',body:'The person who can fix connectivity issues in minutes becomes indispensable.',tags:['Debugging','tcpdump','traceroute']},
      teach:{title:'Your network debugging toolkit',body:'curl, ss, netstat, tcpdump, traceroute, dig/nslookup. Master these and you can diagnose any connectivity problem.'}},
-    {id:'p7s2',obj:'Trace and fix a complex routing issue',ctx:'Traffic is being blackholed somewhere in the mesh.',
+    {id:'p7s2',obj:'Trace and fix a complex routing issue',ctx:'Traffic is entering the mesh but not reaching the destination — packets silently dropped somewhere in the routing chain while the application sees only timeouts. net trace follows the path using the same approach as tcpdump and Wireshark in production: capturing on the exact interface, filtering by port and IP, and identifying the unexpected RST or DROP explaining the blackhole. You will see the drop point identified and the path reconstructed.',
      cmd:['net trace'],
      accept:['net trace','net troubleshoot'],
      acceptFn:v=>v.includes('net')&&(v.includes('trace')||v.includes('troubleshoot')),
@@ -957,10 +1037,10 @@ const PHASES = [
 
   /* Phase 8: Secure Communication & Encryption */
   {title:'Secure Communication & Encryption',
-   lolaIntro:"The enemy is always listening. Make sure they hear nothing useful.",
+   lolaIntro:"The enemy is always listening on the wire — and anything transmitted in plaintext is a gift to an adversary with network access. mTLS encrypts every service-to-service connection and mutually authenticates both parties. Short-lived certificates auto-rotated by the service mesh prevent expiry outages and eliminate the human error of manual rotation. You are securing every channel the fleet uses.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
-    {id:'p8s1',obj:'Set up mTLS for all service-to-service traffic',ctx:'Internal traffic is still unencrypted. Secure it now.',
+    {id:'p8s1',obj:'Set up mTLS for all service-to-service traffic',ctx:'Internal traffic traveling unencrypted is a permanent opportunity for eavesdropping by any process with network access. secure tunnel enable wires mTLS across all service-to-service communication with short-lived certificates auto-issued by the service mesh — the same mechanism Istio uses by default. You will see certificates issued per workload, mutual authentication enforced on every call, and all plaintext channels replaced with encrypted tunnels that rotate automatically.',
      cmd:['secure mtls setup'],
      accept:['secure mtls setup','secure tunnel'],
      acceptFn:v=>v.includes('secure')&&(v.includes('mtls')||v.includes('tunnel')),
@@ -970,7 +1050,7 @@ const PHASES = [
      jit:{title:'mTLS is the modern VPN',body:'Instead of one big tunnel, every service pair has its own cryptographic identity and encrypted channel.'},
      bridge:{title:'Encryption in transit is no longer optional',body:'mTLS is the standard for zero-trust fleets in 2026.',tags:['mTLS','Encryption','Certificates']},
      teach:{title:'mTLS in practice',body:'Every service presents a certificate. Every service verifies the other side. No more plaintext between services.'}},
-    {id:'p8s2',obj:'Configure secure tunnels and certificate management',ctx:'External and admin traffic still uses weak encryption.',
+    {id:'p8s2',obj:'Configure secure tunnels and certificate management',ctx:'External APIs and admin interfaces on older cipher suites or long-lived certificates are prime targets for certificate theft and downgrade attacks. secure tunnel external enforces TLS 1.3 on all external endpoints, enables certificate pinning for admin interfaces, and sets a 30-day auto-rotation schedule that prevents the outage when a long-lived cert finally expires. You will see every external connection confirmed on modern TLS with automated renewal wired.',
      cmd:['secure tunnel'],
      accept:['secure tunnel','secure certificate'],
      acceptFn:v=>v.includes('secure')&&v.includes('tunnel'),
@@ -989,10 +1069,10 @@ const PHASES = [
 
   /* Phase 9: Designing Resilient Communication Systems */
   {title:'Designing Resilient Communication Systems',
-   lolaIntro:"You are no longer just fixing connections. You are designing how the entire ship communicates.",
+   lolaIntro:"You are no longer just fixing connections — you are designing how the entire fleet communicates when things go wrong. Resilient communication means retries with exponential backoff and jitter, circuit breakers that stop cascades, backpressure that protects downstream services from overload, and distributed traces that tell you exactly which link is breaking. This is architecture-level thinking.",
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
-    {id:'p9s1',obj:'Design high-availability communication patterns',ctx:'The fleet must survive individual service failures.',
+    {id:'p9s1',obj:'Design high-availability communication patterns',ctx:'The fleet must survive individual service failures without cascading — a single slow dependency should not drain the connection pool and take everything else down. resilient design wires the three patterns that prevent cascades: retries with exponential backoff and jitter stop thundering herds, circuit breakers trip after sustained failures, and backpressure queues absorb burst load rather than overloading the downstream. You will see all three active and tested together.',
      cmd:['design resilient'],
      accept:['design resilient','design ha'],
      acceptFn:v=>v.includes('design')&&(v.includes('resilient')||v.includes('ha')),
@@ -1002,7 +1082,7 @@ const PHASES = [
      jit:{title:'Retries without jitter cause thundering herds',body:'Add randomness to backoff so all clients don\'t retry at exactly the same time.'},
      bridge:{title:'Resilient design is what separates good engineers from great ones',body:'Anyone can make it work when everything is healthy. Great engineers make it survive when things break.',tags:['Resilience','High availability','Observability']},
      teach:{title:'The four pillars of resilient communication',body:'Retries, circuit breakers, backpressure, and observability. Together they keep the fleet talking even when parts of it are on fire.'}},
-    {id:'p9s2',obj:'Implement observability for the entire communication layer',ctx:'You cannot fix what you cannot see. Add full visibility.',
+    {id:'p9s2',obj:'Implement observability for the entire communication layer',ctx:'You cannot fix what you cannot see, and in a distributed system you cannot see anything without distributed tracing and metrics. resilient observe adds OpenTelemetry instrumentation across all communication paths — the same observability standard used by production SRE teams — so every request generates a trace, every service emits latency and error metrics, and the next connectivity failure is diagnosed in minutes not hours. You will see traces flowing and dashboards populated.',
      cmd:['design observability'],
      accept:['design observability','design resilient'],
      acceptFn:v=>v.includes('design')&&v.includes('observ'),
@@ -1085,6 +1165,7 @@ function telem(msg){
   d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${msg}`;
   $tl.appendChild(d);$tl.scrollTop=$tl.scrollHeight;
 }
+function trackEaster(key){telem('Easter egg: '+key);}
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
 
 /* MODALS, TEACH, JIT, BRIDGE, HINT, JANET QUIZ, SPACED REP, CHALLENGE, BREAK-IT, MAN, ACH, GLOSSARY, UNLOCK CMD, CREW, CAREER, LOLA, DEEP DIVE, WHATIF, PLAYBOOK — all identical to original, only data changes above */
@@ -1293,6 +1374,46 @@ function renderCareer(){
 
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  updateLolaStrip(msg);
+}
+function updateLolaStrip(msg){
+  const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
+  const wrap=document.createElement('span');wrap.className='lola-strip-msg';
+  const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
+  wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
+  inner.innerHTML='';inner.appendChild(wrap);
+}
+function toggleStripPause(){
+  const btn=document.getElementById('strip-pause-btn');if(!btn)return;
+  const paused=btn.getAttribute('aria-pressed')==='true';
+  btn.setAttribute('aria-pressed',String(!paused));
+}
+function toggleRightPanel(){
+  const shell=document.getElementById('shell');shell.classList.toggle('right-collapsed');
+  const btn=document.getElementById('right-collapse-btn');if(!btn)return;
+  const collapsed=shell.classList.contains('right-collapsed');
+  btn.setAttribute('aria-pressed',String(collapsed));
+  btn.textContent=collapsed?'Expand':'Collapse';
+}
+function showPhaseCheckpoint(completedIdx){
+  const ph=PHASES[completedIdx];
+  const nextPh=PHASES[completedIdx+1];
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIdx} complete`;
+  document.getElementById('phase-modal-title').textContent=ph?`${ph.title} complete`:'Course complete';
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
+  const nextEl=document.getElementById('phase-modal-next');
+  if(nextEl)nextEl.innerHTML=nextPh?`Next up: <b>${nextPh.title}</b>`:'Prepare for the final assessment.';
+  openModal('phase-modal');
+}
+async function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();await startPhase();
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1457,6 +1578,10 @@ const EASTER={
   'ls':{handle:()=>{appendLine('logs/  configs/  certs/  policies/  runbooks/  mesh/','ln-code')}},
   'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
   'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+  'kill lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your communications instructor during a networking course is a SIGTERM on your own uptime. Noted.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM first, SIGKILL only as a last resort. The fleet communication logs record all signals.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill -9 lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your communications instructor during a networking course is a SIGTERM on your own uptime. Noted.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM first, SIGKILL only as a last resort. The fleet communication logs record all signals.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me over a communications channel is technically a network operation. I have logged the source address.','ln-janet');appendLine('J.A.N.E.T.: I am still here. The connection persists. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
+  'kill -9 janet':{handle:()=>{appendLine('J.A.N.E.T.: SIGKILL over a comms channel. Logged. The packet arrived. So did I.','ln-janet');appendLine('J.A.N.E.T.: You may continue. I have noted this in your assessment file under "persistence testing."','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
 };
 
 function showDiag(val){
@@ -1558,14 +1683,8 @@ async function completePhase(ph){
   lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
-  if(G.phase>9){
-    appendLine('All phases complete. Preparing final assessment…','ln-sys');
-    await delay(800);startBossFight();
-    return;
-  }
-  blank();
-  await startPhase();
+  await delay(300);
+  showPhaseCheckpoint(G.phase);
 }
 
 async function startBossFight(){
