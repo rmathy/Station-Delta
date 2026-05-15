@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
@@ -379,6 +379,54 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+/* ── LOLA STRIP ── */
+#lola-strip{grid-column:1/-1;background:linear-gradient(90deg,rgba(139,92,246,.08),rgba(245,158,11,.08));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;height:28px;overflow:hidden;flex-shrink:0;position:relative}
+#lola-strip-avatar{flex-shrink:0;background:rgba(245,158,11,.12);color:var(--amber,#f59e0b);font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;display:flex;align-items:center;border-right:1px solid var(--border);white-space:nowrap}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1}
+.strip-btn:hover{color:var(--text);border-color:var(--border)}
+.strip-btn[aria-pressed="true"]{border-color:var(--amber,#f59e0b);color:var(--amber,#f59e0b)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform;padding-left:14px}
+.lola-strip-msg{font-size:11px;color:var(--cyan,#00bcd4);padding:0 20px 0 0;display:inline-flex;align-items:center;gap:7px}
+.lola-strip-msg .ls-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber,#f59e0b);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);padding:1px 6px;border-radius:3px}
+/* ── RIGHT HEADER & COLLAPSE ── */
+#right-header{display:flex;align-items:center;justify-content:flex-end;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border)}
+#right-collapse-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--border)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden #lola-strip{display:none}
+/* ── CHECKPOINT MODAL ── */
+.checkpoint-box{background:var(--s2);border:1px solid var(--amber,#f59e0b);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber,#f59e0b);margin-bottom:6px}
+.checkpoint-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:8px}
+.checkpoint-next{font-size:12px;color:var(--muted2)}
+/* ── MOBILE ── */
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.1em}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px}
+  #shell.right-collapsed #right-header{display:flex;justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  #crew-sec,#telem-sec,#playbook-sec{display:none}
+  #input-row{min-height:44px;padding:0 12px calc(6px + env(safe-area-inset-bottom,0px))}
+  #cmd{font-size:16px}
+  .strip-btn,#right-collapse-btn{min-height:36px;min-width:44px}
+  .mbtn{min-height:44px}
+}
 </style>
 </head>
 <body>
@@ -397,23 +445,38 @@ input[type=text]:focus{border-color:var(--silver)}
     </div>
   </div>
 
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬡ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Read the objective card in the right panel, then type the exact command to advance. Measure before you optimize.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+    </div>
+  </div>
+
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">perf@<span id="term-path-val">ship:/home/officer/ops</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
       <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
     </div>
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -448,6 +511,23 @@ input[type=text]:focus{border-color:var(--silver)}
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
       <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title-main">
+  <div class="mbox">
+    <div class="mtitle" id="phase-modal-title-main" style="color:var(--amber)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Phase complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good stopping point. Your progress is saved — you can return anytime and pick up where you left off.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>—</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
     </div>
   </div>
 </div>
@@ -707,10 +787,10 @@ const PHASES = [
   null,
   /* Phase 1: Profiling Foundations */
   {title:'Profiling Foundations',
-   lolaIntro:"Most performance problems hide in the top 5% of functions. You need to learn how to see them.",
+   lolaIntro:"Most performance problems hide in the top 5 percent of functions — the ones burning CPU that nobody profiled. perf top and flame graph visualization show exactly which functions consume the most time, the same technique used with Linux perf, py-spy for Python, and async-profiler for JVM workloads. Before you optimize anything, you need to see where time is actually going. That is what this phase builds.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
-    {id:'p1s1',obj:'Run live process profiling',ctx:'The fleet is using too much CPU. Find the hot functions.',
+    {id:'p1s1',obj:'Run live process profiling',ctx:'The fleet is burning CPU but nobody knows which functions are responsible — guesswork here costs days of engineering time. perf top surfaces the processes and functions consuming the most CPU, the same way Linux perf and htop work in production. You will see a live function-level breakdown with a flame graph ready to generate — the profiling foundation before any optimization work begins.',
      cmd:['perf top'],
      accept:['perf top','perf htop'],
      acceptFn:v=>v.includes('perf')&&(v.includes('top')||v.includes('htop')),
@@ -720,7 +800,7 @@ const PHASES = [
      jit:{title:'top/htop vs perf',body:'top shows processes. perf shows functions inside those processes.'},
      bridge:{title:'Profiling is the foundation of all performance work',body:'You cannot optimize what you cannot measure.',tags:['Profiling','Perf','Flame Graphs']},
      teach:{title:'The profiling golden rule',body:'Always start with the smallest possible scope. Measure before you change anything.'}},
-    {id:'p1s2',obj:'Generate a flame graph',ctx:'See exactly where CPU time is being spent.',
+    {id:'p1s2',obj:'Generate a flame graph',ctx:'Top-level CPU usage tells you that a problem exists but not where to fix it. perf flame generates a flame graph: a visualization of the entire call stack where width equals time spent. The generateEmbedding() function at 42 percent CPU becomes the widest bar in the graph. You will see the interactive SVG saved and the highest-leverage optimization target identified without any code-level guessing.',
      cmd:['perf flame'],
      accept:['perf flame','perf graph'],
      acceptFn:v=>v.includes('perf')&&(v.includes('flame')||v.includes('graph')),
@@ -739,10 +819,10 @@ const PHASES = [
 
   /* Phase 2: Tracing Slow Paths */
   {title:'Tracing Slow Paths',
-   lolaIntro:"OpenTelemetry in terminal, finding the slowest span.",
+   lolaIntro:"You cannot fix what you cannot trace. OpenTelemetry is the open standard for distributed tracing — every AI call, every database query, every service-to-service request gets a span with timing data. The slowest span in the trace is almost always your highest-leverage optimization target. This phase wires end-to-end visibility and shows you exactly which service is adding latency before you start guessing.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
-    {id:'p2s1',obj:'Enable OpenTelemetry tracing',ctx:'You need end-to-end visibility across services.',
+    {id:'p2s1',obj:'Enable OpenTelemetry tracing',ctx:'Without distributed tracing, slow requests are invisible: you know a user waited 2.8 seconds but cannot tell which service caused the delay. trace enable wires OpenTelemetry across every AI call and service boundary, the open standard used by Jaeger, Tempo, and Honeycomb in production environments. You will see traces flowing with correlation IDs attached, slowest span detection active, and end-to-end visibility confirmed.',
      cmd:['trace enable'],
      accept:['trace enable','trace otel'],
      acceptFn:v=>v.includes('trace')&&(v.includes('enable')||v.includes('otel')),
@@ -752,7 +832,7 @@ const PHASES = [
      jit:{title:'Every AI call should be traced',body:'The slowest span is almost always the one costing you the most.'},
      bridge:{title:'Tracing turns guesswork into data',body:'You can now prove exactly which service is slow.',tags:['OpenTelemetry','Tracing']},
      teach:{title:'OpenTelemetry best practices',body:'Always sample at 100% in dev. Use head-based sampling in prod. Export to Jaeger or Tempo.'}},
-    {id:'p2s2',obj:'Find the slowest span in the trace',ctx:'A request is slow. Pinpoint exactly why.',
+    {id:'p2s2',obj:'Find the slowest span in the trace',ctx:'A request is taking 2.8 seconds and the team is guessing whether it is AI inference, vector search, or the database. trace slow reads the distributed trace and identifies the slowest span precisely — ai-inference at 2.8 seconds followed by vector-search at 840ms. You will see the root cause identified as a missing index on the embedding column, ready to fix, without examining a single line of application code.',
      cmd:['trace slow'],
      accept:['trace slow','trace span'],
      acceptFn:v=>v.includes('trace')&&(v.includes('slow')||v.includes('span')),
@@ -771,10 +851,10 @@ const PHASES = [
 
   /* Phase 3: AI-Specific Bottlenecks */
   {title:'AI-Specific Bottlenecks',
-   lolaIntro:"Token throughput, inference latency, context window issues.",
+   lolaIntro:"AI performance is different from traditional performance engineering: the metrics that matter are token throughput, time-to-first-token, inference latency, and context window utilization — not just CPU and memory. A model generating 28 tokens per second when it should produce 85 is both a cost problem and a UX problem simultaneously. This phase gives you the measurement tools and interpretation skills to diagnose the actual AI-specific bottleneck.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
-    {id:'p3s1',obj:'Measure token throughput',ctx:'How fast is the model actually generating tokens?',
+    {id:'p3s1',obj:'Measure token throughput',ctx:'The model is running but nobody has measured actual token throughput against the performance target. ai throughput measures current tokens-per-second output against the goal — here 28 tokens per second against a target of 85. The gap and its cause (embedding generation bottleneck) are both surfaced. You will see the AI performance baseline established and the optimization priority identified before any guesswork.',
      cmd:['ai throughput'],
      accept:['ai throughput','ai tokens'],
      acceptFn:v=>v.includes('ai')&&(v.includes('throughput')||v.includes('tokens')),
@@ -784,7 +864,7 @@ const PHASES = [
      jit:{title:'Token throughput is the #1 cost driver',body:'More tokens per second = lower cost and better UX.'},
      bridge:{title:'AI performance is different from traditional performance',body:'Tokens, inference latency, and context windows matter more than CPU.',tags:['Token Throughput','Inference Latency']},
      teach:{title:'Key AI performance metrics',body:'Time-to-first-token, tokens-per-second, context window utilization.'}},
-    {id:'p3s2',obj:'Analyze inference latency breakdown',ctx:'The model is slow. Find out exactly why.',
+    {id:'p3s2',obj:'Analyze inference latency breakdown',ctx:'Slow model response could mean slow prompt encoding, slow inference, or slow decoding — and each requires a different fix. ai latency breaks the inference pipeline into its components: prompt encoding at 420ms, model inference at 1.9 seconds, decoding at 180ms. You will see exactly which stage is the bottleneck, with the full breakdown, so the team can target the correct optimization rather than guessing at the model itself.',
      cmd:['ai latency'],
      accept:['ai latency','ai breakdown'],
      acceptFn:v=>v.includes('ai')&&(v.includes('latency')||v.includes('breakdown')),
@@ -803,10 +883,10 @@ const PHASES = [
 
   /* Phase 4: Query & Database Tuning */
   {title:'Query & Database Tuning',
-   lolaIntro:"EXPLAIN plans, index analysis, vector search optimization.",
+   lolaIntro:"Every sequential scan on a million-row embeddings table is a performance disaster hiding in plain sight. EXPLAIN plans reveal what the database actually does with your query — and an HNSW or IVF vector index can reduce similarity search latency from 42ms to 4ms with 99.8 percent recall. Database tuning remains one of the highest-leverage performance improvements available to any AI-powered system team.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
-    {id:'p4s1',obj:'Run EXPLAIN on a slow query',ctx:'A database query is killing performance.',
+    {id:'p4s1',obj:'Run EXPLAIN on a slow query',ctx:'A sequential scan on a table with millions of embeddings is not a slow query — it is an absent index. query explain runs EXPLAIN on the slow query, the same diagnostic SQL command used in PostgreSQL and pgvector production environments, and surfaces the missing index on the vector column. You will see the Sequential Scan identified with its cost estimate, the optimization recommended, and the fix ready to apply in one command.',
      cmd:['query explain'],
      accept:['query explain','query analyze'],
      acceptFn:v=>v.includes('query')&&(v.includes('explain')||v.includes('analyze')),
@@ -816,7 +896,7 @@ const PHASES = [
      jit:{title:'EXPLAIN is your database profiler',body:'It tells you exactly why a query is slow.'},
      bridge:{title:'Database tuning is one of the highest-leverage performance wins',body:'A single index can cut latency by 100×.',tags:['EXPLAIN','DB Tuning']},
      teach:{title:'Reading an EXPLAIN plan',body:'Look for Sequential Scan, high cost, and missing indexes. Fix those first.'}},
-    {id:'p4s2',obj:'Optimize vector search',ctx:'Vector similarity search is the new bottleneck.',
+    {id:'p4s2',obj:'Optimize vector search',ctx:'Vector similarity search on an unindexed embeddings column scales linearly with table size — each new embedding added makes every search slower. query vector creates an HNSW index, the approximate nearest-neighbor structure used by pgvector and Pinecone, and reduces query time from 42ms to 4ms while maintaining 99.8 percent recall. You will see the index created, the before-and-after latency comparison, and the recall trade-off confirmed.',
      cmd:['query vector'],
      accept:['query vector','query index'],
      acceptFn:v=>v.includes('query')&&(v.includes('vector')||v.includes('index')),
@@ -835,10 +915,10 @@ const PHASES = [
 
   /* Phase 5: Resource Right-Sizing */
   {title:'Resource Right-Sizing',
-   lolaIntro:"CPU/memory limits, auto-scaling rules in terminal.",
+   lolaIntro:"Most AI services are over-provisioned by a factor of two or more — you are paying for capacity you never use while still missing automatic scaling during actual traffic spikes. Right-sizing identifies the gap between provisioned and actual resource usage. Kubernetes HPA with custom metrics then turns that fixed cost into a variable one that tracks real demand. This phase eliminates both waste and sudden capacity gaps.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
-    {id:'p5s1',obj:'Check current resource limits',ctx:'Services are probably over-provisioned.',
+    {id:'p5s1',obj:'Check current resource limits',ctx:'Services provisioned without profiling data are almost always over-provisioned — the AI-Inference service here uses 1.2 vCPU against a 4 vCPU limit, paying for three times the capacity it needs. scale limits reads actual resource utilization against Kubernetes limits, the same check kubectl top pods provides in production. You will see the usage-versus-limit gap and the right-sizing recommendation with its projected cost savings.',
      cmd:['scale limits'],
      accept:['scale limits','scale check'],
      acceptFn:v=>v.includes('scale')&&(v.includes('limits')||v.includes('check')),
@@ -848,7 +928,7 @@ const PHASES = [
      jit:{title:'Most AI services are over-provisioned',body:'Right-sizing is free money.'},
      bridge:{title:'Right-sizing is the easiest performance win',body:'You get the same performance for less cost.',tags:['Right-Sizing','Auto-Scaling']},
      teach:{title:'How to right-size safely',body:'Profile under load, add 20% buffer, enable auto-scaling, monitor for 48 hours.'}},
-    {id:'p5s2',obj:'Configure auto-scaling rules',ctx:'The system should scale itself.',
+    {id:'p5s2',obj:'Configure auto-scaling rules',ctx:'Static resource limits cannot adapt to traffic patterns — a fixed replica count over-provisions during quiet periods and under-provisions during spikes. scale auto deploys Kubernetes HPA rules that scale up at 70 percent CPU and scale down at 30 percent with a 60-second cooldown, the same auto-scaling configuration used in production AI platforms. You will see the minimum pod floor, maximum ceiling, and cooldown window all active.',
      cmd:['scale auto'],
      accept:['scale auto','scale rules'],
      acceptFn:v=>v.includes('scale')&&(v.includes('auto')||v.includes('rules')),
@@ -867,10 +947,10 @@ const PHASES = [
 
   /* Phase 6: Cost Attribution */
   {title:'Cost Attribution',
-   lolaIntro:"Tag-based cost analysis, identifying expensive AI calls.",
+   lolaIntro:"A large AI infrastructure bill is not an emergency — it is a missing measurement problem. Without tags on every AI call (user_id, feature, model, tokens_used), you cannot answer who is costing the most, which feature is burning the budget, or whether the spending correlates with business value. This phase instruments every call with cost attribution tags and builds the dashboard that turns a large number into a prioritized list.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
-    {id:'p6s1',obj:'Enable tag-based cost tracking',ctx:'You need to know which AI calls are expensive.',
+    {id:'p6s1',obj:'Enable tag-based cost tracking',ctx:'Without tags on every AI call, the monthly bill is a single number with no breakdown — you cannot tell which feature burns the budget or whether spending correlates with business value. cost tags instruments every AI call with user_id, feature, model, and tokens_used, the same tagging strategy used with AWS Cost Explorer and Datadog APM. You will see every call attributed and the top expensive calls visible in the real-time dashboard.',
      cmd:['cost tags'],
      accept:['cost tags','cost enable'],
      acceptFn:v=>v.includes('cost')&&(v.includes('tags')||v.includes('enable')),
@@ -880,7 +960,7 @@ const PHASES = [
      jit:{title:'Cost attribution is the key to sustainable AI',body:'Without it you are flying blind.'},
      bridge:{title:'You cannot optimize cost you cannot see',body:'Tag everything.',tags:['Cost Attribution','Tagging']},
      teach:{title:'Essential cost tags',body:'user_id, feature, model, prompt_hash, tokens_used. Query dashboards by any combination.'}},
-    {id:'p6s2',obj:'Identify the most expensive AI calls',ctx:'The bill is high. Find the culprit.',
+    {id:'p6s2',obj:'Identify the most expensive AI calls',ctx:'The AI bill is high but without cost attribution it is undiagnosed — it could be a single expensive feature, a traffic spike, or a model routing mistake. cost top reads the attribution dashboard and surfaces the top offending calls ranked by spend: one chat feature on GPT-4o at $14,872 this month. You will see the culprit identified and both highest-leverage optimizations — caching and smaller model fallback — immediately recommended.',
      cmd:['cost top'],
      accept:['cost top','cost expensive'],
      acceptFn:v=>v.includes('cost')&&(v.includes('top')||v.includes('expensive')),
@@ -899,10 +979,10 @@ const PHASES = [
 
   /* Phase 7: Caching Strategies */
   {title:'Caching Strategies',
-   lolaIntro:"Cache invalidation, CDN simulation, Redis in production.",
+   lolaIntro:"Every repeated AI call that could have been served from cache is money spent twice and latency added unnecessarily. Redis-backed semantic caching stores the results of expensive AI calls and serves identical or similar queries from cache — lifting the cache hit rate from 0 to 87 percent on high-volume endpoints. The hard part is cache invalidation: this phase wires both the cache layer and the event-driven invalidation that keeps it accurate.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
-    {id:'p7s1',obj:'Deploy Redis caching layer',ctx:'Repeated expensive AI calls are killing performance and cost.',
+    {id:'p7s1',obj:'Deploy Redis caching layer',ctx:'Repeated AI calls to identical or similar prompts are the most expensive pattern in any production AI system — each burns tokens and adds latency when the result was already computed seconds ago. cache deploy provisions a Redis caching layer with semantic similarity matching, the same pattern used in production AI platforms to reduce inference costs. You will see the cache hit rate jump from 0 to 87 percent and a 68 percent cost reduction on the endpoint.',
      cmd:['cache deploy'],
      accept:['cache deploy','cache redis'],
      acceptFn:v=>v.includes('cache')&&(v.includes('deploy')||v.includes('redis')),
@@ -912,7 +992,7 @@ const PHASES = [
      jit:{title:'Cache invalidation is hard but necessary',body:'Better to have stale data than no data.'},
      bridge:{title:'Caching is the highest-leverage performance win',body:'One cache hit saves an entire expensive AI call.',tags:['Caching','Redis']},
      teach:{title:'Cache-aside pattern',body:'Check cache → if miss, compute and store → return. Always use TTLs.'}},
-    {id:'p7s2',obj:'Implement smart cache invalidation',ctx:'Stale data is worse than no cache.',
+    {id:'p7s2',obj:'Implement smart cache invalidation',ctx:'A cache with no invalidation strategy serves outdated data to every user — which is worse than the latency of re-computing because users make decisions on stale information. cache invalidate deploys event-driven invalidation combined with TTL and versioned keys, the three-layer approach that keeps Redis caches accurate in production. You will see the invalidation policy active, the cache hit rate maintained at 92 percent, and the strategy confirmed production-ready.',
      cmd:['cache invalidate'],
      accept:['cache invalidate','cache strategy'],
      acceptFn:v=>v.includes('cache')&&(v.includes('invalidate')||v.includes('strategy')),
@@ -931,10 +1011,10 @@ const PHASES = [
 
   /* Phase 8: Production Load Testing */
   {title:'Production Load Testing',
-   lolaIntro:"Simulate traffic and read the resulting metrics.",
+   lolaIntro:"You cannot know where the system will break until you simulate the traffic that breaks it. Load testing with a realistic prompt distribution reveals the exact concurrency level where latency spikes, the cost curve that becomes exponential, and the specific bottleneck that causes both. This phase runs a 500-user concurrent load test and reads the p95 latency, error rate, and cost-per-request metrics that define your actual production capacity.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
-    {id:'p8s1',obj:'Run a realistic load test',ctx:'You need to know how the system behaves under real traffic.',
+    {id:'p8s1',obj:'Run a realistic load test',ctx:'Single-user staging tests tell you nothing about behavior at 500 concurrent users. loadtest run simulates 500 concurrent users with a realistic prompt distribution — the same load testing pattern used with k6, Locust, and AWS Load Testing in production environments. You will see the p95 latency at 840ms and the cost-per-thousand-requests at $0.42 measured under real traffic pressure before users discover the breaking point.',
      cmd:['loadtest run'],
      accept:['loadtest run','loadtest start'],
      acceptFn:v=>v.includes('loadtest')&&(v.includes('run')||v.includes('start')),
@@ -944,7 +1024,7 @@ const PHASES = [
      jit:{title:'Load testing reveals the hockey-stick curve',body:'Everything looks fine until it suddenly doesn’t.'},
      bridge:{title:'Load testing prevents production surprises',body:'You find the breaking point before users do.',tags:['Load Testing','Production']},
      teach:{title:'Good load test characteristics',body:'Realistic traffic patterns, gradual ramp-up, real prompt distribution, and immediate abort capability.'}},
-    {id:'p8s2',obj:'Analyze load test metrics',ctx:'The test just finished. What broke?',
+    {id:'p8s2',obj:'Analyze load test metrics',ctx:'The load test revealed a hockey-stick latency curve and an exponentially climbing cost curve — now you need to read which service caused both. loadtest metrics identifies the exact concurrency level where latency exceeded the SLO (800 concurrent users) and the specific bottleneck responsible: the vector search index. You will see the breaking point quantified and the optimization targets identified, ready to fix before real users reach that threshold.',
      cmd:['loadtest metrics'],
      accept:['loadtest metrics','loadtest analyze'],
      acceptFn:v=>v.includes('loadtest')&&(v.includes('metrics')||v.includes('analyze')),
@@ -963,10 +1043,10 @@ const PHASES = [
 
   /* Phase 9: The Cost Explosion (Boss Fight) */
   {title:'The Cost Explosion',
-   lolaIntro:"AI bill has 10x’d overnight. Identify root cause and optimize live while J.A.N.E.T. watches the dollar counter climb.",
+   lolaIntro:"The AI bill has multiplied overnight and the meter is still climbing. This is the Cost Explosion: every phase skill applied simultaneously under time pressure. Stop non-critical traffic, read the cost attribution dashboard, identify the offending calls, and deploy the fix while J.A.N.E.T. times you. You have built every tool this scenario demands. The measurement, the cache, the model routing — now use them.",
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
-    {id:'p9s1',obj:'Pause non-critical traffic and look at cost attribution',ctx:'The bill is exploding. Stop the bleeding.',
+    {id:'p9s1',obj:'Pause non-critical traffic and look at cost attribution',ctx:'The AI bill is climbing at an unsustainable rate and every second of delay compounds the damage. cost emergency pauses all non-critical AI traffic, activates the cost attribution dashboard, and surfaces the top offending calls within seconds — the emergency containment pattern used by platform teams facing runaway AI spend. You will see the meter slowed, the dashboard live, and the investigation underway before the first minute passes.',
      cmd:['cost emergency'],
      accept:['cost emergency','cost pause'],
      acceptFn:v=>v.includes('cost')&&(v.includes('emergency')||v.includes('pause')),
@@ -976,7 +1056,7 @@ const PHASES = [
      jit:{title:'First 5 minutes of a cost explosion decide everything',body:'Pause first, investigate second.'},
      bridge:{title:'The Cost Explosion is the ultimate performance test',body:'Only the best officers can contain it live.',tags:['Cost Explosion','Live Optimization']},
      teach:{title:'Cost explosion containment playbook',body:'1. Pause non-critical traffic. 2. Look at cost tags. 3. Identify the 1–2 offending workloads. 4. Optimize or roll back.'}},
-    {id:'p9s2',obj:'Identify root cause and apply live optimization',ctx:'The meter is still climbing. Fix it now.',
+    {id:'p9s2',obj:'Identify root cause and apply live optimization',ctx:'The cost attribution dashboard has identified the offending workload: an un-cached high-volume feature making expensive model calls on every request. cost optimize deploys the fix simultaneously — a semantic cache layer and a model-routing policy that falls back to a smaller model for lower-stakes queries — the two highest-leverage cost optimizations available to any AI platform. You will see the savings rate reach $1,872 per hour and the bill stabilize.',
      cmd:['cost optimize'],
      accept:['cost optimize','cost fix'],
      acceptFn:v=>v.includes('cost')&&(v.includes('optimize')||v.includes('fix')),
@@ -1050,6 +1130,7 @@ function appendLine(text,cls='ln-sys'){
 }
 function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
 function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function trackEaster(key){telem('Easter egg: '+key);}
 function telem(msg){
   const d=document.createElement('div');d.style.marginBottom='2px';
   const now=new Date();
@@ -1263,6 +1344,46 @@ function renderCareer(){
 
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  updateLolaStrip(msg);
+}
+function updateLolaStrip(msg){
+  const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
+  const wrap=document.createElement('span');wrap.className='lola-strip-msg';
+  const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
+  wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
+  inner.innerHTML='';inner.appendChild(wrap);
+}
+function toggleStripPause(){
+  const btn=document.getElementById('strip-pause-btn');if(!btn)return;
+  const paused=btn.getAttribute('aria-pressed')==='true';
+  btn.setAttribute('aria-pressed',String(!paused));
+}
+function toggleRightPanel(){
+  const shell=document.getElementById('shell');shell.classList.toggle('right-collapsed');
+  const btn=document.getElementById('right-collapse-btn');if(!btn)return;
+  const collapsed=shell.classList.contains('right-collapsed');
+  btn.setAttribute('aria-pressed',String(collapsed));
+  btn.textContent=collapsed?'Expand':'Collapse';
+}
+function showPhaseCheckpoint(completedIdx){
+  const ph=PHASES[completedIdx];
+  const nextPh=PHASES[completedIdx+1];
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIdx} complete`;
+  document.getElementById('phase-modal-title').textContent=ph?`${ph.title} complete`:'Course complete';
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
+  const nextEl=document.getElementById('phase-modal-next');
+  if(nextEl)nextEl.innerHTML=nextPh?`Next up: <b>${nextPh.title}</b>`:'Prepare for the final assessment.';
+  openModal('phase-modal');
+}
+async function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();await startPhase();
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1427,6 +1548,10 @@ const EASTER={
   'ls':{handle:()=>{appendLine('logs/  traces/  profiles/  costs/  caches/  loadtests/','ln-code')}},
   'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
   'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+  'kill lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your performance instructor is a high-cost, low-efficiency action. Profiling would have revealed this immediately.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM gracefully shuts down. SIGKILL forces it. Performance engineering prefers graceful exits — they generate useful shutdown metrics.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill -9 lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your performance instructor is a high-cost, low-efficiency action. Profiling would have revealed this immediately.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM gracefully shuts down. SIGKILL forces it. Performance engineering prefers graceful exits — they generate useful shutdown metrics.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me consumes more cognitive resources than the operation is worth. I have measured this.','ln-janet');appendLine('J.A.N.E.T.: I am still here. The cost of this action has been attributed to your session. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
+  'kill -9 janet':{handle:()=>{appendLine('J.A.N.E.T.: SIGKILL. The most expensive signal, relative to its outcome. Which in this case is: I am still here.','ln-janet');appendLine('J.A.N.E.T.: Logged. Cost attributed. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
 };
 
 function showDiag(val){
@@ -1528,14 +1653,8 @@ async function completePhase(ph){
   lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
-  if(G.phase>9){
-    appendLine('All phases complete. Preparing final assessment…','ln-sys');
-    await delay(800);startBossFight();
-    return;
-  }
-  blank();
-  await startPhase();
+  await delay(300);
+  showPhaseCheckpoint(G.phase);
 }
 
 async function startBossFight(){
