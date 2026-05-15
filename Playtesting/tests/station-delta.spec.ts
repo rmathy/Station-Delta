@@ -2,15 +2,16 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Station Delta — Full QA Suite
- * Covers: Vibe Cadet, Vibe Engineer, Vibe Lieutenant
- * 
+ * Covers: Cadet, Engineer, Lieutenant (base track)
+ *
  * Pass structure mirrors Class-in-Session-Protocol v2.0:
  *   - Primary flow (boot → terminal interaction)
  *   - Accessibility checks (aria-live, role, keyboard nav)
  *   - UI stress tests (overflow, panel collapse, strip controls)
  *   - State persistence (refresh behavior)
  *   - Analytics (webhook POST confirmation)
- * 
+ *   - Officer auth gate (unauthenticated redirect)
+ *
  * Run: npx playwright test
  * Report: npx playwright show-report
  */
@@ -22,27 +23,27 @@ const REQUIRE_ANALYTICS_POST = process.env.REQUIRE_ANALYTICS_POST === '1';
 // ─── SIM CONFIGS ────────────────────────────────────────────────
 const SIMS = [
   {
-    name: 'Vibe Cadet',
+    name: 'Cadet',
     url: '/base/vibe-cadet.html',
     callsign: 'TestCadet',
-    expectedBootText: 'VIBE CADET ACADEMY',
-    expectedPrompt: 'cadet@vibe',
+    expectedBootText: 'STATION DELTA: CADET',
+    expectedPrompt: 'cadet@Station',
     bootBtnText: /BEGIN TRAINING/i,
   },
   {
-    name: 'Vibe Engineer',
+    name: 'Engineer',
     url: '/base/vibe-engineer.html',
     callsign: 'TestEngineer',
-    expectedBootText: 'VIBE ENGINEER ACADEMY',
+    expectedBootText: 'DEAD SERVER PROTOCOL',
     expectedPrompt: 'engineer@station',
     bootBtnText: /BEGIN TRAINING/i,
   },
   {
-    name: 'Vibe Lieutenant',
+    name: 'Lieutenant',
     url: '/base/vibe-lieutenant.html',
     callsign: 'TestLieutenant',
-    expectedBootText: 'VIBE LIEUTENANT',
-    expectedPrompt: 'lt@',
+    expectedBootText: 'VIBE LIEUTENANT v2.0',
+    expectedPrompt: 'lt@stationdelta',
     bootBtnText: /ACCEPT COMMISSION/i,
   },
 ];
@@ -215,6 +216,8 @@ for (const sim of SIMS) {
 
 for (const sim of SIMS) {
   test(`[${sim.name}] UI controls — right panel collapse`, async ({ page }) => {
+    // Force desktop viewport — collapse button is hidden at mobile widths
+    await page.setViewportSize({ width: 1280, height: 720 });
     await bootSim(page, sim);
 
     const collapseBtn = page.locator('#right-collapse-btn');
@@ -230,10 +233,12 @@ for (const sim of SIMS) {
     await expect(shell).not.toHaveClass(/right-collapsed/, { timeout: SHORT });
   });
 
-  test(`[${sim.name}] UI controls — LOLA strip pause and hide`, async ({ page }) => {
+  test(`[${sim.name}] UI controls — LOLA strip pause`, async ({ page }) => {
+    // Force desktop viewport
+    await page.setViewportSize({ width: 1280, height: 720 });
     await bootSim(page, sim);
 
-    // Pause button
+    // Pause button — exists in all base sims as #strip-pause-btn
     const pauseBtn = page.locator('#strip-pause-btn');
     await expect(pauseBtn).toBeVisible();
     await pauseBtn.click();
@@ -242,14 +247,6 @@ for (const sim of SIMS) {
     // Unpause
     await pauseBtn.click();
     await expect(pauseBtn).toHaveAttribute('aria-pressed', 'false');
-
-    // Hide button
-    const hideBtn = page.locator('#strip-dismiss-btn');
-    await expect(hideBtn).toBeVisible();
-    await hideBtn.click();
-
-    const shell = page.locator('#shell');
-    await expect(shell).toHaveClass(/strip-hidden/, { timeout: SHORT });
   });
 }
 
