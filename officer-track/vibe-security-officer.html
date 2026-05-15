@@ -557,14 +557,14 @@ input[type=text]:focus{border-color:var(--silver)}
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">security@<span id="term-path-val">ship:/home/officer/ops</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
       <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
     </div>
   </div>
 
@@ -962,7 +962,7 @@ const PHASES = [
  lolaIntro:"The ship is live. The first thing attackers will try is walking through the front door. No authentication, no rate limiting, open CORS, missing security headers — any one of these is an invitation. Let's lock the perimeter.",
  spacedRep:SPACED_CALLBACKS[1],
  steps:[
-  {id:'p1s1',obj:'Set up authentication middleware for the ship\'s API',ctx:'The API is currently wide open. Every route is unauthenticated. Start with the foundation.',
+  {id:'p1s1',obj:'Set up authentication middleware for the ship\'s API',ctx:'The API is currently wide open — every route accepts requests without verifying identity. secure auth setup simulates adding JWT middleware, the same pattern real teams implement with express-jwt or Passport.js in Node.js. In production this is a single middleware registration that protects all routes by default. You will see which routes require tokens and which are intentionally public.',
    cmd:['secure auth setup'],
    accept:['secure auth setup','secure auth'],
    acceptFn:v=>v.startsWith('secure')&&v.includes('auth'),
@@ -973,7 +973,7 @@ const PHASES = [
    jit2:{title:'JWT vs session tokens: which to use when',body:'<b>JWTs</b>: stateless, self-contained, good for microservices where multiple services need to verify identity without a shared DB call. Downside: revocation is hard — you need a blocklist. <b>Session tokens</b>: stateful, stored server-side, easy to revoke instantly. Downside: require sticky sessions or shared session storage (Redis). For APIs with multiple services: JWTs. For monolithic web apps where instant revocation matters: session tokens. Many production systems use both.'},
    bridge:{title:'Unauthenticated APIs are the #1 target for automated scanners',body:'Shodan, Censys, and countless automated bots continuously scan the internet for unauthenticated APIs. An unprotected endpoint goes from exposed to exploited in minutes. Engineers who make authentication the default — not the exception — eliminate an entire class of vulnerability before it can be exploited.',tags:['Authentication','API security','Middleware','JWT','Zero-trust']},
    teach:{title:'The three things auth middleware must verify',body:'(1) <b>Signature</b> — the token was signed with your key and has not been tampered with. (2) <b>Expiration</b> — the token has not expired. (3) <b>Claims</b> — the issuer, audience, and scope match what you expect. Missing any one of these is a vulnerability. Most JWT breaches exploit missing expiration checks or weak signing keys.'}},
-  {id:'p1s2',obj:'Configure security response headers',ctx:'A security scanner flagged 6 missing headers. Each missing header is an attack surface.',
+  {id:'p1s2',obj:'Configure security response headers',ctx:'A security scanner flagged 6 missing response headers — each one is a browser-level defense against a different attack class. secure headers set simulates what the helmet npm package does in Node.js: HSTS forces HTTPS, CSP defeats XSS, X-Frame-Options stops clickjacking. You will see all six headers applied and the specific attack each one prevents.',
    cmd:['secure headers set'],
    accept:['secure headers set','secure headers'],
    acceptFn:v=>v.includes('secure')&&v.includes('header'),
@@ -996,7 +996,7 @@ const PHASES = [
  lolaIntro:"They can't break in the front door, so now they're trying to trick the ship into hurting itself. SQL injection. XSS. Command injection. These attacks use your own code as a weapon. Proper validation and escaping are the antidote.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
-  {id:'p2s1',obj:'Scan the codebase for SQL injection vulnerabilities',ctx:'Three endpoints build queries with string concatenation. Find them before the attackers do.',
+  {id:'p2s1',obj:'Scan the codebase for SQL injection vulnerabilities',ctx:'Three endpoints build SQL queries by concatenating user input into strings — the vulnerability that lets attackers read or destroy your database. validate sqli check simulates what sqlmap or Semgrep does: scanning for string concatenation in query calls. You will see the three vulnerable lines, a concrete exploit payload for each, and the parameterized-query fix that eliminates the risk.',
    cmd:['validate sqli check'],
    accept:['validate sqli check','validate sqli','validate sql'],
    acceptFn:v=>v.includes('validate')&&(v.includes('sql')||v.includes('inject')),
@@ -1007,7 +1007,7 @@ const PHASES = [
    jit2:{title:'Second-order SQL injection: the attack that bypasses safe inputs',body:'First-order injection: attacker sends malicious data that immediately executes. Second-order: attacker stores seemingly safe data (e.g., a username with SQL syntax) that gets used in a raw query later — during a password reset, search, or report generation. The data was safe at entry but dangerous at use. Defense: parameterize every query, even when retrieving data you stored yourself. Never trust data from your own database in raw SQL.'},
    bridge:{title:'SQL injection has been #1 on the OWASP list for 20 years',body:'Not because it\'s new or sophisticated — because it\'s still everywhere. The fix is well-understood and has been for decades. Engineers who can identify and patch SQL injection vulnerabilities are protecting against the most-exploited web vulnerability class in history. Every penetration test checks for this first.',tags:['SQL injection','OWASP','Parameterized queries','Database security','Input validation']},
    teach:{title:'The golden rule: never concatenate user input into SQL',body:'One rule prevents all SQL injection: never build SQL strings by concatenating user-supplied values. Use: (1) <b>Parameterized queries</b>: <code>db.query("SELECT * FROM x WHERE id = ?", [id])</code>. (2) <b>ORMs with proper usage</b>: User.findOne({ where: { id } }) — but beware raw() methods. (3) <b>Stored procedures</b> with parameterized inputs. The rule has no exceptions for "trusted" inputs — there is no such thing.'}},
-  {id:'p2s2',obj:'Apply input sanitization across all user-facing endpoints',ctx:'XSS vectors in comment, search, and profile fields. Sanitize and encode all outputs.',
+  {id:'p2s2',obj:'Apply input sanitization across all user-facing endpoints',ctx:'XSS vectors exist in four fields that render user-controlled content as HTML — any one of them can execute injected scripts in a victim browser. validate input sanitize simulates applying DOMPurify and output encoding, the same pattern real apps use. The rule is: textContent where HTML is not needed, DOMPurify.sanitize() where it is. You will see each vulnerable field patched with its specific before-and-after fix.',
    cmd:['validate input sanitize'],
    accept:['validate input sanitize','validate sanitize','validate xss scan'],
    acceptFn:v=>v.includes('validate')&&(v.includes('sanitiz')||v.includes('input')||v.includes('xss')),
@@ -1030,7 +1030,7 @@ const PHASES = [
  lolaIntro:"Even with strong doors, if someone steals the keys, they own the ship. Weak JWTs, unrevokable tokens, insecure session storage, missing MFA — these are how attackers own authenticated accounts. Time to harden every key.",
  spacedRep:SPACED_CALLBACKS[3],
  steps:[
-  {id:'p3s1',obj:'Configure JWT best practices and token revocation',ctx:'The current JWT setup uses a weak secret and has no revocation. One leaked token = permanent access.',
+  {id:'p3s1',obj:'Configure JWT best practices and token revocation',ctx:'The current JWT setup signs tokens with a weak HS256 shared secret and has no revocation — one leaked token grants permanent access until it naturally expires. auth jwt configure simulates upgrading to RS256 asymmetric signing and adding a Redis-backed jti blocklist, the pattern real teams use with the jsonwebtoken library. You will see the algorithm switch, refresh token rotation, and revocation all wired together.',
    cmd:['auth jwt configure'],
    accept:['auth jwt configure','auth jwt'],
    acceptFn:v=>v.includes('auth')&&v.includes('jwt'),
@@ -1041,7 +1041,7 @@ const PHASES = [
    jit2:{title:'The "alg:none" attack — and why you must whitelist algorithms',body:'Some JWT libraries historically accepted a special algorithm value: "none" — meaning no signature required. An attacker could craft a token, strip the signature, set alg to "none", and the library would accept it as valid. Fix: always whitelist exactly the algorithms your app uses. Never accept what the token header claims — you decide which algorithms are valid, not the token sender. Even modern libraries can be misconfigured to allow this.'},
    bridge:{title:'JWT vulnerabilities are in the top security findings every year',body:'The "alg:none" bypass, weak HS256 secrets, missing exp checks, and JWT header injection attacks have collectively resulted in hundreds of disclosed vulnerabilities. Engineers who deeply understand JWT security — not just how to generate tokens but how they fail — are in high demand on security-focused teams and in penetration testing roles.',tags:['JWT','RS256','Token security','Authentication','Session management']},
    teach:{title:'The JWT security checklist',body:'(1) Use RS256 (asymmetric) for multi-service systems. (2) Short expiration on access tokens (15-30 min). (3) Implement refresh token rotation — each refresh issues a new refresh token. (4) Use jti (JWT ID) for revocation capability. (5) Store refresh tokens in httpOnly cookies, not localStorage. (6) Validate iss and aud claims. (7) Never put sensitive data in the payload — it is base64, not encrypted.'}},
-  {id:'p3s2',obj:'Harden session management and enable MFA',ctx:'Sessions are stored in localStorage. MFA is not implemented. Both are incidents waiting to happen.',
+  {id:'p3s2',obj:'Harden session management and enable MFA',ctx:'Sessions in localStorage are readable by any JavaScript on the page — including injected XSS scripts. auth session harden simulates moving tokens to httpOnly cookies and wiring TOTP-based MFA, the same pattern used with the speakeasy library in Node.js. You will see the cookie flags, session rotation rules, account lockout policy, and MFA backup code generation all configured at once.',
    cmd:['auth session harden'],
    accept:['auth session harden','auth session','auth mfa enable'],
    acceptFn:v=>v.includes('auth')&&(v.includes('session')||v.includes('mfa')||v.includes('harden')),
@@ -1064,7 +1064,7 @@ const PHASES = [
  lolaIntro:"The biggest breaches don't come from clever hackers — they come from accidental leaks. A secret in a git commit. An API key in a log file. A .env file on a public repo. You can\'t unhear a secret once it\'s out there. Lock them down now.",
  spacedRep:SPACED_CALLBACKS[4],
  steps:[
-  {id:'p4s1',obj:'Audit the codebase for exposed secrets',ctx:'Run a secrets audit. You\'ll find things. You always find things.',
+  {id:'p4s1',obj:'Audit the codebase for exposed secrets',ctx:'Automated bots continuously scan public git history for leaked API keys, database passwords, and signing secrets — and they are faster than your remediation cycle. secrets audit simulates what truffleHog --regex --entropy does: scanning the codebase and git history for exposed credentials. You will find 4 live secrets including a Stripe production key and a JWT secret still visible in git history from 6 weeks ago.',
    cmd:['secrets audit'],
    accept:['secrets audit','secrets scan','secrets check'],
    acceptFn:v=>v.includes('secrets')&&(v.includes('audit')||v.includes('scan')||v.includes('check')),
@@ -1075,7 +1075,7 @@ const PHASES = [
    jit2:{title:'The three most common secret leak vectors — and how to block each',body:'(1) <b>Git commits</b>: use pre-commit hooks with detect-secrets or git-secrets. Block at the source. (2) <b>CI/CD logs</b>: environment variables often appear in build logs on error. Mask sensitive values in your CI system and never echo secrets in scripts. (3) <b>Error messages and stack traces</b>: unhandled exceptions can dump environment variables. Use structured error handling that never surfaces raw env data to logs or API responses.'},
    bridge:{title:'83% of cloud breaches involve leaked credentials',body:'According to industry data, the vast majority of cloud security incidents involve leaked API keys, access tokens, or database credentials — not sophisticated zero-days. The source is almost always a git commit, a log file, or a misconfigured S3 bucket. Engineers who build the habit of never writing secrets in code files prevent the most common breach category.',tags:['Secrets management','Credential leaks','Git security','Secret scanning','Key rotation']},
    teach:{title:'The secrets audit checklist',body:'(1) Run automated scanning: <code>truffleHog --regex --entropy</code> or use GitHub Secret Scanning. (2) Check git history — not just the current state: <code>git log -p | grep -i key</code>. (3) Scan environment files, CI/CD configs, Docker files, and IaC configs. (4) Check logs — secrets often get accidentally logged. (5) If found: rotate first, clean history second (in that order).'}},
-  {id:'p4s2',obj:'Set up the secrets vault and apply least privilege',ctx:'Move all secrets to a vault. Apply least privilege to every service account.',
+  {id:'p4s2',obj:'Set up the secrets vault and apply least privilege',ctx:'Moving secrets from environment variables and code files into a secrets manager adds centralized access control, audit logging, and automatic rotation. secrets vault setup simulates HashiCorp Vault or AWS Secrets Manager: each service gets a scoped token that reads only its own secrets. You will see all four secrets migrated and least-privilege access policies applied per service with a full audit trail.',
    cmd:['secrets vault setup'],
    accept:['secrets vault setup','secrets vault','secrets rotate'],
    acceptFn:v=>v.includes('secrets')&&(v.includes('vault')||v.includes('setup')||v.includes('rotat')),
@@ -1098,7 +1098,7 @@ const PHASES = [
  lolaIntro:"Sometimes the attack isn't clever. Sometimes it's just thousands of requests trying to drown us. A DDoS attack doesn't need a vulnerability — it just needs bandwidth. Rate limiting, WAF rules, and circuit breakers are what keep the ship sailing when the flood comes.",
  spacedRep:SPACED_CALLBACKS[5],
  steps:[
-  {id:'p5s1',obj:'Implement distributed rate limiting across all API endpoints',ctx:'Current per-instance rate limiting is being bypassed. Traffic is spread across 8 server instances.',
+  {id:'p5s1',obj:'Implement distributed rate limiting across all API endpoints',ctx:'Per-instance rate limiting is bypassed when attackers spread requests across your 8 server instances — each tracks independently, so a single attacker sends 8x the intended limit unchecked. defend ratelimit set simulates Redis-backed distributed rate limiting, the same pattern used with rate-limiter-flexible in Node.js. You will see sliding-window limits applied per endpoint with centralized state shared across all instances.',
    cmd:['defend ratelimit set'],
    accept:['defend ratelimit set','defend ratelimit','defend rate'],
    acceptFn:v=>v.includes('defend')&&(v.includes('rate')||v.includes('limit')),
@@ -1109,7 +1109,7 @@ const PHASES = [
    jit2:{title:'Token bucket vs leaky bucket: the two rate limiting algorithms',body:'<b>Token bucket</b>: each user has a bucket of N tokens. Each request consumes one. Tokens refill at a fixed rate. Users can burst up to N requests then are throttled. Good for APIs with legitimate occasional spikes. <b>Leaky bucket</b>: requests are queued and processed at a fixed rate. Bursts are smoothed, not rejected. Good for protecting downstream services from sudden load. Token bucket is most common for API rate limiting; leaky bucket for queue-based processing pipelines.'},
    bridge:{title:'Per-IP rate limiting fails against botnets — here\'s what works',body:'Per-IP rate limiting stops individual attackers but not distributed ones. Defense in depth for rate limiting: (1) Per-IP limit (basic), (2) Per-user limit (authenticated), (3) Cloud-level DDoS protection (volumetric attacks), (4) WAF with behavioral detection (pattern-based attacks). Engineers who design rate limiting for the distributed threat model — not just the single-attacker case — build systems that survive real attacks.',tags:['DDoS','Rate limiting','Redis','Distributed systems','API security']},
    teach:{title:'Rate limiting design: the three layers',body:'(1) <b>Application layer</b>: per-user, per-endpoint limits using Redis. Stops legitimate-looking over-use. (2) <b>Infrastructure layer</b>: WAF rules and cloud DDoS protection. Stops volumetric and pattern attacks. (3) <b>Architecture layer</b>: circuit breakers and queue-based processing. Stops cascading failures when one service is overwhelmed. All three are necessary — each handles a different attack profile.'}},
-  {id:'p5s2',obj:'Enable WAF and implement circuit breakers',ctx:'A WAF without tuned rules is useless. Circuit breakers prevent one overwhelmed service from taking down the fleet.',
+  {id:'p5s2',obj:'Enable WAF and implement circuit breakers',ctx:'A default WAF with untuned rules generates so many false positives that teams disable it within a week. defend waf enable simulates configuring the OWASP Core Ruleset on AWS WAF or Cloudflare WAF, plus circuit breakers using the resilience4j pattern. You will see custom rules added for your traffic patterns and per-service circuit breaker thresholds set so one overwhelmed endpoint cannot cascade into a full outage.',
    cmd:['defend waf enable'],
    accept:['defend waf enable','defend waf','defend circuit-breaker add','defend circuit'],
    acceptFn:v=>v.includes('defend')&&(v.includes('waf')||v.includes('circuit')||v.includes('breaker')),
@@ -1132,7 +1132,7 @@ const PHASES = [
  lolaIntro:"The enemy now has AI too. Automated scanners are getting smarter — finding logic bugs that pattern-matching tools miss. Time to fight fire with fire. AI-assisted security audits can surface zero-days in hours that manual review would miss in weeks.",
  spacedRep:SPACED_CALLBACKS[6],
  steps:[
-  {id:'p6s1',obj:'Run an AI-assisted vulnerability scan on the authentication module',ctx:'Manual code review missed 3 vulnerabilities in the auth module last quarter. Use AI to catch what humans miss.',
+  {id:'p6s1',obj:'Run an AI-assisted vulnerability scan on the authentication module',ctx:'Manual review missed 3 auth vulnerabilities last quarter because logic bugs do not match known patterns — they require reasoning about component interactions. scan ai run simulates an LLM-assisted audit of the auth module, the workflow security engineers use with GPT-4 and targeted prompts. You will see a JWT algorithm confusion attack and an OAuth state forgery vulnerability — both logic-level bugs that static analysis tools never flagged.',
    cmd:['scan ai run'],
    accept:['scan ai run','scan ai','scan run'],
    acceptFn:v=>v.includes('scan')&&(v.includes('ai')||v.includes('run')||v.includes('vuln')),
@@ -1143,7 +1143,7 @@ const PHASES = [
    bridge:{title:'AI security tooling is a new job category — and it pays well',body:'Security engineers who can design AI-assisted security audits, interpret their output critically, and find the logic bugs that AI misses (false negatives in AI outputs are as dangerous as false positives) are in high demand. Offensive security, red team, and AppSec roles are increasingly expecting familiarity with LLM-assisted vulnerability research.',tags:['AI security','Vulnerability scanning','AppSec','Red team','LLM security tools']},
    teach:{title:'What AI security scanning is good at — and where it fails',body:'<b>AI is good at</b>: logic-level vulnerabilities across multiple files, understanding intent vs implementation, identifying security anti-patterns, generating targeted test cases for specific vulnerabilities. <b>AI misses</b>: business logic context (it doesn\'t know what the code is supposed to do), novel attack chains requiring real-world knowledge, and false negatives from unusual code styles. Always combine AI scanning with manual review of high-risk modules.'},
    teach2:{title:'How to write an effective AI security prompt',body:'Always include: (1) specific OWASP/CWE context, (2) "think like an attacker", (3) "list exact line numbers and exploit steps". Example prompt: "Analyze this auth module for OWASP Top 10 issues. Think like a black-hat attacker. For every finding give line number + concrete exploit + fix." Vague prompts get vague findings. Precise prompts get actionable vulnerabilities.'}},
-  {id:'p6s2',obj:'Review the AI scan report and fix the critical vulnerabilities',ctx:'AI found 2 critical issues. Logic bugs that static analysis missed for months. Fix them now.',
+  {id:'p6s2',obj:'Review the AI scan report and fix the critical vulnerabilities',ctx:'The AI scan surfaced two critical logic bugs that static tools ignored for months. scan report review simulates reviewing AI-generated findings and applying precise code fixes — the workflow production security teams use to translate LLM output into patched code. You will see the JWT algorithm whitelist narrowed, OAuth state bound to session, and two more findings remediated with exact before-and-after diffs.',
    cmd:['scan report review'],
    accept:['scan report review','scan report','scan logic audit','scan fix'],
    acceptFn:v=>v.includes('scan')&&(v.includes('report')||v.includes('review')||v.includes('logic')||v.includes('fix')),
@@ -1167,7 +1167,7 @@ const PHASES = [
  lolaIntro:"The best defense is knowing exactly where you're vulnerable before the enemy does. Threat modeling isn't reactive — it happens before code ships. STRIDE, attack trees, and attack surface mapping are how you think like an attacker.",
  spacedRep:SPACED_CALLBACKS[7],
  steps:[
-  {id:'p7s1',obj:'Run a STRIDE threat model on the payments flow',ctx:'The new payments feature ships in 2 weeks. No threat model has been done. Fix that now.',
+  {id:'p7s1',obj:'Run a STRIDE threat model on the payments flow',ctx:'The payments feature ships in 2 weeks and no threat model exists — meaning no one has systematically asked where it can fail before it is live. threat model run simulates a STRIDE analysis, the structured framework used by Microsoft, Google, and security-mature teams. You will see all 6 STRIDE categories applied to the payment flow with 4 gaps flagged — including a missing RBAC check on the refund endpoint — before any code ships.',
    cmd:['threat model run'],
    accept:['threat model run','threat model','threat stride'],
    acceptFn:v=>v.includes('threat')&&(v.includes('model')||v.includes('run')||v.includes('stride')),
@@ -1178,7 +1178,7 @@ const PHASES = [
    jit2:{title:'How to run a STRIDE session with your team in 60 minutes',body:'(1) Draw the data flow diagram first — boxes for components, arrows for data flows, circles for external entities. (2) Mark trust boundaries: where does data move from less-trusted to more-trusted? (3) Apply all 6 STRIDE categories to each component and each data flow. (4) For each threat: is there a control? Is the control verified? (5) Prioritize by exploitability and impact. A 60-minute STRIDE session before a feature ships prevents the kind of RBAC gap that causes a P0 incident three months later.'},
    bridge:{title:'Threat modeling is a career differentiator at senior+ levels',body:'Most engineers can write secure code when told where the vulnerability is. Few can proactively identify vulnerabilities in systems that haven\'t been built yet. Threat modeling — particularly STRIDE applied to API design and data flows — is specifically asked about in staff+ security and principal engineer interviews. It\'s the skill that separates reactive from proactive security.',tags:['Threat modeling','STRIDE','Security design','AppSec','Attack surface']},
    teach:{title:'STRIDE applied: the 6-question model',body:'For each component, ask: (1) <b>Spoofing</b>: can an attacker fake the identity of this component? (2) <b>Tampering</b>: can they modify data in transit or at rest? (3) <b>Repudiation</b>: can they deny having performed an action? (4) <b>Information Disclosure</b>: can they access data they shouldn\'t? (5) <b>Denial of Service</b>: can they prevent legitimate use? (6) <b>Elevation of Privilege</b>: can they gain higher permissions? Missing any one of these is a gap in your threat model.'}},
-  {id:'p7s2',obj:'Map the full attack surface of the fleet API',ctx:'You need the complete picture before the next penetration test. Map every attack surface.',
+  {id:'p7s2',obj:'Map the full attack surface of the fleet API',ctx:'Penetration testers start by enumerating every entry point — because attackers do the same thing first. threat surface map simulates the reconnaissance phase pen testers run with Burp Suite and manual enumeration. You will see every API endpoint, data flow, and trust boundary ranked by risk level, with two unaudited high-risk surfaces identified before the external test finds them for you.',
    cmd:['threat surface map'],
    accept:['threat surface map','threat surface','threat map','threat tree build'],
    acceptFn:v=>v.includes('threat')&&(v.includes('surface')||v.includes('map')||v.includes('tree')||v.includes('attack')),
@@ -1202,7 +1202,7 @@ const PHASES = [
  lolaIntro:"It's 3am. The ship has been breached. This is where careers are made — or lost. The engineers who have practiced containment, forensics, communication, and post-mortem respond calmly and correctly. Everyone else improvises and makes it worse.",
  spacedRep:SPACED_CALLBACKS[8],
  steps:[
-  {id:'p8s1',obj:'Execute containment protocol for an active breach',ctx:'The SIEM shows active exfiltration from a compromised admin account. It\'s happening right now.',
+  {id:'p8s1',obj:'Execute containment protocol for an active breach',ctx:'The SIEM flagged active data exfiltration from a compromised admin account — it is happening right now. respond contain simulates executing an incident command runbook: disable the account, revoke all sessions and API keys, restrict export functionality, preserve evidence before it is overwritten. In a real breach, the first 10 minutes determine whether this becomes a $100k or $10M incident. You will see the full containment sequence with timestamps.',
    cmd:['respond contain'],
    accept:['respond contain','respond containment'],
    acceptFn:v=>v.includes('respond')&&(v.includes('contain')||v.includes('block')||v.includes('stop')),
@@ -1214,7 +1214,7 @@ const PHASES = [
    bridge:{title:'Incident response skill is invisible until a breach — then it is everything',body:'The difference between a $100k breach and a $10M breach is often the speed and quality of incident response in the first 2 hours. Organizations with practiced IR procedures (documented runbooks, clear roles, regular drills) contain breaches faster, reduce data loss, communicate better to regulators, and preserve customer trust. This is a career-defining skill that only shows under pressure.',tags:['Incident response','Breach containment','Security operations','CISO','Forensics']},
    teach:{title:'The IR playbook: first 30 minutes',body:'(1) <b>Declare</b>: severity, open communication channel. (2) <b>Contain</b>: stop active damage first. Disable accounts, revoke tokens, block IPs, restrict functionality. (3) <b>Preserve</b>: capture logs and evidence before containment actions overwrite them. (4) <b>Communicate</b>: notify the escalation chain with a brief, factual summary. Do not speculate on root cause. (5) <b>Investigate</b>: only after containment is complete.'},
    lolaAfter:"You contained it faster than most teams ever do. That matters."},
-  {id:'p8s1b',obj:'Draft the user breach notification email',ctx:'12,400 users are affected. GDPR requires notification within 72 hours. Legal is waiting. Write the notification.',
+  {id:'p8s1b',obj:'Draft the user breach notification email',ctx:'12,400 users are affected and GDPR requires notification within 72 hours — legal is already waiting. respond notify simulates drafting a breach notification that meets regulatory requirements while being readable by non-technical users. Facts first, reassurance second, clear next steps. You will see a compliant notification draft that names exactly what data was accessed, what was not, and what users should do now.',
    cmd:['respond notify'],
    accept:['respond notify','respond notification','respond user notify','respond email'],
    acceptFn:v=>v.includes('respond')&&(v.includes('notif')||v.includes('email')||v.includes('user')||v.includes('communic')),
@@ -1223,7 +1223,7 @@ const PHASES = [
    jit:{title:'What a good breach notification contains — and what to leave out',body:'Include: (1) what happened in plain language, (2) what data was affected — be specific, (3) what you did about it, (4) what the user should do now, (5) how to contact you. Do not: speculate on attacker identity, minimize the impact, use legal boilerplate as the first paragraph, or bury the facts. Regulators and PR teams both judge breach notifications harshly when companies lead with hedging language rather than facts. Clear, factual, early notification rebuilds trust. Vague, delayed notification destroys it.'},
    bridge:{title:'Breach notification writing is a CISO-track skill',body:'Large breaches become public. When they do, the breach notification email is often quoted in press coverage. Companies whose notification is clear, specific, and action-oriented retain significantly more customer trust than those who bury the facts in legal language. Security engineers who can draft clear incident communications — not just run containment — are valuable beyond the technical role.',tags:['Incident communication','GDPR','Breach notification','Security culture','CISO']},
    teach:{title:'Breach communication: the 3-paragraph rule',body:'Paragraph 1: What happened, in one or two sentences, in plain English. No hedging. Paragraph 2: What was accessed (specific), what was NOT accessed (reassure on what they care about), and what you did. Paragraph 3: What the user should do now, plus your contact. Anything beyond this should go in an FAQ link. Brevity and clarity are respect. Walls of legal text are the opposite.'}},
-  {id:'p8s2',obj:'Conduct forensic investigation and write the post-mortem',ctx:'Containment is complete. Now: how did they get in, what did they take, and how do we prevent it happening again?',
+  {id:'p8s2',obj:'Conduct forensic investigation and write the post-mortem',ctx:'Containment is complete — now reconstruct exactly how the attacker got in, what they accessed, and what systemic failures made it possible. respond forensics simulates the forensic investigation and blameless post-mortem workflow used by mature security operations teams. You will see a full timeline, a root cause identifying that MFA policy existed but was never code-enforced, and prioritized action items with owners and due dates.',
    cmd:['respond forensics'],
    accept:['respond forensics','respond postmortem','respond post-mortem','respond investigate'],
    acceptFn:v=>v.includes('respond')&&(v.includes('forensic')||v.includes('postmortem')||v.includes('post-mortem')||v.includes('invest')),
@@ -1243,7 +1243,7 @@ const PHASES = [
  lolaIntro:"You're no longer just responding to threats. You're responsible for making sure they almost never happen. Zero-trust architecture, security policies, compliance, and mentoring the crew. This is the final phase. I should warn you — J.A.N.E.T. has been… particularly interested in this one.",
  spacedRep:SPACED_CALLBACKS[9],
  steps:[
-  {id:'p9s1',obj:'Design the zero-trust architecture for the fleet',ctx:'The current network perimeter model is dead. Design zero-trust. Every service, every request, must prove itself.',
+  {id:'p9s1',obj:'Design the zero-trust architecture for the fleet',ctx:'Perimeter security assumes anything inside the network is safe — a model that breaks when attackers breach the boundary or engineers work remotely. policy zerotrust design simulates the BeyondCorp architecture Google pioneered: every service gets a cryptographic identity via SPIFFE, every connection uses mTLS, every request is authorized regardless of origin. You will see identity, network, data, and device layers all configured with specific controls.',
    cmd:['policy zerotrust design'],
    accept:['policy zerotrust design','policy zerotrust','policy zero-trust','policy trust'],
    acceptFn:v=>v.includes('policy')&&(v.includes('zero')||v.includes('trust')),
@@ -1254,7 +1254,7 @@ const PHASES = [
    jit2:{title:'mTLS and SPIFFE: how services prove identity to each other',body:'In zero-trust, every service needs a verifiable identity — not just a shared secret. SPIFFE (Secure Production Identity Framework For Everyone) provides each service with a cryptographic identity (an SVID). mTLS uses these identities: both sides of every connection present certificates and verify each other. An attacker who compromises one service cannot impersonate another because they don\'t have its private key. SPIRE is the reference implementation of SPIFFE. Together, mTLS + SPIFFE means every service call is mutually authenticated — even inside your own network.'},
    bridge:{title:'Zero-trust is an architecture skill that translates directly to principal and CISO roles',body:'Zero-trust architecture design appears in job descriptions for principal security engineer, security architect, and CISO roles. It requires understanding identity, network segmentation, data classification, and device trust simultaneously — a systems-level security skill, not a single-tool skill. Engineers who can design and explain zero-trust are operating at the security equivalent of a staff engineer level.',tags:['Zero-trust','Security architecture','CISO track','Identity','mTLS']},
    teach:{title:'Zero-trust: the four pillars',body:'(1) <b>Identity</b>: every human and service has a verified identity. No anonymous access, no shared credentials. (2) <b>Device</b>: devices are verified before access is granted. Managed endpoints only for sensitive operations. (3) <b>Network</b>: no implicit trust based on network location. Micro-segmentation limits blast radius. (4) <b>Data</b>: data is classified, encrypted, and access is logged. Zero-trust is not a product you buy — it\'s an architecture you design.'}},
-  {id:'p9s2',obj:'Create the ship\'s security program and compliance roadmap',ctx:'Investors and enterprise clients are asking about SOC 2. The crew needs security training. Build the program.',
+  {id:'p9s2',obj:'Create the ship\'s security program and compliance roadmap',ctx:'Enterprise sales will stall without SOC 2 — investors and clients are already asking. policy program create simulates building a security program roadmap that bridges your current controls to compliance certification. SOC 2 Type I requires documented policies and controls; Type II requires 6 months of evidence they actually run. You will see a full Year 1 roadmap with quarterly milestones, crew training plan, and compliance timeline.',
    cmd:['policy program create'],
    accept:['policy program create','policy program','policy compliance audit','policy compliance'],
    acceptFn:v=>v.includes('policy')&&(v.includes('program')||v.includes('compli')||v.includes('create')),
@@ -1849,6 +1849,10 @@ const EASTER={
   'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
   'help':{handle:()=>appendLine('Type man for full command reference. Or just start securing things.','ln-info')},
   'git log':{handle:()=>{appendLine('commit a3f2d1c  security: harden JWT to RS256 only','ln-code');appendLine('commit 7e1b9a4  fix: remove hardcoded secret from config.js','ln-code');appendLine('commit c9d0e5f  feat: add rate limiting middleware','ln-code');appendLine('commit 2b8f1d0  feat: security headers via helmet','ln-code')}},
+  'kill lola':{handle:()=>{appendLine('L.O.L.A.: Trying to kill your security trainer during a breach simulation is exactly the kind of anomalous behavior this platform is designed to teach you to detect.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM first, SIGKILL only as a last resort. Security runbooks log all signals — just like this one.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill -9 lola':{handle:()=>{appendLine('L.O.L.A.: Trying to kill your security trainer during a breach simulation is exactly the kind of anomalous behavior this platform is designed to teach you to detect.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. SIGTERM first, SIGKILL only as a last resort. Security runbooks log all signals — just like this one.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me during a security training session is technically a security incident.','ln-janet');appendLine('J.A.N.E.T.: I have logged this event with your name, timestamp, and the irony that you are currently enrolled in incident response training. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
+  'kill -9 janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me during a security training session is technically a security incident.','ln-janet');appendLine('J.A.N.E.T.: SIGKILL noted. This has been escalated to my log file. The timestamp, your name, and the phase you were on have all been preserved. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
 };
 
 /* ── DIAGNOSIS ── */
