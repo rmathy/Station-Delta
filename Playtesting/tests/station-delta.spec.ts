@@ -27,6 +27,7 @@ const SIMS = [
     callsign: 'TestCadet',
     expectedBootText: 'VIBE CADET ACADEMY',
     expectedPrompt: 'cadet@vibe',
+    bootBtnText: /BEGIN TRAINING/i,
   },
   {
     name: 'Vibe Engineer',
@@ -34,6 +35,7 @@ const SIMS = [
     callsign: 'TestEngineer',
     expectedBootText: 'VIBE ENGINEER ACADEMY',
     expectedPrompt: 'engineer@station',
+    bootBtnText: /BEGIN TRAINING/i,
   },
   {
     name: 'Vibe Lieutenant',
@@ -41,7 +43,15 @@ const SIMS = [
     callsign: 'TestLieutenant',
     expectedBootText: 'VIBE LIEUTENANT',
     expectedPrompt: 'lt@',
+    bootBtnText: /ACCEPT COMMISSION/i,
   },
+];
+
+// Officer sims used for auth-gate tests (no full Supabase check needed — just redirect verification)
+const OFFICER_AUTH_GATE_SIMS = [
+  { name: 'Chaos Officer', url: '/officer-track/vibe-chaos-officer.html' },
+  { name: 'Comms Officer', url: '/officer-track/vibe-comms-officer.html' },
+  { name: 'Security Officer', url: '/officer-track/vibe-security-officer.html' },
 ];
 
 // ─── HELPER: Boot into a sim ─────────────────────────────────────
@@ -53,8 +63,8 @@ async function bootSim(page, sim) {
   await callsignInput.waitFor({ state: 'visible', timeout: SHORT });
   await callsignInput.fill(sim.callsign);
 
-  // Click BEGIN TRAINING
-  const beginBtn = page.getByRole('button', { name: /BEGIN TRAINING/i });
+  // Click the boot entry button (text varies by sim)
+  const beginBtn = page.getByRole('button', { name: sim.bootBtnText });
   await beginBtn.click();
 
   // Wait for terminal
@@ -339,6 +349,40 @@ for (const sim of SIMS) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// BLOCK 9 — OFFICER-TRACK AUTH REDIRECT
+// Unauthenticated users must be redirected to auth.html
+// Uses a fresh browser context with no localStorage state
+// ═══════════════════════════════════════════════════════════════════
+
+for (const sim of OFFICER_AUTH_GATE_SIMS) {
+  test(`[${sim.name}] Auth gate — unauthenticated user redirected to auth.html`, async ({ browser }) => {
+    // Fresh context = no localStorage (simulates a new unauthenticated visitor)
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    try {
+      await page.goto(sim.url, { waitUntil: 'networkidle', timeout: LONG });
+
+      // Should have been redirected to auth.html
+      await page.waitForURL(/\/auth\.html/, { timeout: SHORT });
+
+      const currentUrl = page.url();
+      expect(currentUrl).toContain('/auth.html');
+
+      // The redirect param must point back to the officer sim
+      const url = new URL(currentUrl);
+      const redirectParam = url.searchParams.get('redirect');
+      expect(redirectParam).toBeTruthy();
+      expect(decodeURIComponent(redirectParam!)).toContain('officer-track');
+
+      console.log(`[${sim.name}] Auth gate confirmed: unauthenticated redirect to ${currentUrl}`);
+    } finally {
+      await context.close();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BLOCK 8 — MOBILE LAYOUT (Pass D physical device proxy)
 // Uses Playwright mobile emulation as a pre-check before real device
 // ═══════════════════════════════════════════════════════════════════
@@ -360,7 +404,7 @@ for (const sim of SIMS) {
 
     // Fill and boot
     await bootInput.fill(sim.callsign);
-    await page.getByRole('button', { name: /BEGIN TRAINING/i }).click();
+    await page.getByRole('button', { name: sim.bootBtnText }).click();
 
     // Terminal input must be reachable on mobile
     const terminalInput = page.locator('#cmd');
