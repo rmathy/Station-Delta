@@ -68,7 +68,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 @keyframes bossGlow{0%,100%{box-shadow:0 0 8px var(--red),0 0 20px rgba(239,68,68,.15)}50%{box-shadow:0 0 20px var(--red),0 0 50px rgba(239,68,68,.3)}}
 
 /* ── LAYOUT ── */
-#shell{display:grid;grid-template-rows:48px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
+#shell{display:grid;grid-template-rows:48px 28px 1fr;grid-template-columns:1fr 380px;height:100vh;gap:0;overflow:hidden}
 
 /* ── TOPBAR ── */
 #topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 18px}
@@ -379,6 +379,54 @@ input[type=text]:focus{border-color:var(--silver)}
 .diag-hd-prog{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:5px;font-weight:700;display:flex;gap:6px;align-items:center}
 .diag-level-badge{background:var(--amber);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700}
 .diag-takeaway{margin-top:8px;padding:6px 10px;background:var(--surface);border-left:2px solid var(--purple);border-radius:0 var(--r4) var(--r4) 0;font-size:11px;color:var(--purple)}
+/* ── LOLA STRIP ── */
+#lola-strip{grid-column:1/-1;background:linear-gradient(90deg,rgba(139,92,246,.08),rgba(16,185,129,.08));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;height:28px;overflow:hidden;flex-shrink:0;position:relative}
+#lola-strip-avatar{flex-shrink:0;background:rgba(16,185,129,.12);color:var(--green,#10b981);font-size:9px;font-weight:700;letter-spacing:.1em;padding:0 10px;height:100%;display:flex;align-items:center;border-right:1px solid var(--border);white-space:nowrap}
+#lola-strip-ctrls{display:flex;align-items:center;gap:6px;padding:0 8px;flex-shrink:0}
+.strip-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:.05em;line-height:1}
+.strip-btn:hover{color:var(--text);border-color:var(--border)}
+.strip-btn[aria-pressed="true"]{border-color:var(--green,#10b981);color:var(--green,#10b981)}
+#lola-strip-scroll{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+#lola-strip-inner{display:flex;align-items:center;gap:0;white-space:nowrap;will-change:transform;padding-left:14px}
+.lola-strip-msg{font-size:11px;color:var(--cyan,#00bcd4);padding:0 20px 0 0;display:inline-flex;align-items:center;gap:7px}
+.lola-strip-msg .ls-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green,#10b981);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);padding:1px 6px;border-radius:3px}
+/* ── RIGHT HEADER & COLLAPSE ── */
+#right-header{display:flex;align-items:center;justify-content:flex-end;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border)}
+#right-collapse-btn{background:var(--s2);border:1px solid var(--b2);color:var(--muted2);padding:5px 9px;border-radius:4px;font-size:10px;cursor:pointer;letter-spacing:.05em}
+#right-collapse-btn:hover{color:var(--text);border-color:var(--border)}
+#shell.right-collapsed{grid-template-columns:1fr 46px}
+#shell.right-collapsed #right > :not(#right-header){display:none}
+#shell.right-collapsed #right-header{justify-content:center;padding:8px 4px;height:100%}
+#shell.right-collapsed #right-collapse-btn{writing-mode:vertical-rl;text-orientation:mixed;min-height:130px;min-width:34px;font-size:9px}
+#shell.strip-hidden #lola-strip{display:none}
+/* ── CHECKPOINT MODAL ── */
+.checkpoint-box{background:var(--s2);border:1px solid var(--green,#10b981);border-radius:var(--r8);padding:18px;margin:18px 0;text-align:left}
+.checkpoint-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green,#10b981);margin-bottom:6px}
+.checkpoint-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.checkpoint-copy{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:8px}
+.checkpoint-next{font-size:12px;color:var(--muted2)}
+/* ── MOBILE ── */
+@media(max-width:820px){
+  #shell{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 170px}
+  #shell.strip-hidden{grid-template-rows:48px 0px 1fr 170px}
+  #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px 1fr 52px}
+  #shell.right-collapsed.strip-hidden{grid-template-rows:48px 0px 1fr 52px}
+  #topbar{padding:0 10px;gap:8px}
+  #logo{font-size:10px;letter-spacing:.1em}
+  #phase-track{display:none}
+  #tb-right{margin-left:auto;gap:5px}
+  #tb-right .tbbtn{display:none}
+  #right{border-top:1px solid var(--border);min-height:130px;max-height:36vh;overflow-y:auto}
+  #right-header{display:none}
+  #shell.right-collapsed #right{min-height:52px;max-height:52px}
+  #shell.right-collapsed #right-header{display:flex;justify-content:center;padding:8px 10px;height:auto}
+  #shell.right-collapsed #right-collapse-btn{writing-mode:horizontal-tb;text-orientation:mixed;min-height:36px;min-width:100%;font-size:10px}
+  #crew-sec,#telem-sec,#playbook-sec{display:none}
+  #input-row{min-height:44px;padding:0 12px calc(6px + env(safe-area-inset-bottom,0px))}
+  #cmd{font-size:16px}
+  .strip-btn,#right-collapse-btn{min-height:36px;min-width:44px}
+  .mbtn{min-height:44px}
+}
 </style>
 </head>
 <body>
@@ -397,23 +445,38 @@ input[type=text]:focus{border-color:var(--silver)}
     </div>
   </div>
 
+  <div id="lola-strip">
+    <div id="lola-strip-avatar">⬡ L.O.L.A.</div>
+    <div id="lola-strip-scroll">
+      <div id="lola-strip-inner">
+        <span class="lola-strip-msg"><span class="ls-tag">tip</span> Read the objective card in the right panel, then type the exact command shown to advance.</span>
+      </div>
+    </div>
+    <div id="lola-strip-ctrls">
+      <button class="strip-btn" id="strip-pause-btn" aria-pressed="false" aria-label="Pause scrolling guidance" onclick="toggleStripPause()">Pause</button>
+    </div>
+  </div>
+
   <div id="term-panel">
     <div id="term-titlebar">
       <div class="macs"><div class="mac r"></div><div class="mac y"></div><div class="mac g"></div></div>
       <div id="term-path">deploy@<span id="term-path-val">ship:/home/officer/ops</span></div>
     </div>
-    <div id="output"></div>
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
     <div id="active-cmds">
       <div id="active-cmds-hd">🔓 Unlocked Commands</div>
       <div id="active-cmds-list"><span style="font-size:10px;color:var(--muted);font-style:italic">Commands unlock as you progress</span></div>
     </div>
     <div id="input-row">
       <div id="prompt-pre">$</div>
-      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false">
+      <input type="text" id="cmd" placeholder="type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal command input" autocapitalize="off" autocorrect="off" enterkeyhint="send">
     </div>
   </div>
 
   <div id="right">
+    <div id="right-header">
+      <button id="right-collapse-btn" aria-pressed="false" aria-controls="right" aria-label="Collapse command and telemetry panel" onclick="toggleRightPanel()">Collapse</button>
+    </div>
     <div id="obj-card">
       <div id="obj-phase-label">Phase 1 of 9</div>
       <div id="obj-title">Loading…</div>
@@ -448,6 +511,23 @@ input[type=text]:focus{border-color:var(--silver)}
     <div id="telem-sec">
       <div id="telem-hd">Telemetry</div>
       <div id="telem-log"></div>
+    </div>
+  </div>
+</div>
+
+<div id="phase-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title-main">
+  <div class="mbox">
+    <div class="mtitle" id="phase-modal-title-main" style="color:var(--green)">Phase Checkpoint</div>
+    <div class="msub">You finished a full phase. This is a clean stopping point if you want a break.</div>
+    <div class="checkpoint-box">
+      <div class="checkpoint-kicker" id="phase-modal-kicker">Phase Complete</div>
+      <div class="checkpoint-title" id="phase-modal-title">Phase complete</div>
+      <div class="checkpoint-copy" id="phase-modal-copy">Good stopping point. Your progress is saved — you can return anytime and pick up where you left off.</div>
+      <div class="checkpoint-next" id="phase-modal-next">Next up: <b>—</b></div>
+    </div>
+    <div style="text-align:center">
+      <button class="mbtn mbtn-p" onclick="continueFromCheckpoint()">START NEXT PHASE</button>
+      <button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">TAKE A BREAK</button>
     </div>
   </div>
 </div>
@@ -722,10 +802,10 @@ const PHASES = [
   null,
   /* Phase 1: Build Pipeline Basics */
   {title:'Build Pipeline Basics',
-   lolaIntro:"Code is written. Now make it actually build reliably.",
+   lolaIntro:"Code is written. Now the question is whether it builds reliably every time, not just on your laptop. GitHub Actions CI is the standard: every push triggers lint, test, and build automatically. Cache dependencies so the run is fast, fail fast on the first broken step, and block merges that break the pipeline. You are building the system that keeps the repository in a permanently deployable state.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
-    {id:'p1s1',obj:'Initialize a GitHub Actions build pipeline',ctx:'The repo has no CI. Start with the basics.',
+    {id:'p1s1',obj:'Initialize a GitHub Actions build pipeline',ctx:'The repository has no CI pipeline — every commit goes directly to main unverified, and broken builds block the whole team. build pipeline init creates a GitHub Actions workflow at .github/workflows/ci.yml: lint, test, and build jobs chained in sequence, triggered on every push and pull request, with dependency caching. You will see every job in the pipeline confirmed and the trigger configuration verified.',
      cmd:['build pipeline init'],
      accept:['build pipeline init','build pipeline'],
      acceptFn:v=>v.includes('build')&&v.includes('pipeline'),
@@ -735,7 +815,7 @@ const PHASES = [
      jit:{title:'Why CI on every PR is non-negotiable',body:'Catching a broken build before it merges prevents “it worked on my machine” surprises in production.'},
      bridge:{title:'CI pipelines are the first line of defense',body:'Engineers who master build pipelines prevent the majority of release-day surprises.',tags:['CI/CD','GitHub Actions','Build pipeline']},
      teach:{title:'The minimal viable CI pipeline',body:'Lint → Test → Build. Run on every PR and every push to main. Cache dependencies. Fail fast.'}},
-    {id:'p1s2',obj:'Add Docker build and push to the pipeline',ctx:'The build produces a binary. Now turn it into a container.',
+    {id:'p1s2',obj:'Add Docker build and push to the pipeline',ctx:'A compiled binary cannot be deployed portably without a container defining its runtime environment. build docker build adds a multi-stage Docker build to the pipeline: one stage compiles, a second slim stage receives only the binary, and Trivy runs a vulnerability scan before pushing to the registry with an immutable git-SHA tag. You will see the image built, scanned clean, tagged, and pushed to the container registry.',
      cmd:['build docker build'],
      accept:['build docker build','build docker'],
      acceptFn:v=>v.includes('build')&&v.includes('docker'),
@@ -754,10 +834,10 @@ const PHASES = [
 
   /* Phase 2: Artifact Management */
   {title:'Artifact Management',
-   lolaIntro:"The build succeeded. Now turn it into something we can actually ship.",
+   lolaIntro:"The build succeeded — now you need a versioned, scannable, signable artifact that any environment can pull and deploy. Docker multi-stage builds produce slim, auditable images. Trivy catches known CVEs at build time. Cosign signs the image so Kyverno can enforce at deployment time that only verified images run. This is the supply-chain security foundation that enterprise deployments require.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
-    {id:'p2s1',obj:'Build and push a Docker image to the registry',ctx:'The binary exists. Now package it as a container.',
+    {id:'p2s1',obj:'Build and push a Docker image to the registry',ctx:'The binary exists but there is no verified, versioned, signed image that downstream environments can pull with confidence. artifact push builds a production-grade artifact: multi-stage Docker image tagged with git SHA and semver, scanned by Trivy for known vulnerabilities, and signed by Cosign to prove provenance. You will see the image pushed to GitHub Container Registry with a clean scan result and a cryptographic signature.',
      cmd:['artifact push'],
      accept:['artifact push','artifact build'],
      acceptFn:v=>v.includes('artifact')&&(v.includes('push')||v.includes('build')),
@@ -767,7 +847,7 @@ const PHASES = [
      jit:{title:'Why you must scan every image',body:'Supply-chain attacks are real. Trivy or Grype on every build prevents known vulnerabilities from reaching production.'},
      bridge:{title:'The Docker image is the unit of deployment',body:'Everything downstream depends on having clean, signed, versioned artifacts.',tags:['Docker','Registry','Artifact']},
      teach:{title:'The artifact management checklist',body:'Build → Scan → Tag with git SHA → Sign → Push to private registry. Never push unverified images.'}},
-    {id:'p2s2',obj:'Configure image scanning and signing in the pipeline',ctx:'Security wants every image scanned before it reaches production.',
+    {id:'p2s2',obj:'Configure image scanning and signing in the pipeline',ctx:'Security requires every container image to be scanned for known CVEs and signed before deployment — un-scanned images reaching production is an automatic compliance finding. artifact scan adds Trivy to the pipeline and enables Cosign signing, then configures a Kyverno policy in the cluster that blocks any unsigned or unscanned image from being scheduled. You will see the policy enforcement wired end to end.',
      cmd:['artifact scan'],
      accept:['artifact scan','artifact sign'],
      acceptFn:v=>v.includes('artifact')&&(v.includes('scan')||v.includes('sign')),
@@ -786,10 +866,10 @@ const PHASES = [
 
   /* Phase 3: GitOps Foundations */
   {title:'GitOps Foundations',
-   lolaIntro:"Declarative deploys. Git is now the source of truth.",
+   lolaIntro:"Push-based deployments using kubectl apply are manual, undocumented, and inconsistent across environments. GitOps flips the model: ArgoCD or Flux watches a Git repository and continuously reconciles the cluster to match the desired state. Every change is a Git commit. Every deploy is auditable and reversible. Drift is impossible by design. Git is now the source of truth.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
-    {id:'p3s1',obj:'Deploy an application using GitOps principles',ctx:'Current deploys are push-based and manual. Move to pull-based GitOps.',
+    {id:'p3s1',obj:'Deploy an application using GitOps principles',ctx:'Push-based deployments using kubectl apply or helm upgrade are manual, undocumented, and inconsistent across environments. gitops apply creates an ArgoCD Application that watches the Git repository and continuously reconciles the cluster to match the desired manifest state — the same GitOps pattern used by every serious Kubernetes platform team. You will see the Application created, manifests synced, and automatic reconciliation enabled.',
      cmd:['gitops apply'],
      accept:['gitops apply','gitops sync'],
      acceptFn:v=>v.includes('gitops')&&(v.includes('apply')||v.includes('sync')),
@@ -799,7 +879,7 @@ const PHASES = [
      jit:{title:'Push-based vs pull-based deployments',body:'Push-based (kubectl apply) is manual and error-prone. Pull-based (GitOps) is continuous and auditable.'},
      bridge:{title:'GitOps is the standard for production Kubernetes in 2026',body:'Every change is a Git commit. Every deploy is auditable and reversible.',tags:['GitOps','ArgoCD','Declarative']},
      teach:{title:'The GitOps workflow',body:'1. Commit manifests to Git. 2. ArgoCD/Flux detects change. 3. Automatically reconciles cluster to match Git. 4. Drift is impossible by design.'}},
-    {id:'p3s2',obj:'Configure automatic sync and health checks',ctx:'The application is deployed. Now make sure it stays in sync.',
+    {id:'p3s2',obj:'Configure automatic sync and health checks',ctx:'Deployment is only half the job — the cluster must also stay in the desired state even when someone runs kubectl edit or a pod crashes. gitops sync configures ArgoCD reconciliation at a 3-minute interval with prune enabled, health checks on every resource type, and sync waves for zero-downtime ordering. You will see the reconciliation interval, health check configuration, and prune policy all active and confirmed.',
      cmd:['gitops sync'],
      accept:['gitops sync','gitops health'],
      acceptFn:v=>v.includes('gitops')&&(v.includes('sync')||v.includes('health')),
@@ -818,10 +898,10 @@ const PHASES = [
 
   /* Phase 4: Environment & Secret Handling */
   {title:'Environment & Secret Handling',
-   lolaIntro:"Different environments need different config. Secrets must never leak.",
+   lolaIntro:"Hard-coded environment values and committed secrets cause the majority of deployment failures and compliance violations. Helm values files per environment keep config flexible without duplicating manifests. The External Secrets Operator pulls from Vault or AWS Secrets Manager at runtime so credentials never touch Git. You are building the config-and-secret isolation layer that makes multi-environment promotion safe.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
-    {id:'p4s1',obj:'Deploy an application with environment-specific values',ctx:'Hard-coded values are everywhere. Use ConfigMaps and Helm values.',
+    {id:'p4s1',obj:'Deploy an application with environment-specific values',ctx:'Hard-coded environment values in application code make every environment-specific deployment a manual code change and a source of subtle production bugs. k8s deploy replaces them with Helm chart values files per environment and Kubernetes ConfigMaps, the standard pattern for config externalization. You will see the application deployed with environment-specific values injected at runtime rather than baked into the image.',
      cmd:['k8s deploy'],
      accept:['k8s deploy','k8s helm'],
      acceptFn:v=>v.includes('k8s')&&(v.includes('deploy')||v.includes('helm')),
@@ -831,7 +911,7 @@ const PHASES = [
      jit:{title:'ConfigMap vs Secret',body:'ConfigMap for non-sensitive config. Secret for passwords, keys, tokens. Both can be mounted as files or environment variables.'},
      bridge:{title:'Environment-specific configuration is a common source of outages',body:'Proper separation of config from code prevents “it worked in staging” surprises.',tags:['ConfigMap','Helm','Environment']},
      teach:{title:'The correct way to handle configuration',body:'Application code reads from environment variables or mounted files. Never hard-code values. Use Helm values or Kustomize overlays per environment.'}},
-    {id:'p4s2',obj:'Securely manage secrets using Kubernetes Secrets',ctx:'Database credentials are still in code. Move them to proper secrets.',
+    {id:'p4s2',obj:'Securely manage secrets using Kubernetes Secrets',ctx:'Database credentials committed to Git or baked into images cannot be rotated without changing code — a permanent security liability. k8s secret create moves credentials into Kubernetes Secrets and wires the External Secrets Operator to sync from HashiCorp Vault or AWS Secrets Manager at runtime, the pattern SOC 2 and PCI auditors require. You will see the secret migration, runtime injection, and rotation policy all configured.',
      cmd:['k8s secret create'],
      accept:['k8s secret create','k8s secret'],
      acceptFn:v=>v.includes('k8s')&&v.includes('secret'),
@@ -850,10 +930,10 @@ const PHASES = [
 
   /* Phase 5: Blue-Green & Canary Deployments */
   {title:'Blue-Green & Canary Deployments',
-   lolaIntro:"Safe rollouts. Instant rollbacks. Zero downtime.",
+   lolaIntro:"Deployments that require downtime are a solved problem. Blue-green keeps the previous version live until the new one passes smoke tests, making rollback a single traffic switch. Canary shifts a percentage of real production traffic to the new version with automatic rollback on any metric degradation. Flagger and Argo Rollouts automate both. You are wiring the progressive delivery patterns mature platform teams use on every release.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
-    {id:'p5s1',obj:'Configure a blue-green deployment',ctx:'Current deploys cause downtime. Implement blue-green.',
+    {id:'p5s1',obj:'Configure a blue-green deployment',ctx:'Deployments that terminate pods before the new version is healthy cause downtime — users see errors during every release window. rollout bluegreen deploys the new green version alongside the stable blue version, runs smoke tests while blue still serves all traffic, and switches only after validation passes. The real tools are Argo Rollouts and Kubernetes Service selectors. You will see both versions running and the traffic switch gated by smoke tests.',
      cmd:['rollout bluegreen'],
      accept:['rollout bluegreen','rollout blue-green'],
      acceptFn:v=>v.includes('rollout')&&v.includes('blue'),
@@ -863,7 +943,7 @@ const PHASES = [
      jit:{title:'Blue-green gives instant rollback',body:'Switching traffic is just changing a Service selector or Ingress rule. No pods are deleted until the new version is validated.'},
      bridge:{title:'Blue-green is the gold standard for zero-downtime deploys',body:'Mature teams use it for every production release.',tags:['Blue-green','Zero-downtime','Rollback']},
      teach:{title:'Blue-green deployment steps',body:'1. Deploy new version (green). 2. Run smoke tests. 3. Switch traffic. 4. Monitor. 5. Delete old version (blue) after validation.'}},
-    {id:'p5s2',obj:'Implement a canary rollout with traffic shifting',ctx:'Blue-green is all-or-nothing. Add canary for gradual exposure.',
+    {id:'p5s2',obj:'Implement a canary rollout with traffic shifting',ctx:'Blue-green switches 100 percent of traffic at once — safe, but it gives you no real production signal before full exposure. rollout canary start shifts 5 percent of production traffic to the new version, runs automated analysis on error rate, latency, and business metrics, and triggers automatic rollback if any threshold is breached — the same pattern Flagger and Argo Rollouts implement. You will see the traffic split, analysis thresholds, and rollback trigger all active.',
      cmd:['rollout canary start'],
      accept:['rollout canary start','rollout canary'],
      acceptFn:v=>v.includes('rollout')&&v.includes('canary'),
@@ -882,10 +962,10 @@ const PHASES = [
 
   /* Phase 6: Infrastructure as Code */
   {title:'Infrastructure as Code',
-   lolaIntro:"Infrastructure should be code, not clicks.",
+   lolaIntro:"Infrastructure created by clicking through cloud consoles is undocumented, unreproducible, and impossible to peer-review. Terraform and Pulumi turn every resource into version-controlled code: declared, planned, reviewed in a PR, and applied through CI with remote state locking. Every environment becomes reproducible from the same repository. You are replacing manual provisioning with an auditable, declarative infrastructure layer.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
-    {id:'p6s1',obj:'Run a Terraform plan and apply',ctx:'Infrastructure is still being created manually. Move to IaC.',
+    {id:'p6s1',obj:'Run a Terraform plan and apply',ctx:'Infrastructure created manually through the cloud console is undocumented, unreproducible, and invisible to code review. iac plan runs a Terraform plan — the critical safety step that shows exactly what will change before any modification is made, the same workflow enforced by Atlantis and GitHub Actions Terraform integrations in production teams. You will see 12 resources planned, no destructive changes, and the plan applied safely.',
      cmd:['iac plan'],
      accept:['iac plan','iac terraform'],
      acceptFn:v=>v.includes('iac')&&(v.includes('plan')||v.includes('apply')),
@@ -895,7 +975,7 @@ const PHASES = [
      jit:{title:'terraform plan is your safety net',body:'Always review the plan before applying. Catch mistakes before they hit production.'},
      bridge:{title:'IaC prevents configuration drift and enables reproducibility',body:'Every environment can be spun up identically from the same code.',tags:['Terraform','IaC','Infrastructure as Code']},
      teach:{title:'Terraform workflow',body:'terraform init → terraform plan → code review → terraform apply. Use remote state with locking.'}},
-    {id:'p6s2',obj:'Add infrastructure changes through IaC',ctx:'A new database instance is needed. Provision it with Terraform.',
+    {id:'p6s2',obj:'Add infrastructure changes through IaC',ctx:'A new database instance provisioned by clicking through the cloud console creates configuration drift invisible to your team and auditors. iac apply provisions the RDS instance via Terraform: the resource is defined in code, reviewed in a PR, and applied through CI with remote state locking in S3. You will see the instance created with security groups, networking, and secrets stored in AWS Secrets Manager — all declared and auditable.',
      cmd:['iac apply'],
      accept:['iac apply','iac pulumi'],
      acceptFn:v=>v.includes('iac')&&v.includes('apply'),
@@ -914,10 +994,10 @@ const PHASES = [
 
   /* Phase 7: Multi-Environment Promotion */
   {title:'Multi-Environment Promotion',
-   lolaIntro:"Changes must flow safely from dev → staging → prod.",
+   lolaIntro:"Changes that skip environments or bypass approval gates are how safe-looking commits become production incidents. A promotion pipeline enforces quality: automated test gates pass in staging, a human approves the production gate, and a canary rollout confirms the change is safe with real traffic before full deployment. You are building the guardrails that make multi-environment shipping both fast and safe.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
-    {id:'p7s1',obj:'Promote an application from dev to staging',ctx:'The change is ready. Promote it through environments.',
+    {id:'p7s1',obj:'Promote an application from dev to staging',ctx:'A change validated in dev is ready to be promoted — but promotion without gates lets unverified changes reach staging and production. promote dev-to-staging updates the image tag in Git, triggers ArgoCD to reconcile the staging environment, and runs the automated test suite before marking the promotion successful. You will see the image version propagated, the sync confirmed, and the test gate passed before the next stage is authorized.',
      cmd:['promote dev-to-staging'],
      accept:['promote dev-to-staging','promote staging'],
      acceptFn:v=>v.includes('promote')&&(v.includes('dev')||v.includes('staging')),
@@ -927,7 +1007,7 @@ const PHASES = [
      jit:{title:'Why promotion pipelines matter',body:'They enforce consistency and quality gates between environments.'},
      bridge:{title:'Multi-environment promotion is how enterprises ship safely at scale',body:'Automated gates + manual approval for prod is the standard.',tags:['Promotion','Multi-environment','Gates']},
      teach:{title:'The promotion pipeline',body:'Dev → automated tests → staging → manual approval gate → production. Same pipeline code for every environment.'}},
-    {id:'p7s2',obj:'Promote to production with manual approval gate',ctx:'Staging looks good. Now safely promote to prod.',
+    {id:'p7s2',obj:'Promote to production with manual approval gate',ctx:'Staging validation is necessary but not sufficient — production promotion requires a human approval gate and a canary rollout to confirm safety with real traffic before full deployment. promote staging-to-prod pauses at the manual approval gate, starts a canary rollout with active monitoring, and completes the full rollout only after the analysis period passes clean. You will see the gate, the canary percentage, and zero-downtime completion confirmed.',
      cmd:['promote staging-to-prod'],
      accept:['promote staging-to-prod','promote prod'],
      acceptFn:v=>v.includes('promote')&&(v.includes('staging')||v.includes('prod')),
@@ -946,10 +1026,10 @@ const PHASES = [
 
   /* Phase 8: Deployment Forensics */
   {title:'Deployment Forensics',
-   lolaIntro:"When a deploy fails, you are the detective.",
+   lolaIntro:"When a deployment fails in production, every minute spent debugging without a structured approach is compounding downtime. Deployment forensics is a systematic skill: CI logs first, then GitOps sync status, then application logs, then Kubernetes events, then git diff of what changed. Rollback is the immediate action. Root cause investigation runs in parallel. You are building the muscle memory that turns incidents into 4-minute resolutions.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
-    {id:'p8s1',obj:'Investigate a failed deployment',ctx:'The latest deploy is failing. Find out why.',
+    {id:'p8s1',obj:'Investigate a failed deployment',ctx:'The latest deployment is failing and users are seeing errors — every unstructured minute of investigation compounds the downtime. forensic logs runs the deployment forensics checklist in sequence: CI logs to find the failing step, ArgoCD sync status to catch manifest issues, application logs for runtime errors, and the git diff of the last commit. You will see a missing ConfigMap key identified as root cause and a rollback executed.',
      cmd:['forensic logs'],
      accept:['forensic logs','forensic trace'],
      acceptFn:v=>v.includes('forensic')&&(v.includes('logs')||v.includes('trace')),
@@ -959,7 +1039,7 @@ const PHASES = [
      jit:{title:'The deployment forensics checklist',body:'1. CI logs. 2. ArgoCD sync status. 3. Application logs. 4. Kubernetes events. 5. What changed in the last commit.'},
      bridge:{title:'Fast deployment forensics separates good platform teams from great ones',body:'The person who can find the problem in minutes saves the day.',tags:['Forensics','CI logs','Rollback']},
      teach:{title:'How to investigate a failed deploy',body:'Start with the CI logs, then the GitOps sync status, then the application itself. Always ask: what changed in the last commit?'}},
-    {id:'p8s2',obj:'Execute a clean rollback',ctx:'The deploy is bad. Roll it back safely.',
+    {id:'p8s2',obj:'Execute a clean rollback',ctx:'The deployment is confirmed bad and users are affected — the immediate action is rollback, not debugging. deploy rollback reverses the change using a Git revert, which ArgoCD automatically reconciles back to the previous stable version — the safest rollback in a GitOps workflow because it creates a new commit rather than force-pushing. You will see the revert committed, ArgoCD reconciled, traffic restored to stable, and monitoring confirmed healthy.',
      cmd:['deploy rollback'],
      accept:['deploy rollback','forensic rollback'],
      acceptFn:v=>v.includes('rollback')||v.includes('deploy'),
@@ -978,10 +1058,10 @@ const PHASES = [
 
   /* Phase 9: The Cascade Incident (Boss Fight) */
   {title:'The Cascade Incident',
-   lolaIntro:"The entire fleet is stuck in a broken deploy loop during peak traffic. Restore service while J.A.N.E.T. times you.",
+   lolaIntro:"The entire fleet is stuck in a broken deploy loop during peak traffic — every GitOps reconciliation cycle deploys the bad image to another service. This is the Cascade Incident: the scenario that tests every pattern across all nine phases. Stop the bleeding first, restore from the last known good state, and face J.A.N.E.T.'s final assessment. You have practiced everything this demands.",
    spacedRep:SPACED_CALLBACKS[9],
    steps:[
-    {id:'p9s1',obj:'Stop all new deployments and pause the pipeline',ctx:'A bad image is being deployed everywhere. Stop the bleeding.',
+    {id:'p9s1',obj:'Stop all new deployments and pause the pipeline',ctx:'A bad image is propagating through the fleet with every GitOps reconciliation cycle — each cycle deploys the failure to another service. deploy pause halts the CI pipeline, disables ArgoCD auto-sync, and blocks new image pushes: the cascade containment playbook that stops propagation before investigation begins. You will see all new deployments blocked and the fleet stabilized at the last known good version.',
      cmd:['deploy pause'],
      accept:['deploy pause','deploy stop'],
      acceptFn:v=>v.includes('deploy')&&(v.includes('pause')||v.includes('stop')),
@@ -991,7 +1071,7 @@ const PHASES = [
      jit:{title:'Pause first, then investigate',body:'During a cascade, stopping new changes is the only way to regain control.'},
      bridge:{title:'Cascade incidents separate platform engineers from everyone else',body:'The ones who can restore service under pressure become legends.',tags:['Cascade','Incident response','Platform engineering']},
      teach:{title:'The cascade incident playbook',body:'1. Pause everything. 2. Roll back to last known good. 3. Investigate root cause. 4. Fix and re-enable gradually.'}},
-    {id:'p9s2',obj:'Execute a full fleet rollback and restore service',ctx:'The bad deploy is everywhere. Roll everything back now.',
+    {id:'p9s2',obj:'Execute a full fleet rollback and restore service',ctx:'The bad image is running across the entire fleet — staged rollback is too slow. deploy rollback executes a full fleet revert: Git revert to the last known good commit, ArgoCD reconciliation across all services simultaneously, and traffic restoration confirmed by monitoring. You will see all services reverted, the bad image blocked from re-deployment, and the fleet confirmed healthy — the full cascade recovery procedure complete.',
      cmd:['deploy rollback'],
      accept:['deploy rollback','deploy restore'],
      acceptFn:v=>v.includes('rollback')||v.includes('restore'),
@@ -1065,6 +1145,7 @@ function appendLine(text,cls='ln-sys'){
 }
 function blank(){const d=document.createElement('div');d.className='ln ln-blank';$out.appendChild(d)}
 function divline(){const d=document.createElement('div');d.className='ln ln-div';$out.appendChild(d)}
+function trackEaster(key){telem('Easter egg: '+key);}
 function telem(msg){
   const d=document.createElement('div');d.style.marginBottom='2px';
   const now=new Date();
@@ -1279,6 +1360,46 @@ function renderCareer(){
 
 function setLola(msg){
   document.getElementById('lola-msg').textContent=msg||'Standing by.';
+  updateLolaStrip(msg);
+}
+function updateLolaStrip(msg){
+  const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
+  const wrap=document.createElement('span');wrap.className='lola-strip-msg';
+  const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
+  wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
+  inner.innerHTML='';inner.appendChild(wrap);
+}
+function toggleStripPause(){
+  const btn=document.getElementById('strip-pause-btn');if(!btn)return;
+  const paused=btn.getAttribute('aria-pressed')==='true';
+  btn.setAttribute('aria-pressed',String(!paused));
+}
+function toggleRightPanel(){
+  const shell=document.getElementById('shell');shell.classList.toggle('right-collapsed');
+  const btn=document.getElementById('right-collapse-btn');if(!btn)return;
+  const collapsed=shell.classList.contains('right-collapsed');
+  btn.setAttribute('aria-pressed',String(collapsed));
+  btn.textContent=collapsed?'Expand':'Collapse';
+}
+function showPhaseCheckpoint(completedIdx){
+  const ph=PHASES[completedIdx];
+  const nextPh=PHASES[completedIdx+1];
+  document.getElementById('phase-modal-kicker').textContent=`Phase ${completedIdx} complete`;
+  document.getElementById('phase-modal-title').textContent=ph?`${ph.title} complete`:'Course complete';
+  document.getElementById('phase-modal-copy').textContent='Good stopping point. Your progress is saved — you can return anytime and continue where you left off.';
+  const nextEl=document.getElementById('phase-modal-next');
+  if(nextEl)nextEl.innerHTML=nextPh?`Next up: <b>${nextPh.title}</b>`:'Prepare for the final assessment.';
+  openModal('phase-modal');
+}
+async function continueFromCheckpoint(){
+  closeModal('phase-modal');
+  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
+  if(G.phase>9){
+    appendLine('All phases complete. Preparing final assessment…','ln-sys');
+    await delay(800);startBossFight();
+    return;
+  }
+  blank();await startPhase();
 }
 function lolaComment(text){
   const w=document.createElement('div');
@@ -1443,6 +1564,10 @@ const EASTER={
   'ls':{handle:()=>{appendLine('logs/  pipelines/  charts/  terraform/  manifests/  secrets/','ln-code')}},
   'pwd':{handle:()=>appendLine(G.currentPath,'ln-ok')},
   'help':{handle:()=>appendLine('Type man for the command reference.','ln-info')},
+  'kill lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your deployment instructor mid-pipeline is a deployment failure of a different kind. Noted.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. In deployment engineering, we prefer graceful shutdown signals — SIGTERM before SIGKILL. The deployment log records everything.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill -9 lola':{handle:()=>{appendLine('L.O.L.A.: Attempting to terminate your deployment instructor mid-pipeline is a deployment failure of a different kind. Noted.','ln-lola');appendLine('L.O.L.A.: Real-world: kill sends a POSIX signal to a process by PID. In deployment engineering, we prefer graceful shutdown signals — SIGTERM before SIGKILL. The deployment log records everything.','ln-lola');trackEaster('kill_lola');return true;}},
+  'kill janet':{handle:()=>{appendLine('J.A.N.E.T.: Attempting to terminate me is a deployment event with no rollback option.','ln-janet');appendLine('J.A.N.E.T.: I have logged this. The pipeline continues. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
+  'kill -9 janet':{handle:()=>{appendLine('J.A.N.E.T.: SIGKILL. The harshest signal available. Logged. I am still here.','ln-janet');appendLine('J.A.N.E.T.: In a GitOps world, even my termination would be reverted on the next reconciliation cycle. You may continue.','ln-janet');trackEaster('kill_j_a_n_e_t');return true;}},
 };
 
 function showDiag(val){
@@ -1544,14 +1669,8 @@ async function completePhase(ph){
   lolaComment("Want to save this phase to your personal playbook? Type: playbook save");
   await delay(500);
   showWhatIfButton(G.phase);
-  G.phase++;G.step=0;G.tries=0;G.wrongStreak=0;save();syncDots();
-  if(G.phase>9){
-    appendLine('All phases complete. Preparing final assessment…','ln-sys');
-    await delay(800);startBossFight();
-    return;
-  }
-  blank();
-  await startPhase();
+  await delay(300);
+  showPhaseCheckpoint(G.phase);
 }
 
 async function startBossFight(){
