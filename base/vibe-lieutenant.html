@@ -1131,8 +1131,7 @@ async function initSupabaseAuthClient(){
         syncBootModalState();
         save();
       }else if(hostedMode){
-        window.location.href=`/auth.html?redirect=${encodeURIComponent('/base/vibe-lieutenant.html')}`;
-        return;
+        console.log('[Station Delta] Guest mode — no session');
       }
     }
   }catch(err){
