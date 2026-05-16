@@ -85,7 +85,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
   .hint-toggle,.hint-body{font-size:12px}
   .teach-body,.concept-bd{font-size:12px}
   #phase-track{display:none}
-  #tb-right .tbbtn:not(#right-toggle-btn){display:none}
+  #tb-right .tbbtn:not(#right-collapse-btn){display:none}
   #logo-sub{font-size:7px;letter-spacing:.14em}
   #shell.right-collapsed{grid-template-columns:1fr;grid-template-rows:48px 28px minmax(0,1fr) 52px}
   #shell.right-collapsed #right{min-height:52px;max-height:52px;border-top:1px solid var(--border)}
@@ -127,7 +127,7 @@ body::after{content:'';pointer-events:none;position:fixed;inset:0;
 #tb-right{display:flex;align-items:center;gap:6px}
 .tbbtn{background:var(--s2);border:1px solid var(--border);color:var(--muted2);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .tbbtn:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
-#right-toggle-btn[aria-pressed="true"]{border-color:var(--silver);color:var(--silver)}
+#right-collapse-btn[aria-pressed="true"]{border-color:var(--silver);color:var(--silver)}
 #sandbox-pill{background:var(--amber-bg);border:1px solid var(--amber-d);color:var(--amber);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #hardmode-pill{background:var(--red-bg);border:1px solid var(--red-d);color:var(--red);padding:2px 9px;border-radius:var(--r4);font-size:9px;letter-spacing:.1em;display:none}
 #career-impact-btn{background:var(--s2);border:1px solid var(--silver-d);color:var(--silver);padding:3px 10px;border-radius:var(--r4);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;display:none}
@@ -509,7 +509,7 @@ input[type=text]:focus{border-color:var(--silver)}
       <span id="sandbox-pill">SANDBOX</span>
       <span id="hardmode-pill">HARD MODE</span>
       <span id="expert-timer" aria-label="Expert mode elapsed time">00:00</span>
-      <button id="right-toggle-btn" class="tbbtn" aria-pressed="false" onclick="toggleRightPanel()">◧ Panels</button>
+      <button id="right-collapse-btn" class="tbbtn" aria-pressed="false" aria-label="Collapse command and telemetry panel" aria-controls="right" onclick="toggleRightPanel()">◧ Panels</button>
       <button id="career-impact-btn" class="tbbtn" onclick="openModal('career-modal');document.getElementById('career-impact-btn').style.display='none'">📈 Career Log</button>
       <button class="tbbtn" onclick="openModal('gloss-modal')">📖 Glossary</button>
       <button class="tbbtn" onclick="openModal('man-modal')">📋 Manual</button>
@@ -1223,7 +1223,7 @@ const PHASES = [
   null,
   /* Phase 1: Agent Basics */
   {title:'Agent Basics',
-   lolaIntro:"Three skills before anything else: decide when not to use an agent, run the loop, and enforce the output shape. This is not a beginner bay anymore.",
+   lolaIntro:"Three skills before anything else: decide when not to use an agent, run the loop, and enforce the output shape. This is not a beginner bay anymore. You will make architectural choices here that determine whether your agent system is debuggable, trustworthy, and worth shipping.",
    spacedRep:SPACED_CALLBACKS[1],
    steps:[
     {id:'p1s0',obj:'Run the first architect decision: version the prompt change',ctx:'Before you interpret an eval regression, you need the exact prompt delta. git diff compares two text files line by line — the same review habit engineers use for code changes. Here you will compare two prompt versions and find the six-word change that rewired the model output format. Diff first, evaluate second.',
@@ -1269,7 +1269,7 @@ const PHASES = [
 
   /* Phase 2: Multi-Agent Coordination */
   {title:'Multi-Agent Coordination',
-   lolaIntro:"One agent is a tool. Multiple agents are a system. Systems need shared memory before they need more cleverness.",
+   lolaIntro:"One agent is a tool. Multiple agents are a system. Systems need shared memory and clear role boundaries before they need more cleverness. This phase you wire agents together using shared context — and learn exactly where coordination fails without it.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
     {id:'p2s1',obj:'Initialize shared state before any hand-off occurs',ctx:'Before agents can coordinate, the shared baton must exist somewhere both sides trust. redis-cli SET writes a key-value pair to Redis — the fast in-memory store teams use for shared state between services. You will write a JSON context payload to a named key and confirm the write before the hand-off depends on it.',
@@ -1305,7 +1305,7 @@ const PHASES = [
 
   /* Phase 3: Evaluation & Evals */
   {title:'Evaluation & Evals',
-   lolaIntro:"Evals are your CI pipeline for agents. They only become useful once you know what changed and what category absorbed the damage.",
+   lolaIntro:"Evals are your CI pipeline for agents. They only become useful once you know what changed and what category absorbed the damage. This phase you build the harness, run baselines, and learn to read a regression diff the way a senior engineer reads a failing test.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
     {id:'p3s1',obj:'Run the baseline eval suite',ctx:'Before you argue that a change improved the agent, you need a baseline capturing the old behavior in measurable form. python evals/run.py --suite baseline runs 50 test cases and writes results to runs/v1.json — the eval-first discipline production teams follow before any prompt change reaches review. A score without a comparison target is a mood, not a metric.',
@@ -1343,7 +1343,7 @@ const PHASES = [
 
   /* Phase 4: RAG Debugging */
   {title:'RAG Debugging',
-   lolaIntro:"Most RAG failures are retrieval failures. Debug before you re-train and rerank before you panic.",
+   lolaIntro:"Most RAG failures are retrieval failures — not model failures. The model cannot reason well over chunks it never received. This phase you debug the retrieval path, tune embeddings, and apply reranking to fix quality before reaching for fine-tuning or a bigger model.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
     {id:'p4s1',obj:'Debug a retrieval miss',ctx:'This is the dangerous kind of failure: the answer sounds plausible enough that an untrained operator could mistake retrieval poison for reasoning skill.',
@@ -1380,7 +1380,7 @@ const PHASES = [
 
   /* Phase 5: Guardrails & Safety Layers */
   {title:'Guardrails & Safety Layers',
-   lolaIntro:"Guardrails are not polish. They are incident prevention with better timing and cleaner paperwork.",
+   lolaIntro:"Guardrails are not polish. They are incident prevention with better timing and cleaner paperwork. This phase you add the safety layers that keep an agent system trustworthy in production: input validation, output filtering, and the human escalation path for decisions that should not be automated.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Deploy output validation on a normal response',ctx:'The next architectural habit is treating every model output as untrusted until a control layer approves it for release. python guardrails/validate.py --input response.json runs schema checks, policy checks, and a confidence threshold — the layered validation pattern used in production AI platforms. You will see a schema pass, a policy pass, and a release-approved decision.',
@@ -1417,7 +1417,7 @@ const PHASES = [
 
   /* Phase 6: Stateful Agents */
   {title:'Stateful Agents',
-   lolaIntro:"Stateless agents are demos. Stateful agents are products. Products need memory discipline, not memory hoarding.",
+   lolaIntro:"Stateless agents are demos. Stateful agents are products. Products need memory discipline, not memory hoarding. This phase you implement context persistence — storing what matters across sessions and pruning what does not — so the agent stays coherent at scale without ballooning in cost.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
     {id:'p6s1',obj:'Store agent memory with a lifecycle in mind',ctx:'Statefulness becomes dangerous when teams design what to save but not when it expires. redis-cli SET with a TTL field writes durable memory with a lifecycle — the pattern production agent systems use to prevent context accumulation from becoming a privacy or cost liability. You will write a session key with an explicit expiration window and verify it persists correctly.',
@@ -1454,7 +1454,7 @@ const PHASES = [
 
   /* Phase 7: Cost & Latency Governance */
   {title:'Cost & Latency Governance',
-   lolaIntro:"An agent that works but bankrupts the team is still a failed design. Governance is architecture in spreadsheet clothing.",
+   lolaIntro:"An agent that works but bankrupts the team is still a failed design. Governance is architecture in spreadsheet clothing. This phase you instrument cost and latency at the call level, set budgets, and make the tradeoff decisions that separate a prototype from a system anyone can run in production.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
     {id:'p7s1',obj:'Set a token budget for the run type',ctx:'This phase starts by turning cost from an accidental outcome into an explicit rule. python cost/budget.py --max-tokens 2000 --model sonnet sets a per-run token budget with a hard stop — the governance pattern production AI platforms use to prevent runaway spend. You will see usage tracked against the ceiling with a warning threshold at 70 percent.',
@@ -1490,7 +1490,7 @@ const PHASES = [
 
   /* Phase 8: Production Observability */
   {title:'Production Observability',
-   lolaIntro:"Observability without alerting is a dashboard somebody intends to check later. Incident response demands more urgency than that.",
+   lolaIntro:"Observability without alerting is a dashboard somebody intends to check later. Incident response demands more urgency than that. This phase you wire traces to alerts, set meaningful thresholds, and build the on-call runbook that turns a 3am page into a five-minute resolution.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
     {id:'p8s1',obj:'Trace the full agent tree',ctx:'This phase starts wide on purpose — the first job in observability is reconstructing the full story before zooming into one suspicious moment. otel-cli exec captures a complete distributed trace using the OpenTelemetry standard, the protocol the industry uses to correlate spans across services. You will see every agent, tool call, and hand-off laid out as a single readable tree.',
@@ -2066,7 +2066,13 @@ function getStripMessages(stepOrId){
   if(!stepOrId) return LOLA_STRIP.default;
   if(typeof stepOrId === 'string') return LOLA_STRIP[stepOrId] || LOLA_STRIP.default;
   const direct = LOLA_STRIP[stepOrId.id];
-  if(direct) return direct;
+  if(direct && direct.length > 1) return direct;
+  if(direct && direct.length === 1){
+    const extra=[];
+    if(stepOrId.teach?.body) extra.push({tag:'why',msg:stepOrId.teach.body.replace(/<[^>]+>/g,'')});
+    if(stepOrId.jit?.body) extra.push({tag:'concept',msg:stepOrId.jit.body.replace(/<[^>]+>/g,'')});
+    return [...direct,...extra.slice(0,2)];
+  }
   const generated = [];
   if(stepOrId.ctx) generated.push({tag:'what',msg:stepOrId.ctx});
   if(stepOrId.teach?.body) generated.push({tag:'why',msg:stepOrId.teach.body.replace(/<[^>]+>/g,'')});
@@ -2288,7 +2294,7 @@ function exportPlaybook(){
 
 function applyUIPreferences(){
   const shell=document.getElementById('shell');
-  const toggle=document.getElementById('right-toggle-btn');
+  const toggle=document.getElementById('right-collapse-btn');
   if(shell) shell.classList.toggle('right-collapsed', !!G.rightCollapsed);
   if(toggle){
     toggle.setAttribute('aria-pressed', G.rightCollapsed ? 'true' : 'false');

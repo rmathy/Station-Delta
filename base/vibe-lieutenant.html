@@ -3834,7 +3834,7 @@ const LT_LOLA_STRIP = {
 
 const LT_PHASES = [
   {title:'Rapid Triage',
-   lolaIntro:'Lieutenant starts where Engineer ended: you already know the tools. Now you use them to brief a room quickly, accurately, and without drift.',
+   lolaIntro:'Lieutenant starts where Engineer ended: you already know the tools. Now you use them to brief a room quickly, accurately, and without drift — a cold codebase walkthrough done under time pressure with a senior audience watching.',
    steps:[
     {id:'p1s1',obj:'Inventory the repo under pressure',ctx:'ls -la reveals hidden files alongside standard ones with permissions, ownership, and size. In an unfamiliar repo, hidden files often contain the .env, config, and credential clues that explain operational failures before you look at any application code.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 88\ndrwxr-xr-x  10 lt   crew   4096 .\ndrwxr-xr-x   4 lt   crew   4096 ..\n-rw-r--r--   1 lt   crew    214 .env.example\n-rw-r--r--   1 lt   crew    138 .gitignore\n-rw-r--r--   1 lt   crew    612 package.json\ndrwxr-xr-x   7 lt   crew   4096 src\ndrwxr-xr-x   3 lt   crew   4096 tests\ndrwxr-xr-x   2 lt   crew   4096 docker',unlockCmd:'ls',bridge:{title:'This is the first 30 seconds of ownership',body:'A Lieutenant does not open random tabs. They inventory the environment, spot risk surfaces, and build a mental model before anyone else finishes describing the outage.',tags:['Triage','Incident leadership','Repo orientation']}},
     {id:'p1s2',obj:'Read the service manifest',ctx:'cat package.json surfaces the runtime, the scripts you can safely run, and the dependencies that constrain the fix. Reading the manifest before touching production code tells you whether the service is stable or already carrying technical debt that may complicate the repair.',cmd:['cat package.json'],accept:['cat package.json'],hint:'Type: cat package.json',out:'{\n  "name": "escape-pod-api",\n  "runtime": "bun",\n  "scripts": {\n    "dev": "bun run src/index.ts",\n    "test": "vitest run",\n    "typecheck": "tsc --noEmit"\n  },\n  "dependencies": {\n    "hono": "^4.4.0",\n    "@prisma/client": "^5.14.0"\n  }\n}',unlockCmd:'cat'},
@@ -3858,7 +3858,7 @@ const LT_PHASES = [
    ach:'debugger'},
 
   {title:'Code Review',
-   lolaIntro:'A Lieutenant does not read diffs for curiosity. They read them to decide whether code is safe to merge, revert, or block.',
+   lolaIntro:'A Lieutenant does not read diffs for curiosity. They read them to decide whether code is safe to merge, revert, or block. This phase you treat every diff as a release-safety question with a deadline, not a code review you can complete at your own pace.',
    spacedRep:LT_SPACED_CALLBACKS[3],
    steps:[
     {id:'p3s1',obj:'Inspect the latest patch directly',ctx:'git diff HEAD~1 shows exactly which lines changed in the last commit. Ticket titles describe intent; the diff shows what actually happened. Risk assessment requires reading the actual code change before you form a go/no-go opinion on shipping it.',cmd:['git diff HEAD~1'],accept:['git diff HEAD~1'],hint:'Type: git diff HEAD~1',out:'diff --git a/src/routes/pods.ts b/src/routes/pods.ts\n- const pod = await prisma.pods.findUnique({ where: { id: podId } })\n+ const pod = await prisma.pods.findOne({ where: { id: podId } })\n+ const timeoutMs = 60 * 1000; // 1 hour',unlockCmd:'git diff'},
@@ -3868,7 +3868,7 @@ const LT_PHASES = [
    ach:'historian'},
 
   {title:'Stack Trace Triage',
-   lolaIntro:'Traces do not just tell you where the program crashed. They tell you where your attention should go next.',
+   lolaIntro:'Traces do not just tell you where the program crashed. They tell you where your attention should go next — local fix, rollback, or wider data issue. This phase you read stack traces as decision evidence, not just debugging output to be mechanically resolved.',
    spacedRep:LT_SPACED_CALLBACKS[4],
    steps:[
     {id:'p4s1',obj:'Trace the failure path',ctx:'Stack traces show the full call chain, but the relevant frame is the one in your application code — not the framework above it. The trace command here surfaces the exact line the failure originated from so you open the right file without guessing.',cmd:['trace'],accept:['trace'],hint:'Type: trace',out:'TypeError: Cannot read properties of undefined (reading "capacity")\n  at src/routes/pods.ts:18\n  at src/middleware/auth.ts:15\n  at node_modules/hono/router.js:284',unlockCmd:'trace'},
@@ -3878,7 +3878,7 @@ const LT_PHASES = [
    ach:'ai_auditor'},
 
   {title:'TypeScript & API Audit',
-   lolaIntro:'Now you decide whether the service is safe to release. That means compiler signal, route intent, and live endpoint behavior all have to agree.',
+   lolaIntro:'Now you decide whether the service is safe to release. That means compiler signal, route intent, and live endpoint behavior all have to agree. A green test suite is necessary but not sufficient — this phase you connect those signals into an actual judgment call.',
    spacedRep:LT_SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Run the compiler in audit mode',ctx:'tsc --noEmit runs the TypeScript compiler in audit mode — it reports all type errors without writing any output files. This gives you a risk assessment before you decide whether a patch is safe to ship or whether the type system is flagging a real runtime hazard.',cmd:['tsc --noEmit'],accept:['tsc --noEmit','tsc --noemit'],hint:'Type: tsc --noEmit',out:'src/routes/pods.ts:18:25 - error TS2339: Property \'findOne\' does not exist on type \'PrismaPodsDelegate\'',unlockCmd:'tsc'},
@@ -3891,7 +3891,7 @@ const LT_PHASES = [
    ach:'packager'},
 
   {title:'Advanced Git',
-   lolaIntro:'When the problem is history, you need more than add and commit. This phase is about surgical git moves made deliberately, not theatrically.',
+   lolaIntro:'When the problem is history, you need more than add and commit. This phase is about surgical git moves made deliberately, not theatrically — cherry-pick, bisect, and interactive rebase done with clear purpose, not because the commands exist.',
    spacedRep:LT_SPACED_CALLBACKS[6],
    steps:[
     {id:'p6s1',obj:'Safely park local edits',ctx:'git stash parks in-progress edits safely before a rebase or branch switch. The stash is a stack — git stash pop restores your work exactly where you left off after the update completes. This is the standard clean-context pattern before rebasing.',cmd:['git stash'],accept:['git stash'],hint:'Type: git stash',out:'Saved working directory and index state WIP on main: triage notes',unlockCmd:'git stash'},
@@ -3916,7 +3916,7 @@ const LT_PHASES = [
    ach:'crew_leader'},
 
   {title:'AI Code Review & Live API',
-   lolaIntro:'This is where judgment becomes explicit. The AI gave you a patch. You decide whether it survives contact with real APIs, real ORMs, and real tests.',
+   lolaIntro:'This is where judgment becomes explicit. The AI gave you a patch. You decide whether it survives contact with real APIs, real ORMs, and real tests — and whether the evidence you have is enough to ship or reason enough to block it outright.',
    spacedRep:LT_SPACED_CALLBACKS[8],
    steps:[
     {id:'p8s1',obj:'Review the AI-generated diff',ctx:'review diff shows the AI-generated change before you approve it. Reading the diff is mandatory regardless of source — AI-generated code ships the same bugs as human-written code when the reviewer does not read it. You are the final gate, not a rubber stamp.',cmd:['review diff'],accept:['review diff'],hint:'Type: review diff',out:'AI Review Summary:\n- Replaced findUnique with findOne\n- Added timeoutMs = 60 * 1000 // 1 hour\n- No null guard for missing pod\n\n⚠ Multiple correctness and safety concerns found.',unlockCmd:'review'},

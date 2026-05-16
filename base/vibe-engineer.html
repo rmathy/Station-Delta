@@ -1378,13 +1378,13 @@ function setLolaStrip(stepOrId){
 
   clearInterval(_stripRotateInterval);
 
-  if((!msgs || msgs.length===0) && step){
-    const fallbackMsgs=[];
+  if((!msgs || msgs.length<=1) && step){
+    const fallbackMsgs=msgs&&msgs.length?[...msgs]:[];
     const teach=sidebarTeachForStep(step);
     const bridge=sidebarBridgeForStep(step);
-    if(step.ctx) fallbackMsgs.push({tag:'mission', msg:step.ctx});
-    if(teach?.body) fallbackMsgs.push({tag:'teach', msg:`<b>${teach.title || 'Field note'}:</b> ${teach.body}`});
-    if(bridge?.body) fallbackMsgs.push({tag:'why', msg:bridge.body});
+    if(!fallbackMsgs.length&&step.ctx) fallbackMsgs.push({tag:'mission', msg:step.ctx});
+    if(teach?.body&&fallbackMsgs.length<3) fallbackMsgs.push({tag:'teach', msg:`<b>${teach.title || 'Field note'}:</b> ${teach.body}`});
+    if(bridge?.body&&fallbackMsgs.length<3) fallbackMsgs.push({tag:'why', msg:bridge.body});
     msgs=fallbackMsgs;
   }
 
@@ -1691,7 +1691,7 @@ const PHASES = [null,
  
 /* ── P2: File Operations ── */
 {title:'File Operations',
- lolaIntro:"Creating and editing files from the terminal is faster than any GUI and fully automatable. Let's build that muscle.",
+ lolaIntro:"Creating and editing files from the terminal is faster than any GUI and fully automatable. This phase you master touch, echo, cat, and sed — the toolkit for building and modifying files without ever opening a text editor.",
  spacedRep:SPACED_CALLBACKS[2],
  steps:[
   {id:'p2s1', obj:'Create a file called manifest.txt', ctx:'Create a new empty file without opening any editor — <code>touch filename</code> is the standard approach. We will use a COMMAND followed by a file name, check your <code>man</code> for the right one. You will see the file appear in the directory immediately with zero bytes.',
@@ -4806,7 +4806,7 @@ const ENGINEER_LOLA_STRIP={
 
 const ENGINEER_PHASES=[
   {title:'Rapid Orientation',
-   lolaIntro:'You already know the basics. Engineer starts with pressure: orient fast, extract signal, then inspect recent history before you touch anything.',
+   lolaIntro:'You already know the basics. Engineer starts with pressure: orient fast, extract signal, then inspect recent history before you touch anything. The mission is already degraded — do not make it worse by skipping cold orientation.',
    steps:[
     {id:'p1s1',obj:'Inventory the distress bay',ctx:'<code>ls -la</code> runs a full inventory: <code>-l</code> adds ownership and size detail, <code>-a</code> reveals hidden files. Under incident pressure, hidden config files and dotfiles often contain the secrets or settings that matter. Learn the shape of the environment before you change it.',cmd:['ls -la'],accept:['ls -la','ls -al'],hint:'Type: ls -la',out:'total 28\ndrwxr-xr-x  6 engineer engineer 4096 .\ndrwxr-xr-x  3 engineer engineer 4096 ..\ndrwx------  2 engineer engineer 4096 .ssh\n-rw-r--r--  1 engineer engineer  812 distress.log\n-rw-r--r--  1 engineer engineer  214 rescue.sh.template\n-rw-r--r--  1 engineer engineer  181 Dockerfile.template',unlockCmd:'ls',jit:{title:'Engineer mode starts with hidden risk surfaces',body:'In incident work, <code>ls -la</code> is not trivia. It exposes hidden directories like <code>.ssh</code>, permission posture, and the artifacts that tell you whether this machine is safe to touch or already misconfigured.'},bridge:{title:'Pressure changes the framing, not the command',body:'Cadet taught you how to list files. Engineer teaches you why you do it immediately during an incident: inventory first, assumptions second.',tags:['Incident response','Operational discipline']},teach:{title:'Inventory before intervention',body:'Do not open random files yet. First get the full surface area: hidden folders, rescue scripts, Docker hints, and anything that changes your mental model of the machine you are on.'}},
     {id:'p1s2',obj:'Extract host, service, and battery signal',ctx:'Pull only the Host, Service, and Battery lines using <code>grep -E</code> with an alternation pattern. <code>-E</code> enables extended regex, and the pipe avoids a temp file. In real incident triage this is how you isolate relevant signal from a noisy log stream.',cmd:['cat distress.log | grep -E "Host|Service|Battery"','cat distress.log | grep "Host\\|Service\\|Battery"'],acceptFn:v=>v.includes('distress.log')&&v.includes('|')&&v.includes('grep')&&v.includes('Host')&&v.includes('Service')&&v.includes('Battery'),accept:['cat distress.log | grep -E "Host|Service|Battery"'],hint:'Use a pipe from cat into grep for the three beacon terms.',out:'Host: 192.168.1.42\nService: pod-monitor DOWN\nBattery remaining: 89m',unlockCmd:['grep','|'],jit:{title:'This is triage, not reading practice',body:'The goal is not to memorize the whole log. The goal is to pull the three facts that decide your next move: where the host is, what service is down, and how much time you have left.'},teach:{title:'Fast signal extraction',body:'<code>grep -E</code> lets one search pattern act like a short checklist. The <code>|</code> operator means "or," so <code>Host|Service|Battery</code> matches any of those labels and collapses noisy output into the few facts you actually need.'},bridge:{title:'Every noisy system needs a first-pass filter',body:'Production logs, CI output, and agent traces all become usable only after you reduce them to the few lines that actually change the decision in front of you. This is the same pattern you will use later with test failures, deploy logs, and agent traces: search for several high-value indicators in one pass, then zoom in from there.',tags:['Incident triage','Logs','Operational focus']}},
@@ -4817,7 +4817,7 @@ const ENGINEER_PHASES=[
    ach:'navigator'},
 
   {title:'Shell Scripting',
-   lolaIntro:'Now we automate the rescue path. Engineer scripting is not about syntax trivia; it is about writing, editing, and safely running repeatable fixes.',
+   lolaIntro:'Now we automate the rescue path. Engineer scripting is not about syntax trivia; it is about writing, editing, and safely running repeatable fixes against a live degraded system where manual mistakes compound fast.',
    steps:[
     {id:'p2s1',obj:'Create the rescue script file',ctx:'<code>touch rescue.sh</code> creates the empty file that will carry the rescue workflow. Starting with an empty file forces you to build the script deliberately from the shebang line down — no defaults, no template, just the exact steps the rescue requires.',cmd:['touch rescue.sh'],accept:['touch rescue.sh'],hint:'Type: touch rescue.sh',out:'rescue.sh created',unlockCmd:'touch'},
     {id:'p2s2',obj:'Write the shebang line',ctx:'The shebang line <code>#!/bin/bash</code> tells the OS which interpreter to use. Without it, different environments may execute the script with different shells and produce inconsistent results. Write it first so the runtime is unambiguous before any rescue logic is added.',cmd:['echo \'#!/bin/bash\' > rescue.sh','echo "#!/bin/bash" > rescue.sh'],acceptFn:v=>v.startsWith('echo')&&v.includes('rescue.sh')&&v.includes('>')&&(v.includes('#!/bin/bash')||v.includes('#!/usr/bin/env bash')),accept:['echo shebang > rescue.sh'],hint:'Type: echo \'#!/bin/bash\' > rescue.sh',out:'Shebang written to rescue.sh',unlockCmd:'echo >',jit:{title:'A script file needs an interpreter contract',body:'Without a shebang, the shell may guess how to run the file based on how it was invoked. That works until the environment changes. A one-line interpreter hint removes the ambiguity before the script ever starts.'},teach:{title:'Why line 1 matters',body:'When you execute <code>./rescue.sh</code>, the operating system reads the first line before anything else. A shebang like <code>#!/bin/bash</code> says "run this file with Bash," which makes the script predictable for teammates, automation, and future you.'},bridge:{title:'Engineer turns terminal steps into reusable artifacts',body:'Cadet had you type commands directly. Engineer starts teaching the next layer up: package the command logic into a script so it can be rerun, reviewed, and trusted during a real response.',tags:['Shell scripting','Automation','Operational discipline']}},
@@ -4830,7 +4830,7 @@ const ENGINEER_PHASES=[
    ach:'file_master'},
 
   {title:'SSH & Remote Access',
-   lolaIntro:'The server will not fix itself. SSH is how you operate safely on a machine that is not yours.',
+   lolaIntro:'The server will not fix itself. SSH is how you operate safely on a machine that is not yours — remote shell, key authentication, and secure file transfer. You will connect to the distress host, inspect its state, and run the rescue sequence from a live remote session.',
    steps:[
     {id:'p3s1',obj:'Generate an SSH key pair',ctx:'<code>ssh-keygen -t ed25519</code> creates an asymmetric key pair — private key stays on your machine, public key goes to the server. Ed25519 is the current recommended algorithm: faster and more secure than RSA. You will see the key fingerprint and file location confirmed.',cmd:['ssh-keygen -t ed25519 -C "engineer@station-delta"'],acceptFn:v=>v.startsWith('ssh-keygen')&&v.includes('-t ed25519')&&v.includes('-C'),accept:['ssh-keygen'],hint:'Type: ssh-keygen -t ed25519 -C "engineer@station-delta"',out:'Generating public/private ed25519 key pair...\nYour public key has been saved in ~/.ssh/id_ed25519.pub',unlockCmd:'ssh-keygen'},
     {id:'p3s2',obj:'Authorize this machine on the distress host',ctx:'<code>ssh-copy-id</code> appends your public key to the remote host <code>authorized_keys</code> file so future logins do not require a password. This is the standard SSH setup step. After this, connecting will not require a credential prompt.',cmd:['ssh-copy-id engineer@192.168.1.42'],accept:['ssh-copy-id engineer@192.168.1.42'],hint:'Type: ssh-copy-id engineer@192.168.1.42',out:'Public key installed at remote ~/.ssh/authorized_keys',unlockCmd:'ssh-copy-id'},
@@ -4843,7 +4843,7 @@ const ENGINEER_PHASES=[
    ach:'git_mind'},
 
   {title:'curl & APIs',
-   lolaIntro:'Next you talk to the service directly. Engineer work means proving what the endpoint says, not relying on guesswork.',
+   lolaIntro:'Next you talk to the service directly. Engineer work means proving what the endpoint says, not relying on guesswork. You will query the service API with curl, inspect the response shape, and trigger actions that only work if your assumptions are actually correct.',
    steps:[
     {id:'p4s1',obj:'Fetch the health endpoint',ctx:'<code>curl</code> is the most widely used HTTP client in production environments — the same tool engineers use in runbooks, CI steps, and incident triage. A GET to <code>/health</code> returns the service status directly. You will see the JSON response appear in the terminal.',cmd:['curl http://192.168.1.42/health'],accept:['curl http://192.168.1.42/health'],hint:'Type: curl http://192.168.1.42/health',out:'{"status":"degraded","uptime":4201,"battery":67}',unlockCmd:'curl'},
     {id:'p4s2',obj:'POST a restart request',ctx:'<code>curl -X POST</code> sends an HTTP POST with a JSON body attached via <code>-d</code>. This is how engineers trigger remote actions — restart, flush, reload — against services that expose a management API. You will see the restart acknowledgment in the response.',cmd:['curl -X POST http://192.168.1.42/restart -d \'{"service":"pod-monitor"}\'','curl -X POST http://192.168.1.42/restart -d "{\"service\":\"pod-monitor\"}"'],acceptFn:v=>v.startsWith('curl -X POST')&&v.includes('/restart')&&v.includes('-d')&&v.includes('pod-monitor'),accept:['curl post restart'],hint:'Use -X POST with -d and the service JSON body.',out:'{"accepted":true,"service":"pod-monitor","eta":"12s"}',unlockCmd:'curl -X POST'},
@@ -4855,7 +4855,7 @@ const ENGINEER_PHASES=[
    ach:'packager'},
 
   {title:'Pipes, jq & Data',
-   lolaIntro:'You already know text pipelines. Now we turn structured data into something operationally useful.',
+   lolaIntro:'You already know text pipelines. Now we turn structured data into something operationally useful — filtering JSON with jq, splitting streams with tee, and running recursive searches that turn file discovery into action. This is where shell literacy becomes incident response capability.',
    steps:[
     {id:'p5s1',obj:'Anchor with grep recall',ctx:'<code>cat events.log | grep ERROR</code> establishes a baseline before switching to structured JSON processing. This step reconnects the text-filter reflex from earlier phases with the more powerful JSON pipeline that follows. You will see only the ERROR lines.',cmd:['cat events.log | grep "ERROR"'],acceptFn:v=>v.includes('cat events.log')&&v.includes('|')&&v.includes('grep')&&v.includes('ERROR'),accept:['cat events.log | grep ERROR'],hint:'Type: cat events.log | grep "ERROR"',out:'[ERR] timeout on /sync\n[ERR] auth token expired'},
     {id:'p5s2',obj:'Filter JSON error events with jq',ctx:'<code>jq</code> is the standard JSON processor for the terminal — it reads, filters, and reshapes JSON streams. Where <code>grep</code> works on lines, <code>jq</code> works on structure. You will keep only objects where <code>.level == "ERROR"</code>, discarding everything else.',cmd:['cat events.json | jq \'.[] | select(.level == "ERROR")\'','cat events.json | jq ".[] | select(.level == \\\"ERROR\\\")"'],acceptFn:v=>v.includes('cat events.json')&&v.includes('jq')&&v.includes('select')&&v.includes('ERROR'),accept:['jq select error'],hint:'Use .[] | select(.level == "ERROR")',out:'{"level":"ERROR","timestamp":"11:42","message":"battery below threshold"}',unlockCmd:'jq select'},
@@ -4868,7 +4868,7 @@ const ENGINEER_PHASES=[
    ach:'pipe_dream'},
 
   {title:'Agent Orchestration',
-   lolaIntro:'Cadet introduced the agent runtime. Engineer gives it operational context: you are building a crew to help stabilize a live rescue mission.',
+   lolaIntro:'Cadet introduced the agent runtime. Engineer gives it operational context: you are building a crew to stabilize a live rescue mission, not running a demo. Manager and specialist agents get real roles, real task boundaries, and real stakes.',
    steps:[
     {id:'p6s1',obj:'Check current agent status',ctx:'<code>vibe status</code> shows the current agent runtime — which agents are active, their roles, and their capability grants. Before adding new agents or tools, inspect existing state to prevent duplicate provisioning and catch stale sessions from prior rescue runs.',cmd:['vibe status','vibe agents','vibe ls'],accept:['vibe status','vibe agents','vibe ls','vibe list'],hint:'Type: vibe status',out:'VIBE AGENT RUNTIME v2.0\nActive agents: 0\nMCP connections: 0\nStatus: ready to initialize',unlockCmd:'vibe'},
     {id:'p6s2',obj:'Create a manager agent named Captain',ctx:'<code>vibe create --role manager --name Captain</code> provisions the coordinator agent. In a multi-agent rescue scenario the manager holds planning authority and delegates execution to specialists. Creating it before the specialist establishes the authority hierarchy correctly.',cmd:['vibe create --role manager --name Captain'],acceptFn:v=>v.startsWith('vibe create')&&v.includes('--role')&&v.toLowerCase().includes('manager')&&v.includes('--name'),accept:['vibe create --role manager --name captain'],hint:'Type: vibe create --role manager --name Captain',out:'✓ Agent "Captain" initialized\n  role: manager\n  model: claude-opus\n  tools: filesystem, shell, web',jit:{title:'You are defining command structure, not just a name',body:'The role flag controls how the agent will reason and what kind of work it should own. In good agent systems, that role choice changes downstream behavior in a meaningful way.'},teach:{title:'Why manager agents matter',body:'Operationally, the manager agent owns the plan so specialist agents can stay focused on execution.'},bridge:{title:'Planning and execution should not compete for the same context window',body:'Giving one agent the plan and another the implementation keeps responsibilities clean and makes it easier to review where a workflow actually went wrong.',tags:['Agents','Delegation','Operational design']}},
@@ -4879,7 +4879,7 @@ const ENGINEER_PHASES=[
    ach:'orchestrator'},
 
   {title:'MCP & Permissions',
-   lolaIntro:'MCP matters more when the work is real. This is where your crew connects to tools and receives only the access it needs.',
+   lolaIntro:'MCP matters more when the work is real. This is where your crew connects to tools and receives only the access it needs — filesystem, npm, nothing more. Principle of least privilege applies to agents exactly as it applies to services.',
    steps:[
     {id:'p7s1',obj:'Initialize the MCP runtime',ctx:'<code>vibe mcp init</code> starts the Model Context Protocol bridge — the real open standard for agent-to-tool communication. Without the runtime active, agents can reason but cannot act on external systems. You will see the MCP bridge confirm it is listening and ready.',cmd:['vibe mcp init'],accept:['vibe mcp init'],hint:'Type: vibe mcp init',out:'MCP Runtime v1.4 initializing…\n✓ Transport: stdio\n✓ Capability negotiation: complete\n✓ MCP Online. 0 servers connected.'},
     {id:'p7s2',obj:'Connect the filesystem server',ctx:'Connecting the filesystem MCP server grants the agent runtime explicit access to project files. Tool access is always explicit in a secure agentic system — no server connected means no filesystem capability, regardless of agent role or the permissions it was granted.',cmd:['vibe mcp connect --server filesystem'],acceptFn:v=>v.startsWith('vibe mcp connect')&&(v.includes('filesystem')||v.includes('fs')),accept:['vibe mcp connect --server filesystem'],hint:'Type: vibe mcp connect --server filesystem',out:'✓ MCP server "filesystem" connected\n  Tools available: read_file, write_file, list_dir, search_files\n  Access: ~/projects/**'},
@@ -4890,7 +4890,7 @@ const ENGINEER_PHASES=[
    ach:'crew_leader'},
 
   {title:'Prompt Engineering',
-   lolaIntro:'Now your crew needs clear instructions. Prompting in Engineer is not abstract; it directly shapes the rescue workflow.',
+   lolaIntro:'Now your crew needs clear instructions. Prompting in Engineer is not abstract; it directly shapes the rescue workflow. You will send structured prompts, chain agent outputs through pipes, and debug response format until the crew executes exactly as intended.',
    steps:[
     {id:'p8s1',obj:'Ask Captain to explain MCP',ctx:'Send Captain a direct prompt to confirm alignment on the newly initialized protocol. A basic query before complex orchestration reveals whether the agent has the context it needs. You will see the response before you add format constraints or chain it with other agents.',cmd:['prompt Captain "Explain MCP"'],acceptFn:v=>v.startsWith('prompt')&&v.toLowerCase().includes('captain'),accept:['prompt captain'],hint:'Type: prompt Captain "Explain MCP"',out:'Captain: MCP is our Model Context Protocol bridge. It lets me read project files and use connected tools directly instead of relying on pasted context.',unlockCmd:'prompt'},
     {id:'p8s2',obj:'Ask Captain for three rescue priorities',ctx:'Constrain the output format explicitly — <code>"One sentence each"</code> prevents paragraph-length answers when a list is needed. Format constraints are how you make agent output predictable enough to pipe into another tool or display in a UI without post-processing.',cmd:['prompt Captain "List 3 rescue priorities. One sentence each."'],acceptFn:v=>v.startsWith('prompt')&&v.toLowerCase().includes('captain')&&v.toLowerCase().includes('rescue priorities'),accept:['prompt captain "list 3 rescue priorities. one sentence each."'],hint:'Type: prompt Captain "List 3 rescue priorities. One sentence each."',out:'Captain:\n1. Restore service visibility before making deep changes.\n2. Stabilize the failing monitor path before shipping anything new.\n3. Keep every step reversible and documented for mission control.'},
@@ -4902,7 +4902,7 @@ const ENGINEER_PHASES=[
    ach:'prompter'},
 
   {title:'Docker & Ship',
-   lolaIntro:'You know enough now. Containerize the rescue path, run it cleanly, then ship with evidence instead of bravado.',
+   lolaIntro:'You know enough now. Containerize the rescue path with Docker, run it cleanly in a verified environment, then deploy to Vercel with secrets managed correctly and health checks confirming the system works. Evidence over bravado — show it, do not claim it.',
    steps:[
     {id:'p9s1',obj:'Inspect running containers',ctx:'<code>docker ps</code> lists all running containers with their status, ports, and names. Checking the current runtime state before rebuilding prevents replacing a container that was already running correctly. You will see the failing <code>pod-monitor</code> container listed.',cmd:['docker ps'],accept:['docker ps'],hint:'Type: docker ps',out:'CONTAINER ID   IMAGE                 NAMES\nb19f...        pod-monitor:legacy    pod-monitor',unlockCmd:'docker ps'},
     {id:'p9s2',obj:'Read the container logs',ctx:'<code>docker logs pod-monitor --tail 20</code> retrieves the last 20 lines from the container log stream — the standard first diagnostic step for a failing container. The <code>--tail</code> flag keeps the output focused and readable under incident pressure.',cmd:['docker logs pod-monitor --tail 20'],acceptFn:v=>v.includes('docker logs')&&v.includes('pod-monitor')&&v.includes('--tail 20'),accept:['docker logs pod-monitor --tail 20'],hint:'Type: docker logs pod-monitor --tail 20',out:'[WARN] heartbeat delayed\n[ERR] dependency mismatch',unlockCmd:'docker logs'},

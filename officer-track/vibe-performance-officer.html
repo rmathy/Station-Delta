@@ -1349,12 +1349,25 @@ function setLola(msg){
 }
 function updateLolaStrip(msg){
   const inner=document.getElementById('lola-strip-inner');if(!inner||!msg)return;
-  if(inner.dataset.lastMsg===msg)return;
+  clearInterval(_stripRotateInterval);
+  const msgs=[{tag:'ctx',msg}];
+  try{
+    const s=PHASES[G.phase]&&PHASES[G.phase].steps?PHASES[G.phase].steps[G.step]:null;
+    if(s&&s.jit&&s.jit.body) msgs.push({tag:'concept',msg:s.jit.body.replace(/<[^>]+>/g,'')});
+    if(s&&s.bridge&&s.bridge.body) msgs.push({tag:'real world',msg:s.bridge.body.replace(/<[^>]+>/g,'')});
+  }catch(e){}
+  if(msgs.length===1){
+    inner.dataset.lastMsg=msg;
+    inner.className='no-scroll';
+    inner.innerHTML=msgs.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');
+    return;
+  }
+  const doubled=[...msgs,...msgs];
+  inner.innerHTML=doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');
+  const charCount=msgs.reduce((a,m)=>a+m.msg.length,0);
+  inner.style.animationDuration=Math.max(20,Math.min(55,charCount*0.18))+'s';
+  inner.className='scrolling';
   inner.dataset.lastMsg=msg;
-  const wrap=document.createElement('span');wrap.className='lola-strip-msg';
-  const tag=document.createElement('span');tag.className='ls-tag';tag.textContent='ctx';
-  wrap.appendChild(tag);wrap.appendChild(document.createTextNode(' '+msg));
-  inner.innerHTML='';inner.appendChild(wrap);
 }
 function toggleStripPause(){
   const btn=document.getElementById('strip-pause-btn');if(!btn)return;

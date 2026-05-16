@@ -1409,6 +1409,21 @@ function setLolaStrip(tag,msg){
   inner.className='no-scroll';
   inner.innerHTML=`<span class="lola-strip-msg"><span class="ls-tag">${tag}</span> ${msg}</span>`;
 }
+function setLolaStripStep(step){
+  const inner=document.getElementById('lola-strip-inner');if(!inner||!step)return;
+  clearInterval(_stripRotateInterval);
+  const msgs=[];
+  if(step.ctx) msgs.push({tag:'ctx',msg:step.ctx});
+  if(step.jit&&step.jit.body) msgs.push({tag:'concept',msg:step.jit.body.replace(/<[^>]+>/g,'')});
+  if(step.bridge&&step.bridge.body) msgs.push({tag:'real world',msg:step.bridge.body.replace(/<[^>]+>/g,'')});
+  if(!msgs.length){setLolaStrip('tip','Type a command to continue.');return;}
+  if(msgs.length===1){inner.className='no-scroll';inner.innerHTML=msgs.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');return;}
+  const doubled=[...msgs,...msgs];
+  inner.innerHTML=doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');
+  const charCount=msgs.reduce((a,m)=>a+m.msg.length,0);
+  inner.style.animationDuration=Math.max(20,Math.min(55,charCount*0.18))+'s';
+  inner.className='scrolling';
+}
 
 /* ── MODALS ── */
 function openModal(id){
@@ -1810,7 +1825,7 @@ function syncObjCard(){
   const totalSteps=PHASES.slice(1).reduce((a,p)=>a+(p?p.steps.length:0),0);
   const doneSteps=PHASES.slice(1,G.phase).reduce((a,p)=>a+(p?p.steps.length:0),0)+G.step;
   document.getElementById('obj-prog-fill').style.width=Math.round(doneSteps/totalSteps*100)+'%';
-  setLolaStrip('objective',`${s.obj} Use <code>${s.cmd?s.cmd[0]:'the command on the card'}</code> when you're ready.`);
+  setLolaStripStep(s);
 }
 let eaglePhase=true;
 function revealCmd(){

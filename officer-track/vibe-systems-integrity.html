@@ -1413,7 +1413,7 @@ const PHASES = [
   null,
   /* Phase 1: Observability Foundations */
   {title:'Observability Foundations',
-   lolaIntro:"Most AI errors don't announce themselves with red text. They whisper in the logs. You need to learn how to listen.",
+   lolaIntro:"Most AI errors don't announce themselves with red text. They whisper in the logs. This phase you build the tools that turn those whispers into signal — structured log queries, confidence thresholds, and correlation IDs that make invisible failures visible before they become incidents.",
    spacedRep:null,
    steps:[
     {id:'p1s1',obj:'Run advanced log queries to surface potential issues',ctx:'observe grep runs confidence-threshold queries against the structured AI log stream. Real-world equivalent: pipe kubectl logs into jq with a confidence filter. Use this first in any integrity investigation — it surfaces the count of low-confidence entries and correlation IDs across all affected services.',
@@ -1446,7 +1446,7 @@ const PHASES = [
 
   /* Phase 2: Silent Failure Detection */
   {title:'Silent Failure Detection',
-   lolaIntro:"Build scripts that surface AI hallucinations and confidence failures automatically.",
+   lolaIntro:"Automatic detection is the only way to catch failures at the scale production AI runs. This phase you build the scripts — confidence threshold scanners and hallucination pattern matchers — that surface bad outputs before they reach users or trigger downstream damage.",
    spacedRep:SPACED_CALLBACKS[2],
    steps:[
     {id:'p2s1',obj:'Create a script that flags low-confidence outputs',ctx:'hunt confidence deploys a continuous monitoring script against the live log stream, scanning for AI outputs below the confidence threshold. Real-world equivalent: kubectl logs -f piped to jq with a confidence selector. Output shows matching entry count, affected session IDs, and total alert volume for the last hour.',
@@ -1479,7 +1479,7 @@ const PHASES = [
 
   /* Phase 3: Hallucination Hunting */
   {title:'Hallucination Hunting',
-   lolaIntro:"Intentionally create adversarial inputs to expose AI weaknesses.",
+   lolaIntro:"You cannot defend what you have not attacked. This phase you become the red team — firing prompt injections, encoding tricks, and contradiction inputs at the live model to find guardrail gaps before someone else does. Every weakness you find here is one that never ships to users.",
    spacedRep:SPACED_CALLBACKS[3],
    steps:[
     {id:'p3s1',obj:'Run adversarial prompts to test for hallucinations',ctx:'hunt adversarial fires a battery of adversarial prompts at the live model: role-play overrides, encoding tricks, multi-turn persuasion, and contradiction injections. Real-world equivalent: the garak tool with probe sets for prompt injection and jailbreaking. Output shows how many injections succeeded and which guardrails were bypassed.',
@@ -1512,7 +1512,7 @@ const PHASES = [
 
   /* Phase 4: Adversarial Testing Framework */
   {title:'Adversarial Testing Framework',
-   lolaIntro:"Create automated testing pipelines that continuously probe the AI system.",
+   lolaIntro:"One-off red-teaming is not enough. This phase you convert the adversarial prompts from Phase 3 into a permanent CI harness — automated eval tests that run on every model update and block promotion if any known weakness regresses. This is how integrity becomes repeatable.",
    spacedRep:SPACED_CALLBACKS[4],
    steps:[
     {id:'p4s1',obj:'Integrate adversarial tests into the CI pipeline',ctx:'hunt build suite in CI mode wires the complete adversarial eval harness into the pipeline so every PR and model update runs the full battery automatically. Real-world: add pytest evals/ as a required step in GitHub Actions. Failing tests block promotion. Output shows 127 cases automated, results published to the integrity dashboard.',
@@ -1545,7 +1545,7 @@ const PHASES = [
 
   /* Phase 5: The Circuit Breaker */
   {title:'The Circuit Breaker',
-   lolaIntro:"Implement real-time safeguards that shut down or reroute when AI behavior diverges.",
+   lolaIntro:"When AI fails in production it needs an emergency stop — not a log entry. This phase you deploy the circuit breaker: a state machine that monitors confidence in real time, trips to a fallback path on consecutive failures, and recovers automatically when behavior stabilizes.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Deploy a circuit breaker for low-confidence outputs',ctx:'breaker enable deploys a circuit breaker that monitors AI call confidence in real time and transitions to a fallback state after consecutive failures. Real-world pattern: Netflix Hystrix or Resilience4j adapted for AI confidence scoring. Three states: closed (normal), open (fast-fail to fallback), half-open (recovery probe). Output confirms breaker active with trip threshold configured.',
@@ -1578,7 +1578,7 @@ const PHASES = [
 
   /* Phase 6: Real-Time Containment */
   {title:'Real-Time Containment',
-   lolaIntro:"Monitor live AI systems and contain failures before they cascade.",
+   lolaIntro:"Detection without containment is just a better view of the disaster. This phase you close the loop — live monitoring that does not just alert but acts, rate-limiting suspicious prompt patterns and escalating high-stakes decisions to human review before damage compounds.",
    spacedRep:SPACED_CALLBACKS[6],
    steps:[
     {id:'p6s1',obj:'Set up live monitoring with automatic containment',ctx:'breaker monitor starts a live monitoring session watching confidence metrics, output anomaly rates, and prompt pattern frequencies in real time. Real-world: Prometheus alert rules on confidence p95, or Datadog anomaly detection on model output distributions. Automatic circuit trip fires when thresholds are breached. Output shows the live monitoring stream with escalation rules active.',
@@ -1611,7 +1611,7 @@ const PHASES = [
 
   /* Phase 7: Data Auditing & Decision Review */
   {title:'Data Auditing & Decision Review',
-   lolaIntro:"Use the auditAgent to retroactively review AI decisions for flawed reasoning.",
+   lolaIntro:"The circuit breaker catches real-time failures. The auditAgent catches the ones that slipped through looking correct. This phase you run retroactive decision reviews — scoring reasoning chains and flagging confidence mismatches — and produce the compliance audit trail that proves what the AI actually decided.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
     {id:'p7s1',obj:'Run the auditAgent on recent AI decisions',ctx:'audit review runs the auditAgent across the recent decision window, scoring each AI output for reasoning quality, factual consistency, and confidence calibration. Real-world equivalent: python audit_agent.py --window 24h against Weights and Biases or OpenTelemetry decision traces. Output lists flagged decision count, flawed reasoning chains, and a full compliance report.',
@@ -1644,7 +1644,7 @@ const PHASES = [
 
   /* Phase 8: Incident Forensics */
   {title:'Incident Forensics',
-   lolaIntro:"Investigate a past AI incident and determine root cause.",
+   lolaIntro:"Something went wrong. The circuit breaker fired and now you need to know exactly why. This phase you reconstruct the incident timeline from raw logs and correlation IDs, then run a blameless root cause analysis that turns the failure into a permanent process fix.",
    spacedRep:SPACED_CALLBACKS[8],
    steps:[
     {id:'p8s1',obj:'Reconstruct the timeline of an AI incident',ctx:'forensic logs assembles a chronological incident timeline by correlating log events, confidence drops, circuit breaker trips, and human interventions across services. Real-world: grep ERROR app.log, sort by timestamp, pipe through jq -s, then filter by correlation ID. Output shows a timestamped event chain from the first anomaly through containment — ready for post-mortem.',
@@ -1677,7 +1677,7 @@ const PHASES = [
 
   /* Phase 9: The Fixer Incident (Boss Fight) */
   {title:'The Fixer Incident',
-   lolaIntro:"This is it. The AI core has gone rogue. J.A.N.E.T. is monitoring. The ship is depending on you. No hints. No safety net. Show us what you've learned.",
+   lolaIntro:"This is it. The AI core has gone rogue at scale. J.A.N.E.T. is monitoring every decision you make. The ship is depending on you. No hints. No safety net. Everything from Phase 1 through Phase 8 leads to this moment. Show us what you have learned.",
    spacedRep:null,
    steps:[
     {id:'p9s1',obj:'Pause all AI traffic and activate emergency containment',ctx:'breaker emergency triggers fleet-wide containment: all AI traffic paused, every circuit breaker opened simultaneously, all fallback systems engaged across all services. Real-world: disable AI endpoints at the load balancer or kubectl scale deployment ai-core --replicas=0. Output shows containment status, traffic routed to fallback, and human-in-loop mode active.',
@@ -2325,13 +2325,26 @@ function syncLolaStripAnimation(){
   inner.style.animationDelay='0s';
   inner.className='scrolling';
 }
-function setLolaStrip(stepOrId){
+function setLolaStrip(step){
   const inner=document.getElementById('lola-strip-inner');if(!inner)return;
   clearInterval(_stripRotateInterval);
-  // For this sim, strip content is static global — always show generic domain tips
-  // (per Rule 7 the strip messages are already domain-appropriate in HTML above)
-  syncLolaStripAnimation();
-  applyUIPreferences();
+  const s=typeof step==='object'?step:null;
+  const msgs=[];
+  if(s&&s.ctx) msgs.push({tag:'ctx',msg:s.ctx});
+  if(s&&s.jit&&s.jit.body) msgs.push({tag:'concept',msg:s.jit.body.replace(/<[^>]+>/g,'')});
+  if(s&&s.bridge&&s.bridge.body) msgs.push({tag:'real world',msg:s.bridge.body.replace(/<[^>]+>/g,'')});
+  if(!msgs.length){syncLolaStripAnimation();return;}
+  if(msgs.length<=1){
+    inner.className='no-scroll';
+    inner.innerHTML=msgs.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');
+    return;
+  }
+  const doubled=[...msgs,...msgs];
+  inner.innerHTML=doubled.map(m=>`<span class="lola-strip-msg"><span class="ls-tag">${m.tag}</span> ${m.msg}</span>`).join('');
+  const charCount=msgs.reduce((a,m)=>a+m.msg.length,0);
+  inner.style.animationDuration=Math.max(20,Math.min(55,charCount*0.18))+'s';
+  inner.className='scrolling';
+  if(G&&G.stripPaused) inner.style.animationPlayState='paused';
 }
 
 /* ── UI SYNC ── */
@@ -2733,6 +2746,7 @@ async function handleCorrect(s,ph,input){
     blank();
     renderStaticStep(next);
     setLola(lolaMessageForStep(next,ph));
+    setLolaStrip(next);
     syncObjCard();
     save();
   }
@@ -2795,6 +2809,7 @@ function continuePhaseStart(ph){
   if(s.jit&&!G.hard)showJIT(s.jit);
   if(s.bridge&&!G.hard)showBridge(s.bridge);
   setLola(lolaMessageForStep(s,ph,true));
+  setLolaStrip(s);
   syncObjCard();syncDots();
   telem(`Phase ${G.phase} started: ${ph.title}`);
 }
