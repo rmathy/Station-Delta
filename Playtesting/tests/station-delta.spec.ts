@@ -77,7 +77,7 @@ const OFFICER_SIMS = [
 const MOCK_AUTH = JSON.stringify({
   userId:       'playwright-test-user',
   email:        'test@stationdelta.dev',
-  tier:         'officer',
+  tier:         'ai_systems_pass',
   accessToken:  'mock-access-token',
   refreshToken: 'mock-refresh-token',
 });

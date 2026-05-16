@@ -670,7 +670,7 @@ input[type=text]:focus{border-color:var(--silver)}
 <div id="phase-modal" class="modal"><div class="mbox"><div class="mtitle">Phase Checkpoint</div><div class="msub" id="phase-modal-copy">Good stopping point. Your progress is already saved, so you can pause here and return when you are ready.</div><div class="boot-features" id="phase-modal-summary"></div><button class="mbtn mbtn-p" onclick="startPendingPhase()">Start Next Phase</button><button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">Pause Here</button></div></div>
 
 <script>/* early auth guard — fires before any CDN loads, avoids async timing issues */
-(function(){if(location.protocol==='file:')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');if(!s||!s.userId)location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));}catch(e){}})();
+(function(){if(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');var paid=['individual','fleet','bundle','ai_systems_bundle','officer_bundle','all_access','ai_systems_pass'];if(!s||!s.userId){location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));return;}if(paid.indexOf((s.tier||'').toLowerCase().trim())<0){location.replace('/auth.html?billing=ai_systems_pass&redirect='+encodeURIComponent(location.pathname+location.search));}}catch(e){}})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
