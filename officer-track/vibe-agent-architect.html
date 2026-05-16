@@ -669,6 +669,9 @@ input[type=text]:focus{border-color:var(--silver)}
 <div id="career-modal" class="modal"><div class="mbox"><div class="mtitle">📈 Career Impact Log</div><div class="msub">What these skills are worth in the real world.</div><div id="career-list"></div><div style="margin-top:14px"><button class="mbtn mbtn-s" onclick="closeModal('career-modal')">Close</button></div></div></div>
 <div id="phase-modal" class="modal"><div class="mbox"><div class="mtitle">Phase Checkpoint</div><div class="msub" id="phase-modal-copy">Good stopping point. Your progress is already saved, so you can pause here and return when you are ready.</div><div class="boot-features" id="phase-modal-summary"></div><button class="mbtn mbtn-p" onclick="startPendingPhase()">Start Next Phase</button><button class="mbtn mbtn-s" onclick="closeModal('phase-modal')">Pause Here</button></div></div>
 
+<script>/* early auth guard — fires before any CDN loads, avoids async timing issues */
+(function(){if(location.protocol==='file:')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');if(!s||!s.userId)location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));}catch(e){}})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════

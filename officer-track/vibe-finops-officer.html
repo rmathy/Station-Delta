@@ -658,6 +658,9 @@ input[type=text]:focus{border-color:var(--green)}
   </div>
 </div>
 
+<script>/* early auth guard — fires before any CDN loads, avoids async timing issues */
+(function(){if(location.protocol==='file:')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');if(!s||!s.userId)location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));}catch(e){}})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════

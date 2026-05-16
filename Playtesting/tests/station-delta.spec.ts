@@ -51,6 +51,9 @@ const BASE_SIMS = [
     url:             '/base/vibe-lieutenant.html',
     callsign:        'TestLieutenant',
     expectedBootText: 'VIBE LIEUTENANT v2.0',
+    // Lieutenant's boot animation writes to #output (main terminal), not #output-static.
+    // #output-static is used for the step context card (setStaticContext). Use #output here.
+    bootTextSelector: '#output',
     expectedPrompt:   'lt@stationdelta',
     bootBtnText:      /ACCEPT COMMISSION/i,
   },
@@ -130,7 +133,8 @@ for (const sim of BASE_SIMS) {
 for (const sim of BASE_SIMS) {
   test(`[${sim.name}] Boot identity — correct sim name and prompt prefix`, async ({ page }) => {
     const terminalInput = await bootSim(page, sim);
-    const staticOutput = page.locator('#output-static');
+    const outputSel = (sim as any).bootTextSelector ?? '#output-static';
+    const staticOutput = page.locator(outputSel);
     await expect(staticOutput).toContainText(
       new RegExp(sim.expectedBootText, 'i'),
       { timeout: LONG }
@@ -164,7 +168,10 @@ for (const sim of BASE_SIMS) {
     expect(ariaLabel, '#cmd missing aria-label').toBeTruthy();
   });
 
-  test(`[${sim.name}] Accessibility — keyboard navigation to boot button`, async ({ page }) => {
+  test(`[${sim.name}] Accessibility — keyboard navigation to boot button`, async ({ page, browserName }) => {
+    // Safari does not Tab-focus <button> elements by default (macOS/iOS system setting).
+    // This is a known platform behavior, not an accessibility defect in the sim.
+    test.skip(browserName === 'webkit', 'Safari skips button elements in Tab order by default');
     await page.goto(sim.url, { waitUntil: 'networkidle', timeout: LONG });
     const bootInput = page.locator('#boot-name');
     await bootInput.waitFor({ state: 'visible', timeout: SHORT });
