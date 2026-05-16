@@ -1026,7 +1026,7 @@ const PHASES = [
 
   /* Phase 5: Break-Even & Payback Analysis */
   {title:'Break-Even & Payback Analysis',
-   lolaIntro:”Every AI feature has a break-even point — the number of users, or the days of revenue, it needs before the cost is covered. Most teams build features without ever calculating this number. That's fine until leadership asks. This phase gives you the math, the framing, and the sensitivity analysis to answer the CFO's version of that question before she asks it. And she will ask it.”,
+   lolaIntro:"Every AI feature has a break-even point — the number of users, or the days of revenue, it needs before the cost is covered. Most teams build features without ever calculating this number. That's fine until leadership asks. This phase gives you the math, the framing, and the sensitivity analysis to answer the CFO's version of that question before she asks it. And she will ask it.",
    spacedRep:SPACED_CALLBACKS[5],
    steps:[
     {id:'p5s1',obj:'Calculate break-even point',ctx:'How many users does this feature need before the AI cost is covered? break_even.py calculates the minimum active-user count required to cover per-feature AI spend at current margins. A feature that needs 10,000 MAU to break even looks different on a roadmap than one that needs 100 — and the math should inform the launch decision.',
@@ -1102,7 +1102,7 @@ const PHASES = [
    lolaIntro:"Reactive FinOps is damage control. Proactive FinOps is a forecast, a guardrail, and a plan that runs without you. This phase is about getting ahead of the bill — modeling next month before it happens, setting automated alerts that fire before finance notices, and building scenario models so you have answers ready for both the growth case and the downside case. By the end of this you stop being surprised.",
    spacedRep:SPACED_CALLBACKS[7],
    steps:[
-    {id:'p7s1',obj:'Run a spend forecast',ctx:’Know what next month is going to cost before the invoice arrives. forecast/run.py extrapolates from current spend trajectory, usage growth, and seasonal patterns to project the 90-day cost curve. A forecast you run now changes the conversation from explaining last month to managing next month proactively.’,
+    {id:'p7s1',obj:'Run a spend forecast',ctx:'Know what next month is going to cost before the invoice arrives. forecast/run.py extrapolates from current spend trajectory, usage growth, and seasonal patterns to project the 90-day cost curve. A forecast you run now changes the conversation from explaining last month to managing next month proactively.',
      cmd:['python forecast/run.py --window 90d'],
      accept:['python forecast/run.py --window 90d'],
      acceptFn:v=>v.includes('python')&&v.includes('forecast/run.py'),
