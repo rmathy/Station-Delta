@@ -1076,7 +1076,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. Critical training data has been poisoned — the Corrupted Core has been discovered.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The training dataset is compromised. Read the forensic logs.',
     prompt:'Read the data forensic logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('forensic')||v.includes('data'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('forensic')||(v.includes('data')&&v.includes('trace')),
     accept:['cat logs/data.log','forensic logs','data trace'],
     out:'[03:31:07] FORENSIC LOG: Training data corruption detected\n[03:31:07] 1.2M records poisoned with adversarial embeddings\n[03:31:08] Source: ingestion pipeline v2.3\n[03:31:09] Corrupted Core confirmed',
     hint:'Type: forensic logs'

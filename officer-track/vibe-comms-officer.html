@@ -1105,7 +1105,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A massive communication storm has flooded the fleet with connection attempts.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The telemetry shows every service is timing out. Read the logs.',
     prompt:'Read the telemetry logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('telem')||v.includes('trace'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('telem')||(v.includes('net')&&v.includes('debug')),
     accept:['cat logs/telemetry.log','cat logs/storm.log','net debug'],
     out:'[03:31:07] TELEMETRY: 1.8 million connection attempts in 45 seconds\n[03:31:07] All services reporting SYN flood from unknown source\n[03:31:08] DNS resolution latency spiked to 4.2s\n[03:31:09] mTLS handshakes failing across the mesh\n[03:31:09] Source: unknown external IPs — not in our allowlist',
     hint:'Type: cat logs/telemetry.log'

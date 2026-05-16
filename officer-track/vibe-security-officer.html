@@ -1280,7 +1280,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. An unknown intrusion has triggered an emergency shutdown of her intelligence core. She was mid-incident.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The SIEM has fired an alert. Read the logs.',
     prompt:'Read the SIEM alert logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('siem')||v.includes('log'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('siem')||(v.includes('respond')&&v.includes('invest')),
     accept:['cat logs/siem.log','cat logs/alert.log','cat siem','respond investigate'],
     out:'[03:31:07] SIEM ALERT: Anomalous data access pattern\n[03:31:07] Account: svc-backup@shipfleet.io\n[03:31:07] Action: SELECT * FROM users — 180,000 rows\n[03:31:08] Action: SELECT * FROM payments — 94,000 rows\n[03:31:08] Volume: 2.4GB exported in 90 seconds\n[03:31:08] Source IP: 203.0.113.47 (unusual — normally 10.0.0.x)\n[03:31:09] ALERT: Service account accessed from external IP\n[03:31:09] Last known access from this IP: NEVER',
     hint:'Type: cat logs/siem.log'

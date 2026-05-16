@@ -1141,7 +1141,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. Multiple cascading failures have hit the fleet simultaneously — the Black Swan has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The logs show pod kills, network partitions, and AI hallucinations all at once. Read the logs.',
     prompt:'Read the chaos logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('forensic')||v.includes('chaos'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('forensic')||(v.includes('chaos')&&v.includes('observe')),
     accept:['cat logs/chaos.log','forensic logs','chaos observe'],
     out:'[03:31:07] CHAOS LOG: Multiple failures detected simultaneously\n[03:31:07] Pod kills + network partition + AI hallucination cascade\n[03:31:08] Blast radius expanding rapidly\n[03:31:09] Black Swan event confirmed',
     hint:'Type: forensic logs'

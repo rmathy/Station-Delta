@@ -1091,7 +1091,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. A bad image has triggered a cascade failure across the entire fleet.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The CI logs show every service is deploying the same broken image. Read the logs.',
     prompt:'Read the CI and deployment logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('log')||v.includes('forensic')||v.includes('trace'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('log'))||v.includes('forensic'),
     accept:['cat logs/ci.log','cat logs/deploy.log','forensic logs'],
     out:'[03:31:07] CI LOG: v2.4.0 pushed with failing health check\n[03:31:07] Every ArgoCD Application is syncing v2.4.0\n[03:31:08] 47 services now reporting 502 errors\n[03:31:09] Cascade in progress — traffic shifting failed',
     hint:'Type: forensic logs'

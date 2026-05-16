@@ -1076,7 +1076,7 @@ const BOSS_STEPS = [
     id:'boss1',
     scenario:'L.O.L.A. has gone offline. The AI bill has suddenly 10×’d overnight — the Cost Explosion has arrived.\n\nI — J.A.N.E.T. — have been asked to oversee your final assessment. I want to acknowledge that I did not request this role. However, I will fulfill it with appropriate thoroughness.\n\nSTEP 1 OF 5: The cost dashboard is red. Read the cost logs.',
     prompt:'Read the cost attribution logs.',
-    acceptFn:v=>v.includes('cat')&&v.includes('cost')||v.includes('cost')||v.includes('forensic'),
+    acceptFn:v=>(v.includes('cat')&&v.includes('cost'))||(v.includes('cost')&&v.includes('top'))||v.includes('forensic'),
     accept:['cat logs/cost.log','cost top','forensic logs'],
     out:'[03:31:07] COST LOG: $14,872 in the last hour — 10× normal rate\n[03:31:07] Top call: feature=chat, model=gpt-4o, tokens=2.4M\n[03:31:08] No caching detected\n[03:31:09] Cost explosion confirmed',
     hint:'Type: cost top'
