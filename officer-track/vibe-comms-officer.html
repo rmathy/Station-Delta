@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>(function(){if(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');if(!s||!s.userId){location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Communications Officer</title>
+<title>Station Delta: Comms Officer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Unbounded:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -539,7 +539,7 @@ input[type=text]:focus{border-color:var(--silver)}
 <div id="boot-modal" class="modal open">
   <div class="mbox">
     <div style="font-size:28px;margin-bottom:8px">📡</div>
-    <div class="mtitle" style="color:var(--silver);font-size:19px">Vibe Communications Officer</div>
+    <div class="mtitle" style="color:var(--silver);font-size:19px">Station Delta: Comms Officer</div>
     <div class="msub">The ship is live. Its systems need to communicate flawlessly. Ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, network debugging, secure tunnels, and resilient architectures — everything that keeps the fleet talking under fire.</div>
     <div class="boot-features">
       <span>▸</span>9 phases · real-world networking engineering<br>
@@ -582,11 +582,11 @@ input[type=text]:focus{border-color:var(--silver)}
   <div class="mbox">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">📡</div>
     <div class="mtitle" style="text-align:center;color:var(--silver)">Communications Certification</div>
-    <div class="msub" style="text-align:center">You completed all 9 phases of Vibe Communications Officer — including the boss fight. The fleet is connected.</div>
+    <div class="msub" style="text-align:center">You completed all 9 phases of Station Delta: Comms Officer — including the Blackout Incident. The fleet is connected.</div>
     <div class="grad-cert">
       <div class="grad-ct">Communications Certification</div>
       <div class="grad-name" id="grad-name">—</div>
-      <div class="grad-sub">Vibe Communications Officer · Class of 2026</div>
+      <div class="grad-sub">Station Delta: Comms Officer · Class of 2026</div>
     </div>
     <div class="skills-list">
       <span>✓</span>Ports, protocols, TCP/UDP, sockets, common ports<br>
@@ -1513,7 +1513,7 @@ function renderPlaybook(){
   const sec=document.getElementById('playbook-sec');sec.style.maxHeight='220px';
 }
 function exportPlaybook(){
-  const md=`# My Communications Playbook\n*Vibe Communications Officer — ${new Date().toLocaleDateString()}*\n\n`+
+  const md=`# My Communications Playbook\n*Station Delta: Comms Officer — ${new Date().toLocaleDateString()}*\n\n`+
     G.playbook.map(e=>`## ${e.phase}\n${e.note}`).join('\n\n');
   const ta=document.createElement('textarea');ta.value=md;ta.style.position='fixed';ta.style.opacity='0';
   document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
@@ -1797,7 +1797,7 @@ async function completeBossFight(){
   for(const s of steps){await delay(220);appendLine('  '+s,'ln-code')}
   await delay(500);blank();
   appendLine('📡 COMMUNICATIONS CERTIFICATION GRANTED','ln-success');
-  appendLine(`Officer ${G.name} — Vibe Communications Officer · Class of 2026`,'ln-success');
+  appendLine(`Officer ${G.name} — Station Delta: Comms Officer · Class of 2026`,'ln-success');
   blank();
   appendLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','ln-success');
   appendLine('      COMMUNICATIONS CERTIFICATION COMPLETE','ln-success');
@@ -1904,9 +1904,9 @@ function resumeSession(){
   syncDots();syncObjCard();$cmd.focus();
 }
 
-function doRestart(){if(confirm('Restart Vibe Communications Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
+function doRestart(){if(confirm('Restart Station Delta: Comms Officer from scratch?')){localStorage.removeItem(SAVE_KEY);location.reload()}}
 function shareGrad(){
-  const txt=`Just completed Vibe Communications Officer 📡\n\nAll 9 phases: ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, debugging, secure comms, and resilient design.\n\nFree training →`;
+  const txt=`Just completed Station Delta: Comms Officer 📡\n\nAll 9 phases: ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, debugging, secure comms, and resilient design.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
 }
 
