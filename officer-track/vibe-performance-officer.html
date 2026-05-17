@@ -599,7 +599,8 @@ input[type=text]:focus{border-color:var(--silver)}
       <span>✓</span>Live cost explosion containment and optimization
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="continueTrack()">CONTINUE TO CAPTAIN</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
@@ -1878,6 +1879,10 @@ function doRestart(){if(confirm('Restart Station Delta: Performance Officer from
 function shareGrad(){
   const txt=`Just completed Station Delta: Performance Officer 📈\n\nAll 9 phases: profiling, tracing, AI bottlenecks, query tuning, right-sizing, cost attribution, caching, load testing, and surviving the Cost Explosion.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+const NEXT_TRACK_URL = './vibe-captain.html';
+function continueTrack(){
+  window.location.href = NEXT_TRACK_URL;
 }
 
 /* ── STARTUP ── */

@@ -599,7 +599,8 @@ input[type=text]:focus{border-color:var(--silver)}
       <span>✓</span>Resilient zero-downtime deployment architecture
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="continueTrack()">CONTINUE TO COMMS OFFICER</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
@@ -1894,6 +1895,10 @@ function doRestart(){if(confirm('Restart Station Delta: Deployment Officer from 
 function shareGrad(){
   const txt=`Just completed Station Delta: Deployment Officer 🚀\n\nAll 9 phases: build pipelines, artifact management, GitOps, environments & secrets, blue-green & canary, IaC, multi-env promotion, deployment forensics, and surviving the cascade.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+const NEXT_TRACK_URL = './vibe-comms-officer.html';
+function continueTrack(){
+  window.location.href = NEXT_TRACK_URL;
 }
 
 /* ── STARTUP ── */

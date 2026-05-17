@@ -619,7 +619,8 @@ input[type=text]:focus{border-color:var(--silver)}
       <span>✓</span>Full chaos resilience under live pressure
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="continueTrack()">CONTINUE TO SECURITY OFFICER</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
@@ -2066,6 +2067,10 @@ function confirmRestart(){closeModal('restart-modal');localStorage.removeItem(SA
 function shareGrad(){
   const txt=`Just completed Station Delta: Chaos Officer 💥\n\nAll 9 phases: chaos fundamentals, failure injection, blast radius mapping, resilience patterns, game days, advanced fault injection, recovery automation, post-mortem mastery, and surviving the Black Swan.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+const NEXT_TRACK_URL = './vibe-security-officer.html';
+function continueTrack(){
+  window.location.href = NEXT_TRACK_URL;
 }
 
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m && m.id!=='boot-modal'){closeModal(m.id);}}));

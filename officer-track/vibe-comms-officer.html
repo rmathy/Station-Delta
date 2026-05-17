@@ -600,7 +600,8 @@ input[type=text]:focus{border-color:var(--silver)}
       <span>✓</span>High-availability patterns, retries, backpressure, observability
     </div>
     <div style="text-align:center">
-      <button class="mbtn mbtn-p" onclick="shareGrad()">SHARE ON X</button>
+      <button class="mbtn mbtn-p" onclick="continueTrack()">CONTINUE TO CAPTAIN</button>
+      <button class="mbtn mbtn-s" onclick="shareGrad()">SHARE ON X</button>
       <button class="mbtn mbtn-s" onclick="doRestart()">REPLAY</button>
     </div>
     <div style="margin-top:12px;text-align:center;font-size:11px;color:var(--muted)">Final score: <span id="final-score" style="color:var(--silver)">—</span></div>
@@ -1908,6 +1909,10 @@ function doRestart(){if(confirm('Restart Station Delta: Comms Officer from scrat
 function shareGrad(){
   const txt=`Just completed Station Delta: Comms Officer 📡\n\nAll 9 phases: ports & protocols, HTTP/HTTPS, DNS, firewalls, load balancing, service discovery, debugging, secure comms, and resilient design.\n\nFree training →`;
   window.open('https://x.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');closeModal('grad-modal');
+}
+const NEXT_TRACK_URL = './vibe-captain.html';
+function continueTrack(){
+  window.location.href = NEXT_TRACK_URL;
 }
 
 /* ── STARTUP ── */
