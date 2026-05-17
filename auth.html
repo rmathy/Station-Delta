@@ -460,6 +460,13 @@ button:hover{transform:translateY(-1px)}
       <ul class="entitlement-list" id="entitlementList"></ul>
     </div>
 
+    <div id="successPanel" style="display:none;margin-top:20px;padding:18px 20px;border:1px solid rgba(0,255,136,.3);border-radius:5px;background:rgba(0,255,136,.04)">
+      <div style="font-family:var(--display,monospace);font-size:16px;letter-spacing:.06em;color:#00ff88;margin-bottom:8px">✓ Access Confirmed</div>
+      <p style="font-size:13px;color:var(--muted2,#999);margin:0 0 14px">Your simulations are unlocked and ready. Choose one to begin:</p>
+      <div id="successSimList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <a href="/" style="display:inline-block;margin-top:14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2,#999);text-decoration:none">← Back to Station Delta</a>
+    </div>
+
     <div class="form">
       <div class="field">
         <label for="email">Email</label>
@@ -768,19 +775,76 @@ function hasPaidTrackAccess(tier) {
     'ai_systems_bundle',
     'officer_bundle',
     'all_access',
-    'ai_systems_pass'
+    'ai_systems_pass',
+    'officer_pass',
+    'security_bundle',
+    'platform_bundle',
+    'data_bundle'
   ].includes(String(tier || '').toLowerCase().trim());
+}
+
+function getSimsForTier(tier) {
+  const t = String(tier || '').toLowerCase().trim();
+  if (t === 'security_bundle') return [
+    {name:'Chaos Officer', url:'/officer-track/vibe-chaos-officer.html'},
+    {name:'Security Officer', url:'/officer-track/vibe-security-officer.html'},
+    {name:'Systems Integrity', url:'/officer-track/vibe-systems-integrity.html'},
+    {name:'Station Delta: Captain', url:'/officer-track/vibe-captain.html'},
+  ];
+  if (t === 'platform_bundle') return [
+    {name:'Deployment Officer', url:'/officer-track/vibe-deployment-officer.html'},
+    {name:'Comms Officer', url:'/officer-track/vibe-comms-officer.html'},
+    {name:'Performance Officer', url:'/officer-track/vibe-performance-officer.html'},
+    {name:'Station Delta: Captain', url:'/officer-track/vibe-captain.html'},
+  ];
+  if (t === 'ai_systems_bundle') return [
+    {name:'Agent Architect', url:'/officer-track/vibe-agent-architect.html'},
+    {name:'Systems Integrity', url:'/officer-track/vibe-systems-integrity.html'},
+    {name:'FinOps Officer', url:'/officer-track/vibe-finops-officer.html'},
+    {name:'Station Delta: Captain', url:'/officer-track/vibe-captain.html'},
+  ];
+  if (t === 'data_bundle') return [
+    {name:'Data Officer', url:'/officer-track/vibe-data-officer.html'},
+    {name:'Performance Officer', url:'/officer-track/vibe-performance-officer.html'},
+    {name:'FinOps Officer', url:'/officer-track/vibe-finops-officer.html'},
+    {name:'Station Delta: Captain', url:'/officer-track/vibe-captain.html'},
+  ];
+  // Officer Pass or legacy tiers — all 10
+  return [
+    {name:'Agent Architect', url:'/officer-track/vibe-agent-architect.html'},
+    {name:'FinOps Officer', url:'/officer-track/vibe-finops-officer.html'},
+    {name:'Systems Integrity', url:'/officer-track/vibe-systems-integrity.html'},
+    {name:'Chaos Officer', url:'/officer-track/vibe-chaos-officer.html'},
+    {name:'Deployment Officer', url:'/officer-track/vibe-deployment-officer.html'},
+    {name:'Performance Officer', url:'/officer-track/vibe-performance-officer.html'},
+    {name:'Security Officer', url:'/officer-track/vibe-security-officer.html'},
+    {name:'Comms Officer', url:'/officer-track/vibe-comms-officer.html'},
+    {name:'Data Officer', url:'/officer-track/vibe-data-officer.html'},
+    {name:'Station Delta: Captain', url:'/officer-track/vibe-captain.html'},
+  ];
 }
 
 function getTierDetails(tier) {
   if (hasPaidTrackAccess(tier)) {
+    const t = String(tier || '').toLowerCase().trim();
+    const isBundle = t.endsWith('_bundle');
+    const trackLabel = {
+      security_bundle: 'Security & Reliability',
+      platform_bundle: 'Platform & Delivery',
+      ai_systems_bundle: 'AI Systems',
+      data_bundle: 'Data & Intelligence',
+    }[t] || 'Officer Pass';
+    const sims = getSimsForTier(tier);
+    const simNames = sims.map(s => s.name).join(', ');
     return {
-      label: tier === 'fleet' ? 'Fleet' : 'Paid',
-      pill: tier === 'fleet' ? 'Fleet Access' : 'Officer Track Unlocked',
-      copy: 'Paid access detected. Officer-track simulations and premium modules are unlocked and ready.',
+      label: t === 'fleet' ? 'Fleet' : isBundle ? trackLabel + ' Bundle' : 'Officer Pass',
+      pill: t === 'fleet' ? 'Fleet Access' : 'Officer Access Unlocked',
+      copy: isBundle
+        ? `${trackLabel} track unlocked. Your simulations are ready to begin.`
+        : 'Officer Pass active. All 10 officer-track simulations are unlocked and ready.',
       items: [
         ['Cadet, Engineer, Lieutenant', 'free'],
-        ['Agent Architect, Systems Integrity, FinOps Officer, Captain', 'paid'],
+        [simNames, 'paid'],
         ['Cloud saves and returning-member continuity', 'paid']
       ]
     };
@@ -1222,6 +1286,24 @@ function bindAuthStateListener() {
 bindAuthStateListener();
 setTimeout(bindAuthStateListener, 250);
 setTimeout(bindAuthStateListener, 1000);
+
+// Show success panel when returning from Stripe checkout
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('billing') === 'success') {
+    const plan = params.get('plan') || 'ai_systems_pass';
+    const panel = document.getElementById('successPanel');
+    const list = document.getElementById('successSimList');
+    if (!panel || !list) return;
+    const sims = getSimsForTier(plan);
+    list.innerHTML = sims.map(s =>
+      `<a href="${s.url}" style="display:block;padding:10px 14px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:3px;font-size:13px;font-weight:600;color:#00ff88;text-decoration:none;letter-spacing:.03em">${s.name} →</a>`
+    ).join('');
+    panel.style.display = 'block';
+    // Scroll to success panel
+    setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+  }
+})();
 
 refreshSession().catch((error) => {
   setMessage('err', 'Initialization failed. ' + error.message);
