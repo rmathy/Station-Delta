@@ -498,6 +498,10 @@ button:hover{transform:translateY(-1px)}
         <button class="btn-secondary" id="upgradeBtn" type="button" hidden onclick="window.runUpgradeToPaid && window.runUpgradeToPaid()">Unlock Officer Pass — $19/month</button>
       </div>
 
+      <div class="ghost-row" id="enterSimsRow" style="display:none">
+        <a href="/" class="btn-primary" id="enterSimsBtn" style="text-align:center;text-decoration:none">Enter Your Sims →</a>
+      </div>
+
       <div class="message" id="messageBox">
         Enter free with Cadet and Engineer. Create a free account to unlock Lieutenant, keep your progress, and continue into Security, Platform, AI Systems, and Data when you are ready.
       </div>
@@ -892,6 +896,12 @@ function renderState() {
     if (showUpgrade) {
       els.upgradeBtn.textContent = 'Unlock Officer Pass — $19/month';
     }
+  }
+
+  const enterRow = document.getElementById('enterSimsRow');
+  if (enterRow) {
+    const hasPaid = hasPaidTrackAccess(state.tier);
+    enterRow.style.display = hasPaid ? 'flex' : 'none';
   }
 }
 
