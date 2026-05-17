@@ -1558,6 +1558,49 @@ document.addEventListener("keydown", (e) => {
 document.getElementById("waitlist-modal").addEventListener("click", (e) => {
   if (e.target.id === "waitlist-modal") closeWaitlistModal();
 });
+
+// Auth-aware sim cards: upgrade "Unlock" buttons to "Launch →" for paid users
+(function(){
+  try {
+    var snap = JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');
+    if (!snap||!snap.userId) return;
+    var tier = (snap.tier||'').toLowerCase().trim();
+    var allAccess = ['individual','fleet','bundle','ai_systems_bundle','officer_bundle','all_access','ai_systems_pass','officer_pass'].indexOf(tier)>=0;
+    var bundleMap = {
+      security_bundle:  ['Chaos Officer','Security Officer','Systems Integrity','Station Delta: Captain'],
+      platform_bundle:  ['Deployment Officer','Comms Officer','Performance Officer','Station Delta: Captain'],
+      ai_systems_bundle:['Agent Architect','Systems Integrity','FinOps Officer','Station Delta: Captain'],
+      data_bundle:      ['Data Officer','Performance Officer','FinOps Officer','Station Delta: Captain'],
+    };
+    var urlMap = {
+      'Agent Architect':          '/officer-track/vibe-agent-architect.html',
+      'Chaos Officer':            '/officer-track/vibe-chaos-officer.html',
+      'Data Officer':             '/officer-track/vibe-data-officer.html',
+      'Deployment Officer':       '/officer-track/vibe-deployment-officer.html',
+      'FinOps Officer':           '/officer-track/vibe-finops-officer.html',
+      'Performance Officer':      '/officer-track/vibe-performance-officer.html',
+      'Comms Officer':            '/officer-track/vibe-comms-officer.html',
+      'Security Officer':         '/officer-track/vibe-security-officer.html',
+      'Systems Integrity':        '/officer-track/vibe-systems-integrity.html',
+      'Station Delta: Captain':   '/officer-track/vibe-captain.html',
+    };
+    var accessible = allAccess ? Object.keys(urlMap) : (bundleMap[tier]||[]);
+    if (!accessible.length) return;
+    document.querySelectorAll('.sim-card').forEach(function(card){
+      var titleEl = card.querySelector('.sim-title');
+      if (!titleEl) return;
+      var name = titleEl.textContent.trim();
+      if (accessible.indexOf(name)<0) return;
+      var url = urlMap[name];
+      if (!url) return;
+      var btn = card.querySelector('.sim-launch');
+      if (!btn) return;
+      btn.href = url;
+      btn.textContent = 'Launch →';
+      btn.className = 'sim-launch launch-free';
+    });
+  } catch(e) {}
+})();
 </script>
 
 </body>
