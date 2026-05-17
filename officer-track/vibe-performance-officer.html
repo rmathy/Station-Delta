@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<script>(function(){if(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');var paid=['individual','fleet','bundle','ai_systems_bundle','officer_bundle','all_access','ai_systems_pass'];if(!s||!s.userId){location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));return;}if(paid.indexOf((s.tier||'').toLowerCase().trim())<0){location.replace('/auth.html?billing=ai_systems_pass&redirect='+encodeURIComponent(location.pathname+location.search));}}catch(e){}})();</script>
+<script>(function(){if(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;try{var s=JSON.parse(localStorage.getItem('station_delta_local_auth')||'null');var paid=['individual','fleet','bundle','ai_systems_bundle','officer_bundle','all_access','ai_systems_pass','officer_pass','platform_bundle','data_bundle'];if(!s||!s.userId){location.replace('/auth.html?redirect='+encodeURIComponent(location.pathname+location.search));return;}if(paid.indexOf((s.tier||'').toLowerCase().trim())<0){location.replace('/auth.html?billing=officer_pass&redirect='+encodeURIComponent(location.pathname+location.search));}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Station Delta: Performance Officer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">

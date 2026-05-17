@@ -937,8 +937,8 @@ function applyOfficerAccessState(){
   const note=document.getElementById('boot-access-note');
   if(!enterBtn || !note) return;
   if(isFileProtocol()){ note.textContent='Local build mode. Hosted Station Delta will require a paid officer-track account for Captain.'; return; }
-  if(!G.userId){ enterBtn.textContent='SIGN IN FOR AI SYSTEMS ACCESS'; enterBtn.onclick=goToAuthGate; note.textContent='Captain is currently unlocked through the paid AI Systems track. Sign in to verify your Station Delta access.'; return; }
-  if(!G.isPaid){ enterBtn.textContent='UNLOCK AI SYSTEMS TRACK'; enterBtn.onclick=goToBillingCheckout; note.textContent='Your account is active, but Captain currently requires paid AI Systems access. Upgrade to take command.'; return; }
+  if(!G.userId){ enterBtn.textContent='SIGN IN FOR OFFICER ACCESS'; enterBtn.onclick=goToAuthGate; note.textContent='Captain is currently unlocked through the paid Officer Pass. Sign in to verify your Station Delta access.'; return; }
+  if(!G.isPaid){ enterBtn.textContent='UNLOCK OFFICER PASS'; enterBtn.onclick=goToBillingCheckout; note.textContent='Your account is active, but Captain currently requires paid Officer Pass access. Upgrade to take command.'; return; }
   enterBtn.textContent='TAKE COMMAND'; enterBtn.onclick=startAcademy; note.textContent='Officer-track access confirmed. Captain is the summit of the Station Delta ladder.';
 }
 function syncBootModalState(){
@@ -947,7 +947,7 @@ function syncBootModalState(){
   const hasProgress=(G.name!=='Captain'&&(G.phase>1||G.completedPhases.length>0)) || G.sandbox || G.bossActive || G.capstoneActive;
   if(hasProgress){ title.textContent=`Welcome back, Captain ${G.name}`; sub.textContent=`Phase ${G.phase} of ${PHASES.length-1}. Resume?`; primary.textContent='RESUME'; primary.onclick=resumeSession; secondary.textContent='Start Over'; secondary.onclick=doRestart; }
   else { title.innerHTML=`Station Delta:<span class="modal-sub-title">Captain</span>`; sub.textContent='The command track for staff-plus engineering judgment: architecture, scaling, reliability, AI orchestration, mentoring, stakeholder leadership, and incident command under pressure.'; primary.textContent='TAKE COMMAND'; primary.onclick=startAcademy; secondary.textContent='Reset Save'; secondary.onclick=doRestart; }
-  if(!hasProgress) applyOfficerAccessState(); else if(!isFileProtocol() && !G.isPaid){ primary.textContent='UNLOCK AI SYSTEMS TRACK'; primary.onclick=goToBillingCheckout; }
+  if(!hasProgress) applyOfficerAccessState(); else if(!isFileProtocol() && !G.isPaid){ primary.textContent='UNLOCK OFFICER PASS'; primary.onclick=goToBillingCheckout; }
 }
 async function initSupabaseAuthClient(){
   if(!window.supabase?.createClient){ const snapshot=readLocalAuthSnapshot(); if(snapshot?.userId){ G.userId=snapshot.userId; G.userEmail=snapshot.email||null; G.isPaid=hasOfficerAccessTier(snapshot.tier); G.paidTierChecked=true; save(); } applyOfficerAccessState(); return; }
@@ -989,7 +989,10 @@ function hasOfficerAccessTier(tier){
     'officer_bundle',
     'all_access',
     'ai_systems_pass'
-  ].includes(normalized);
+  ,
+    'security_bundle',
+    'platform_bundle',
+    'data_bundle'].includes(normalized);
 }
 
 /* ── J.A.N.E.T. PERSONALITY LINES ── */

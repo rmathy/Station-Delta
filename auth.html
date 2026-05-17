@@ -488,7 +488,7 @@ button:hover{transform:translateY(-1px)}
       </div>
 
       <div class="ghost-row">
-        <button class="btn-secondary" id="upgradeBtn" type="button" hidden onclick="window.runUpgradeToPaid && window.runUpgradeToPaid()">Unlock AI Systems Track — $19/month</button>
+        <button class="btn-secondary" id="upgradeBtn" type="button" hidden onclick="window.runUpgradeToPaid && window.runUpgradeToPaid()">Unlock Officer Pass — $19/month</button>
       </div>
 
       <div class="message" id="messageBox">
@@ -826,7 +826,7 @@ function renderState() {
     const showUpgrade = Boolean(state.session?.user?.id) && state.tier === 'free';
     els.upgradeBtn.hidden = !showUpgrade;
     if (showUpgrade) {
-      els.upgradeBtn.textContent = 'Unlock AI Systems Track — $19/month';
+      els.upgradeBtn.textContent = 'Unlock Officer Pass — $19/month';
     }
   }
 }
@@ -841,7 +841,7 @@ function getCheckoutUrl(planOverride = null) {
 
 function runUpgradeToPaid(planOverride = null) {
   if (!state.session?.user?.id) {
-    setMessage('err', 'Sign in first, then unlock the AI Systems Track.');
+    setMessage('err', 'Sign in first, then unlock the Officer Pass.');
     return;
   }
   window.location.href = getCheckoutUrl(planOverride);

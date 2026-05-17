@@ -29,14 +29,44 @@ function getPlanCatalog() {
     ai_systems_pass: {
       plan: "ai_systems_pass",
       priceEnv: "STRIPE_PRICE_AI_SYSTEMS_PASS",
+      mode: "subscription",
       tier: "ai_systems_pass",
-      label: "Station Delta: AI Systems Track",
+      label: "Station Delta: Officer Pass",
     },
     fleet: {
       plan: "fleet",
       priceEnv: "STRIPE_PRICE_FLEET",
+      mode: "subscription",
       tier: "fleet",
-      label: "Station Delta: AI Systems Fleet",
+      label: "Station Delta: Fleet",
+    },
+    security_bundle: {
+      plan: "security_bundle",
+      priceEnv: "STRIPE_PRICE_SECURITY_BUNDLE",
+      mode: "payment",
+      tier: "security_bundle",
+      label: "Station Delta: Security & Reliability Bundle",
+    },
+    platform_bundle: {
+      plan: "platform_bundle",
+      priceEnv: "STRIPE_PRICE_PLATFORM_BUNDLE",
+      mode: "payment",
+      tier: "platform_bundle",
+      label: "Station Delta: Platform & Delivery Bundle",
+    },
+    ai_systems_bundle: {
+      plan: "ai_systems_bundle",
+      priceEnv: "STRIPE_PRICE_AI_SYSTEMS_BUNDLE",
+      mode: "payment",
+      tier: "ai_systems_bundle",
+      label: "Station Delta: AI Systems Bundle",
+    },
+    data_bundle: {
+      plan: "data_bundle",
+      priceEnv: "STRIPE_PRICE_DATA_BUNDLE",
+      mode: "payment",
+      tier: "data_bundle",
+      label: "Station Delta: Data & Intelligence Bundle",
     },
   };
 }

@@ -6,10 +6,32 @@ const {
   syncProfileFromSubscription,
   updateProfileByUserId,
   findProfileByStripeCustomerId,
+  findProfileByEmail,
   requireEnv,
 } = require("./_stripe-billing");
 
 async function handleCheckoutCompleted(session) {
+  // One-time payment (bundle purchase)
+  if (session.mode === "payment") {
+    const tier = session.metadata?.access_tier;
+    if (!tier) return { ok: true, ignored: true, reason: "payment_missing_tier" };
+
+    const userId = session.client_reference_id || session.metadata?.user_id || null;
+    const email = session.customer_details?.email || null;
+    const profile = !userId && email ? await findProfileByEmail(email) : null;
+    const resolvedId = userId || profile?.id || null;
+
+    if (!resolvedId) return { ok: false, reason: "missing_user_id_for_bundle" };
+
+    await updateProfileByUserId(resolvedId, {
+      subscription_tier: tier,
+      stripe_customer_id: session.customer || null,
+    });
+
+    return { ok: true, userId: resolvedId, nextTier: tier };
+  }
+
+  // Subscription checkout
   if (session.mode !== "subscription" || !session.subscription) {
     return { ok: true, ignored: true, reason: "not_subscription_checkout" };
   }

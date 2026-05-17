@@ -53,8 +53,9 @@ module.exports = async function handler(req, res) {
       body.cancelUrl ||
       `${origin}/auth.html?billing=cancelled&plan=${encodeURIComponent(plan.plan)}`;
 
+    const isOneTime = plan.mode === "payment";
     const form = new URLSearchParams();
-    form.set("mode", "subscription");
+    form.set("mode", isOneTime ? "payment" : "subscription");
     form.set("success_url", successUrl);
     form.set("cancel_url", cancelUrl);
     form.set("allow_promotion_codes", "true");
@@ -65,9 +66,11 @@ module.exports = async function handler(req, res) {
     form.set("metadata[user_id]", userId);
     form.set("metadata[plan]", plan.plan);
     form.set("metadata[access_tier]", plan.tier);
-    form.set("subscription_data[metadata][user_id]", userId);
-    form.set("subscription_data[metadata][plan]", plan.plan);
-    form.set("subscription_data[metadata][access_tier]", plan.tier);
+    if (!isOneTime) {
+      form.set("subscription_data[metadata][user_id]", userId);
+      form.set("subscription_data[metadata][plan]", plan.plan);
+      form.set("subscription_data[metadata][access_tier]", plan.tier);
+    }
 
     if (email) {
       form.set("customer_email", email);
